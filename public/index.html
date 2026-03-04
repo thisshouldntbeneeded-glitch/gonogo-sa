@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoNoGo SA — South Africa's Independent Brand Ratings</title>
+<meta name="description" content="Compare South African brands using an easy, consistent 100-point score. 13 industries, 99 brands rated.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Styles -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="header-left">
+      <a class="logo-link" onclick="navigateHome()" aria-label="GoNoGo Home">
+        <img src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng" alt="GoNoGo" loading="eager">
+      </a>
+      <span class="sa-badge">
+        <span>South Africa</span>
+      </span>
+    </div>
+    <div class="header-right">
+      <button class="back-btn" id="backBtn" onclick="navigateHome()">
+        <i class="fas fa-arrow-left"></i> Back to Categories
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MAIN CONTENT ============ -->
+<main>
+
+  <!-- === HOMEPAGE SECTIONS === -->
+  <div id="homeView">
+
+    <!-- HERO -->
+    <section class="hero" id="heroSection">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content">
+            <h1 class="hero-heading">Compare brands using an easy, consistent 100&#8209;point&nbsp;score</h1>
+            <p class="hero-subtitle">We use a six-category framework to assess the full customer experience, covering areas such as compliance, support, value and innovation. Allowing you to quickly see whether the brand is a Go or a No&nbsp;Go.</p>
+            <div class="hero-pills">
+              <span class="hero-pill"><i class="fas fa-check"></i> 6 categories, 100 points</span>
+              <span class="hero-pill"><i class="fas fa-check"></i> Same framework across industries</span>
+              <span class="hero-pill"><i class="fas fa-check"></i> Transparent scores, no star guessing</span>
+            </div>
+            <div class="hero-ctas">
+              <a class="btn-primary" href="#methodologySection">See how the 100-point score works <span aria-hidden="true">→</span></a>
+              <a class="btn-secondary" href="#categoriesSection">Or jump straight to categories</a>
+            </div>
+            <p class="hero-disclaimer">Disclaimer — We may earn a small commission for purchases made through links on this page, at no extra cost to you.</p>
+          </div>
+          <div class="hero-image-wrapper">
+            <img class="hero-image" src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/5436f273-518b-4a0a-81b2-105db9b2f8c6/pexels-polina-tankilevitch-7382473.jpg?content-type=image%2Fjpeg" alt="Woman browsing brands on phone" loading="eager">
+            <div class="hero-score-card">
+              <div class="score-circle go">93</div>
+              <div>
+                <div class="hero-score-label">TymeBank</div>
+                <div class="hero-score-sub">Top rated in Banking</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METHODOLOGY -->
+    <section class="methodology section" id="methodologySection">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">The GoNoGo 100-Point Framework</h2>
+          <p class="section-subtitle">At GoNoGo, the 100-point score is the consistent language used to judge every brand, regardless of industry. Each score is built from the same six categories so you can confidently compare like-for-like.</p>
+        </div>
+        <div class="methodology-grid" id="methodologyGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="section" id="categoriesSection">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Browse Categories</h2>
+          <p class="section-subtitle" id="categoriesCount"></p>
+        </div>
+        <div class="categories-grid" id="categoriesGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- === CATEGORY DETAIL VIEW === -->
+  <div class="category-view section" id="categoryView">
+    <div class="container">
+      <div class="category-view-header" id="categoryViewHeader">
+        <!-- Populated by JS -->
+      </div>
+      <div class="category-prefs" id="categoryPrefs">
+        <!-- Preference pills appear here in category view -->
+      </div>
+      <div class="brand-list" id="brandList">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modalPanel">
+    <div class="modal-header" id="modalHeader">
+      <!-- Populated by JS -->
+    </div>
+    <div class="modal-tabs" id="modalTabs">
+      <button class="modal-tab active" data-tab="framework">Framework Breakdown</button>
+      <button class="modal-tab" data-tab="features">Features &amp; Pricing</button>
+      <button class="modal-tab" data-tab="strengths">Strengths &amp; Concerns</button>
+      <button class="modal-tab" data-tab="reviews">Reviews</button>
+    </div>
+    <div class="modal-body">
+      <div class="tab-content active" id="tabFramework"></div>
+      <div class="tab-content" id="tabFeatures"></div>
+      <div class="tab-content" id="tabStrengths"></div>
+      <div class="tab-content" id="tabReviews"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng" alt="GoNoGo" loading="lazy">
+        <p class="footer-tagline">South Africa's Independent Brand Ratings</p>
+      </div>
+      <nav class="footer-links">
+        <a href="#methodologySection">Methodology</a>
+        <a href="#heroSection">About GoNoGo</a>
+        <a href="mailto:contact@gonogo.co.za">Contact</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 GoNoGo Ratings and Reviews Ltd</span>
+      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
