@@ -222,7 +222,7 @@ const Components = {
 
     // Shorten labels for radar
     const shortLabels = labels.map(l => {
-      if (l.length > 18) return l.substring(0, 16) + '…';
+      if (l.length > 18) return l.substring(0, 16) + '\u2026';
       return l;
     });
 
@@ -312,7 +312,7 @@ const Components = {
       return cs ? Math.round((cs.score / cs.max) * 100) : 0;
     });
 
-    const shortLabels = allLabels.map(l => l.length > 18 ? l.substring(0, 16) + '…' : l);
+    const shortLabels = allLabels.map(l => l.length > 18 ? l.substring(0, 16) + '\u2026' : l);
     const color1 = '#11a551';
     const color2 = '#ff9800';
 
