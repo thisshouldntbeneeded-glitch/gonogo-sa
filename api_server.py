@@ -1,529 +1,528 @@
 #!/usr/bin/env python3
-"""GoNoGo SA — Unified API Server (FastAPI + SQLite)
-
-Endpoints:
-  GET  /api/brands                            → all brands grouped by category
-  GET  /api/brands/:slug                      → brands in a category
-  GET  /api/brand/:id                         → single brand detail
-  GET  /api/categories                        → all categories
-  GET  /api/top-brands?count=6                → top N brands by score
-  GET  /api/stats                             → overall stats (brand count, category count)
-
-  GET  /api/reviews?brand={name}&category={slug} → reviews for a brand
-  GET  /api/reviews/all                       → all reviews (admin)
-  POST /api/reviews                           → submit a new review
-
-  POST /api/admin/brand                       → add or update a brand
-  GET  /api/health                            → health check
+"""
+GoNoGo SA — API Server (Google Sheets Edition)
+Reads brand data from pre-generated JSON files (synced from Google Sheets).
+Reviews are stored in JSON files and synced to/from Google Sheets via cron.
+No SQLite dependency — all persistent data lives in Google Sheets.
 """
 
-import sqlite3
 import json
-import uuid
 import os
-import re
-from datetime import datetime, timezone
+import uuid
+import asyncio
+from datetime import datetime
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel
+from typing import Optional
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gonogo_sa.db")
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+from research_engine import research_brand, apply_research_to_brand
 
+# Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+API_DATA_DIR = os.path.join(BASE_DIR, 'api_data')
+REVIEWS_FILE = os.path.join(API_DATA_DIR, 'reviews.json')
 
-# ============================================================
-# DATABASE SETUP
-# ============================================================
-def get_db():
-    db = sqlite3.connect(DB_PATH, check_same_thread=False)
-    db.row_factory = sqlite3.Row
-    db.execute("PRAGMA journal_mode=WAL")
-    return db
+# In-memory cache
+brand_cache = {}
+reviews_cache = []
 
 
-def init_db(db):
-    # Reviews table
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS reviews (
-            id TEXT PRIMARY KEY,
-            category TEXT NOT NULL,
-            brand_name TEXT NOT NULL,
-            reviewer_name TEXT NOT NULL,
-            compliance INTEGER DEFAULT 0,
-            customer_satisfaction INTEGER DEFAULT 0,
-            product_value INTEGER DEFAULT 0,
-            innovation INTEGER DEFAULT 0,
-            customer_support INTEGER DEFAULT 0,
-            accessibility_security INTEGER DEFAULT 0,
-            average_score REAL DEFAULT 0,
-            review_text TEXT DEFAULT '',
-            status TEXT DEFAULT 'pending',
-            created_at TEXT NOT NULL,
-            timestamp_epoch INTEGER NOT NULL
-        )
-    """)
-    db.execute("""
-        CREATE INDEX IF NOT EXISTS idx_reviews_brand
-        ON reviews(category, brand_name)
-    """)
-    db.commit()
+def load_json(filename):
+    """Load a JSON file from api_data directory."""
+    filepath = os.path.join(API_DATA_DIR, filename)
+    if os.path.exists(filepath):
+        with open(filepath) as f:
+            return json.load(f)
+    return None
 
 
-db = get_db()
-init_db(db)
+def save_reviews():
+    """Save reviews to JSON file (will be synced to Google Sheets by cron)."""
+    os.makedirs(API_DATA_DIR, exist_ok=True)
+    with open(REVIEWS_FILE, 'w') as f:
+        json.dump(reviews_cache, f, ensure_ascii=False, indent=2)
 
 
-# ============================================================
-# BRAND DATA — LOADED FROM JS FILES AT STARTUP
-# ============================================================
-def load_brand_data():
-    """Parse the static JS data files and return structured brand data."""
-    all_data = []
+def load_all_data():
+    """Load all pre-generated API data into memory."""
+    global brand_cache, reviews_cache
 
-    # Read and parse each data_part file
-    for part in ["A", "B", "C", "D", "E", "F"]:
-        filepath = os.path.join(DATA_DIR, f"data_part{part}.js")
-        if not os.path.exists(filepath):
-            continue
+    brand_cache['categories'] = load_json('categories.json') or []
+    brand_cache['brands'] = load_json('brands.json') or []
+    brand_cache['stats'] = load_json('stats.json') or {}
+    brand_cache['top_brands'] = load_json('top_brands.json') or []
 
-        with open(filepath, "r") as f:
-            content = f.read()
+    # Load per-category brand lists
+    for cat in brand_cache['categories']:
+        cat_brands = load_json(f"brands_{cat['id']}.json")
+        if cat_brands:
+            brand_cache[f"brands_{cat['id']}"] = cat_brands
 
-        # Extract the JSON array from the JS variable assignment
-        # Format: var BRAND_DATA_PARTX = [...];
-        match = re.search(r"=\s*(\[[\s\S]*\])\s*;?\s*$", content)
-        if match:
-            try:
-                parsed = json.loads(match.group(1))
-                all_data.extend(parsed)
-            except json.JSONDecodeError as e:
-                print(f"Warning: Could not parse {filepath}: {e}")
+    # Load reviews
+    raw_reviews = load_json('reviews.json')
+    if raw_reviews:
+        reviews_cache = raw_reviews
+    else:
+        reviews_cache = []
 
-    return all_data
+    print(f"Loaded: {len(brand_cache['brands'])} brands, {len(brand_cache['categories'])} categories, {len(reviews_cache)} reviews")
 
 
-def slugify(name):
-    return re.sub(r"(^-|-$)", "", re.sub(r"[^a-z0-9]+", "-", name.lower()))
-
-
-def normalize_brand(brand, category):
-    """Convert a brand from the JS data format to a flat API-friendly format."""
-    category_scores = {}
-    for fb in brand.get("framework_breakdown", []):
-        parts = fb["score"].split("/")
-        score = float(parts[0])
-        max_val = float(parts[1])
-        category_scores[fb["category"]] = {
-            "score": score,
-            "max": max_val,
-            "description": fb.get("description", ""),
-        }
-
-    gp_raw = (brand.get("app_ratings") or {}).get("google_play", "N/A")
-    ios_raw = (brand.get("app_ratings") or {}).get("ios", "N/A")
-
-    try:
-        gp_score = float(gp_raw.replace("/5", ""))
-    except (ValueError, AttributeError):
-        gp_score = 0
-
-    try:
-        ios_score = float(ios_raw.replace("/5", ""))
-    except (ValueError, AttributeError):
-        ios_score = 0
-
-    return {
-        "id": slugify(brand["name"]),
-        "name": brand["name"],
-        "categorySlug": category["slug"],
-        "categoryName": category["category"],
-        "categoryIcon": category.get("icon", ""),
-        "logo": brand.get("logo_url", ""),
-        "website": brand.get("website_url", ""),
-        "overallScore": brand.get("gonogo_score", 0),
-        "verdict": "GO WITH CAUTION" if brand.get("verdict", "NOGO") == "CAUTION" else brand.get("verdict", "NOGO"),
-        "categoryScores": category_scores,
-        "scoringCategories": category.get("scoring_categories", []),
-        "keyFeatures": brand.get("key_features", []),
-        "pricing": brand.get("pricing", []),
-        "appRatings": {
-            "googlePlay": gp_raw,
-            "ios": ios_raw,
-            "googlePlayScore": gp_score,
-            "iosScore": ios_score,
-        },
-        "strengths": brand.get("key_strengths", []),
-        "concerns": brand.get("key_concerns", []),
-        "socialSentiment": brand.get("social_sentiment", {}),
-        "lastUpdated": "2026-03-01",
-    }
-
-
-# Load brand data at startup
-BRAND_DATA_RAW = load_brand_data()
-ALL_BRANDS = []
-CATEGORIES = []
-
-for cat in BRAND_DATA_RAW:
-    cat_info = {
-        "id": cat["slug"],
-        "name": cat["category"],
-        "icon": cat.get("icon", ""),
-        "brandCount": len(cat.get("brands", [])),
-        "scoringCategories": cat.get("scoring_categories", []),
-    }
-    CATEGORIES.append(cat_info)
-    for b in cat.get("brands", []):
-        ALL_BRANDS.append(normalize_brand(b, cat))
-
-print(f"Loaded {len(ALL_BRANDS)} brands across {len(CATEGORIES)} categories")
-
-
-# ============================================================
-# FASTAPI APP
-# ============================================================
 @asynccontextmanager
 async def lifespan(app):
+    load_all_data()
     yield
-    db.close()
 
 
-app = FastAPI(title="GoNoGo SA API", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
 # ============================================================
-# BRAND ENDPOINTS
+# BRAND ENDPOINTS (read from cached JSON)
 # ============================================================
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "ok",
+        "total_brands": len(brand_cache.get('brands', [])),
+        "total_categories": len(brand_cache.get('categories', [])),
+        "total_reviews": len(reviews_cache),
+        "data_source": "google_sheets"
+    }
+
+
 @app.get("/api/categories")
 def get_categories():
-    return CATEGORIES
+    return brand_cache.get('categories', [])
 
 
 @app.get("/api/brands")
 def get_all_brands():
-    return ALL_BRANDS
+    return brand_cache.get('brands', [])
 
 
 @app.get("/api/brands/{slug}")
 def get_brands_by_category(slug: str):
-    brands = [b for b in ALL_BRANDS if b["categorySlug"] == slug]
-    if not brands:
-        cat = next((c for c in CATEGORIES if c["id"] == slug), None)
-        if not cat:
-            raise HTTPException(status_code=404, detail="Category not found")
-        return []
-    return brands
+    key = f"brands_{slug}"
+    if key in brand_cache:
+        return brand_cache[key]
+    # Fallback: filter from all brands
+    return [b for b in brand_cache.get('brands', []) if b.get('categorySlug') == slug]
 
 
 @app.get("/api/brand/{brand_id}")
-def get_brand(brand_id: str):
-    brand = next((b for b in ALL_BRANDS if b["id"] == brand_id), None)
-    if not brand:
-        raise HTTPException(status_code=404, detail="Brand not found")
-    return brand
+def get_brand_by_id(brand_id: str):
+    # Try per-brand file first
+    brand = load_json(f"brand_{brand_id}.json")
+    if brand:
+        return brand
+    # Fallback: search all brands
+    for b in brand_cache.get('brands', []):
+        if b.get('id') == brand_id:
+            return b
+    raise HTTPException(status_code=404, detail="Brand not found")
 
 
 @app.get("/api/top-brands")
-def get_top_brands(count: int = Query(default=6, ge=1, le=20)):
-    sorted_brands = sorted(ALL_BRANDS, key=lambda b: b["overallScore"], reverse=True)
-    return sorted_brands[:count]
+def get_top_brands(count: int = Query(default=6)):
+    return brand_cache.get('top_brands', [])[:count]
 
 
 @app.get("/api/stats")
 def get_stats():
-    go_count = sum(1 for b in ALL_BRANDS if b["verdict"] == "GO")
-    caution_count = sum(1 for b in ALL_BRANDS if b["verdict"] == "GO WITH CAUTION")
-    nogo_count = sum(1 for b in ALL_BRANDS if b["verdict"] == "NOGO")
-    return {
-        "totalBrands": len(ALL_BRANDS),
-        "totalCategories": len(CATEGORIES),
-        "goCount": go_count,
-        "cautionCount": caution_count,
-        "nogoCount": nogo_count,
-        "averageScore": round(sum(b["overallScore"] for b in ALL_BRANDS) / max(len(ALL_BRANDS), 1), 1),
-    }
+    stats = brand_cache.get('stats', {})
+    # Update review count dynamically
+    stats['totalReviews'] = len(reviews_cache)
+    return stats
 
 
 # ============================================================
-# REVIEW ENDPOINTS
+# REVIEW ENDPOINTS (read/write JSON, synced to Google Sheets)
 # ============================================================
+
 class ReviewSubmission(BaseModel):
     category: str
     brand_name: str
-    reviewer_name: str = Field(..., min_length=1, max_length=50)
-    scores: dict = {}  # Optional: { "Compliance": 75, ... }
-    review_text: Optional[str] = ""
-
-
-def row_to_review(row) -> dict:
-    return {
-        "id": row["id"],
-        "category": row["category"],
-        "brand_name": row["brand_name"],
-        "reviewer_name": row["reviewer_name"],
-        "scores": {
-            "Compliance": row["compliance"],
-            "Customer Satisfaction": row["customer_satisfaction"],
-            "Product Value": row["product_value"],
-            "Innovation": row["innovation"],
-            "Customer Support": row["customer_support"],
-            "Accessibility & Security": row["accessibility_security"],
-        },
-        "average_score": row["average_score"],
-        "review_text": row["review_text"],
-        "status": row["status"],
-        "created_at": row["created_at"],
-    }
+    reviewer_name: str
+    scores: Optional[dict] = {}
+    review_text: str
 
 
 @app.get("/api/reviews")
-def get_reviews(
-    brand: str = Query(..., description="Brand name"),
-    category: str = Query(..., description="Category slug"),
-):
-    rows = db.execute(
-        "SELECT * FROM reviews WHERE category = ? AND brand_name = ? ORDER BY timestamp_epoch DESC",
-        [category, brand],
-    ).fetchall()
-    return [row_to_review(r) for r in rows]
+def get_reviews(brand: str = "", category: str = ""):
+    filtered = reviews_cache
+    if brand:
+        filtered = [r for r in filtered if r.get('BrandName', '') == brand]
+    if category:
+        filtered = [r for r in filtered if r.get('Category', '') == category]
+
+    # Only return approved + pending reviews (not rejected)
+    filtered = [r for r in filtered if r.get('Status', 'pending') != 'rejected']
+
+    # Map to frontend format
+    return [{
+        'id': r.get('ReviewID', ''),
+        'category': r.get('Category', ''),
+        'brand_name': r.get('BrandName', ''),
+        'reviewer_name': r.get('ReviewerName', ''),
+        'scores': {
+            'compliance': safe_float(r.get('Compliance', '0')),
+            'customer_satisfaction': safe_float(r.get('CustomerSatisfaction', '0')),
+            'product_value': safe_float(r.get('ProductValue', '0')),
+            'innovation': safe_float(r.get('Innovation', '0')),
+            'customer_support': safe_float(r.get('CustomerSupport', '0')),
+            'accessibility_security': safe_float(r.get('AccessibilitySecurity', '0'))
+        },
+        'average_score': safe_float(r.get('AverageScore', '0')),
+        'review_text': r.get('ReviewText', ''),
+        'created_at': r.get('Date', ''),
+        'status': r.get('Status', 'pending')
+    } for r in filtered]
 
 
 @app.get("/api/reviews/all")
 def get_all_reviews():
-    rows = db.execute("SELECT * FROM reviews ORDER BY timestamp_epoch DESC").fetchall()
-    return [row_to_review(r) for r in rows]
+    return [{
+        'id': r.get('ReviewID', ''),
+        'category': r.get('Category', ''),
+        'brand_name': r.get('BrandName', ''),
+        'reviewer_name': r.get('ReviewerName', ''),
+        'scores': {
+            'compliance': safe_float(r.get('Compliance', '0')),
+            'customer_satisfaction': safe_float(r.get('CustomerSatisfaction', '0')),
+            'product_value': safe_float(r.get('ProductValue', '0')),
+            'innovation': safe_float(r.get('Innovation', '0')),
+            'customer_support': safe_float(r.get('CustomerSupport', '0')),
+            'accessibility_security': safe_float(r.get('AccessibilitySecurity', '0'))
+        },
+        'average_score': safe_float(r.get('AverageScore', '0')),
+        'review_text': r.get('ReviewText', ''),
+        'created_at': r.get('Date', ''),
+        'status': r.get('Status', 'pending')
+    } for r in reviews_cache]
 
 
-@app.post("/api/reviews", status_code=201)
+@app.post("/api/reviews")
 def submit_review(review: ReviewSubmission):
-    review_id = str(uuid.uuid4())[:8]
-    now = datetime.now(timezone.utc)
-    date_str = now.strftime("%d %b %Y")
-    epoch = int(now.timestamp())
+    review_id = uuid.uuid4().hex[:8]
+    now = datetime.now()
 
+    # Calculate average from scores
     scores = review.scores or {}
-    compliance = int(scores.get("Compliance", 0))
-    cust_sat = int(scores.get("Customer Satisfaction", 0))
-    prod_val = int(scores.get("Product Value", 0))
-    innovation = int(scores.get("Innovation", 0))
-    cust_sup = int(scores.get("Customer Support", 0))
-    acc_sec = int(scores.get("Accessibility & Security", 0))
+    score_vals = [float(v) for v in scores.values() if v]
+    avg = round(sum(score_vals) / len(score_vals), 1) if score_vals else 0
 
-    all_scores = [compliance, cust_sat, prod_val, innovation, cust_sup, acc_sec]
-    average = round(sum(all_scores) / len(all_scores), 1) if any(all_scores) else 0
+    new_review = {
+        'ReviewID': review_id,
+        'Category': review.category,
+        'BrandName': review.brand_name,
+        'ReviewerName': review.reviewer_name,
+        'Compliance': str(scores.get('compliance', '0')),
+        'CustomerSatisfaction': str(scores.get('customer_satisfaction', '0')),
+        'ProductValue': str(scores.get('product_value', '0')),
+        'Innovation': str(scores.get('innovation', '0')),
+        'CustomerSupport': str(scores.get('customer_support', '0')),
+        'AccessibilitySecurity': str(scores.get('accessibility_security', '0')),
+        'AverageScore': str(avg),
+        'ReviewText': review.review_text,
+        'Date': now.strftime('%d %b %Y'),
+        'Status': 'pending',
+        'ModeratedBy': '',
+        'ModeratedAt': ''
+    }
 
-    db.execute(
-        """INSERT INTO reviews
-           (id, category, brand_name, reviewer_name,
-            compliance, customer_satisfaction, product_value,
-            innovation, customer_support, accessibility_security,
-            average_score, review_text, status, created_at, timestamp_epoch)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        [
-            review_id,
-            review.category,
-            review.brand_name,
-            review.reviewer_name,
-            compliance,
-            cust_sat,
-            prod_val,
-            innovation,
-            cust_sup,
-            acc_sec,
-            average,
-            review.review_text or "",
-            "pending",
-            date_str,
-            epoch,
-        ],
-    )
-    db.commit()
+    reviews_cache.append(new_review)
+    save_reviews()
 
     return {
-        "id": review_id,
-        "message": "Review submitted successfully",
-        "average_score": average,
+        'id': review_id,
+        'status': 'pending',
+        'message': 'Review submitted successfully'
     }
 
 
 @app.put("/api/reviews/{review_id}/status")
 def update_review_status(review_id: str, status: str = Query(...)):
-    if status not in ("pending", "approved", "rejected", "flagged"):
+    if status not in ['approved', 'rejected', 'pending']:
         raise HTTPException(status_code=400, detail="Invalid status")
-    result = db.execute("UPDATE reviews SET status = ? WHERE id = ?", [status, review_id])
-    db.commit()
-    if result.rowcount == 0:
-        raise HTTPException(status_code=404, detail="Review not found")
-    return {"id": review_id, "status": status}
 
+    for r in reviews_cache:
+        if r.get('ReviewID') == review_id:
+            r['Status'] = status
+            r['ModeratedBy'] = 'admin'
+            r['ModeratedAt'] = datetime.now().strftime('%d %b %Y %H:%M')
+            save_reviews()
+            return {'id': review_id, 'status': status}
 
-@app.get("/api/reviews/stats")
-def get_review_stats(
-    brand: str = Query(..., description="Brand name"),
-    category: str = Query(..., description="Category slug"),
-):
-    rows = db.execute(
-        "SELECT * FROM reviews WHERE category = ? AND brand_name = ?",
-        [category, brand],
-    ).fetchall()
-
-    if not rows:
-        return {"count": 0, "averages": {}, "overall_average": 0}
-
-    totals = {
-        "Compliance": 0,
-        "Customer Satisfaction": 0,
-        "Product Value": 0,
-        "Innovation": 0,
-        "Customer Support": 0,
-        "Accessibility & Security": 0,
-    }
-    for r in rows:
-        totals["Compliance"] += r["compliance"]
-        totals["Customer Satisfaction"] += r["customer_satisfaction"]
-        totals["Product Value"] += r["product_value"]
-        totals["Innovation"] += r["innovation"]
-        totals["Customer Support"] += r["customer_support"]
-        totals["Accessibility & Security"] += r["accessibility_security"]
-
-    count = len(rows)
-    averages = {k: round(v / count) for k, v in totals.items()}
-    overall = round(sum(averages.values()) / len(averages))
-
-    return {
-        "count": count,
-        "averages": averages,
-        "overall_average": overall,
-    }
+    raise HTTPException(status_code=404, detail="Review not found")
 
 
 # ============================================================
 # ADMIN ENDPOINTS
 # ============================================================
-class BrandUpdate(BaseModel):
-    name: str
-    categorySlug: str
-    website: Optional[str] = ""
-    logo: Optional[str] = ""
-    scores: dict = {}  # { "Compliance": {"score": 19, "max": 20, "description": "..."}, ... }
-    googlePlayRating: Optional[str] = "N/A"
-    iosRating: Optional[str] = "N/A"
-    keyFeatures: List[str] = []
-    pricing: list = []
-    keyStrengths: List[str] = []
-    keyConcerns: List[str] = []
+
+class BrandData(BaseModel):
+    category_slug: str
+    brand_name: str
+    scores: dict = {}
+    details: dict = {}
 
 
 @app.post("/api/admin/brand")
-def save_brand(brand: BrandUpdate):
-    """Add or update a brand in the in-memory data and persist to local storage."""
-    brand_id = slugify(brand.name)
+def save_brand(data: BrandData):
+    """Save/update brand data. Changes are stored in memory and will be
+    written back to Google Sheets by the sync cron."""
+    # Find and update in cache
+    for b in brand_cache.get('brands', []):
+        if b.get('name', '').lower() == data.brand_name.lower():
+            if data.scores:
+                for key, val in data.scores.items():
+                    if key in b.get('categoryScores', {}):
+                        b['categoryScores'][key]['score'] = val
+            if data.details:
+                for key, val in data.details.items():
+                    b[key] = val
+            return {'status': 'updated', 'brand': data.brand_name}
 
-    # Find existing category
-    cat = next((c for c in BRAND_DATA_RAW if c["slug"] == brand.categorySlug), None)
-    if not cat:
-        raise HTTPException(status_code=400, detail="Category not found")
+    return {'status': 'not_found', 'message': f'Brand {data.brand_name} not found in cache. Add via Google Sheets.'}
 
-    # Build framework_breakdown
-    framework = []
-    raw_total = 0
-    raw_max = 0
-    for cat_name, data in brand.scores.items():
-        score = float(data.get("score", 0))
-        max_val = float(data.get("max", 0))
-        raw_total += score
-        raw_max += max_val
-        framework.append({
-            "category": cat_name,
-            "score": f"{score}/{max_val}",
-            "description": data.get("description", ""),
-        })
 
-    gonogo_score = round((raw_total / raw_max) * 100) if raw_max > 0 else 0
-    if gonogo_score >= 80:
-        verdict = "GO"
-    elif gonogo_score >= 60:
-        verdict = "GO WITH CAUTION"
-    else:
-        verdict = "NOGO"
-
-    # Build the brand object in the JS data format
-    new_brand_raw = {
-        "name": brand.name,
-        "gonogo_score": gonogo_score,
-        "verdict": verdict,
-        "logo_url": brand.logo or "",
-        "website_url": brand.website or "",
-        "framework_breakdown": framework,
-        "key_features": brand.keyFeatures,
-        "pricing": brand.pricing,
-        "app_ratings": {
-            "google_play": brand.googlePlayRating or "N/A",
-            "ios": brand.iosRating or "N/A",
-        },
-        "key_strengths": brand.keyStrengths,
-        "key_concerns": brand.keyConcerns,
-        "social_sentiment": {},
-    }
-
-    # Update in-memory raw data
-    existing_idx = None
-    for i, b in enumerate(cat.get("brands", [])):
-        if slugify(b["name"]) == brand_id:
-            existing_idx = i
-            break
-
-    if existing_idx is not None:
-        cat["brands"][existing_idx] = new_brand_raw
-    else:
-        cat["brands"].append(new_brand_raw)
-        # Update category brand count
-        for c in CATEGORIES:
-            if c["id"] == brand.categorySlug:
-                c["brandCount"] = len(cat["brands"])
-
-    # Update normalized ALL_BRANDS
-    normalized = normalize_brand(new_brand_raw, cat)
-    existing_norm_idx = None
-    for i, b in enumerate(ALL_BRANDS):
-        if b["id"] == brand_id:
-            existing_norm_idx = i
-            break
-
-    if existing_norm_idx is not None:
-        ALL_BRANDS[existing_norm_idx] = normalized
-    else:
-        ALL_BRANDS.append(normalized)
-
+@app.post("/api/admin/reload")
+def reload_data():
+    """Reload all data from JSON files (after a sync)."""
+    load_all_data()
     return {
-        "id": brand_id,
-        "message": "Brand saved successfully",
-        "gonogo_score": gonogo_score,
-        "verdict": verdict,
+        'status': 'reloaded',
+        'brands': len(brand_cache.get('brands', [])),
+        'categories': len(brand_cache.get('categories', [])),
+        'reviews': len(reviews_cache)
     }
 
 
 # ============================================================
-# HEALTH
+# RESEARCH ENDPOINTS
 # ============================================================
-@app.get("/api/health")
-def health():
-    review_count = db.execute("SELECT COUNT(*) FROM reviews").fetchone()[0]
+
+# Track active research tasks
+research_status = {}
+
+
+@app.get("/api/admin/research/status")
+def get_research_status():
+    """Get status of all research tasks."""
+    return research_status
+
+
+@app.get("/api/admin/research/status/{brand_id}")
+def get_brand_research_status(brand_id: str):
+    """Get research status for a specific brand."""
+    if brand_id in research_status:
+        return research_status[brand_id]
+    return {'status': 'not_started'}
+
+
+@app.post("/api/admin/research-batch")
+async def trigger_batch_research(category: str = "", freshness: str = "outdated"):
+    """Trigger research for multiple brands at once.
+    Can filter by category and/or freshness status."""
+    now = datetime.now()
+    targets = []
+
+    for b in brand_cache.get('brands', []):
+        # Filter by category if specified
+        if category and b.get('categorySlug') != category:
+            continue
+
+        # Filter by freshness
+        try:
+            last_date = datetime.strptime(b.get('lastUpdated', '2020-01-01'), '%Y-%m-%d')
+        except (ValueError, TypeError):
+            last_date = datetime(2020, 1, 1)
+
+        days_since = (now - last_date).days
+
+        if freshness == 'outdated' and days_since <= 30:
+            continue
+        elif freshness == 'stale' and days_since <= 14:
+            continue
+
+        targets.append(b)
+
+    if not targets:
+        return {'status': 'no_targets', 'message': 'No brands match the criteria'}
+
+    # Limit batch size to avoid overwhelming
+    max_batch = 10
+    batch = targets[:max_batch]
+
+    # Run research in parallel (with concurrency limit)
+    results = []
+    for brand in batch:
+        brand_id = brand.get('id', '')
+        research_status[brand_id] = {
+            'status': 'queued',
+            'brand_name': brand.get('name', '')
+        }
+
+    # Process sequentially with small delays to be respectful
+    for brand in batch:
+        brand_id = brand.get('id', '')
+        research_status[brand_id]['status'] = 'in_progress'
+        try:
+            res = await research_brand(
+                brand_name=brand.get('name', ''),
+                website=brand.get('website', ''),
+                current_data=brand
+            )
+            updated, changes = apply_research_to_brand(brand, res)
+
+            # Update cache
+            for i, b in enumerate(brand_cache.get('brands', [])):
+                if b.get('id') == brand_id:
+                    brand_cache['brands'][i] = updated
+                    break
+
+            research_status[brand_id] = {
+                'status': 'completed',
+                'fields_updated': res.get('fields_updated', []),
+                'changes': changes
+            }
+            results.append({'brand': brand.get('name', ''), 'status': 'completed', 'changes': changes})
+        except Exception as e:
+            research_status[brand_id] = {'status': 'error', 'error': str(e)}
+            results.append({'brand': brand.get('name', ''), 'status': 'error', 'error': str(e)})
+
+        await asyncio.sleep(1)  # Rate limiting
+
+    # Save all updated data
+    brands_json_path = os.path.join(API_DATA_DIR, 'brands.json')
+    with open(brands_json_path, 'w') as f:
+        json.dump(brand_cache.get('brands', []), f, ensure_ascii=False)
+
     return {
-        "status": "ok",
-        "total_brands": len(ALL_BRANDS),
-        "total_categories": len(CATEGORIES),
-        "total_reviews": review_count,
+        'status': 'completed',
+        'total_researched': len(batch),
+        'total_remaining': max(0, len(targets) - max_batch),
+        'results': results
     }
+
+
+@app.post("/api/admin/research/{brand_id}")
+async def trigger_research(brand_id: str):
+    """Trigger auto-research for a specific brand."""
+    # Find the brand
+    target = None
+    for b in brand_cache.get('brands', []):
+        if b.get('id') == brand_id:
+            target = b
+            break
+
+    if not target:
+        raise HTTPException(status_code=404, detail="Brand not found")
+
+    brand_name = target.get('name', '')
+
+    # Check if already researching
+    if brand_id in research_status and research_status[brand_id].get('status') == 'in_progress':
+        return {'status': 'already_running', 'brand': brand_name}
+
+    # Mark as in progress
+    research_status[brand_id] = {
+        'status': 'in_progress',
+        'started_at': datetime.now().isoformat(),
+        'brand_name': brand_name
+    }
+
+    try:
+        # Run research
+        results = await research_brand(
+            brand_name=brand_name,
+            website=target.get('website', ''),
+            current_data=target
+        )
+
+        # Apply results to brand data
+        updated_brand, changes = apply_research_to_brand(target, results)
+
+        # Update the brand in cache
+        for i, b in enumerate(brand_cache.get('brands', [])):
+            if b.get('id') == brand_id:
+                brand_cache['brands'][i] = updated_brand
+                break
+
+        # Also update category-specific cache
+        cat_key = f"brands_{updated_brand.get('categorySlug', '')}"
+        if cat_key in brand_cache:
+            for i, b in enumerate(brand_cache[cat_key]):
+                if b.get('id') == brand_id:
+                    brand_cache[cat_key][i] = updated_brand
+                    break
+
+        # Save updated brand to individual JSON file
+        brand_json_path = os.path.join(API_DATA_DIR, f'brand_{brand_id}.json')
+        with open(brand_json_path, 'w') as f:
+            json.dump(updated_brand, f, ensure_ascii=False)
+
+        # Save all brands to brands.json
+        brands_json_path = os.path.join(API_DATA_DIR, 'brands.json')
+        with open(brands_json_path, 'w') as f:
+            json.dump(brand_cache.get('brands', []), f, ensure_ascii=False)
+
+        # Save category brands too
+        if cat_key in brand_cache:
+            cat_json_path = os.path.join(API_DATA_DIR, f"{cat_key.replace('brands_', 'brands_')}.json")
+            with open(cat_json_path, 'w') as f:
+                json.dump(brand_cache[cat_key], f, ensure_ascii=False)
+
+        # Update top brands
+        sorted_brands = sorted(brand_cache.get('brands', []), key=lambda x: x.get('overallScore', 0), reverse=True)
+        top_brands_path = os.path.join(API_DATA_DIR, 'top_brands.json')
+        with open(top_brands_path, 'w') as f:
+            json.dump(sorted_brands[:10], f, ensure_ascii=False)
+
+        # Mark research complete
+        research_status[brand_id] = {
+            'status': 'completed',
+            'completed_at': datetime.now().isoformat(),
+            'brand_name': brand_name,
+            'fields_updated': results.get('fields_updated', []),
+            'changes': changes,
+            'errors': results.get('errors', []),
+            'research_data': results.get('data', {})
+        }
+
+        return {
+            'status': 'completed',
+            'brand': brand_name,
+            'fields_updated': results.get('fields_updated', []),
+            'changes': changes,
+            'data': results.get('data', {}),
+            'errors': results.get('errors', [])
+        }
+
+    except Exception as e:
+        research_status[brand_id] = {
+            'status': 'error',
+            'error': str(e),
+            'brand_name': brand_name
+        }
+        return {
+            'status': 'error',
+            'brand': brand_name,
+            'error': str(e)
+        }
+
+
+def safe_float(val):
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 if __name__ == "__main__":

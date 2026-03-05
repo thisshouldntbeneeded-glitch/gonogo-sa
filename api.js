@@ -172,6 +172,25 @@ var GoNoGoAPI = (function() {
     // ============================================================
     async saveBrand(brandData) {
       return await _post('/api/admin/brand', brandData);
+    },
+
+    async triggerResearch(brandId) {
+      return await _post('/api/admin/research/' + brandId, {});
+    },
+
+    async triggerBatchResearch(freshness, category) {
+      var params = '?freshness=' + (freshness || 'outdated');
+      if (category) params += '&category=' + category;
+      return await _post('/api/admin/research-batch' + params, {});
+    },
+
+    async getResearchStatus(brandId) {
+      if (brandId) return await _fetch('/api/admin/research/status/' + brandId);
+      return await _fetch('/api/admin/research/status');
+    },
+
+    async reloadData() {
+      return await _post('/api/admin/reload', {});
     }
   };
 })();
