@@ -1,0 +1,1 @@
+var BRAND_DATA_PARTB2 = (function(){var a=BRAND_DATA_PARTB2A[0],b=BRAND_DATA_PARTB2B[0];return [{...a,brands:[...a.brands,...b.brands]}];})();
