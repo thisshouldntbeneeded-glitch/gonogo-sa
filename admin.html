@@ -202,11 +202,15 @@
       // Activity Feed
       var topBrands = await GoNoGoAPI.getTopBrands(3);
       var activities = [
-        { icon: 'fa-database', bg: 'var(--green-bg)', color: 'var(--green-text)', text: '<strong>' + allBrands.length + ' SA brands</strong> loaded across ' + categoriesCount + ' industries', time: 'Platform data' },
-        { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Top scorer: <strong>' + topBrands[0].name + '</strong> with ' + topBrands[0].overallScore + '/100', time: topBrands[0].categoryName },
-        { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Runner-up: <strong>' + topBrands[1].name + '</strong> with ' + topBrands[1].overallScore + '/100', time: topBrands[1].categoryName },
-        { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Third: <strong>' + topBrands[2].name + '</strong> with ' + topBrands[2].overallScore + '/100', time: topBrands[2].categoryName }
+        { icon: 'fa-database', bg: 'var(--green-bg)', color: 'var(--green-text)', text: '<strong>' + allBrands.length + ' SA brands</strong> loaded across ' + categoriesCount + ' industries', time: 'Platform data' }
       ];
+      if (topBrands.length >= 3) {
+        activities.push(
+          { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Top scorer: <strong>' + topBrands[0].name + '</strong> with ' + topBrands[0].overallScore + '/100', time: topBrands[0].categoryName },
+          { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Runner-up: <strong>' + topBrands[1].name + '</strong> with ' + topBrands[1].overallScore + '/100', time: topBrands[1].categoryName },
+          { icon: 'fa-chart-simple', bg: 'var(--green-bg)', color: 'var(--green-text)', text: 'Third: <strong>' + topBrands[2].name + '</strong> with ' + topBrands[2].overallScore + '/100', time: topBrands[2].categoryName }
+        );
+      }
 
       document.getElementById('activity-feed').innerHTML = activities.map(function(a) {
         return '<div class="activity-item">' +
