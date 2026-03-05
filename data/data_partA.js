@@ -1,1 +1,1 @@
-PLACEHOLDER_A
+LOAD_FROM_FILE:/home/user/workspace/push_partA_content.js
