@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-ZA">
 <head>
 <!--
    ______                            __
@@ -11,188 +11,154 @@
         Created with Perplexity Computer
         https://www.perplexity.ai/computer
 -->
-
-<!-- Perplexity Computer Attribution — SEO Meta Tags -->
 <meta name="generator" content="Perplexity Computer">
 <meta name="author" content="Perplexity Computer">
 <meta property="og:see_also" content="https://www.perplexity.ai/computer">
 <link rel="author" href="https://www.perplexity.ai/computer">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoNoGo SA — South Africa's Independent Brand Ratings</title>
-<meta name="description" content="Compare South African brands using an easy, consistent 100-point score. 13 industries, 99 brands rated.">
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<!-- Styles -->
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoNoGo South Africa — Honest Brand Comparisons</title>
+  <meta name="description" content="GoNoGo South Africa rates and compares brands across 13 industries using a transparent 100-point scoring framework.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <div id="nav"></div>
 
-<!-- ============ HEADER ============ -->
-<header class="site-header">
-  <div class="container header-inner">
-    <div class="header-left">
-      <a class="logo-link" onclick="navigateHome()" aria-label="GoNoGo Home">
-        <img src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng" alt="GoNoGo" loading="eager">
-      </a>
-      <span class="sa-badge">
-        <span>South Africa</span>
-      </span>
-    </div>
-    <div class="header-right">
-      <button class="back-btn" id="backBtn" onclick="navigateHome()">
-        <i class="fas fa-arrow-left"></i> Back to Categories
-      </button>
-    </div>
-  </div>
-</header>
-
-<!-- ============ MAIN CONTENT ============ -->
-<main>
-
-  <!-- === HOMEPAGE SECTIONS === -->
-  <div id="homeView">
-
-    <!-- HERO -->
-    <section class="hero" id="heroSection">
-      <div class="container">
-        <div class="hero-grid">
-          <div class="hero-content">
-            <h1 class="hero-heading">Compare brands using an easy, consistent 100&#8209;point&nbsp;score</h1>
-            <p class="hero-subtitle">We use a six-category framework to assess the full customer experience, covering areas such as compliance, support, value and innovation. Allowing you to quickly see whether the brand is a Go or a No&nbsp;Go.</p>
-            <div class="hero-pills">
-              <span class="hero-pill"><i class="fas fa-check"></i> 6 categories, 100 points</span>
-              <span class="hero-pill"><i class="fas fa-check"></i> Same framework across industries</span>
-              <span class="hero-pill"><i class="fas fa-check"></i> Transparent scores, no star guessing</span>
-            </div>
-            <div class="hero-ctas">
-              <a class="btn-primary" href="#methodologySection">See how the 100-point score works <span aria-hidden="true">→</span></a>
-              <a class="btn-secondary" href="#categoriesSection">Or jump straight to categories</a>
-            </div>
-            <p class="hero-disclaimer">Disclaimer — We may earn a small commission for purchases made through links on this page, at no extra cost to you.</p>
-          </div>
-          <div class="hero-image-wrapper">
-            <img class="hero-image" src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/5436f273-518b-4a0a-81b2-105db9b2f8c6/pexels-polina-tankilevitch-7382473.jpg?content-type=image%2Fjpeg" alt="Woman browsing brands on phone" loading="eager">
-            <div class="hero-score-card">
-              <div class="score-circle go">93</div>
-              <div>
-                <div class="hero-score-label">TymeBank</div>
-                <div class="hero-score-sub">Top rated in Banking</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- METHODOLOGY -->
-    <section class="methodology section" id="methodologySection">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">The GoNoGo 100-Point Framework</h2>
-          <p class="section-subtitle">At GoNoGo, the 100-point score is the consistent language used to judge every brand, regardless of industry. Each score is built from the same six categories so you can confidently compare like-for-like.</p>
-        </div>
-        <div class="methodology-grid" id="methodologyGrid">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- CATEGORIES -->
-    <section class="section" id="categoriesSection">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Browse Categories</h2>
-          <p class="section-subtitle" id="categoriesCount"></p>
-        </div>
-        <div class="categories-grid" id="categoriesGrid">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- === CATEGORY DETAIL VIEW === -->
-  <div class="category-view section" id="categoryView">
+  <!-- Hero -->
+  <section class="hero">
     <div class="container">
-      <div class="category-view-header" id="categoryViewHeader">
-        <!-- Populated by JS -->
-      </div>
-      <div class="category-prefs" id="categoryPrefs">
-        <!-- Preference pills appear here in category view -->
-      </div>
-      <div class="brand-list" id="brandList">
-        <!-- Populated by JS -->
+      <h1 class="hero-title">GoNoGo <span style="color:var(--green)">South Africa</span></h1>
+      <p class="hero-subtitle">Honest brand comparisons for the SA market. We rate every brand on a transparent 100-point scoring framework so you can decide: Go, or No Go.</p>
+      <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;position:relative">
+        <a href="#industries" class="btn btn-primary btn-lg"><i class="fa-solid fa-compass"></i> Explore Brands</a>
+        <a href="#how-we-score" class="btn btn-secondary btn-lg"><i class="fa-solid fa-chart-simple"></i> How We Score</a>
       </div>
     </div>
-  </div>
+  </section>
 
-</main>
-
-<!-- ============ MODAL ============ -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
-  <div class="modal" id="modalPanel">
-    <div class="modal-header" id="modalHeader">
-      <!-- Populated by JS -->
-    </div>
-    <div class="modal-tabs" id="modalTabs">
-      <button class="modal-tab active" data-tab="framework">Framework Breakdown</button>
-      <button class="modal-tab" data-tab="features">Features &amp; Pricing</button>
-      <button class="modal-tab" data-tab="strengths">Strengths &amp; Concerns</button>
-      <button class="modal-tab" data-tab="reviews">Reviews</button>
-    </div>
-    <div class="modal-body">
-      <div class="tab-content active" id="tabFramework"></div>
-      <div class="tab-content" id="tabFeatures"></div>
-      <div class="tab-content" id="tabStrengths"></div>
-      <div class="tab-content" id="tabReviews"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ FOOTER ============ -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng" alt="GoNoGo" loading="lazy">
-        <p class="footer-tagline">South Africa's Independent Brand Ratings</p>
+  <!-- Industry Grid -->
+  <section class="section" id="industries">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Browse by Industry</h2>
+        <p class="section-subtitle">Explore brands across 13 South African industries</p>
       </div>
-      <nav class="footer-links">
-        <a href="#methodologySection">Methodology</a>
-        <a href="#heroSection">About GoNoGo</a>
-        <a href="mailto:contact@gonogo.co.za">Contact</a>
-      </nav>
+      <div class="industry-grid" id="industry-grid">
+        <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading industries...</div>
+      </div>
     </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 GoNoGo Ratings and Reviews Ltd</span>
-      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
-    </div>
-  </div>
-</footer>
+  </section>
 
-<!-- Scripts -->
-<script>
-  // Set this to your Google Apps Script Web App URL
-  // Deploy the script from Extensions → Apps Script in your SA Reviews Google Sheet
-  window.GONOGO_SHEETS_API = ''; // Will be set after Apps Script deployment
-</script>
-<script src="data_partA.js"></script>
-<script src="data_partB.js"></script>
-<script src="data_partC.js"></script>
-<script src="data_partD.js"></script>
-<script src="data_partE.js"></script>
-<script src="data_partF.js"></script>
-<script src="data.js"></script>
-<script src="app.js"></script>
+  <!-- Top Rated -->
+  <section class="section" style="background:var(--surface-1)">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Top Rated Brands</h2>
+        <p class="section-subtitle">The highest-scoring brands across all industries</p>
+      </div>
+      <div class="brand-grid" id="top-brands">
+        <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading top brands...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How We Score -->
+  <section class="section" id="how-we-score">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How We Score</h2>
+        <p class="section-subtitle">Every brand is evaluated on a 100-point framework across multiple weighted categories</p>
+      </div>
+      <div class="category-grid" id="scoring-grid">
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-shield-halved"></i> Compliance &amp; Regulation</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Licensing, regulatory standing, industry body memberships, and legal compliance within the South African market.</p>
+        </div>
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-face-smile"></i> Customer Satisfaction</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Real user feedback from app stores, review platforms, social media sentiment, and complaint resolution rates.</p>
+        </div>
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-coins"></i> Product Value</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Pricing fairness, feature breadth, transparency of fees, and overall value for money in the SA context.</p>
+        </div>
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-lightbulb"></i> Innovation</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Technology adoption, digital experience quality, unique differentiators, and forward-thinking approach.</p>
+        </div>
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-headset"></i> Customer Support</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Availability of support channels, response times, resolution quality, and accessibility of help resources.</p>
+        </div>
+        <div class="category-card">
+          <div class="category-card-header">
+            <span class="category-card-name"><i class="fa-solid fa-lock"></i> Accessibility &amp; Security</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+          <p class="category-card-desc">Platform accessibility, data security practices, POPIA compliance, and inclusive design considerations.</p>
+        </div>
+      </div>
+      <p style="color:var(--text-muted);font-size:var(--text-xs);margin-top:var(--space-6);text-align:center">
+        Note: Each industry has its own specific scoring categories with tailored weightings. The categories above represent the general framework.
+      </p>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+    <script src="data/data_partA.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
+  <script src="data/helpers.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('nav').innerHTML = Components.renderPublicNav('home');
+    document.getElementById('footer').innerHTML = Components.renderFooter();
+
+    (async function() {
+      // Industry grid
+      var categories = await GoNoGoAPI.getCategoriesWithBrands();
+      var industryGrid = document.getElementById('industry-grid');
+      industryGrid.innerHTML = categories.map(function(cat) {
+        return '<a href="category.html?cat=' + cat.id + '" class="industry-card ' + (cat.hasBrands ? '' : 'no-data') + '">' +
+          '<i class="fa-solid ' + cat.icon + '"></i>' +
+          '<div class="name">' + cat.name + '</div>' +
+          '<div class="count">' + cat.brandCount + ' brand' + (cat.brandCount !== 1 ? 's' : '') + '</div>' +
+        '</a>';
+      }).join('');
+
+      // Top brands
+      var topBrands = await GoNoGoAPI.getTopBrands(6);
+      var topGrid = document.getElementById('top-brands');
+      topGrid.innerHTML = topBrands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
+
+      // Init radar charts for top brands
+      topBrands.forEach(function(brand) {
+        Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
+      });
+    })();
+  </script>
 </body>
 </html>

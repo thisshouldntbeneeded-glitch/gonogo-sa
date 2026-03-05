@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoNoGo SA — Review Moderation</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div id="sidebar-container"></div>
+    <main class="admin-main" id="admin-content" style="display:none;">
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">Review Moderation</h1>
+          <p class="text-sm text-secondary">Review, approve, and manage user-submitted reviews</p>
+        </div>
+      </div>
+
+      <div class="kpi-grid" style="margin-bottom:var(--space-6);" id="comment-kpis">
+        <div class="kpi-card"><div class="kpi-label">Loading...</div></div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <select id="brand-filter" style="width:auto;max-width:180px;" onchange="filterComments()">
+              <option value="">All Brands</option>
+            </select>
+            <select id="status-filter" style="width:auto;max-width:150px;" onchange="filterComments()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="flagged">Flagged</option>
+            </select>
+          </div>
+          <span class="text-xs text-muted" id="comment-count"></span>
+        </div>
+        <div id="comments-list" style="padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3);"></div>
+      </div>
+
+      <div style="padding:var(--space-6) 0;text-align:center;">
+        <p class="text-xs text-muted">
+          &copy; 2026 GoNoGo South Africa |
+          <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);">Created with Perplexity Computer</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+    <script src="data/data_partA.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
+  <script src="data/helpers.js"></script>
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('comments');
+
+    if (Components.checkAdminAuth()) {
+      initAdminPage();
+    }
+
+    var allComments = [];
+
+    async function initAdminPage() {
+      document.getElementById('admin-content').style.display = '';
+
+      // Load all reviews from API
+      var reviews = await GoNoGoAPI.getAllReviews();
+      allComments = reviews.map(function(r) {
+        return {
+          id: r.id,
+          author: r.reviewer_name,
+          text: r.review_text,
+          date: r.created_at,
+          brandName: r.brand_name,
+          category: r.category,
+          status: r.status || 'pending',
+          averageScore: r.average_score
+        };
+      });
+
+      // Populate brand filter
+      var brandFilter = document.getElementById('brand-filter');
+      var brandNames = [];
+      var seen = {};
+      allComments.forEach(function(c) {
+        if (!seen[c.brandName]) {
+          seen[c.brandName] = true;
+          brandNames.push(c.brandName);
+        }
+      });
+      brandNames.sort();
+      brandNames.forEach(function(name) {
+        brandFilter.innerHTML += '<option value="' + name + '">' + name + '</option>';
+      });
+
+      // KPIs
+      var totalCount = allComments.length;
+      var pendingCount = allComments.filter(function(c) { return c.status === 'pending'; }).length;
+      var approvedCount = allComments.filter(function(c) { return c.status === 'approved'; }).length;
+      var flaggedCount = allComments.filter(function(c) { return c.status === 'flagged'; }).length;
+
+      document.getElementById('comment-kpis').innerHTML =
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Total Reviews</div>' +
+          '<div class="kpi-value">' + totalCount + '</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Pending</div>' +
+          '<div class="kpi-value" style="color:' + (pendingCount > 0 ? 'var(--orange-text)' : 'var(--green-text)') + '">' + pendingCount + '</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Approved</div>' +
+          '<div class="kpi-value" style="color:var(--green-text)">' + approvedCount + '</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Flagged</div>' +
+          '<div class="kpi-value" style="color:' + (flaggedCount > 0 ? 'var(--red-text)' : 'var(--green-text)') + '">' + flaggedCount + '</div>' +
+        '</div>';
+
+      filterComments();
+    }
+
+    function filterComments() {
+      var brandFilter = document.getElementById('brand-filter').value;
+      var statusFilter = document.getElementById('status-filter').value;
+
+      var filtered = allComments.filter(function(c) {
+        var matchBrand = !brandFilter || c.brandName === brandFilter;
+        var matchStatus = !statusFilter || c.status === statusFilter;
+        return matchBrand && matchStatus;
+      });
+
+      filtered.sort(function(a, b) {
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (b.status === 'pending' && a.status !== 'pending') return 1;
+        return 0;
+      });
+
+      document.getElementById('comment-count').textContent = filtered.length + ' reviews';
+      renderComments(filtered);
+    }
+
+    function renderComments(data) {
+      var container = document.getElementById('comments-list');
+
+      if (data.length === 0) {
+        container.innerHTML =
+          '<div style="text-align:center;padding:var(--space-10);">' +
+            '<i class="fa-solid fa-comments" style="font-size:var(--text-2xl);color:var(--text-faint);margin-bottom:var(--space-3);display:block;"></i>' +
+            '<p class="text-sm text-muted">No reviews yet. Reviews will appear here when users submit them on brand pages.</p>' +
+          '</div>';
+        return;
+      }
+
+      container.innerHTML = data.map(function(c) {
+        var borderStyle = c.status === 'pending' ? 'border-color:var(--orange-dim);' : c.status === 'flagged' ? 'border-color:var(--red-dim);' : '';
+        var statusClass = c.status === 'approved' ? 'freshness-fresh' : c.status === 'pending' ? 'freshness-stale' : c.status === 'flagged' ? 'freshness-outdated' : 'freshness-stale';
+
+        return '<div class="comment-card" style="' + borderStyle + '">' +
+          '<div class="comment-header">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;">' +
+              '<span class="comment-author">' + c.author + '</span>' +
+              '<span class="text-xs text-muted">on <strong>' + c.brandName + '</strong></span>' +
+              '<span class="text-xs text-muted">(' + c.category + ')</span>' +
+              '<span class="freshness-badge ' + statusClass + '">' + c.status + '</span>' +
+            '</div>' +
+            '<span class="comment-date">' + c.date + '</span>' +
+          '</div>' +
+          '<div class="comment-text">' + c.text + '</div>' +
+          '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);">' +
+            (c.status === 'pending' ?
+              '<button class="btn btn-sm" style="background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-dim);" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
+                '<i class="fa-solid fa-check"></i> Approve' +
+              '</button>' +
+              '<button class="btn btn-sm" style="background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-dim);" onclick="moderateComment(\'' + c.id + '\', \'rejected\')">' +
+                '<i class="fa-solid fa-xmark"></i> Reject' +
+              '</button>'
+            : '') +
+            (c.status !== 'flagged' ?
+              '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'flagged\')">' +
+                '<i class="fa-solid fa-flag"></i> Flag' +
+              '</button>'
+            :
+              '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
+                '<i class="fa-solid fa-check"></i> Unflag' +
+              '</button>'
+            ) +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    async function moderateComment(reviewId, newStatus) {
+      try {
+        await GoNoGoAPI.updateReviewStatus(reviewId, newStatus);
+        // Update local state
+        for (var i = 0; i < allComments.length; i++) {
+          if (allComments[i].id === reviewId) {
+            allComments[i].status = newStatus;
+            break;
+          }
+        }
+        Components.showToast('Review ' + newStatus);
+        filterComments();
+      } catch (e) {
+        Components.showToast('Error updating review status', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

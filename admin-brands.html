@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoNoGo SA — Brand Management</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div id="sidebar-container"></div>
+    <main class="admin-main" id="admin-content" style="display:none;">
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">Brand Management</h1>
+          <p class="text-sm text-secondary">Manage all rated brands across SA industries</p>
+        </div>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-secondary btn-sm" onclick="exportBrands()">
+            <i class="fa-solid fa-download"></i> Export CSV
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+            <i class="fa-solid fa-plus"></i> Add Brand
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <div class="search-input" style="max-width:280px;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search brands..." oninput="filterBrands()">
+            </div>
+            <select id="industry-filter" style="width:auto;max-width:180px;" onchange="filterBrands()">
+              <option value="">All Industries</option>
+            </select>
+            <select id="verdict-filter" style="width:auto;max-width:150px;" onchange="filterBrands()">
+              <option value="">All Verdicts</option>
+              <option value="GO">GO</option>
+              <option value="GO WITH CAUTION">Go with Caution</option>
+              <option value="NOGO">NOGO</option>
+            </select>
+          </div>
+          <span class="text-xs text-muted" id="brand-count"></span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="brands-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable('name')">Brand <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th onclick="sortTable('categoryName')">Industry <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th onclick="sortTable('overallScore')">Score <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th>Verdict</th>
+                <th>App Ratings</th>
+                <th onclick="sortTable('lastUpdated')">Updated <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="brands-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading brands...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="padding:var(--space-6) 0;text-align:center;">
+        <p class="text-xs text-muted">
+          &copy; 2026 GoNoGo South Africa |
+          <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);">Created with Perplexity Computer</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="brand-modal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add Brand</h2>
+        <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="brand-form" onsubmit="saveBrand(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Brand Name</label>
+            <input type="text" id="f-name" required placeholder="e.g. Discovery Bank">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Industry</label>
+            <select id="f-industry" required></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Website URL</label>
+            <input type="url" id="f-website" placeholder="https://example.co.za">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Logo URL</label>
+            <input type="url" id="f-logo" placeholder="https://logo.clearbit.com/example.co.za">
+          </div>
+        </div>
+
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);">Category Scores</h4>
+        <p class="text-xs text-muted" style="margin-bottom:var(--space-3);">
+          Scores vary by industry. Enter raw score and max for each category.
+        </p>
+        <div id="score-fields" style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);"></div>
+
+        <div class="form-row" style="margin-top:var(--space-5);">
+          <div class="form-group">
+            <label class="form-label">Google Play Rating</label>
+            <input type="number" id="f-googleplay" step="0.1" min="0" max="5" placeholder="4.2">
+          </div>
+          <div class="form-group">
+            <label class="form-label">iOS App Store Rating</label>
+            <input type="number" id="f-ios" step="0.1" min="0" max="5" placeholder="4.5">
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-btn"><i class="fa-solid fa-check"></i> Save Brand</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <script src="data/data_partA.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
+  <script src="data/helpers.js"></script>
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('brands');
+
+    if (Components.checkAdminAuth()) {
+      initAdminPage();
+    }
+
+    var currentSort = { key: 'overallScore', dir: 'desc' };
+    var allBrandsData = [];
+    var editingBrandId = null;
+
+    async function initAdminPage() {
+      document.getElementById('admin-content').style.display = '';
+      allBrandsData = await GoNoGoAPI.getAllBrands();
+      var cats = await GoNoGoAPI.getCategories();
+
+      var industryFilter = document.getElementById('industry-filter');
+      var fIndustry = document.getElementById('f-industry');
+      cats.forEach(function(cat) {
+        industryFilter.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+        fIndustry.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+      });
+
+      // Populate score fields in modal
+      var scoreFields = document.getElementById('score-fields');
+      var defaultCats = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
+      defaultCats.forEach(function(catName) {
+        var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
+        scoreFields.innerHTML +=
+          '<div class="form-group">' +
+            '<label class="form-label">' + catName + '</label>' +
+            '<div style="display:flex;gap:var(--space-2)">' +
+              '<input type="number" id="' + fieldId + '-score" min="0" max="35" placeholder="Score" style="flex:1">' +
+              '<input type="number" id="' + fieldId + '-max" min="0" max="35" placeholder="Max" style="flex:1">' +
+            '</div>' +
+          '</div>';
+      });
+
+      filterBrands();
+    }
+
+    function filterBrands() {
+      var search = document.getElementById('search-input').value.toLowerCase();
+      var industry = document.getElementById('industry-filter').value;
+      var verdict = document.getElementById('verdict-filter').value;
+
+      var filtered = allBrandsData.filter(function(b) {
+        var matchSearch = !search || b.name.toLowerCase().indexOf(search) !== -1 || b.categoryName.toLowerCase().indexOf(search) !== -1;
+        var matchIndustry = !industry || b.categorySlug === industry;
+        var matchVerdict = !verdict || b.verdict === verdict;
+        return matchSearch && matchIndustry && matchVerdict;
+      });
+
+      filtered = Components.sortData(filtered, currentSort.key, currentSort.dir);
+      renderTable(filtered);
+    }
+
+    function sortTable(key) {
+      if (currentSort.key === key) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.key = key;
+        currentSort.dir = key === 'name' ? 'asc' : 'desc';
+      }
+      filterBrands();
+    }
+
+    function renderTable(data) {
+      document.getElementById('brand-count').textContent = data.length + ' brands';
+      var tbody = document.getElementById('brands-tbody');
+
+      tbody.innerHTML = data.map(function(b) {
+        var logoHtml = Components.renderLogo(b, 'brand-logo');
+        return '<tr>' +
+          '<td>' +
+            '<div class="brand-cell">' +
+              logoHtml +
+              '<div>' +
+                '<div class="font-semibold text-sm">' + b.name + '</div>' +
+                (b.website ? '<a href="' + b.website + '" target="_blank" rel="noopener" class="text-xs text-muted">' + b.website.replace('https://', '').replace('http://', '') + '</a>' : '') +
+              '</div>' +
+            '</div>' +
+          '</td>' +
+          '<td><span class="text-sm">' + b.categoryName + '</span></td>' +
+          '<td>' + Components.renderScoreBadge(b.overallScore) + '</td>' +
+          '<td>' + Components.renderVerdictBadge(b.verdict) + '</td>' +
+          '<td>' +
+            '<div style="display:flex;flex-direction:column;gap:2px;font-size:var(--text-xs)">' +
+              '<span><i class="fa-brands fa-google-play" style="width:14px;opacity:0.5"></i> ' + b.appRatings.googlePlay + '</span>' +
+              '<span><i class="fa-brands fa-apple" style="width:14px;opacity:0.5"></i> ' + b.appRatings.ios + '</span>' +
+            '</div>' +
+          '</td>' +
+          '<td><span class="text-xs text-muted">' + Components.formatRelativeDate(b.lastUpdated) + '</span></td>' +
+          '<td>' +
+            '<div style="display:flex;gap:var(--space-1);">' +
+              '<a href="brand.html?id=' + b.id + '" class="btn btn-ghost btn-sm" title="View"><i class="fa-solid fa-eye"></i></a>' +
+              '<button class="btn btn-ghost btn-sm" title="Edit" onclick="editBrand(\'' + b.id + '\')"><i class="fa-solid fa-pen"></i></button>' +
+            '</div>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function openAddModal() {
+      editingBrandId = null;
+      document.getElementById('modal-title').textContent = 'Add Brand';
+      document.getElementById('brand-form').reset();
+      document.getElementById('brand-modal').classList.add('open');
+    }
+
+    function editBrand(id) {
+      var b = null;
+      for (var i = 0; i < allBrandsData.length; i++) {
+        if (allBrandsData[i].id === id) { b = allBrandsData[i]; break; }
+      }
+      if (!b) return;
+      editingBrandId = id;
+      document.getElementById('modal-title').textContent = 'Edit: ' + b.name;
+      document.getElementById('f-name').value = b.name;
+      document.getElementById('f-industry').value = b.categorySlug;
+      document.getElementById('f-website').value = b.website || '';
+      document.getElementById('f-logo').value = b.logo || '';
+      document.getElementById('f-googleplay').value = b.appRatings.googlePlayScore || '';
+      document.getElementById('f-ios').value = b.appRatings.iosScore || '';
+
+      // Fill in category scores
+      Object.entries(b.categoryScores).forEach(function(entry) {
+        var name = entry[0], data = entry[1];
+        var fieldId = 'f-' + name.toLowerCase().replace(/[^a-z]+/g, '-');
+        var scoreEl = document.getElementById(fieldId + '-score');
+        var maxEl = document.getElementById(fieldId + '-max');
+        if (scoreEl) scoreEl.value = data.score;
+        if (maxEl) maxEl.value = data.max;
+      });
+
+      document.getElementById('brand-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('brand-modal').classList.remove('open');
+    }
+
+    async function saveBrand(e) {
+      e.preventDefault();
+      var saveBtn = document.getElementById('save-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      // Collect scores
+      var scoreCategories = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
+      var scores = {};
+      scoreCategories.forEach(function(catName) {
+        var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
+        var scoreEl = document.getElementById(fieldId + '-score');
+        var maxEl = document.getElementById(fieldId + '-max');
+        if (scoreEl && maxEl && scoreEl.value && maxEl.value) {
+          scores[catName] = {
+            score: parseFloat(scoreEl.value),
+            max: parseFloat(maxEl.value),
+            description: ''
+          };
+        }
+      });
+
+      var gpVal = document.getElementById('f-googleplay').value;
+      var iosVal = document.getElementById('f-ios').value;
+
+      var brandData = {
+        name: document.getElementById('f-name').value.trim(),
+        categorySlug: document.getElementById('f-industry').value,
+        website: document.getElementById('f-website').value.trim(),
+        logo: document.getElementById('f-logo').value.trim(),
+        scores: scores,
+        googlePlayRating: gpVal ? gpVal + '/5' : 'N/A',
+        iosRating: iosVal ? iosVal + '/5' : 'N/A',
+        keyFeatures: [],
+        pricing: [],
+        keyStrengths: [],
+        keyConcerns: []
+      };
+
+      try {
+        var result = await GoNoGoAPI.saveBrand(brandData);
+        Components.showToast('Brand saved — ' + result.verdict + ' (' + result.gonogo_score + '/100)');
+        closeModal();
+
+        // Refresh the brand list
+        allBrandsData = await GoNoGoAPI.getAllBrands();
+        filterBrands();
+      } catch (err) {
+        Components.showToast('Error saving brand: ' + err.message, 'error');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Brand';
+    }
+
+    function exportBrands() {
+      var data = allBrandsData.map(function(b) {
+        return {
+          Name: b.name,
+          Industry: b.categoryName,
+          Score: b.overallScore,
+          Verdict: b.verdict,
+          GooglePlay: b.appRatings.googlePlay,
+          iOS: b.appRatings.ios,
+          Website: b.website,
+          LastUpdated: b.lastUpdated
+        };
+      });
+      Components.exportCSV(data, 'gonogo-sa-brands.csv');
+      Components.showToast('CSV exported');
+    }
+
+    document.getElementById('brand-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>
