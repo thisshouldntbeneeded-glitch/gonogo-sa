@@ -20,6 +20,112 @@
 <title>GoNoGo SA — Research Status</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  .research-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .research-modal-overlay.active {
+    display: flex;
+  }
+  .research-modal {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    max-width: 560px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .research-log {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .research-log .log-entry {
+    padding: 2px 0;
+    color: var(--text-secondary);
+  }
+  .research-log .log-entry.success {
+    color: var(--green-text);
+  }
+  .research-log .log-entry.error {
+    color: var(--red-text);
+  }
+  .research-log .log-entry.info {
+    color: var(--blue-text, var(--text-primary));
+  }
+  .research-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-primary);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: rspin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes rspin {
+    to { transform: rotate(360deg); }
+  }
+  .batch-progress {
+    margin-top: var(--space-4);
+    height: 6px;
+    background: var(--surface-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .batch-progress-bar {
+    height: 100%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .research-result-card {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-3);
+  }
+  .result-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .result-field:last-child {
+    border-bottom: none;
+  }
+  .result-label {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .result-value {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .btn-researching {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+</style>
 </head>
 <body>
   <div class="admin-layout">
@@ -28,11 +134,16 @@
       <div class="admin-header">
         <div>
           <h1 class="admin-title">Research Status</h1>
-          <p class="text-sm text-secondary">Track data freshness and research priorities</p>
+          <p class="text-sm text-secondary">Track data freshness and trigger automated research</p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="Components.showToast('Research automation coming soon')">
-          <i class="fa-solid fa-robot"></i> Auto-Research
-        </button>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-secondary btn-sm" id="btn-batch-stale" onclick="triggerBatchResearch('stale')">
+            <i class="fa-solid fa-clock"></i> Refresh Stale
+          </button>
+          <button class="btn btn-primary btn-sm" id="btn-batch-all" onclick="triggerBatchResearch('outdated')">
+            <i class="fa-solid fa-robot"></i> Auto-Research Outdated
+          </button>
+        </div>
       </div>
 
       <!-- KPIs -->
@@ -96,20 +207,24 @@
         </div>
       </div>
 
-      <!-- Automation Section -->
-      <div class="card" style="margin-top:var(--space-6);border-color:var(--border-primary);text-align:center;padding:var(--space-10);">
-        <i class="fa-solid fa-robot" style="font-size:var(--text-2xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block;"></i>
-        <h3 class="text-lg font-semibold" style="margin-bottom:var(--space-2);">Automated Research</h3>
-        <p class="text-sm text-secondary" style="max-width:500px;margin:0 auto var(--space-4);">
-          Configure automated data collection triggers to keep brand scores up-to-date. Pull from Google Reviews, Hellopeter, app stores, and regulatory sources on a schedule.
-        </p>
-        <div style="display:flex;gap:var(--space-2);justify-content:center;">
-          <button class="btn btn-secondary btn-sm" onclick="Components.showToast('Coming in v2.0')">
-            <i class="fa-solid fa-gear"></i> Configure Triggers
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="Components.showToast('Coming in v2.0')">
-            <i class="fa-solid fa-plug"></i> API Connections
-          </button>
+      <!-- Research Info -->
+      <div class="card" style="margin-top:var(--space-6);border-color:var(--border-primary);padding:var(--space-6);">
+        <div style="display:flex;align-items:flex-start;gap:var(--space-4);">
+          <i class="fa-solid fa-circle-info" style="font-size:var(--text-lg);color:var(--green);margin-top:2px;"></i>
+          <div>
+            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-2);">How Auto-Research Works</h3>
+            <div class="text-xs text-secondary" style="line-height:1.8;">
+              <p style="margin-bottom:var(--space-2);">When you click <strong>Refresh</strong> on a brand, the system automatically:</p>
+              <ol style="padding-left:var(--space-5);margin-bottom:var(--space-2);">
+                <li>Checks the <strong>Google Play Store</strong> for current app rating</li>
+                <li>Queries the <strong>Apple App Store</strong> (iTunes API) for iOS rating</li>
+                <li>Looks up <strong>Hellopeter</strong> trust index and review count</li>
+                <li>Verifies <strong>website accessibility</strong> and HTTPS status</li>
+                <li>Updates the brand's <strong>Last Researched</strong> date</li>
+              </ol>
+              <p>Updated data syncs to Google Sheets via the daily auto-sync. Use <strong>Auto-Research Outdated</strong> to refresh all brands over 30 days old (up to 10 at a time).</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -122,7 +237,30 @@
     </main>
   </div>
 
-    <script src="data/data_partA.js"></script>
+  <!-- Research Modal -->
+  <div class="research-modal-overlay" id="research-modal">
+    <div class="research-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+        <h3 class="text-lg font-semibold" id="modal-title">Researching Brand</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeResearchModal()" id="modal-close-btn" style="display:none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modal-status" class="text-sm text-secondary" style="margin-bottom:var(--space-3);">
+        <span class="research-spinner"></span> Collecting data from public sources...
+      </div>
+      <div class="batch-progress" id="modal-progress" style="display:none;">
+        <div class="batch-progress-bar" id="modal-progress-bar"></div>
+      </div>
+      <div class="research-log" id="modal-log"></div>
+      <div id="modal-results" style="display:none;"></div>
+      <div id="modal-actions" style="margin-top:var(--space-4);display:none;text-align:right;">
+        <button class="btn btn-primary btn-sm" onclick="closeResearchModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
   <script src="data/data_partD.js"></script>
@@ -141,6 +279,7 @@
 
     var researchData = [];
     var currentSort = { key: 'daysSince', dir: 'desc' };
+    var activeResearch = {};
 
     async function initAdminPage() {
       document.getElementById('admin-content').style.display = '';
@@ -178,6 +317,11 @@
       });
 
       // KPIs
+      renderKPIs();
+      filterResearch();
+    }
+
+    function renderKPIs() {
       var fresh = researchData.filter(function(r) { return r.freshness === 'fresh'; }).length;
       var stale = researchData.filter(function(r) { return r.freshness === 'stale'; }).length;
       var outdated = researchData.filter(function(r) { return r.freshness === 'outdated'; }).length;
@@ -222,9 +366,9 @@
               '</div>' +
             '</div>' +
           '</div>';
+      } else {
+        document.getElementById('alerts').innerHTML = '';
       }
-
-      filterResearch();
     }
 
     function sortResearch(key) {
@@ -262,8 +406,13 @@
         var logoHtml = Components.renderLogo(r, 'brand-logo');
         var freshnessIcon = r.freshness === 'fresh' ? 'fa-circle-check' : r.freshness === 'stale' ? 'fa-clock' : 'fa-triangle-exclamation';
         var daysColor = r.daysSince > 30 ? 'color:var(--red-text)' : r.daysSince > 14 ? 'color:var(--orange-text)' : 'color:var(--green-text)';
+        var isResearching = activeResearch[r.id];
+        var btnClass = isResearching ? 'btn-researching' : (r.freshness !== 'fresh' ? 'btn-primary' : 'btn-ghost');
+        var btnIcon = isResearching ? '<span class="research-spinner"></span>' : '<i class="fa-solid fa-rotate"></i> ';
+        var btnText = isResearching ? 'Researching...' : (r.freshness !== 'fresh' ? 'Refresh' : 'Re-check');
+        var escapedName = r.name.replace(/'/g, "\\'" );
 
-        return '<tr>' +
+        return '<tr id="row-' + r.id + '">' +
           '<td>' +
             '<div class="brand-cell">' +
               logoHtml +
@@ -282,16 +431,239 @@
           '</td>' +
           '<td><span class="text-sm tabular-nums" style="' + daysColor + '">' + r.daysSince + ' days</span></td>' +
           '<td>' +
-            '<button class="btn btn-sm ' + (r.freshness !== 'fresh' ? 'btn-primary' : 'btn-ghost') + '" onclick="triggerResearch(\'' + r.name.replace(/'/g, "\\'") + '\')">' +
-              '<i class="fa-solid fa-rotate"></i> ' + (r.freshness !== 'fresh' ? 'Refresh' : 'Re-check') +
+            '<button class="btn btn-sm ' + btnClass + '" id="btn-' + r.id + '" onclick="triggerResearch(\'' + r.id + '\', \'' + escapedName + '\')">' +
+              btnIcon + btnText +
             '</button>' +
           '</td>' +
         '</tr>';
       }).join('');
     }
 
-    function triggerResearch(brandName) {
-      Components.showToast('Research triggered for ' + brandName);
+    // ============================================================
+    // RESEARCH ACTIONS
+    // ============================================================
+
+    async function triggerResearch(brandId, brandName) {
+      if (activeResearch[brandId]) return;
+
+      // Check if backend is available
+      var isLive = GoNoGoAPI.isLive();
+      if (!isLive) {
+        Components.showToast('Auto-Research requires the live platform backend. Currently running in static mode.', 'error');
+        return;
+      }
+
+      activeResearch[brandId] = true;
+
+      // Update button state
+      var btn = document.getElementById('btn-' + brandId);
+      if (btn) {
+        btn.className = 'btn btn-sm btn-researching';
+        btn.innerHTML = '<span class="research-spinner"></span> Researching...';
+      }
+
+      // Show modal
+      showResearchModal(brandName);
+      addLog('Starting research for ' + brandName + '...', 'info');
+      addLog('Checking Google Play Store...', '');
+      addLog('Querying Apple App Store (iTunes API)...', '');
+      addLog('Looking up Hellopeter data...', '');
+      addLog('Verifying website status...', '');
+
+      try {
+        var rawBase = '__PORT_8000__';
+        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
+        var resp = await fetch(API_BASE + '/api/admin/research/' + brandId, { method: 'POST' });
+        var result = await resp.json();
+
+        if (result.status === 'completed') {
+          addLog('', '');
+          addLog('Research completed successfully', 'success');
+
+          var fieldsUpdated = result.fields_updated || [];
+          if (fieldsUpdated.length > 0) {
+            fieldsUpdated.forEach(function(field) {
+              addLog('  Updated: ' + field, 'success');
+            });
+          }
+
+          var changes = result.changes || [];
+          if (changes.length > 0) {
+            addLog('', '');
+            addLog('Changes:', 'info');
+            changes.forEach(function(change) {
+              addLog('  ' + change, 'info');
+            });
+          }
+
+          // Show result details
+          showResearchResults(result);
+
+          // Update local data
+          var rd = researchData.find(function(r) { return r.id === brandId; });
+          if (rd) {
+            rd.lastUpdated = new Date().toISOString().split('T')[0];
+            rd.daysSince = 0;
+            rd.freshness = 'fresh';
+          }
+
+          renderKPIs();
+          filterResearch();
+
+          Components.showToast('Research complete for ' + brandName, 'success');
+        } else if (result.status === 'error') {
+          addLog('', '');
+          addLog('Error: ' + (result.error || 'Unknown error'), 'error');
+          Components.showToast('Research failed for ' + brandName, 'error');
+        }
+      } catch (e) {
+        addLog('', '');
+        addLog('Request failed: ' + e.message, 'error');
+        Components.showToast('Failed to reach research API', 'error');
+      }
+
+      activeResearch[brandId] = false;
+      completeModal();
+    }
+
+    async function triggerBatchResearch(freshness) {
+      var isLive = GoNoGoAPI.isLive();
+      if (!isLive) {
+        Components.showToast('Auto-Research requires the live platform backend.', 'error');
+        return;
+      }
+
+      var label = freshness === 'stale' ? 'stale (15-30 days)' : 'outdated (30+ days)';
+      var count = researchData.filter(function(r) {
+        if (freshness === 'stale') return r.freshness === 'stale' || r.freshness === 'outdated';
+        return r.freshness === 'outdated';
+      }).length;
+
+      if (count === 0) {
+        Components.showToast('No ' + label + ' brands to research', 'info');
+        return;
+      }
+
+      showResearchModal('Batch Research — ' + label);
+      addLog('Starting batch research for ' + count + ' brands...', 'info');
+      addLog('Processing up to 10 brands at a time...', '');
+
+      document.getElementById('modal-progress').style.display = 'block';
+
+      try {
+        var rawBase = '__PORT_8000__';
+        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
+        var resp = await fetch(API_BASE + '/api/admin/research-batch?freshness=' + freshness, { method: 'POST' });
+        var result = await resp.json();
+
+        if (result.status === 'completed') {
+          var total = result.total_researched || 0;
+          document.getElementById('modal-progress-bar').style.width = '100%';
+
+          addLog('', '');
+          addLog('Batch research completed: ' + total + ' brands processed', 'success');
+
+          if (result.total_remaining > 0) {
+            addLog(result.total_remaining + ' brands remaining — run again to continue', 'info');
+          }
+
+          (result.results || []).forEach(function(r) {
+            if (r.status === 'completed') {
+              var changeStr = (r.changes || []).join(', ');
+              addLog('  ' + r.brand + ': ' + (changeStr || 'updated'), 'success');
+            } else {
+              addLog('  ' + r.brand + ': ' + (r.error || 'failed'), 'error');
+            }
+          });
+
+          // Refresh the whole page data
+          await initAdminPage();
+          Components.showToast('Batch research complete: ' + total + ' brands updated', 'success');
+        } else if (result.status === 'no_targets') {
+          addLog('No brands match the criteria', 'info');
+        }
+      } catch (e) {
+        addLog('Batch request failed: ' + e.message, 'error');
+        Components.showToast('Batch research request failed', 'error');
+      }
+
+      completeModal();
+    }
+
+    // ============================================================
+    // MODAL HELPERS
+    // ============================================================
+
+    function showResearchModal(title) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-status').innerHTML = '<span class="research-spinner"></span> Collecting data from public sources...';
+      document.getElementById('modal-log').innerHTML = '';
+      document.getElementById('modal-results').style.display = 'none';
+      document.getElementById('modal-results').innerHTML = '';
+      document.getElementById('modal-actions').style.display = 'none';
+      document.getElementById('modal-close-btn').style.display = 'none';
+      document.getElementById('modal-progress').style.display = 'none';
+      document.getElementById('modal-progress-bar').style.width = '0%';
+      document.getElementById('research-modal').classList.add('active');
+    }
+
+    function closeResearchModal() {
+      document.getElementById('research-modal').classList.remove('active');
+    }
+
+    function completeModal() {
+      document.getElementById('modal-status').innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--green);"></i> Research complete';
+      document.getElementById('modal-close-btn').style.display = '';
+      document.getElementById('modal-actions').style.display = '';
+    }
+
+    function addLog(message, type) {
+      var log = document.getElementById('modal-log');
+      var entry = document.createElement('div');
+      entry.className = 'log-entry' + (type ? ' ' + type : '');
+      var timestamp = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      entry.textContent = (message ? '[' + timestamp + '] ' + message : '');
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function showResearchResults(result) {
+      var container = document.getElementById('modal-results');
+      var data = result.data || {};
+      var html = '<div class="research-result-card">';
+      html += '<h4 class="text-sm font-semibold" style="margin-bottom:var(--space-3);">Research Results</h4>';
+
+      if (data.googlePlay) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-google-play" style="margin-right:4px;"></i> Google Play</span><span class="result-value">' + data.googlePlay + '</span></div>';
+      }
+      if (data.ios) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-apple" style="margin-right:4px;"></i> iOS App Store</span><span class="result-value">' + data.ios + '</span></div>';
+      }
+      if (data.hellopeter) {
+        var hp = data.hellopeter;
+        var hpStr = '';
+        if (hp.trust_index) hpStr += 'Trust: ' + hp.trust_index;
+        if (hp.star_rating) hpStr += (hpStr ? ' | ' : '') + hp.star_rating + '/5';
+        if (hp.review_count) hpStr += (hpStr ? ' | ' : '') + hp.review_count + ' reviews';
+        if (hpStr) {
+          html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-comments" style="margin-right:4px;"></i> Hellopeter</span><span class="result-value">' + hpStr + '</span></div>';
+        }
+      }
+      if (data.website_status) {
+        var ws = data.website_status;
+        var statusIcon = ws.accessible ? '<span style="color:var(--green);">Online</span>' : '<span style="color:var(--red-text);">Offline</span>';
+        var details = statusIcon;
+        if (ws.response_time_ms) details += ' (' + ws.response_time_ms + 'ms)';
+        if (ws.https) details += ' <i class="fa-solid fa-lock" style="color:var(--green);font-size:10px;"></i>';
+        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-globe" style="margin-right:4px;"></i> Website</span><span class="result-value">' + details + '</span></div>';
+      }
+      if (data.lastUpdated) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-calendar" style="margin-right:4px;"></i> Updated</span><span class="result-value">' + data.lastUpdated + '</span></div>';
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
+      container.style.display = '';
     }
   </script>
 </body>
