@@ -286,6 +286,11 @@
           Components.showToast('Please fill in both fields', 'error');
           return;
         }
+        // Check if backend is available
+        if (!GoNoGoAPI.isLive()) {
+          Components.showToast('Reviews require the live GoNoGo platform. This static version is read-only.', 'error');
+          return;
+        }
         try {
           await GoNoGoAPI.submitReview({
             category: brand.categorySlug,
@@ -299,7 +304,13 @@
           Components.showToast('Review submitted — thank you!');
           await loadReviews();
         } catch (e) {
-          Components.showToast('Error submitting review. Please try again.', 'error');
+          var msg = e.message || 'Error submitting review. Please try again.';
+          if (msg.indexOf('live platform') !== -1 || msg.indexOf('require') !== -1) {
+            Components.showToast(msg, 'error');
+          } else {
+            Components.showToast('Error submitting review. Please try again.', 'error');
+          }
+          console.error('Review submission error:', e);
         }
       };
 
