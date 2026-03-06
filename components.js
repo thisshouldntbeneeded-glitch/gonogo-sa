@@ -3,6 +3,80 @@
 
 const LOGO_URL = 'https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng';
 
+// ===== Static fallback functions for read-only mode =====
+
+function getAllBrands() {
+  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
+  var brands = [];
+  BRAND_DATA.forEach(function(cat) {
+    if (!cat.brands) return;
+    cat.brands.forEach(function(b) {
+      brands.push(Object.assign({}, b, {
+        category_slug: cat.slug,
+        category_name: cat.name
+      }));
+    });
+  });
+  return brands;
+}
+
+function getCategories() {
+  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
+  return BRAND_DATA.map(function(cat) {
+    return {
+      id: cat.slug,
+      slug: cat.slug,
+      name: cat.name,
+      icon: cat.icon || null,
+      brandCount: (cat.brands || []).length,
+      scoringCategories: cat.scoring_categories || []
+    };
+  });
+}
+
+function getCategoriesWithBrands() {
+  return getCategories().map(function(cat) {
+    return Object.assign({}, cat, {
+      hasBrands: cat.brandCount > 0
+    });
+  });
+}
+
+function getBrandsByCategory(slug) {
+  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
+  var category = BRAND_DATA.find(function(cat) { return cat.slug === slug; });
+  return category && Array.isArray(category.brands) ? category.brands : [];
+}
+
+function getBrandById(id) {
+  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return null;
+  var found = null;
+  BRAND_DATA.forEach(function(cat) {
+    (cat.brands || []).forEach(function(b) {
+      if (String(b.id) === String(id)) {
+        found = Object.assign({}, b, {
+          category_slug: cat.slug,
+          category_name: cat.name
+        });
+      }
+    });
+  });
+  return found;
+}
+
+function getTopBrands(count) {
+  var n = count || 6;
+  var all = getAllBrands();
+  all.sort(function(a, b) {
+    var sa = a.gonogo_score || 0;
+    var sb = b.gonogo_score || 0;
+    return sb - sa;
+  });
+  return all.slice(0, n);
+}
+
+// ===== End static fallback functions =====
+
 const Components = {
   // ============================================================
   // LOGO HELPER
