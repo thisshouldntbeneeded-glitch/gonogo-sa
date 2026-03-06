@@ -5,16 +5,58 @@ const LOGO_URL = 'https://images.squarespace-cdn.com/content/6814797d734d653e602
 
 // ===== Static fallback functions for read-only mode =====
 
+// ===== Static fallback functions for read-only mode =====
+
+// Transform raw brand data to match UI expectations
+function transformBrand(rawBrand, categorySlug, categoryName) {
+  // Build categoryScores object from framework_breakdown
+  var categoryScores = {};
+  if (Array.isArray(rawBrand.framework_breakdown)) {
+    rawBrand.framework_breakdown.forEach(function(item) {
+      var scoreParts = item.score.split('/');
+      categoryScores[item.category] = {
+        score: parseInt(scoreParts[0]) || 0,
+        max: parseInt(scoreParts[1]) || 0
+      };
+    });
+  }
+
+  // Parse app ratings
+  var appRatings = { googlePlay: 'N/A', ios: 'N/A' };
+  if (rawBrand.app_ratings) {
+    appRatings.googlePlay = rawBrand.app_ratings.google_play || 'N/A';
+    appRatings.ios = rawBrand.app_ratings.ios || 'N/A';
+  }
+
+  return {
+    id: rawBrand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    name: rawBrand.name,
+    overallScore: rawBrand.gonogo_score || 0,
+    gonogo_score: rawBrand.gonogo_score || 0,
+    verdict: rawBrand.verdict || 'CAUTION',
+    logo: rawBrand.logo_url || null,
+    website: rawBrand.website_url || null,
+    categoryScores: categoryScores,
+    categoryName: categoryName,
+    category_name: categoryName,
+    category_slug: categorySlug,
+    appRatings: appRatings,
+    keyFeatures: rawBrand.key_features || [],
+    pricing: rawBrand.pricing || [],
+    keyStrengths: rawBrand.key_strengths || [],
+    keyConcerns: rawBrand.key_concerns || [],
+    socialSentiment: rawBrand.social_sentiment || {},
+    lastUpdated: rawBrand.last_updated || ''
+  };
+}
+
 function getAllBrands() {
   if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
   var brands = [];
   BRAND_DATA.forEach(function(cat) {
-    if (!cat.brands) return;
-    cat.brands.forEach(function(b) {
-      brands.push(Object.assign({}, b, {
-        category_slug: cat.slug,
-        category_name: cat.name
-      }));
+    if (!cat.brands || !Array.isArray(cat.brands)) return;
+    cat.brands.forEach(function(rawBrand) {
+      brands.push(transformBrand(rawBrand, cat.slug, cat.category || cat.name));
     });
   });
   return brands;
@@ -26,7 +68,7 @@ function getCategories() {
     return {
       id: cat.slug,
       slug: cat.slug,
-      name: cat.name,
+      name: cat.category || cat.name,
       icon: cat.icon || null,
       brandCount: (cat.brands || []).length,
       scoringCategories: cat.scoring_categories || []
@@ -45,35 +87,26 @@ function getCategoriesWithBrands() {
 function getBrandsByCategory(slug) {
   if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
   var category = BRAND_DATA.find(function(cat) { return cat.slug === slug; });
-  return category && Array.isArray(category.brands) ? category.brands : [];
+  if (!category || !Array.isArray(category.brands)) return [];
+  return category.brands.map(function(rawBrand) {
+    return transformBrand(rawBrand, category.slug, category.category || category.name);
+  });
 }
 
 function getBrandById(id) {
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return null;
-  var found = null;
-  BRAND_DATA.forEach(function(cat) {
-    (cat.brands || []).forEach(function(b) {
-      if (String(b.id) === String(id)) {
-        found = Object.assign({}, b, {
-          category_slug: cat.slug,
-          category_name: cat.name
-        });
-      }
-    });
-  });
-  return found;
+  var all = getAllBrands();
+  return all.find(function(b) { return b.id === id; }) || null;
 }
 
 function getTopBrands(count) {
   var n = count || 6;
   var all = getAllBrands();
   all.sort(function(a, b) {
-    var sa = a.gonogo_score || 0;
-    var sb = b.gonogo_score || 0;
-    return sb - sa;
+    return b.overallScore - a.overallScore;
   });
   return all.slice(0, n);
 }
+
 
 // ===== End static fallback functions =====
 
