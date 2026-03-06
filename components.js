@@ -37,33 +37,35 @@ var Components = (function() {
   }
 
   function renderBrandCard(brand, index) {
-    var color = getScoreColor(brand.overallScore);
-    var verdict = brand.verdict || (brand.overallScore >= 80 ? 'GO' : brand.overallScore >= 60 ? 'CAUTION' : 'NOGO');
+  var score = brand.gonogo_score || 0;
+  var color = getScoreColor(score);
+  var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'CAUTION' : 'NOGO');
 
-    return '<div class="brand-card">' +
-      '<div class="brand-card-header">' +
-        '<div class="brand-logo-wrapper">' +
-          (brand.logo ? '<img src="' + brand.logo + '" alt="' + brand.name + '" class="brand-logo">' : 
-           '<div class="brand-logo-placeholder"><i class="fa-solid fa-building"></i></div>') +
-        '</div>' +
-        '<div class="brand-info">' +
-          '<h3 class="brand-name">' + brand.name + '</h3>' +
-          '<p class="brand-category">' + (brand.category || '') + '</p>' +
-        '</div>' +
+  return '<div class="brand-card">' +
+    '<div class="brand-card-header">' +
+      '<div class="brand-logo-wrapper">' +
+        (brand.logo ? '<img src="' + brand.logo + '" alt="' + brand.name + '" class="brand-logo">' : 
+         '<div class="brand-logo-placeholder"><i class="fa-solid fa-building"></i></div>') +
       '</div>' +
-      '<div class="score-section">' +
-        '<div class="score-circle" style="border-color:' + color + '">' +
-          '<div class="score-value" style="color:' + color + '">' + brand.overallScore + '</div>' +
-          '<div class="score-label">Score</div>' +
-        '</div>' +
-        '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(' ', '-') + '">' + verdict + '</div>' +
+      '<div class="brand-info">' +
+        '<h3 class="brand-name">' + brand.name + '</h3>' +
+        '<p class="brand-category">' + (brand.category || '') + '</p>' +
       '</div>' +
-      '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
-      '<div class="brand-details">' +
-        '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
+    '</div>' +
+    '<div class="score-section">' +
+      '<div class="score-circle" style="border-color:' + color + '">' +
+        '<div class="score-value" style="color:' + color + '">' + score + '</div>' +
+        '<div class="score-label">Score</div>' +
       '</div>' +
-    '</div>';
-  }
+      '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(' ', '-') + '">' + verdict + '</div>' +
+    '</div>' +
+    '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
+    '<div class="brand-details">' +
+      '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
+    '</div>' +
+  '</div>';
+}
+
 
   function createRadarChart(canvasId, brand, options) {
     options = options || {};
