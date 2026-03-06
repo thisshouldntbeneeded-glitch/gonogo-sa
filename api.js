@@ -1,78 +1,106 @@
-// GoNoGo SA - Final Fixed API Client
-// Properly returns static data from window functions
-
+// GoNoGo SA - API Client (PROPERLY FIXED)
 var GoNoGoAPI = (function() {
-  var API_BASE = '';
-  var _backendAvailable = false;
+  'use strict';
 
-  // Simple backend check
+  var API_BASE = '';
+
   function checkBackend() {
-    return Promise.resolve(false); // Always use static mode
+    // Always return false to use static mode
+    return Promise.resolve(false);
   }
 
   return {
-    isLive: function() { 
-      return false; 
+    isLive: function() {
+      return false;
     },
 
     getCategoriesWithBrands: function() {
-      console.log('API: getCategoriesWithBrands called');
-      return checkBackend().then(function(available) {
-        console.log('API: backend available?', available);
-        if (!available && typeof window.getCategoriesWithBrands === 'function') {
-          console.log('API: calling window.getCategoriesWithBrands');
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof window.getCategoriesWithBrands !== 'function') {
+            reject(new Error('getCategoriesWithBrands not available'));
+            return;
+          }
           var result = window.getCategoriesWithBrands();
-          console.log('API: got result:', result ? result.length : 'undefined');
-          return result; // RETURN the result!
+          resolve(result);
+        } catch (e) {
+          reject(e);
         }
-        return [];
       });
     },
 
+    getCategories: function() {
+      // Alias for getCategoriesWithBrands
+      return this.getCategoriesWithBrands();
+    },
+
     getTopBrands: function(count) {
-      console.log('API: getTopBrands called');
-      return checkBackend().then(function(available) {
-        console.log('API: backend available?', available);
-        if (!available && typeof window.getTopBrands === 'function') {
-          console.log('API: calling window.getTopBrands');
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof window.getTopBrands !== 'function') {
+            reject(new Error('getTopBrands not available'));
+            return;
+          }
           var result = window.getTopBrands(count || 6);
-          console.log('API: got result:', result ? result.length : 'undefined');
-          return result; // RETURN the result!
+          resolve(result);
+        } catch (e) {
+          reject(e);
         }
-        return [];
       });
     },
 
     getAllBrands: function() {
-      return checkBackend().then(function(available) {
-        if (!available && typeof window.getAllBrands === 'function') {
-          return window.getAllBrands();
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof window.getAllBrands !== 'function') {
+            reject(new Error('getAllBrands not available'));
+            return;
+          }
+          var result = window.getAllBrands();
+          resolve(result);
+        } catch (e) {
+          reject(e);
         }
-        return [];
       });
     },
 
     getBrandsByCategory: function(slug) {
-      return checkBackend().then(function(available) {
-        if (!available && typeof window.getBrandsByCategory === 'function') {
-          return window.getBrandsByCategory(slug);
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof window.getBrandsByCategory !== 'function') {
+            reject(new Error('getBrandsByCategory not available'));
+            return;
+          }
+          var result = window.getBrandsByCategory(slug);
+          resolve(result);
+        } catch (e) {
+          reject(e);
         }
-        return [];
       });
     },
 
     getBrandById: function(id) {
-      return checkBackend().then(function(available) {
-        if (!available && typeof window.getBrandById === 'function') {
-          return window.getBrandById(id);
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof window.getBrandById !== 'function') {
+            reject(new Error('getBrandById not available'));
+            return;
+          }
+          var result = window.getBrandById(id);
+          resolve(result);
+        } catch (e) {
+          reject(e);
         }
-        return null;
       });
     },
 
     getStats: function() {
-      return checkBackend().then(function(available) {
-        if (!available && typeof BRAND_DATA !== 'undefined') {
+      return new Promise(function(resolve, reject) {
+        try {
+          if (typeof BRAND_DATA === 'undefined') {
+            reject(new Error('BRAND_DATA not available'));
+            return;
+          }
           var totalBrands = 0;
           var totalScore = 0;
           BRAND_DATA.forEach(function(c) {
@@ -83,20 +111,17 @@ var GoNoGoAPI = (function() {
               });
             }
           });
-          return {
+          resolve({
             totalCategories: BRAND_DATA.length,
             totalBrands: totalBrands,
             averageScore: totalBrands > 0 ? Math.round(totalScore / totalBrands * 10) / 10 : 0
-          };
+          });
+        } catch (e) {
+          reject(e);
         }
-        return {};
       });
     }
   };
 })();
 
-console.log('GoNoGoAPI loaded:', typeof GoNoGoAPI);
-console.log('Testing API call...');
-GoNoGoAPI.getCategoriesWithBrands().then(function(result) {
-  console.log('API test complete. Result:', result ? result.length + ' categories' : 'FAILED');
-});
+console.log('GoNoGoAPI loaded successfully');
