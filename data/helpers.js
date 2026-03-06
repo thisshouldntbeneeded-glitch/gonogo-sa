@@ -1,97 +1,133 @@
-// GoNoGo SA - Helpers (DEBUG VERSION - Ultra Simple)
+// GoNoGo SA - Data Helpers (FIXED SCORE CALCULATIONS)
 
-console.log('helpers.js loading...');
-console.log('BRAND_DATA exists?', typeof BRAND_DATA);
-console.log('BRAND_DATA length:', Array.isArray(BRAND_DATA) ? BRAND_DATA.length : 'NOT ARRAY');
-
-// Ultra simple - just return BRAND_DATA directly with minimal transformation
-window.getCategoriesWithBrands = function() {
-  console.log('getCategoriesWithBrands called, BRAND_DATA:', typeof BRAND_DATA);
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) {
-    console.error('BRAND_DATA not available!');
-    return [];
-  }
-
-  try {
-    var result = BRAND_DATA.map(function(cat) {
-      return {
-        id: cat.slug || '',
-        name: cat.category || '',
-        icon: cat.icon || '',
-        brandCount: (cat.brands && cat.brands.length) || 0,
-        hasBrands: (cat.brands && cat.brands.length > 0) || false,
-        scoringCategories: []
-      };
-    });
-    console.log('getCategoriesWithBrands returning:', result.length, 'categories');
-    return result;
-  } catch (e) {
-    console.error('Error in getCategoriesWithBrands:', e);
-    return [];
-  }
-};
-
-window.getTopBrands = function(count) {
-  console.log('getTopBrands called, BRAND_DATA:', typeof BRAND_DATA);
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) {
-    console.error('BRAND_DATA not available for getTopBrands!');
-    return [];
-  }
-
-  try {
-    var allBrands = [];
-    BRAND_DATA.forEach(function(cat) {
-      if (cat.brands && Array.isArray(cat.brands)) {
-        cat.brands.forEach(function(brand) {
-          allBrands.push(brand);
-        });
-      }
-    });
-
-    allBrands.sort(function(a, b) {
-      return (b.gonogo_score || 0) - (a.gonogo_score || 0);
-    });
-
-    var result = allBrands.slice(0, count || 6);
-    console.log('getTopBrands returning:', result.length, 'brands');
-    return result;
-  } catch (e) {
-    console.error('Error in getTopBrands:', e);
-    return [];
-  }
-};
-
-// Add other functions
-window.getAllBrands = function() {
-  if (typeof BRAND_DATA === 'undefined') return [];
-  var all = [];
-  BRAND_DATA.forEach(function(c) {
-    if (c.brands) c.brands.forEach(function(b) { all.push(b); });
-  });
-  return all;
-};
-
-window.getBrandsByCategory = function(slug) {
-  if (typeof BRAND_DATA === 'undefined') return [];
-  var cat = BRAND_DATA.find(function(c) { return c.slug === slug; });
-  return (cat && cat.brands) || [];
-};
-
+// Transform BRAND_DATA into proper structure with calculated percentage scores
 window.getBrandById = function(id) {
-  if (typeof BRAND_DATA === 'undefined') return null;
   for (var i = 0; i < BRAND_DATA.length; i++) {
-    if (BRAND_DATA[i].brands) {
-      for (var j = 0; j < BRAND_DATA[i].brands.length; j++) {
-        if (BRAND_DATA[i].brands[j].id === id) return BRAND_DATA[i].brands[j];
+    var cat = BRAND_DATA[i];
+    if (cat.brands) {
+      for (var j = 0; j < cat.brands.length; j++) {
+        if (cat.brands[j].id === id) {
+          var b = cat.brands[j];
+          return {
+            id: b.id,
+            name: b.name,
+            category: cat.category,
+            overallScore: b.gonogo_score || 0,
+            verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
+            logo: b.logo || '',
+            website: b.website || '',
+            scores: calculatePercentageScores(b),
+            strengths: parseListField(b.strengths),
+            weaknesses: parseListField(b.concerns),
+            features: parseListField(b.features),
+            pricing: b.pricing || '',
+            googlePlayRating: b.googleplay_rating || '',
+            iosRating: b.ios_rating || '',
+            tags: parseListField(b.tags),
+            socialSentiment: b.social_sentiment || '',
+            socialPositive: parseListField(b.social_positive),
+            socialConcerns: parseListField(b.social_concerns),
+            lastUpdated: b.last_updated || ''
+          };
+        }
       }
     }
   }
   return null;
 };
 
-window.getCategories = window.getCategoriesWithBrands;
+window.getBrandsByCategory = function(slug) {
+  for (var i = 0; i < BRAND_DATA.length; i++) {
+    if (BRAND_DATA[i].slug === slug) {
+      var cat = BRAND_DATA[i];
+      return (cat.brands || []).map(function(b) {
+        return {
+          id: b.id,
+          name: b.name,
+          category: cat.category,
+          overallScore: b.gonogo_score || 0,
+          verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
+          logo: b.logo || '',
+          scores: calculatePercentageScores(b),
+          strengths: parseListField(b.strengths),
+          weaknesses: parseListField(b.concerns)
+        };
+      });
+    }
+  }
+  return [];
+};
+
+window.getAllBrands = function() {
+  var allBrands = [];
+  for (var i = 0; i < BRAND_DATA.length; i++) {
+    var cat = BRAND_DATA[i];
+    if (cat.brands) {
+      cat.brands.forEach(function(b) {
+        allBrands.push({
+          id: b.id,
+          name: b.name,
+          category: cat.category,
+          overallScore: b.gonogo_score || 0,
+          verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
+          logo: b.logo || '',
+          scores: calculatePercentageScores(b)
+        });
+      });
+    }
+  }
+  return allBrands;
+};
+
+window.getTopBrands = function(count) {
+  var all = getAllBrands();
+  all.sort(function(a, b) { return b.overallScore - a.overallScore; });
+  return all.slice(0, count || 6);
+};
+
+window.getCategoriesWithBrands = function() {
+  return BRAND_DATA.map(function(cat) {
+    return {
+      id: cat.slug,
+      name: cat.category,
+      icon: cat.icon,
+      brandCount: cat.brands ? cat.brands.length : 0,
+      hasBrands: cat.brands && cat.brands.length > 0
+    };
+  });
+};
+
+// Calculate percentage scores for radar chart
+function calculatePercentageScores(brand) {
+  var scores = {};
+  var scoreFields = [
+    {name: 'Compliance', score: 'compliance_score', max: 'compliance_max'},
+    {name: 'Customer Satisfaction', score: 'customer_satisfaction_score', max: 'customer_satisfaction_max'},
+    {name: 'Product Value', score: 'product_value_score', max: 'product_value_max'},
+    {name: 'Innovation', score: 'innovation_score', max: 'innovation_max'},
+    {name: 'Customer Support', score: 'customer_support_score', max: 'customer_support_max'},
+    {name: 'Accessibility & Security', score: 'accessibility_security_score', max: 'accessibility_security_max'}
+  ];
+
+  scoreFields.forEach(function(field) {
+    if (brand[field.score] !== undefined && brand[field.max] && brand[field.max] > 0) {
+      scores[field.name] = Math.round((brand[field.score] / brand[field.max]) * 100);
+    }
+  });
+
+  return scores;
+}
+
+// Parse semicolon-separated list fields
+function parseListField(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return value.toString().split(';').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+}
 
 console.log('helpers.js loaded - testing now...');
 console.log('Test window.getCategoriesWithBrands():');
-var testResult = window.getCategoriesWithBrands();
-console.log('Result:', testResult ? testResult.length + ' categories' : 'FAILED');
+var testCats = window.getCategoriesWithBrands();
+console.log('getCategoriesWithBrands called, BRAND_DATA:', typeof BRAND_DATA);
+console.log('getCategoriesWithBrands returning:', testCats.length, 'categories');
+console.log('Result:', testCats.length, 'categories');
