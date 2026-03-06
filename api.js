@@ -125,11 +125,19 @@ var GoNoGoAPI = (function() {
     },
 
     async getBrandById(id) {
-      var data = await _fetch('/api/brand/' + id);
-      if (data) return data;
-      if (typeof getBrandById === 'function') return getBrandById(id);
-      return null;
-    },
+  // Try backend first
+  try {
+    var data = await _fetch('/api/brand/' + id);
+    if (data) return data;
+  } catch (e) {
+    // Backend unavailable, fall through to static
+  }
+  // Use static fallback from global scope
+  if (typeof window.getBrandById === 'function') {
+    return window.getBrandById(id);
+  }
+  return null;
+}
 
     async getTopBrands(count) {
       var data = await _fetch('/api/top-brands?count=' + (count || 6));
