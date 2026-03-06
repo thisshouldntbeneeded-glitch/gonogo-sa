@@ -4,12 +4,12 @@
 <!--
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+ / /   / __ \\/ __ `__ \\/ __ \\/ / / / __/ _ \\/ ___/
 / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+\\____/\\____/_/ /_/ /_/ .___/\\__,_/\\__/\\___/_/
                     /_/
         Created with Perplexity Computer
-        https://www.perplexity.ai/computer
+        [https://www.perplexity.ai/computer](https://www.perplexity.ai/computer)
 -->
 <meta name="generator" content="Perplexity Computer">
 <meta name="author" content="Perplexity Computer">
@@ -122,7 +122,8 @@
 
   <div id="footer"></div>
 
-    <script src="data/data_partA1a.js"></script>
+  <!-- CRITICAL: Data files MUST load first -->
+  <script src="data/data_partA1a.js"></script>
   <script src="data/data_partA1b.js"></script>
   <script src="data/data_partA1.js"></script>
   <script src="data/data_partA2.js"></script>
@@ -149,9 +150,16 @@
   <script src="data/data_partF.js"></script>
   <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
+  
+  <!-- Chart.js for radar charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Components (static helpers) MUST come after data, before API -->
   <script src="components.js"></script>
+  
+  <!-- API client MUST come last -->
   <script src="api.js"></script>
+  
   <script>
     document.getElementById('nav').innerHTML = Components.renderPublicNav('home');
     document.getElementById('footer').innerHTML = Components.renderFooter();
