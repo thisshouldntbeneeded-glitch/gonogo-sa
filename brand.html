@@ -25,50 +25,58 @@
 <body>
   <div id="nav"></div>
 
-  <!-- Brand Header -->
-  <section class="brand-header" id="brand-header">
+  <!-- Brand Hero -->
+  <section class="brand-header" id="brand-header" style="padding:var(--space-12) 0">
     <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading brand...</div>
   </section>
 
-  <!-- Score Breakdown -->
+  <!-- Quick Stats -->
+  <section class="section" style="background:var(--surface-1);padding:var(--space-6) 0">
+    <div class="container">
+      <div id="quick-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4)"></div>
+    </div>
+  </section>
+
+  <!-- Main Content Grid -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title">Score Breakdown</h2>
-      <div id="score-breakdown">
-        <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading scores...</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Key Features -->
-  <section class="section" style="background:var(--surface-1)">
-    <div class="container">
-      <h2 class="section-title">Key Features</h2>
-      <div id="key-features"></div>
-    </div>
-  </section>
-
-  <!-- Strengths & Concerns -->
-  <section class="section">
-    <div class="container">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-6)">
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-8)">
+        
+        <!-- Left Column: Detailed Scores -->
         <div>
-          <h3 class="section-title" style="font-size:var(--text-xl)">Key Strengths</h3>
-          <div id="key-strengths"></div>
+          <h2 class="section-title">Detailed Score Breakdown</h2>
+          <div id="detailed-scores" style="margin-bottom:var(--space-8)"></div>
+
+          <h2 class="section-title">Social Sentiment</h2>
+          <div id="social-sentiment" style="margin-bottom:var(--space-8)"></div>
+
+          <h2 class="section-title">Customer Reviews</h2>
+          <div id="customer-reviews"></div>
         </div>
+
+        <!-- Right Column: Summary Info -->
         <div>
-          <h3 class="section-title" style="font-size:var(--text-xl)">Key Concerns</h3>
-          <div id="key-concerns"></div>
+          <div class="info-card">
+            <h3 style="margin-bottom:var(--space-4)"><i class="fa-solid fa-star"></i> Key Features</h3>
+            <div id="key-features"></div>
+          </div>
+
+          <div class="info-card" style="margin-top:var(--space-4)">
+            <h3 style="margin-bottom:var(--space-4)"><i class="fa-solid fa-coins"></i> Pricing</h3>
+            <div id="pricing"></div>
+          </div>
+
+          <div class="info-card" style="margin-top:var(--space-4)">
+            <h3 style="margin-bottom:var(--space-4)"><i class="fa-solid fa-thumbs-up"></i> Strengths</h3>
+            <div id="key-strengths"></div>
+          </div>
+
+          <div class="info-card" style="margin-top:var(--space-4)">
+            <h3 style="margin-bottom:var(--space-4)"><i class="fa-solid fa-triangle-exclamation"></i> Concerns</h3>
+            <div id="key-concerns"></div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
-  <section class="section" style="background:var(--surface-1)">
-    <div class="container">
-      <h2 class="section-title">Pricing</h2>
-      <div id="pricing"></div>
     </div>
   </section>
 
@@ -117,119 +125,197 @@
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
     (async function() {
-      // Get brand ID from URL
       var brandId = Components.getParam('id');
       if (!brandId) {
         document.getElementById('brand-header').innerHTML = '<div class="container"><p style="text-align:center;color:var(--text-muted)">No brand selected</p></div>';
         return;
       }
 
-      // Load brand
       var brand = await GoNoGoAPI.getBrandById(brandId);
       if (!brand) {
         document.getElementById('brand-header').innerHTML = '<div class="container"><p style="text-align:center;color:var(--text-muted)">Brand not found</p></div>';
         return;
       }
 
-      // Render header
+      // === BRAND HEADER ===
       document.getElementById('brand-header').innerHTML = `
         <div class="container">
-          <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)">
+          <div style="text-align:center;max-width:800px;margin:0 auto">
             ${Components.renderLogo(brand, 'brand-logo brand-logo-lg')}
-            <div style="flex:1">
-              <h1 class="brand-name">${brand.name}</h1>
-              <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap">
-                ${Components.renderVerdictBadge(brand.verdict)}
-                ${Components.renderScoreBadge(brand.overallScore)}
-                <span class="text-muted">in ${brand.categoryName}</span>
-              </div>
+            <h1 style="font-size:var(--text-4xl);margin:var(--space-4) 0">${brand.name}</h1>
+            <div style="display:flex;gap:var(--space-3);align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-6)">
+              ${Components.renderVerdictBadge(brand.verdict)}
+              ${Components.renderScoreBadge(brand.overallScore)}
+              <a href="category.html?cat=${brand.category_slug}" class="badge badge-secondary">
+                <i class="fa-solid fa-tags"></i> ${brand.categoryName}
+              </a>
             </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--space-6)">
-            <div style="text-align:center">
-              ${Components.renderScoreCircle(brand.overallScore, 'lg')}
-              <div style="margin-top:var(--space-3);color:var(--text-muted);font-size:var(--text-sm)">Overall Score</div>
-            </div>
-            <div style="min-height:300px;position:relative">
+            ${brand.website ? '<a href="' + brand.website + '" target="_blank" rel="noopener" class="btn btn-primary"><i class="fa-solid fa-external-link"></i> Visit Website</a>' : ''}
+            <div style="margin-top:var(--space-8);max-width:500px;margin-left:auto;margin-right:auto">
               <canvas id="brand-radar"></canvas>
             </div>
           </div>
         </div>
       `;
 
-      // Render radar chart
       Components.createRadarChart('brand-radar', brand, { showTicks: true, labelSize: 11 });
 
-      // Render score breakdown
-      var scoreHtml = '<div style="display:grid;gap:var(--space-4)">';
-      Object.keys(brand.categoryScores).forEach(function(cat) {
-        var cs = brand.categoryScores[cat];
-        var pct = Math.round((cs.score / cs.max) * 100);
-        scoreHtml += `
-          <div class="score-item">
-            <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2)">
-              <span class="score-category">${cat}</span>
-              <span class="score-value">${cs.score}/${cs.max}</span>
-            </div>
-            ${Components.renderScoreBar(cs.score, cs.max)}
+      // === QUICK STATS ===
+      var statsHtml = `
+        <div class="stat-card">
+          <div class="stat-label">Overall Score</div>
+          <div class="stat-value" style="color:${getScoreColor(brand.overallScore)}">${brand.overallScore}/100</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Verdict</div>
+          <div class="stat-value">${brand.verdict}</div>
+        </div>
+      `;
+      if (brand.appRatings) {
+        statsHtml += `
+          <div class="stat-card">
+            <div class="stat-label"><i class="fa-brands fa-google-play"></i> Google Play</div>
+            <div class="stat-value">${brand.appRatings.googlePlay}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label"><i class="fa-brands fa-apple"></i> iOS</div>
+            <div class="stat-value">${brand.appRatings.ios}</div>
           </div>
         `;
-      });
-      scoreHtml += '</div>';
-      document.getElementById('score-breakdown').innerHTML = scoreHtml;
+      }
+      if (brand.lastUpdated) {
+        statsHtml += `
+          <div class="stat-card">
+            <div class="stat-label">Last Updated</div>
+            <div class="stat-value" style="font-size:var(--text-sm)">${brand.lastUpdated}</div>
+          </div>
+        `;
+      }
+      document.getElementById('quick-stats').innerHTML = statsHtml;
 
-      // Render key features
-      if (brand.keyFeatures && brand.keyFeatures.length > 0) {
-        var featuresHtml = '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">';
-        brand.keyFeatures.forEach(function(feat) {
-          featuresHtml += `<span class="badge badge-secondary"><i class="fa-solid fa-check"></i> ${feat}</span>`;
+      // === DETAILED SCORES (from raw framework_breakdown) ===
+      var detailedHtml = '';
+      if (brand.categoryScores && Object.keys(brand.categoryScores).length > 0) {
+        // Try to get descriptions from the original raw data
+        var rawBrand = null;
+        BRAND_DATA.forEach(function(cat) {
+          (cat.brands || []).forEach(function(b) {
+            if (b.name === brand.name) rawBrand = b;
+          });
         });
-        featuresHtml += '</div>';
+
+        Object.keys(brand.categoryScores).forEach(function(cat) {
+          var cs = brand.categoryScores[cat];
+          var pct = Math.round((cs.score / cs.max) * 100);
+          var desc = '';
+          
+          // Find description from framework_breakdown
+          if (rawBrand && rawBrand.framework_breakdown) {
+            var item = rawBrand.framework_breakdown.find(function(fb) { return fb.category === cat; });
+            if (item) desc = item.description;
+          }
+
+          detailedHtml += `
+            <div class="score-detail-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">
+                <h3 style="font-size:var(--text-lg);font-weight:600">${cat}</h3>
+                <span style="font-size:var(--text-xl);font-weight:700;color:${getScoreColor(pct)}">${cs.score}/${cs.max}</span>
+              </div>
+              ${Components.renderScoreBar(cs.score, cs.max)}
+              ${desc ? '<p style="margin-top:var(--space-3);color:var(--text-secondary);font-size:var(--text-sm)">' + desc + '</p>' : ''}
+            </div>
+          `;
+        });
+      }
+      document.getElementById('detailed-scores').innerHTML = detailedHtml || '<p class="text-muted">No detailed scores available</p>';
+
+      // === SOCIAL SENTIMENT ===
+      var sentimentHtml = '';
+      if (brand.socialSentiment && brand.socialSentiment.summary) {
+        sentimentHtml = '<div class="sentiment-card">';
+        sentimentHtml += '<p style="font-size:var(--text-base);margin-bottom:var(--space-4)">' + brand.socialSentiment.summary + '</p>';
+        
+        if (brand.socialSentiment.positive_themes && brand.socialSentiment.positive_themes.length > 0) {
+          sentimentHtml += '<div style="margin-bottom:var(--space-3)"><strong style="color:var(--green)"><i class="fa-solid fa-thumbs-up"></i> Positive Themes:</strong><ul class="bullet-list" style="margin-top:var(--space-2)">';
+          brand.socialSentiment.positive_themes.forEach(function(theme) {
+            sentimentHtml += '<li>' + theme + '</li>';
+          });
+          sentimentHtml += '</ul></div>';
+        }
+
+        if (brand.socialSentiment.common_concerns && brand.socialSentiment.common_concerns.length > 0) {
+          sentimentHtml += '<div><strong style="color:var(--orange)"><i class="fa-solid fa-triangle-exclamation"></i> Common Concerns:</strong><ul class="bullet-list" style="margin-top:var(--space-2)">';
+          brand.socialSentiment.common_concerns.forEach(function(concern) {
+            sentimentHtml += '<li>' + concern + '</li>';
+          });
+          sentimentHtml += '</ul></div>';
+        }
+
+        sentimentHtml += '</div>';
+      } else {
+        sentimentHtml = '<p class="text-muted">No social sentiment data available</p>';
+      }
+      document.getElementById('social-sentiment').innerHTML = sentimentHtml;
+
+      // === CUSTOMER REVIEWS (placeholder for now) ===
+      document.getElementById('customer-reviews').innerHTML = `
+        <div class="review-placeholder">
+          <p class="text-muted">User reviews are currently managed offline and synced from Google Sheets.</p>
+          <button class="btn btn-secondary" onclick="alert('Review submission requires the live backend.')">
+            <i class="fa-solid fa-comment"></i> Leave a Review
+          </button>
+        </div>
+      `;
+
+      // === KEY FEATURES ===
+      if (brand.keyFeatures && brand.keyFeatures.length > 0) {
+        var featuresHtml = '<ul class="bullet-list">';
+        brand.keyFeatures.forEach(function(feat) {
+          featuresHtml += '<li><i class="fa-solid fa-check" style="color:var(--green)"></i> ' + feat + '</li>';
+        });
+        featuresHtml += '</ul>';
         document.getElementById('key-features').innerHTML = featuresHtml;
       } else {
-        document.getElementById('key-features').innerHTML = '<p class="text-muted">No features listed</p>';
+        document.getElementById('key-features').innerHTML = '<p class="text-muted text-sm">No features listed</p>';
       }
 
-      // Render strengths
+      // === PRICING ===
+      if (brand.pricing && brand.pricing.length > 0) {
+        var pricingHtml = '';
+        brand.pricing.forEach(function(tier) {
+          pricingHtml += '<div style="margin-bottom:var(--space-3)">';
+          pricingHtml += '<div style="font-weight:600;margin-bottom:var(--space-1)">' + (tier.name || 'Pricing') + '</div>';
+          pricingHtml += '<div style="font-size:var(--text-sm);color:var(--text-secondary)">' + (tier.cost || 'Contact for pricing') + '</div>';
+          if (tier.features) pricingHtml += '<div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-1)">' + tier.features + '</div>';
+          pricingHtml += '</div>';
+        });
+        document.getElementById('pricing').innerHTML = pricingHtml;
+      } else {
+        document.getElementById('pricing').innerHTML = '<p class="text-muted text-sm">Pricing not available</p>';
+      }
+
+      // === STRENGTHS ===
       if (brand.keyStrengths && brand.keyStrengths.length > 0) {
         var strengthsHtml = '<ul class="bullet-list">';
         brand.keyStrengths.forEach(function(str) {
-          strengthsHtml += `<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ${str}</li>`;
+          strengthsHtml += '<li style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> ' + str + '</li>';
         });
         strengthsHtml += '</ul>';
         document.getElementById('key-strengths').innerHTML = strengthsHtml;
       } else {
-        document.getElementById('key-strengths').innerHTML = '<p class="text-muted">No strengths listed</p>';
+        document.getElementById('key-strengths').innerHTML = '<p class="text-muted text-sm">No strengths listed</p>';
       }
 
-      // Render concerns
+      // === CONCERNS ===
       if (brand.keyConcerns && brand.keyConcerns.length > 0) {
         var concernsHtml = '<ul class="bullet-list">';
         brand.keyConcerns.forEach(function(con) {
-          concernsHtml += `<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ${con}</li>`;
+          concernsHtml += '<li style="color:var(--orange)"><i class="fa-solid fa-triangle-exclamation"></i> ' + con + '</li>';
         });
         concernsHtml += '</ul>';
         document.getElementById('key-concerns').innerHTML = concernsHtml;
       } else {
-        document.getElementById('key-concerns').innerHTML = '<p class="text-muted">No concerns listed</p>';
-      }
-
-      // Render pricing
-      if (brand.pricing && brand.pricing.length > 0) {
-        var pricingHtml = '<div style="display:grid;gap:var(--space-4)">';
-        brand.pricing.forEach(function(tier) {
-          pricingHtml += `
-            <div class="pricing-card">
-              <div class="pricing-name">${tier.name || 'Standard'}</div>
-              <div class="pricing-cost">${tier.cost || 'Contact for pricing'}</div>
-              ${tier.features ? '<div class="pricing-features">' + tier.features + '</div>' : ''}
-            </div>
-          `;
-        });
-        pricingHtml += '</div>';
-        document.getElementById('pricing').innerHTML = pricingHtml;
-      } else {
-        document.getElementById('pricing').innerHTML = '<p class="text-muted">Pricing information not available</p>';
+        document.getElementById('key-concerns').innerHTML = '<p class="text-muted text-sm">No concerns listed</p>';
       }
     })();
   </script>
