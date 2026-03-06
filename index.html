@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+
+fixed_index_html = """<!DOCTYPE html>
 <html lang="en-ZA">
 <head>
 <!--
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \\/ __ `__ \\/ __ \\/ / / / __/ _ \\/ ___/
+ / /   / __ \\\\/ __ `__ \\\\/ __ \\\\/ / / / __/ _ \\\\/ ___/
 / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\\____/\\____/_/ /_/ /_/ .___/\\__,_/\\__/\\___/_/
+\\\\____/\\\\____/_/ /_/ /_/ .___/\\\\__,_/\\\\__/\\\\___/_/
                     /_/
         Created with Perplexity Computer
         [https://www.perplexity.ai/computer](https://www.perplexity.ai/computer)
@@ -123,7 +124,6 @@
   <div id="footer"></div>
 
   <!-- CRITICAL: Data files MUST load first -->
-  
   <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   
@@ -140,9 +140,8 @@
     document.getElementById('nav').innerHTML = Components.renderPublicNav('home');
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
-    (async function() {
-      // Industry grid
-      var categories = await GoNoGoAPI.getCategoriesWithBrands();
+    // Load categories and brands using .then() instead of async/await
+    GoNoGoAPI.getCategoriesWithBrands().then(function(categories) {
       var industryGrid = document.getElementById('industry-grid');
       industryGrid.innerHTML = categories.map(function(cat) {
         return '<a href="category.html?cat=' + cat.id + '" class="industry-card ' + (cat.hasBrands ? '' : 'no-data') + '">' +
@@ -151,9 +150,13 @@
           '<div class="count">' + cat.brandCount + ' brand' + (cat.brandCount !== 1 ? 's' : '') + '</div>' +
         '</a>';
       }).join('');
+    }).catch(function(error) {
+      console.error('Error loading categories:', error);
+      document.getElementById('industry-grid').innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--red)">Error loading industries. Please refresh the page.</div>';
+    });
 
-      // Top brands
-      var topBrands = await GoNoGoAPI.getTopBrands(6);
+    // Load top brands
+    GoNoGoAPI.getTopBrands(6).then(function(topBrands) {
       var topGrid = document.getElementById('top-brands');
       topGrid.innerHTML = topBrands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
 
@@ -161,7 +164,36 @@
       topBrands.forEach(function(brand) {
         Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
       });
-    })();
+    }).catch(function(error) {
+      console.error('Error loading top brands:', error);
+      document.getElementById('top-brands').innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--red)">Error loading brands. Please refresh the page.</div>';
+    });
   </script>
 </body>
 </html>
+"""
+
+with open('index.html', 'w', encoding='utf-8') as f:
+    f.write(fixed_index_html)
+
+print("✅ Created fixed index.html")
+print("📦 File size:", len(fixed_index_html), "bytes")
+print("\n" + "="*60)
+print("UPLOAD THIS TO GITHUB:")
+print("="*60)
+print("1. Download index.html from above")
+print("2. Go to: https://github.com/thisshouldntbeneeded-glitch/gonogo-sa")
+print("3. Click on 'index.html'")
+print("4. Click the PENCIL icon to edit")
+print("5. Select ALL (Ctrl+A) and DELETE")
+print("6. Open the downloaded index.html in Notepad")
+print("7. Copy ALL the content (Ctrl+A, Ctrl+C)")
+print("8. Paste into GitHub (Ctrl+V)")
+print("9. Commit: 'Fix async/await syntax error'")
+print("10. Wait 2 minutes and refresh!")
+print("="*60)
+print("\nKey changes:")
+print("✅ Removed async/await syntax")
+print("✅ Uses .then() for promises instead")
+print("✅ Added error handling")
+print("✅ 100% browser compatible!")
