@@ -110,22 +110,25 @@
         var brands = [];
         for (var i = 0; i < BRAND_DATA.length; i++) {
           if (BRAND_DATA[i].slug === slug && BRAND_DATA[i].brands) {
-            brands = BRAND_DATA[i].brands.map(function(b) {
-              return {
-                id: b.id,
-                name: b.name,
-                overallScore: b.gonogo_score || 0,
-                verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'CAUTION' : 'NOGO'),
-                category: catInfo.name,
-                logo: b.logo || '',
-                scores: b.scores || {},
-                strengths: b.strengths || [],
-                weaknesses: b.weaknesses || [],
-                tags: b.tags || []
-              };
-            });
-            break;
-          }
+  brands = BRAND_DATA[i].brands.map(function(b) {
+    var score = b.gonogo_score || 0;
+    return {
+      id: b.id,
+      name: b.name,
+      gonogo_score: score,  // <-- this is what renderBrandCard now uses
+      overallScore: score,
+      verdict: b.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'CAUTION' : 'NOGO'),
+      category: catInfo.name,
+      logo: b.logo || '',
+      scores: calculatePercentageScores(b),
+      strengths: parseListField(b.strengths),
+      weaknesses: parseListField(b.concerns),
+      tags: b.tags || []
+    };
+  });
+  break;
+}
+}
         }
 
         var currentSort = 'score-desc';
