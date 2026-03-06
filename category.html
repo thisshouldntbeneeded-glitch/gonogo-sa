@@ -4,12 +4,12 @@
 <!--
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+ / /   / __ \\/ __ `__ \\/ __ \\/ / / / __/ _ \\/ ___/
 / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+\\____/\\____/_/ /_/ /_/ .___/\\__,_/\\__/\\___/_/
                     /_/
         Created with Perplexity Computer
-        https://www.perplexity.ai/computer
+        [https://www.perplexity.ai/computer](https://www.perplexity.ai/computer)
 -->
 <meta name="generator" content="Perplexity Computer">
 <meta name="author" content="Perplexity Computer">
@@ -38,12 +38,29 @@
     var slug = Components.getParam('cat');
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
-    (async function() {
+    // Direct data loading - wait for BRAND_DATA
+    setTimeout(function() {
+      if (typeof BRAND_DATA === 'undefined') {
+        console.error('BRAND_DATA not loaded!');
+        document.getElementById('page-content').innerHTML = '<section class="section"><div class="container" style="text-align:center"><h1 class="section-title">Error Loading Data</h1></div></section>';
+        return;
+      }
+
       if (!slug) {
         // Show all categories grid
         document.getElementById('nav').innerHTML = Components.renderPublicNav('');
         document.title = 'All Industries — GoNoGo South Africa';
-        var categories = await GoNoGoAPI.getCategoriesWithBrands();
+        
+        var categories = BRAND_DATA.map(function(cat) {
+          return {
+            id: cat.slug,
+            name: cat.category,
+            icon: cat.icon,
+            brandCount: cat.brands.length,
+            hasBrands: cat.brands.length > 0
+          };
+        });
+        
         document.getElementById('page-content').innerHTML =
           '<section class="section"><div class="container">' +
             '<div class="section-header">' +
@@ -61,11 +78,18 @@
             '</div>' +
           '</div></section>';
       } else {
-        // Load category data
-        var allCats = await GoNoGoAPI.getCategories();
+        // Load category data directly from BRAND_DATA
         var catInfo = null;
-        for (var i = 0; i < allCats.length; i++) {
-          if (allCats[i].id === slug) { catInfo = allCats[i]; break; }
+        for (var i = 0; i < BRAND_DATA.length; i++) {
+          if (BRAND_DATA[i].slug === slug) {
+            catInfo = {
+              id: BRAND_DATA[i].slug,
+              name: BRAND_DATA[i].category,
+              icon: BRAND_DATA[i].icon,
+              scoringCategories: BRAND_DATA[i].scoring_categories || []
+            };
+            break;
+          }
         }
 
         if (!catInfo) {
@@ -82,7 +106,28 @@
         document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
         document.title = catInfo.name + ' — GoNoGo South Africa';
 
-        var brands = await GoNoGoAPI.getBrandsByCategory(slug);
+        // Get brands for this category
+        var brands = [];
+        for (var i = 0; i < BRAND_DATA.length; i++) {
+          if (BRAND_DATA[i].slug === slug && BRAND_DATA[i].brands) {
+            brands = BRAND_DATA[i].brands.map(function(b) {
+              return {
+                id: b.id,
+                name: b.name,
+                overallScore: b.gonogo_score || 0,
+                verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'CAUTION' : 'NOGO'),
+                category: catInfo.name,
+                logo: b.logo || '',
+                scores: b.scores || {},
+                strengths: b.strengths || [],
+                weaknesses: b.weaknesses || [],
+                tags: b.tags || []
+              };
+            });
+            break;
+          }
+        }
+
         var currentSort = 'score-desc';
 
         window.sortBrands = function(key) {
@@ -150,7 +195,7 @@
 
         renderBrands();
       }
-    })();
+    }, 500); // Wait for BRAND_DATA to load
   </script>
 </body>
 </html>
