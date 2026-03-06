@@ -1,692 +1,137 @@
-// GoNoGo SA — Shared Components
-// Reusable rendering functions for public and admin pages
+// GoNoGo SA - Components (FIXED FOR REAL DATA)
 
-const LOGO_URL = 'https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng';
+var Components = (function() {
+  'use strict';
 
-// ===== Static fallback functions for read-only mode =====
-
-// ===== Static fallback functions for read-only mode =====
-
-// Transform raw brand data to match UI expectations
-function transformBrand(rawBrand, categorySlug, categoryName) {
-  // Build categoryScores object from framework_breakdown
-  var categoryScores = {};
-  if (Array.isArray(rawBrand.framework_breakdown)) {
-    rawBrand.framework_breakdown.forEach(function(item) {
-      var scoreParts = item.score.split('/');
-      categoryScores[item.category] = {
-        score: parseInt(scoreParts[0]) || 0,
-        max: parseInt(scoreParts[1]) || 0
-      };
-    });
+  // Missing helper function for score colors
+  function getScoreColor(score) {
+    if (score >= 80) return 'var(--green)';
+    if (score >= 60) return 'var(--yellow)';
+    return 'var(--red)';
   }
 
-  // Parse app ratings
-  var appRatings = { googlePlay: 'N/A', ios: 'N/A' };
-  if (rawBrand.app_ratings) {
-    appRatings.googlePlay = rawBrand.app_ratings.google_play || 'N/A';
-    appRatings.ios = rawBrand.app_ratings.ios || 'N/A';
+  function getParam(name) {
+    var urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
   }
 
-  return {
-    id: rawBrand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-    name: rawBrand.name,
-    overallScore: rawBrand.gonogo_score || 0,
-    gonogo_score: rawBrand.gonogo_score || 0,
-    verdict: rawBrand.verdict || 'CAUTION',
-    logo: rawBrand.logo_url || null,
-    website: rawBrand.website_url || null,
-    categoryScores: categoryScores,
-    categoryName: categoryName,
-    category_name: categoryName,
-    category_slug: categorySlug,
-    appRatings: appRatings,
-    keyFeatures: rawBrand.key_features || [],
-    pricing: rawBrand.pricing || [],
-    keyStrengths: rawBrand.key_strengths || [],
-    keyConcerns: rawBrand.key_concerns || [],
-    socialSentiment: rawBrand.social_sentiment || {},
-    lastUpdated: rawBrand.last_updated || ''
-  };
-}
+  function renderPublicNav(activeSlug) {
+    return '<nav class="nav"><div class="container">' +
+      '<a href="index.html" class="nav-brand"><i class="fa-solid fa-circle-check"></i> GoNoGo</a>' +
+      '<div class="nav-links">' +
+        '<a href="index.html" class="nav-link ' + (!activeSlug ? 'active' : '') + '">Home</a>' +
+        '<a href="category.html" class="nav-link">Industries</a>' +
+        '<a href="about.html" class="nav-link">About</a>' +
+      '</div>' +
+    '</div></nav>';
+  }
 
-window.getAllBrands = function getAllBrands() {
-  // ... keep existing code ...
-};
+  function renderFooter() {
+    return '<footer class="footer"><div class="container">' +
+      '<div class="footer-content">' +
+        '<div class="footer-brand"><i class="fa-solid fa-circle-check"></i> GoNoGo South Africa</div>' +
+        '<p style="margin:var(--space-2) 0;color:var(--text-muted)">Evidence-based brand ratings for South African consumers</p>' +
+        '<div style="margin-top:var(--space-4);color:var(--text-muted);font-size:var(--text-sm)">&copy; 2026 GoNoGo South Africa. All rights reserved.</div>' +
+      '</div>' +
+    '</div></footer>';
+  }
 
-window.getCategories = function getCategories() {
-  // ... keep existing code ...
-};
+  function renderBrandCard(brand, index) {
+    var color = getScoreColor(brand.overallScore);
+    var verdict = brand.verdict || (brand.overallScore >= 80 ? 'GO' : brand.overallScore >= 60 ? 'CAUTION' : 'NOGO');
 
-window.getCategoriesWithBrands = function getCategoriesWithBrands() {
-  // ... keep existing code ...
-};
+    return '<div class="brand-card">' +
+      '<div class="brand-card-header">' +
+        '<div class="brand-logo-wrapper">' +
+          (brand.logo ? '<img src="' + brand.logo + '" alt="' + brand.name + '" class="brand-logo">' : 
+           '<div class="brand-logo-placeholder"><i class="fa-solid fa-building"></i></div>') +
+        '</div>' +
+        '<div class="brand-info">' +
+          '<h3 class="brand-name">' + brand.name + '</h3>' +
+          '<p class="brand-category">' + (brand.category || '') + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="score-section">' +
+        '<div class="score-circle" style="border-color:' + color + '">' +
+          '<div class="score-value" style="color:' + color + '">' + brand.overallScore + '</div>' +
+          '<div class="score-label">Score</div>' +
+        '</div>' +
+        '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(' ', '-') + '">' + verdict + '</div>' +
+      '</div>' +
+      '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
+      '<div class="brand-details">' +
+        '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
+      '</div>' +
+    '</div>';
+  }
 
-window.getBrandsByCategory = function getBrandsByCategory(slug) {
-  // ... keep existing code ...
-};
+  function createRadarChart(canvasId, brand, options) {
+    options = options || {};
+    var ctx = document.getElementById(canvasId);
+    if (!ctx) return;
 
-window.getBrandById = function getBrandById(id) {
-  // ... keep existing code ...
-};
+    var scores = brand.scores || {};
+    var labels = Object.keys(scores);
+    var data = Object.values(scores);
 
-window.getTopBrands = function getTopBrands(count) {
-  // ... keep existing code ...
-};
-
-
-function getCategories() {
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
-  return BRAND_DATA.map(function(cat) {
-    return {
-      id: cat.slug,
-      slug: cat.slug,
-      name: cat.category || cat.name,
-      icon: cat.icon || null,
-      brandCount: (cat.brands || []).length,
-      scoringCategories: cat.scoring_categories || []
-    };
-  });
-}
-
-function getCategoriesWithBrands() {
-  return getCategories().map(function(cat) {
-    return Object.assign({}, cat, {
-      hasBrands: cat.brandCount > 0
-    });
-  });
-}
-
-function getBrandsByCategory(slug) {
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
-  var category = BRAND_DATA.find(function(cat) { return cat.slug === slug; });
-  if (!category || !Array.isArray(category.brands)) return [];
-  return category.brands.map(function(rawBrand) {
-    return transformBrand(rawBrand, category.slug, category.category || category.name);
-  });
-}
-
-function getBrandById(id) {
-  var all = getAllBrands();
-  return all.find(function(b) { return b.id === id; }) || null;
-}
-
-function getTopBrands(count) {
-  var n = count || 6;
-  var all = getAllBrands();
-  all.sort(function(a, b) {
-    return b.overallScore - a.overallScore;
-  });
-  return all.slice(0, n);
-}
-
-
-// ===== End static fallback functions =====
-
-const Components = {
-  // ============================================================
-  // LOGO HELPER
-  // ============================================================
-  getBrandInitials(name) {
-    return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-  },
-
-  getLogoFallback(name, size = 48) {
-    const colors = ['#e74c3c', '#3b82f6', '#11a551', '#ff9800', '#8b5cf6', '#06b6d4', '#ec4899', '#f59e0b'];
-    const hash = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    const color = colors[hash % colors.length];
-    const initials = this.getBrandInitials(name);
-    const fontSize = size * 0.38;
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${size*0.16}" fill="${color}"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="${fontSize}">${initials}</text></svg>`)}`;
-  },
-
-  renderLogo(brand, className = 'brand-logo') {
-    if (brand.logo) {
-      return `<img src="${brand.logo}" alt="${brand.name}" class="${className}" onerror="this.src='${this.getLogoFallback(brand.name, className.includes('lg') ? 48 : 32)}'">`;
+    if (labels.length === 0) {
+      labels = ['N/A'];
+      data = [0];
     }
-    return `<img src="${this.getLogoFallback(brand.name, className.includes('lg') ? 48 : 32)}" alt="${brand.name}" class="${className}">`;
-  },
 
-  // ============================================================
-  // NAVIGATION
-  // ============================================================
-  renderPublicNav(activePage) {
-    const links = [
-      { href: 'index.html', label: 'Home', icon: 'fa-house', id: 'home' },
-      { href: 'category.html?cat=banking', label: 'Banking', icon: 'fa-building-columns', id: 'banking' },
-      { href: 'category.html?cat=medical-aid', label: 'Medical Aid', icon: 'fa-heart-pulse', id: 'medical-aid' },
-      { href: 'category.html?cat=insurance', label: 'Insurance', icon: 'fa-umbrella', id: 'insurance' },
-      { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
-      { href: 'admin.html', label: 'Admin', icon: 'fa-lock', id: 'admin' }
-    ];
+    var color = getScoreColor(brand.overallScore);
 
-    return `
-      <header class="site-header">
-        <div class="container">
-          <a href="index.html" class="logo">
-            <img src="${LOGO_URL}" alt="GoNoGo" style="height:32px;width:auto;">
-          </a>
-          <nav>
-            <ul class="nav-links">
-              ${links.map(l => `
-                <li><a href="${l.href}" class="${activePage === l.id ? 'active' : ''}">
-                  <i class="fa-solid ${l.icon}"></i> ${l.label}
-                </a></li>
-              `).join('')}
-            </ul>
-          </nav>
-          <button class="hamburger" onclick="Components.toggleMobileNav()" aria-label="Menu">
-            <i class="fa-solid fa-bars" id="hamburger-icon"></i>
-          </button>
-        </div>
-      </header>
-      <div class="mobile-nav" id="mobile-nav">
-        ${links.map(l => `
-          <a href="${l.href}" class="${activePage === l.id ? 'active' : ''}">
-            <i class="fa-solid ${l.icon}"></i> ${l.label}
-          </a>
-        `).join('')}
-      </div>
-    `;
-  },
-
-  renderAdminSidebar(activePage) {
-    const links = [
-      { href: 'admin.html', label: 'Dashboard', icon: 'fa-gauge', id: 'dashboard' },
-      { href: 'admin-brands.html', label: 'Brands', icon: 'fa-tags', id: 'brands' },
-      { href: 'admin-comments.html', label: 'Comments', icon: 'fa-comments', id: 'comments' },
-      { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' }
-    ];
-
-    return `
-      <aside class="admin-sidebar" id="admin-sidebar">
-        <a href="index.html" class="logo">
-          <img src="${LOGO_URL}" alt="GoNoGo" style="height:28px;width:auto;">
-        </a>
-        <nav class="admin-sidebar-nav">
-          ${links.map(l => `
-            <a href="${l.href}" class="admin-sidebar-link ${activePage === l.id ? 'active' : ''}">
-              <i class="fa-solid ${l.icon}"></i> ${l.label}
-            </a>
-          `).join('')}
-          <div style="flex:1"></div>
-          <a href="index.html" class="admin-sidebar-link">
-            <i class="fa-solid fa-arrow-left"></i> Back to Site
-          </a>
-          <a href="#" class="admin-sidebar-link" onclick="Components.adminLogout(); return false;">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-          </a>
-        </nav>
-      </aside>
-      <button class="admin-mobile-toggle" onclick="Components.toggleAdminSidebar()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    `;
-  },
-
-  toggleMobileNav() {
-    const nav = document.getElementById('mobile-nav');
-    const icon = document.getElementById('hamburger-icon');
-    const isOpen = nav.classList.toggle('open');
-    icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
-  },
-
-  toggleAdminSidebar() {
-    document.getElementById('admin-sidebar').classList.toggle('mobile-open');
-  },
-
-  // ============================================================
-  // FOOTER
-  // ============================================================
-  renderFooter() {
-    return `
-      <footer class="site-footer">
-        <div class="container">
-          <div class="footer-content">
-            <div class="footer-links">
-              <a href="index.html">Home</a>
-              <a href="category.html?cat=banking">Banking</a>
-              <a href="category.html?cat=medical-aid">Medical Aid</a>
-              <a href="category.html?cat=insurance">Insurance</a>
-              <a href="compare.html">Compare</a>
-            </div>
-            <div class="footer-attribution">
-              &copy; 2026 GoNoGo South Africa. All rights reserved.<br>
-              <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);font-size:var(--text-xs)">Created with Perplexity Computer</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    `;
-  },
-
-  // ============================================================
-  // SCORE BADGE
-  // ============================================================
-  getScoreClass(score) {
-    if (score >= 80) return 'score-high';
-    if (score >= 60) return 'score-mid';
-    return 'score-low';
-  },
-
-  renderScoreBadge(score) {
-    return `<span class="badge badge-score ${this.getScoreClass(score)}">${score}/100</span>`;
-  },
-
-  renderVerdictBadge(verdict) {
-    let cls, icon;
-    if (verdict === 'GO') {
-      cls = 'badge-go'; icon = 'fa-circle-check';
-    } else if (verdict === 'NOGO') {
-      cls = 'badge-nogo'; icon = 'fa-circle-xmark';
-    } else {
-      cls = 'badge-caution'; icon = 'fa-triangle-exclamation';
-    }
-    return `<span class="badge ${cls}">
-      <i class="fa-solid ${icon}"></i>
-      ${verdict}
-    </span>`;
-  },
-
-  // ============================================================
-  // SCORE CIRCLE (SVG)
-  // ============================================================
-  renderScoreCircle(score, size = 'md') {
-    const sizeClass = size === 'lg' ? 'score-circle-lg' : '';
-    const r = size === 'lg' ? 52 : 34;
-    const circumference = 2 * Math.PI * r;
-    const offset = circumference - (score / 100) * circumference;
-    const color = getScoreColor(score);
-    const cx = size === 'lg' ? 60 : 40;
-    const cy = cx;
-    const viewBox = size === 'lg' ? '0 0 120 120' : '0 0 80 80';
-
-    return `
-      <div class="score-circle ${sizeClass}">
-        <svg viewBox="${viewBox}">
-          <circle cx="${cx}" cy="${cy}" r="${r}" stroke="#2a2a2a" stroke-width="${size === 'lg' ? 8 : 6}" fill="none"/>
-          <circle cx="${cx}" cy="${cy}" r="${r}" stroke="${color}" stroke-width="${size === 'lg' ? 8 : 6}" fill="none"
-            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
-            stroke-linecap="round" style="transition: stroke-dashoffset 800ms cubic-bezier(0.16,1,0.3,1)"/>
-        </svg>
-        <span class="score-value" style="color:${color}">${score}</span>
-      </div>
-    `;
-  },
-
-  // ============================================================
-  // SCORE BAR
-  // ============================================================
-  renderScoreBar(score, maxScore) {
-    const pct = Math.round((score / maxScore) * 100);
-    const color = getScoreColor(pct);
-    return `
-      <div class="score-bar">
-        <div class="score-bar-fill" style="width:${pct}%;background:${color}"></div>
-      </div>
-    `;
-  },
-
-  // ============================================================
-  // RADAR CHART (Chart.js wrapper)
-  // ============================================================
-  createRadarChart(canvasId, brand, options = {}) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return null;
-
-    const labels = Object.keys(brand.categoryScores);
-    const data = labels.map(key => {
-      const cs = brand.categoryScores[key];
-      return Math.round((cs.score / cs.max) * 100);
-    });
-
-    // Shorten labels for radar
-    const shortLabels = labels.map(l => {
-      if (l.length > 18) return l.substring(0, 16) + '\u2026';
-      return l;
-    });
-
-    const color = getScoreColor(brand.overallScore);
-    const bgColor = color + '20';
-
-    return new Chart(canvas, {
+    new Chart(ctx, {
       type: 'radar',
       data: {
-        labels: shortLabels,
+        labels: labels,
         datasets: [{
-          label: brand.name,
           data: data,
-          backgroundColor: bgColor,
+          backgroundColor: color + '15',
           borderColor: color,
           borderWidth: 2,
           pointBackgroundColor: color,
-          pointBorderColor: color,
+          pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: color,
-          pointRadius: options.pointRadius !== undefined ? options.pointRadius : 3,
-          pointHoverRadius: 5
+          pointRadius: options.pointRadius || 3,
+          pointHoverRadius: options.pointRadius ? options.pointRadius + 1 : 4
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          r: {
-            min: 0,
-            max: 100,
-            ticks: {
-              stepSize: 25,
-              display: options.showTicks !== false,
-              color: '#666',
-              backdropColor: 'transparent',
-              font: { size: 9 }
-            },
-            pointLabels: {
-              color: '#a0a0a0',
-              font: {
-                family: 'Inter, sans-serif',
-                size: options.labelSize || 10,
-                weight: '500'
-              }
-            },
-            grid: { color: 'rgba(255,255,255,0.06)' },
-            angleLines: { color: 'rgba(255,255,255,0.06)' }
-          }
-        },
+        maintainAspectRatio: true,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            backgroundColor: '#1a1a1a',
-            titleColor: '#fff',
-            bodyColor: '#a0a0a0',
-            borderColor: '#2a2a2a',
-            borderWidth: 1,
-            cornerRadius: 8,
-            padding: 10,
-            titleFont: { family: 'Inter', weight: '600' },
-            bodyFont: { family: 'Inter' },
-            callbacks: {
-              label: function(ctx) {
-                return labels[ctx.dataIndex] + ': ' + ctx.raw + '%';
-              }
-            }
-          }
+          tooltip: { enabled: true }
         },
-        animation: { duration: 800, easing: 'easeOutQuart' }
-      }
-    });
-  },
-
-  createCompareRadarChart(canvasId, brand1, brand2) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return null;
-
-    // Use union of scoring categories
-    const allLabels = Object.keys(brand1.categoryScores);
-    const data1 = allLabels.map(key => {
-      const cs = brand1.categoryScores[key];
-      return cs ? Math.round((cs.score / cs.max) * 100) : 0;
-    });
-    const data2 = allLabels.map(key => {
-      const cs = brand2.categoryScores[key];
-      return cs ? Math.round((cs.score / cs.max) * 100) : 0;
-    });
-
-    const shortLabels = allLabels.map(l => l.length > 18 ? l.substring(0, 16) + '\u2026' : l);
-    const color1 = '#11a551';
-    const color2 = '#ff9800';
-
-    return new Chart(canvas, {
-      type: 'radar',
-      data: {
-        labels: shortLabels,
-        datasets: [
-          {
-            label: brand1.name,
-            data: data1,
-            backgroundColor: color1 + '20',
-            borderColor: color1,
-            borderWidth: 2,
-            pointBackgroundColor: color1,
-            pointBorderColor: color1,
-            pointRadius: 3
-          },
-          {
-            label: brand2.name,
-            data: data2,
-            backgroundColor: color2 + '20',
-            borderColor: color2,
-            borderWidth: 2,
-            pointBackgroundColor: color2,
-            pointBorderColor: color2,
-            pointRadius: 3
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
         scales: {
           r: {
-            min: 0,
+            beginAtZero: true,
             max: 100,
-            ticks: { stepSize: 25, display: true, color: '#666', backdropColor: 'transparent', font: { size: 9 } },
-            pointLabels: { color: '#a0a0a0', font: { family: 'Inter, sans-serif', size: 11, weight: '500' } },
-            grid: { color: 'rgba(255,255,255,0.06)' },
-            angleLines: { color: 'rgba(255,255,255,0.06)' }
+            ticks: {
+              display: options.showTicks !== false,
+              stepSize: 20,
+              font: { size: 10 }
+            },
+            grid: { color: 'rgba(0,0,0,0.1)' },
+            pointLabels: {
+              font: { size: options.labelSize || 11 }
+            }
           }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: { color: '#a0a0a0', font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle', padding: 20 }
-          },
-          tooltip: { backgroundColor: '#1a1a1a', titleColor: '#fff', bodyColor: '#a0a0a0', borderColor: '#2a2a2a', borderWidth: 1, cornerRadius: 8, padding: 10 }
-        },
-        animation: { duration: 800, easing: 'easeOutQuart' }
+        }
       }
     });
-  },
-
-  // ============================================================
-  // BRAND CARD (Public listing)
-  // ============================================================
-  renderBrandCard(brand, index = 0) {
-    const staggerClass = index < 6 ? `stagger-${index + 1}` : '';
-    const chartId = `radar-${brand.id}`;
-
-    return `
-      <a href="brand.html?id=${brand.id}" class="brand-card animate-in ${staggerClass}">
-        <div class="brand-card-top">
-          ${this.renderLogo(brand, 'brand-logo brand-logo-lg')}
-          <div class="brand-card-info">
-            <div class="brand-card-name">${brand.name}</div>
-            <div class="brand-card-meta">
-              ${this.renderVerdictBadge(brand.verdict)}
-              ${this.renderScoreBadge(brand.overallScore)}
-            </div>
-          </div>
-        </div>
-        <div class="brand-card-chart">
-          <canvas id="${chartId}"></canvas>
-        </div>
-        <div class="brand-card-stats">
-          <span><i class="fa-brands fa-google-play"></i> ${brand.appRatings.googlePlay}</span>
-          <span><i class="fa-brands fa-apple"></i> ${brand.appRatings.ios}</span>
-          <span><i class="fa-solid fa-tags"></i> ${brand.categoryName}</span>
-        </div>
-      </a>
-    `;
-  },
-
-  // ============================================================
-  // COMMENT CARD
-  // ============================================================
-  renderCommentCard(comment, brandName = '') {
-    return `
-      <div class="comment-card">
-        <div class="comment-header">
-          <div>
-            <span class="comment-author">${comment.author || 'Anonymous'}</span>
-            ${brandName ? `<span class="text-xs text-muted" style="margin-left:var(--space-2)">on ${brandName}</span>` : ''}
-          </div>
-          <div style="display:flex;align-items:center;gap:var(--space-2)">
-            <span class="sentiment-badge sentiment-${comment.sentiment || 'neutral'}">${comment.sentiment || 'neutral'}</span>
-            <span class="comment-date">${this.formatDate(comment.date)}</span>
-          </div>
-        </div>
-        <div class="comment-text">${comment.text}</div>
-      </div>
-    `;
-  },
-
-  // ============================================================
-  // URL PARAMETER HELPERS
-  // ============================================================
-  getParam(name) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(name);
-  },
-
-  setParam(name, value) {
-    const params = new URLSearchParams(window.location.search);
-    params.set(name, value);
-    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
-  },
-
-  // ============================================================
-  // DATE FORMATTING
-  // ============================================================
-  formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
-  },
-
-  formatRelativeDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Yesterday';
-    if (diff < 7) return `${diff} days ago`;
-    if (diff < 30) return `${Math.floor(diff / 7)} weeks ago`;
-    return this.formatDate(dateStr);
-  },
-
-  // ============================================================
-  // TOAST NOTIFICATIONS
-  // ============================================================
-  showToast(message, type = 'success') {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${message}`;
-    document.body.appendChild(toast);
-
-    requestAnimationFrame(() => { toast.classList.add('show'); });
-
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 400);
-    }, 3000);
-  },
-
-  // ============================================================
-  // ADMIN AUTH
-  // ============================================================
-  checkAdminAuth() {
-    const isAuth = GoNoGoStorage.get('adminAuth');
-    if (!isAuth) {
-      this.showPasswordPrompt();
-      return false;
-    }
-    return true;
-  },
-
-  showPasswordPrompt() {
-    const overlay = document.createElement('div');
-    overlay.className = 'password-overlay';
-    overlay.id = 'password-overlay';
-    overlay.innerHTML = `
-      <div class="password-box">
-        <div class="logo" style="justify-content:center">
-          <img src="${LOGO_URL}" alt="GoNoGo" style="height:32px;width:auto;">
-        </div>
-        <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-5)">Enter password to access the admin dashboard</p>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" id="admin-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')Components.submitPassword()">
-          <div class="password-error" id="password-error">Incorrect password. Try again.</div>
-        </div>
-        <button class="btn btn-primary w-full" onclick="Components.submitPassword()">
-          <i class="fa-solid fa-lock"></i> Sign In
-        </button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    setTimeout(() => document.getElementById('admin-password').focus(), 100);
-  },
-
-  submitPassword() {
-    const input = document.getElementById('admin-password');
-    const error = document.getElementById('password-error');
-    if (input.value === 'gonogo2026') {
-      GoNoGoStorage.set('adminAuth', true);
-      document.getElementById('password-overlay').remove();
-      if (typeof initAdminPage === 'function') initAdminPage();
-    } else {
-      error.style.display = 'block';
-      input.value = '';
-      input.focus();
-    }
-  },
-
-  adminLogout() {
-    GoNoGoStorage.remove('adminAuth');
-    window.location.href = 'index.html';
-  },
-
-  // ============================================================
-  // CSV EXPORT
-  // ============================================================
-  exportCSV(data, filename) {
-    if (!data.length) return;
-    const headers = Object.keys(data[0]);
-    const csv = [
-      headers.join(','),
-      ...data.map(row => headers.map(h => {
-        let val = row[h];
-        if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
-          val = '"' + val.replace(/"/g, '""') + '"';
-        }
-        return val;
-      }).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  },
-
-  // ============================================================
-  // SORT HELPER
-  // ============================================================
-  sortData(data, key, direction = 'asc') {
-    return [...data].sort((a, b) => {
-      let aVal = typeof a[key] === 'string' ? a[key].toLowerCase() : a[key];
-      let bVal = typeof b[key] === 'string' ? b[key].toLowerCase() : b[key];
-      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
   }
-};
+
+  return {
+    getParam: getParam,
+    renderPublicNav: renderPublicNav,
+    renderFooter: renderFooter,
+    renderBrandCard: renderBrandCard,
+    createRadarChart: createRadarChart,
+    getScoreColor: getScoreColor
+  };
+})();
+
+console.log('Components loaded successfully');
