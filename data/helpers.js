@@ -1,180 +1,92 @@
-// GoNoGo SA — Data Access Layer
-// Works with the BRAND_DATA array from data_part[A-F].js
+// GoNoGo SA - Static Data Helpers
+// Used when no backend API is available
+// Reads from BRAND_DATA global variable
 
-// ============================================================
-// CATEGORY / INDUSTRY HELPERS
-// ============================================================
 function getCategories() {
-  return BRAND_DATA.map(cat => ({
-    id: cat.slug,
-    name: cat.category,
-    icon: cat.icon,
-    brandCount: cat.brands.length,
-    scoringCategories: cat.scoring_categories
-  }));
+  if (typeof BRAND_DATA === 'undefined') return [];
+  return BRAND_DATA.map(function(cat) {
+    return {
+      id: cat.slug,
+      name: cat.category,
+      slug: cat.slug,
+      icon: cat.icon,
+      brandCount: cat.brands.length
+    };
+  });
 }
 
 function getCategoriesWithBrands() {
-  return BRAND_DATA.map(cat => ({
-    id: cat.slug,
-    name: cat.category,
-    icon: cat.icon,
-    brandCount: cat.brands.length,
-    hasBrands: cat.brands.length > 0,
-    scoringCategories: cat.scoring_categories
-  }));
-}
-
-function getCategoryBySlug(slug) {
-  const cat = BRAND_DATA.find(c => c.slug === slug);
-  if (!cat) return null;
-  return {
-    id: cat.slug,
-    name: cat.category,
-    icon: cat.icon,
-    brandCount: cat.brands.length,
-    scoringCategories: cat.scoring_categories,
-    brands: cat.brands.map(b => normalizeBrand(b, cat))
-  };
-}
-
-// ============================================================
-// BRAND NORMALIZATION
-// Converts SA brand data into a flat, consistent format
-// ============================================================
-function normalizeBrand(brand, category) {
-  // Parse framework_breakdown scores
-  const categoryScores = {};
-  const categoryDescriptions = {};
-  (brand.framework_breakdown || []).forEach(fb => {
-    const parts = fb.score.split('/');
-    const score = parseFloat(parts[0]);
-    const max = parseFloat(parts[1]);
-    const key = fb.category;
-    categoryScores[key] = { score, max, description: fb.description };
-    categoryDescriptions[key] = fb.description;
+  if (typeof BRAND_DATA === 'undefined') return [];
+  return BRAND_DATA.map(function(cat) {
+    return {
+      id: cat.slug,
+      name: cat.category,
+      icon: cat.icon,
+      brandCount: cat.brands.length,
+      hasBrands: cat.brands.length > 0,
+      scoringCategories: extractScoringCategories(cat.brands[0] || {})
+    };
   });
-
-  // Parse app ratings
-  const gpRaw = (brand.app_ratings && brand.app_ratings.google_play) || 'N/A';
-  const iosRaw = (brand.app_ratings && brand.app_ratings.ios) || 'N/A';
-  const gpScore = parseFloat(gpRaw) || 0;
-  const iosScore = parseFloat(iosRaw) || 0;
-
-  return {
-    id: slugify(brand.name),
-    name: brand.name,
-    categorySlug: category.slug,
-    categoryName: category.category,
-    categoryIcon: category.icon,
-    logo: brand.logo_url || '',
-    website: brand.website_url || '',
-    overallScore: brand.gonogo_score,
-    verdict: brand.verdict,
-    categoryScores: categoryScores,
-    scoringCategories: category.scoring_categories,
-    keyFeatures: brand.key_features || [],
-    pricing: brand.pricing || [],
-    appRatings: {
-      googlePlay: gpRaw,
-      ios: iosRaw,
-      googlePlayScore: gpScore,
-      iosScore: iosScore
-    },
-    strengths: brand.key_strengths || [],
-    concerns: brand.key_concerns || [],
-    socialSentiment: brand.social_sentiment || {},
-    lastUpdated: '2026-03-01'
-  };
 }
 
-function slugify(name) {
-  return name.toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-// ============================================================
-// BRAND ACCESS
-// ============================================================
 function getAllBrands() {
-  const all = [];
-  BRAND_DATA.forEach(cat => {
-    cat.brands.forEach(b => {
-      all.push(normalizeBrand(b, cat));
+  if (typeof BRAND_DATA === 'undefined') return [];
+  var allBrands = [];
+  BRAND_DATA.forEach(function(cat) {
+    cat.brands.forEach(function(brand) {
+      allBrands.push(brand);
     });
   });
-  return all;
+  return allBrands;
 }
 
 function getBrandsByCategory(slug) {
-  const cat = BRAND_DATA.find(c => c.slug === slug);
-  if (!cat) return [];
-  return cat.brands.map(b => normalizeBrand(b, cat));
+  if (typeof BRAND_DATA === 'undefined') return [];
+  var category = BRAND_DATA.find(function(c) { return c.slug === slug; });
+  return category ? category.brands : [];
 }
 
 function getBrandById(id) {
-  for (const cat of BRAND_DATA) {
-    for (const b of cat.brands) {
-      if (slugify(b.name) === id) {
-        return normalizeBrand(b, cat);
-      }
+  if (typeof BRAND_DATA === 'undefined') return null;
+  for (var i = 0; i < BRAND_DATA.length; i++) {
+    var cat = BRAND_DATA[i];
+    for (var j = 0; j < cat.brands.length; j++) {
+      var brand = cat.brands[j];
+      if (brand.id === id) return brand;
     }
   }
   return null;
 }
 
-function getBrandByName(name) {
-  for (const cat of BRAND_DATA) {
-    for (const b of cat.brands) {
-      if (b.name === name) {
-        return normalizeBrand(b, cat);
-      }
+function getTopBrands(count) {
+  if (typeof BRAND_DATA === 'undefined') return [];
+  var allBrands = getAllBrands();
+  allBrands.sort(function(a, b) {
+    return (b.gonogo_score || 0) - (a.gonogo_score || 0);
+  });
+  return allBrands.slice(0, count || 6);
+}
+
+function extractScoringCategories(brand) {
+  if (!brand || !brand.categoryScores) return [];
+  var categories = [];
+  for (var key in brand.categoryScores) {
+    if (brand.categoryScores.hasOwnProperty(key)) {
+      categories.push({
+        name: key,
+        max: brand.categoryScores[key].max || 0
+      });
     }
   }
-  return null;
+  return categories;
 }
 
-function getTopBrands(count = 6) {
-  return getAllBrands()
-    .sort((a, b) => b.overallScore - a.overallScore)
-    .slice(0, count);
+// Make functions available globally and on window
+if (typeof window !== 'undefined') {
+  window.getCategories = getCategories;
+  window.getCategoriesWithBrands = getCategoriesWithBrands;
+  window.getAllBrands = getAllBrands;
+  window.getBrandsByCategory = getBrandsByCategory;
+  window.getBrandById = getBrandById;
+  window.getTopBrands = getTopBrands;
 }
-
-function getTotalBrandCount() {
-  return BRAND_DATA.reduce((sum, cat) => sum + cat.brands.length, 0);
-}
-
-// ============================================================
-// SCORE HELPERS
-// ============================================================
-function getScoreColor(score) {
-  if (score >= 80) return '#11a551';
-  if (score >= 60) return '#ff9800';
-  return '#e74c3c';
-}
-
-function getScoreLabel(score) {
-  if (score >= 80) return 'Excellent';
-  if (score >= 70) return 'Good';
-  if (score >= 60) return 'Fair';
-  return 'Poor';
-}
-
-function getVerdictFromScore(score) {
-  if (score >= 80) return 'GO';
-  if (score >= 60) return 'GO WITH CAUTION';
-  return 'NOGO';
-}
-
-// ============================================================
-// IN-MEMORY STORAGE (no persistent storage in sandbox)
-// ============================================================
-const GoNoGoStorage = {
-  _store: {},
-  get(key) { return this._store[key] !== undefined ? this._store[key] : null; },
-  set(key, value) { this._store[key] = value; },
-  remove(key) { delete this._store[key]; },
-  getLocal(key) { return this._store['local_' + key] !== undefined ? this._store['local_' + key] : null; },
-  setLocal(key, value) { this._store['local_' + key] = value; }
-};
