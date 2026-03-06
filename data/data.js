@@ -1,11 +1,15 @@
-[
+// GoNoGo SA - Complete Brand Data
+// Auto-generated: 2026-03-06
+// Contains 13 categories with 83 brands
+
+var BRAND_DATA = [
   {
     "category": "Banking",
     "slug": "banking",
     "icon": "fa-building-columns",
     "brands": [
       {
-        "id": "1",
+        "id": "tymebank",
         "name": "TymeBank",
         "category": "banking",
         "category_slug": "banking",
@@ -55,7 +59,12 @@
           "kiosks",
           "Visa debit"
         ],
-        "pricing": "Pricing: No monthly; ATM R10, card replace R100, decline R3, intl 2% FX",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: No monthly; ATM R10, card replace R100, decline R3, intl 2% FX"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "3.5/5"
@@ -90,7 +99,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "2",
+        "id": "capitec-bank",
         "name": "Capitec Bank",
         "category": "banking",
         "category_slug": "banking",
@@ -140,7 +149,12 @@
           "PayShap",
           "1% cashback"
         ],
-        "pricing": "Pricing: R7/mo fee; ATM R9, card replace R130; Connect SIM from R29",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: R7/mo fee; ATM R9, card replace R130; Connect SIM from R29"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.5/5",
           "ios": "4.7/5"
@@ -173,7 +187,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "3",
+        "id": "fnb-first-national-bank",
         "name": "FNB (First National Bank)",
         "category": "banking",
         "category_slug": "banking",
@@ -223,7 +237,12 @@
           "open banking APIs",
           "business banking"
         ],
-        "pricing": "Pricing: Easy Zero R0/mo; Aspire from R109; Premier from R199; Personal from R275",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Easy Zero R0/mo; Aspire from R109; Premier from R199; Personal from R275"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5",
           "ios": "4.7/5"
@@ -256,7 +275,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "4",
+        "id": "standard-bank",
         "name": "Standard Bank",
         "category": "banking",
         "category_slug": "banking",
@@ -306,7 +325,12 @@
           "business banking",
           "pan-Africa presence"
         ],
-        "pricing": "Pricing: MyMo R4.95/mo; Elite R195/mo; Prestige from R149/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: MyMo R4.95/mo; Elite R195/mo; Prestige from R149/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "4.7/5"
@@ -338,7 +362,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "5",
+        "id": "absa",
         "name": "Absa",
         "category": "banking",
         "category_slug": "banking",
@@ -388,7 +412,12 @@
           "open banking",
           "pan-Africa"
         ],
-        "pricing": "Pricing: Transact R55/mo; Gold from R90; Premier from R195; Private from R400",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Transact R55/mo; Gold from R90; Premier from R195; Private from R400"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.3/5",
           "ios": "4.7/5"
@@ -420,7 +449,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "6",
+        "id": "nedbank",
         "name": "Nedbank",
         "category": "banking",
         "category_slug": "banking",
@@ -470,7 +499,12 @@
           "business banking",
           "green finance"
         ],
-        "pricing": "Pricing: Savvy from R69/mo; Savvy Plus R189; Private Wealth R395",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Savvy from R69/mo; Savvy Plus R189; Private Wealth R395"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "4.6/5"
@@ -503,7 +537,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "7",
+        "id": "discovery-bank",
         "name": "Discovery Bank",
         "category": "banking",
         "category_slug": "banking",
@@ -553,7 +587,12 @@
           "Apple Pay",
           "real-time insights"
         ],
-        "pricing": "Pricing: Gold from R195/mo; Platinum from R345; Black from R695; linked to Vitality plan",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Gold from R195/mo; Platinum from R345; Black from R695; linked to Vitality plan"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "4.5/5"
@@ -585,7 +624,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "8",
+        "id": "african-bank",
         "name": "African Bank",
         "category": "banking",
         "category_slug": "banking",
@@ -634,7 +673,12 @@
           "credit cards",
           "fixed deposits"
         ],
-        "pricing": "Pricing: MyWORLD R4.95/mo; savings accounts fee-free; loan rates high",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: MyWORLD R4.95/mo; savings accounts fee-free; loan rates high"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.8/5",
           "ios": "3.6/5"
@@ -672,7 +716,7 @@
     "icon": "fa-signal",
     "brands": [
       {
-        "id": "9",
+        "id": "vodacom",
         "name": "Vodacom",
         "category": "mobile-networks",
         "category_slug": "mobile-networks",
@@ -722,7 +766,12 @@
           "eSIM",
           "roaming"
         ],
-        "pricing": "Pricing: SIM-only from R129/mo (15GB) to R399/mo (400GB); prepaid R99 (10GB anytime +10GB night owl)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: SIM-only from R129/mo (15GB) to R399/mo (400GB); prepaid R99 (10GB anytime +10GB night owl)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.5/5 (319K reviews) VodaPay",
           "ios": "4.7/5 (149K ratings) VodaPay"
@@ -757,7 +806,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "10",
+        "id": "telkom-mobile",
         "name": "Telkom Mobile",
         "category": "mobile-networks",
         "category_slug": "mobile-networks",
@@ -806,7 +855,12 @@
           "all-network roaming",
           "MyTelkom app"
         ],
-        "pricing": "Pricing: Prepaid data R7.50/35MB- R999/100GB; LTE 80GB R169pm; FreeMe from R157/1.5GB; price hikes April 2026",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Prepaid data R7.50/35MB- R999/100GB; LTE 80GB R169pm; FreeMe from R157/1.5GB; price hikes April 2026"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.5/5",
           "ios": "1.3/5"
@@ -839,7 +893,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "11",
+        "id": "rain",
         "name": "RAIN",
         "category": "mobile-networks",
         "category_slug": "mobile-networks",
@@ -887,7 +941,12 @@
           "5G home integration",
           "national coverage"
         ],
-        "pricing": "Pricing: From R165/mo rainGO (2GB, 60mins, 100SMS), month-to-month",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R165/mo rainGO (2GB, 60mins, 100SMS), month-to-month"
+          }
+        ],
         "appRatings": {
           "googlePlay": "2.81/5 (my rain app, 12k reviews); 4.2/5 (rain talk, 828 reviews)",
           "ios": "No prominent iOS app found"
@@ -919,7 +978,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "12",
+        "id": "cell-c",
         "name": "Cell C",
         "category": "mobile-networks",
         "category_slug": "mobile-networks",
@@ -969,7 +1028,12 @@
           "MVNO hosting",
           "device contracts"
         ],
-        "pricing": "Pricing: Elevate+ from R229/mo (3GB), promos like 20GB R99; 1GB prepaid ~R65",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Elevate+ from R229/mo (3GB), promos like 20GB R99; 1GB prepaid ~R65"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.8/5",
           "ios": "2.7/5"
@@ -1004,7 +1068,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "13",
+        "id": "mtn-south-africa",
         "name": "MTN South Africa",
         "category": "mobile-networks",
         "category_slug": "mobile-networks",
@@ -1053,7 +1117,12 @@
           "DataShare",
           "self-service app"
         ],
-        "pricing": "Pricing: Contracts from R115/mo (30GB), home uncapped from R339/mo (15Mbps); 5.4% hike Feb 2026 w/speed bonuses",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Contracts from R115/mo (30GB), home uncapped from R339/mo (15Mbps); 5.4% hike Feb 2026 w/speed bonuses"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.9/5",
           "ios": "~2.5/5"
@@ -1094,7 +1163,7 @@
     "icon": "fa-users-gear",
     "brands": [
       {
-        "id": "14",
+        "id": "workday",
         "name": "Workday",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1144,7 +1213,12 @@
           "mobile app",
           "compliance tools"
         ],
-        "pricing": "Pricing: Custom enterprise; est. R1,800-R7,500/emp/year (from $96-504)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Custom enterprise; est. R1,800-R7,500/emp/year (from $96-504)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.3/5",
           "ios": "4.7/5"
@@ -1178,7 +1252,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "15",
+        "id": "sage-hr-south-africa",
         "name": "Sage HR South Africa",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1228,7 +1302,12 @@
           "performance reviews",
           "recruitment"
         ],
-        "pricing": "Pricing: Core + Leave from R24/emp/mo; add-ons R10-14/emp/mo, Recruitment R1850/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Core + Leave from R24/emp/mo; add-ons R10-14/emp/mo, Recruitment R1850/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.7/5 (Sage Self Service, 501 reviews)",
           "ios": "Limited data; complaints on functionality"
@@ -1264,7 +1343,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "16",
+        "id": "simplepay",
         "name": "SimplePay",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1314,10 +1393,15 @@
           "Xero/QuickBooks integration",
           "custom items"
         ],
-        "pricing": "Pricing: ~R65 base + R18/emp/mo excl VAT",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: ~R65 base + R18/emp/mo excl VAT"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (Self-Service app exists, 50K+ downloads)",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "ease of use",
@@ -1346,7 +1430,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "17",
+        "id": "payspace-deel-local-payroll,-powered-by-payspace",
         "name": "PaySpace (Deel Local Payroll, powered by PaySpace)",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1396,7 +1480,12 @@
           "HR modules (performance/recruitment)",
           "multi-country support"
         ],
-        "pricing": "Pricing: Pay-per-employee/month (no annual fees); Lite/Premier/Master plans; no specific ZAR listed",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Pay-per-employee/month (no annual fees); Lite/Premier/Master plans; no specific ZAR listed"
+          }
+        ],
         "appRatings": {
           "googlePlay": "Not found",
           "ios": "Not found"
@@ -1431,7 +1520,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "18",
+        "id": "orangehrm",
         "name": "OrangeHRM",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1482,7 +1571,12 @@
           "mobile app",
           "reporting"
         ],
-        "pricing": "Pricing: Free Starter; Advanced custom quote (no public 2025/2026 ZAR pricing found)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Free Starter; Advanced custom quote (no public 2025/2026 ZAR pricing found)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "5.0/5 (86 reviews)",
           "ios": "2.0/5 (5 ratings)"
@@ -1516,7 +1610,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "19",
+        "id": "bamboohr",
         "name": "BambooHR",
         "category": "hr-software",
         "category_slug": "hr-software",
@@ -1566,7 +1660,12 @@
           "reporting/analytics",
           "150+ integrations"
         ],
-        "pricing": "Pricing: Quote-based ~$10-20/emp/mo USD; no public SA ZAR pricing",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Quote-based ~$10-20/emp/mo USD; no public SA ZAR pricing"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "4.7/5"
@@ -1607,7 +1706,7 @@
     "icon": "fa-calculator",
     "brands": [
       {
-        "id": "20",
+        "id": "zoho-books",
         "name": "Zoho Books",
         "category": "accounting-software",
         "category_slug": "accounting-software",
@@ -1658,7 +1757,12 @@
           "Zoho CRM integration",
           "mobile app"
         ],
-        "pricing": "Pricing: Free (<R1M); Standard R199/mo; Professional R399/mo; Premium R699/mo; Elite R799/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Free (<R1M); Standard R199/mo; Professional R399/mo; Premium R699/mo; Elite R799/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5 (4K reviews)",
           "ios": "4.7/5 (3.2K reviews)"
@@ -1692,7 +1796,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "21",
+        "id": "sage-accounting-sa",
         "name": "Sage Accounting SA",
         "category": "accounting-software",
         "category_slug": "accounting-software",
@@ -1743,7 +1847,12 @@
           "mobile app",
           "reporting"
         ],
-        "pricing": "Pricing: Core R129/mo; Accounting R299/mo; Accounting Plus R429/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Core R129/mo; Accounting R299/mo; Accounting Plus R429/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5 (3.5K reviews)",
           "ios": "4.5/5 (2.8K reviews)"
@@ -1777,7 +1886,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "22",
+        "id": "xero-south-africa",
         "name": "Xero South Africa",
         "category": "accounting-software",
         "category_slug": "accounting-software",
@@ -1828,7 +1937,12 @@
           "mobile app",
           "reporting"
         ],
-        "pricing": "Pricing: Starter R260/mo (20 invoices); Standard R450/mo; Premium R720/mo (multi-currency)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Starter R260/mo (20 invoices); Standard R450/mo; Premium R720/mo (multi-currency)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5 (35K reviews)",
           "ios": "4.7/5 (160K reviews)"
@@ -1862,7 +1976,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "23",
+        "id": "quickbooks-online-sa",
         "name": "QuickBooks Online SA",
         "category": "accounting-software",
         "category_slug": "accounting-software",
@@ -1913,7 +2027,12 @@
           "mobile app",
           "reporting"
         ],
-        "pricing": "Pricing: Simple Start R185/mo; Essentials R280/mo; Plus R380/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Simple Start R185/mo; Essentials R280/mo; Plus R380/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.3/5 (200K reviews)",
           "ios": "4.7/5 (680K reviews)"
@@ -1947,7 +2066,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "24",
+        "id": "wave-financial",
         "name": "Wave Financial",
         "category": "accounting-software",
         "category_slug": "accounting-software",
@@ -1997,7 +2116,12 @@
           "AI Copilot",
           "mobile app"
         ],
-        "pricing": "Pricing: Free core; Payments 1.4%+R5 per transaction; Payroll from ~R250/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Free core; Payments 1.4%+R5 per transaction; Payroll from ~R250/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5 (50K reviews)",
           "ios": "4.7/5 (84K reviews)"
@@ -2037,7 +2161,7 @@
     "icon": "fa-house-chimney",
     "brands": [
       {
-        "id": "25",
+        "id": "chas-everitt",
         "name": "Chas Everitt",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2086,7 +2210,12 @@
           "bond calculator",
           "property management"
         ],
-        "pricing": "Pricing: Letting mgmt ~8-10% monthly rent (industry); sales comm 5-7.5% (negotiable)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Letting mgmt ~8-10% monthly rent (industry); sales comm 5-7.5% (negotiable)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (agent app, low visibility)",
           "ios": "N/R (insufficient reviews)"
@@ -2118,7 +2247,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "26",
+        "id": "just-property",
         "name": "Just Property",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2168,7 +2297,12 @@
           "sales/lettings residential/commercial",
           "RENTSECURE insurance"
         ],
-        "pricing": "Pricing: Management ~8-12% rent (est.); commissions 5-7.5%+VAT (seller-paid); RENTSECURE 3.5% rent",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Management ~8-12% rent (est.); commissions 5-7.5%+VAT (seller-paid); RENTSECURE 3.5% rent"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -2202,7 +2336,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "27",
+        "id": "pam-golding-properties",
         "name": "Pam Golding Properties",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2252,7 +2386,12 @@
           "maintenance coordination",
           "exit inspections"
         ],
-        "pricing": "Pricing: Typically 8-12% monthly rent + VAT for management (industry norm; no 2025 specifics published)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Typically 8-12% monthly rent + VAT for management (industry norm; no 2025 specifics published)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -2285,7 +2424,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "28",
+        "id": "harcourts--property-letting",
         "name": "Harcourts | Property Letting",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2335,7 +2474,12 @@
           "nationwide branches",
           "online property search"
         ],
-        "pricing": "Pricing: Standard SA rates: 8-12% monthly rent + VAT for management; 100% monthly rent letting fee",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Standard SA rates: 8-12% monthly rent + VAT for management; 100% monthly rent letting fee"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no public app found)",
           "ios": "N/A (internal/enterprise apps only)"
@@ -2367,7 +2511,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "29",
+        "id": "seeff-property-group",
         "name": "Seeff Property Group",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2417,7 +2561,12 @@
           "SSLR legal support",
           "PayProp automation"
         ],
-        "pricing": "Pricing: Industry std: 8-12% monthly rent mgmt fee + 50-100% 1st month placement (+VAT); Seeff specifics not public",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry std: 8-12% monthly rent mgmt fee + 50-100% 1st month placement (+VAT); Seeff specifics not public"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -2450,7 +2599,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "30",
+        "id": "jawitz-properties",
         "name": "Jawitz Properties",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2500,7 +2649,12 @@
           "lease compliance",
           "online accounting portal"
         ],
-        "pricing": "Pricing: Admin fee ~R1,750; deposit 2x rent (e.g. R15k for R7.5k/mo); commissions 5-7.5%+VAT (industry std)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Admin fee ~R1,750; deposit 2x rent (e.g. R15k for R7.5k/mo); commissions 5-7.5%+VAT (industry std)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app found)",
           "ios": "N/A (no app found)"
@@ -2534,7 +2688,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "31",
+        "id": "wakefields-property-management",
         "name": "Wakefields Property Management",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2584,10 +2738,15 @@
           "online portal",
           "body corporate mgmt"
         ],
-        "pricing": "Pricing: Not publicly listed; procurement/admin letting via small fee or % of rental income",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Not publicly listed; procurement/admin letting via small fee or % of rental income"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "85+ year family-owned",
@@ -2618,7 +2777,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "32",
+        "id": "rawson-property-letting",
         "name": "Rawson Property Letting",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2668,7 +2827,12 @@
           "property valuations",
           "online portal"
         ],
-        "pricing": "Pricing: Industry standard ~8% + VAT commission on monthly rental income",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry standard ~8% + VAT commission on monthly rental income"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app found)",
           "ios": "N/A (no app found)"
@@ -2701,7 +2865,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "33",
+        "id": "only-realty",
         "name": "Only Realty",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2750,10 +2914,15 @@
           "national branches (~47)",
           "long-term investment focus"
         ],
-        "pricing": "Pricing: Standard SA letting fees (est. 8-12% monthly management + 50-100% one month's rent leasing; no specific 2025/2026 published)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Standard SA letting fees (est. 8-12% monthly management + 50-100% one month's rent leasing; no specific 2025/2026 published)"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "wide branch network",
@@ -2780,7 +2949,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "34",
+        "id": "tyson-properties",
         "name": "Tyson Properties",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2830,10 +2999,15 @@
           "finance pre-qual",
           "rentals from studios to luxury homes"
         ],
-        "pricing": "Pricing: Rentals from R6,500/mo (1-bed apt) to R45,000/mo (luxury); deposit equals rent + admin ~R1,150",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Rentals from R6,500/mo (1-bed apt) to R45,000/mo (luxury); deposit equals rent + admin ~R1,150"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "20+ years experience",
@@ -2864,7 +3038,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "35",
+        "id": "leapfrog-property-group",
         "name": "Leapfrog Property Group",
         "category": "property-letting",
         "category_slug": "property-letting",
@@ -2913,7 +3087,12 @@
           "BEE Level 2 compliant",
           "agent tech dashboard"
         ],
-        "pricing": "Pricing: Letting mgmt 8-12% monthly rent + VAT (industry std); rentals R10k-R50k/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Letting mgmt 8-12% monthly rent + VAT (industry std); rentals R10k-R50k/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -2952,7 +3131,7 @@
     "icon": "fa-cart-shopping",
     "brands": [
       {
-        "id": "36",
+        "id": "superbalist",
         "name": "Superbalist",
         "category": "online-retailers",
         "category_slug": "online-retailers",
@@ -3002,7 +3181,12 @@
           "frequent sales",
           "student discounts"
         ],
-        "pricing": "Pricing: Clothing/shoes from R49 (sale) to R3000+; R400 off first order promo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Clothing/shoes from R49 (sale) to R3000+; R400 off first order promo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.7/5 (228K reviews)",
           "ios": "4.4/5 (45.3K ratings)"
@@ -3036,7 +3220,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "37",
+        "id": "takealot",
         "name": "Takealot",
         "category": "online-retailers",
         "category_slug": "online-retailers",
@@ -3086,7 +3270,12 @@
           "marketplace",
           "pickup points"
         ],
-        "pricing": "Pricing: Electronics from R500; clothing from R50; delivery R99/free over R450",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Electronics from R500; clothing from R50; delivery R99/free over R450"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.7/5 (667K reviews)",
           "ios": "4.8/5 (119K ratings)"
@@ -3121,7 +3310,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "38",
+        "id": "loot.co.za",
         "name": "Loot.co.za",
         "category": "online-retailers",
         "category_slug": "online-retailers",
@@ -3170,7 +3359,12 @@
           "extended return policy",
           "competitive pricing on media"
         ],
-        "pricing": "Pricing: Books from R100; electronics R500-R5000; delivery R89-R200",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Books from R100; electronics R500-R5000; delivery R89-R200"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.5/5 (57K reviews)",
           "ios": "4.3/5 (3.7K ratings)"
@@ -3211,7 +3405,7 @@
     "icon": "fa-heart-pulse",
     "brands": [
       {
-        "id": "39",
+        "id": "profmed-medical-aid",
         "name": "Profmed Medical Aid",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3261,7 +3455,12 @@
           "international travel assistance",
           "network options for affordability"
         ],
-        "pricing": "Pricing: From R1,022/mo (ProSelect Savvy) to R13,309 (ProPinnacle); 2026 +6.76%",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1,022/mo (ProSelect Savvy) to R13,309 (ProPinnacle); 2026 +6.76%"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (few reviews, negative feedback)",
           "ios": "~2/5 (based on negative App Store reviews)"
@@ -3293,7 +3492,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "40",
+        "id": "discovery-health-medical-scheme",
         "name": "Discovery Health Medical Scheme",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3343,7 +3542,12 @@
           "screenings",
           "virtual care"
         ],
-        "pricing": "Pricing: From R1,278/mo KeyCare Start Regional; Active Smart R1,350 unchanged 2026",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1,278/mo KeyCare Start Regional; Active Smart R1,350 unchanged 2026"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.2/5",
           "ios": "New app, mixed early reviews"
@@ -3379,7 +3583,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "41",
+        "id": "bestmed-medical-aid",
         "name": "Bestmed Medical Aid",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3429,7 +3633,12 @@
           "maternity/chronic/oncology programs",
           "Netcare911"
         ],
-        "pricing": "Pricing: From R1736/mo (Rhythm1 income-based principal) to R12572/mo (Pace4)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1736/mo (Rhythm1 income-based principal) to R12572/mo (Pace4)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (app exists, rating not extracted)",
           "ios": "Mixed (bugs/UI/connectivity issues in reviews)"
@@ -3465,7 +3674,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "42",
+        "id": "momentum-medical-scheme",
         "name": "Momentum Medical Scheme",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3516,10 +3725,15 @@
           "international emergency",
           "GapCover/HealthSaver+"
         ],
-        "pricing": "Pricing: Ingwe from R645/mo (income-based); Evolve R2029; Custom R2585+; Incentive R3362+ (10% savings); Extender R7939+ (25% savings); Summit R16469 (unlimited hospital)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Ingwe from R645/mo (income-based); Evolve R2029; Custom R2585+; Incentive R3362+ (10% savings); Extender R7939+ (25% savings); Summit R16469 (unlimited hospital)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.9/5",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "affordable entry plans",
@@ -3551,7 +3765,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "43",
+        "id": "medshield",
         "name": "Medshield",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3601,7 +3815,12 @@
           "mental health support",
           "gap partnerships"
         ],
-        "pricing": "Pricing: From R1,821/mo principal (MediCurve) to R9,489/mo (PremiumPlus); 7.5% 2026 increase",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1,821/mo principal (MediCurve) to R9,489/mo (PremiumPlus); 7.5% 2026 increase"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (10K+ downloads, updated 2025)",
           "ios": "Mixed (3-4 reviews shown: crashes, auth issues, some praise)"
@@ -3635,7 +3854,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "44",
+        "id": "keyhealth-medical-scheme",
         "name": "KeyHealth Medical Scheme",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3685,7 +3904,12 @@
           "Easy-ER emergency access",
           "dental/optical benefits"
         ],
-        "pricing": "Pricing: From R2187/mo (Essence main) to R13840/mo (Platinum); Gold R8675",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R2187/mo (Essence main) to R13840/mo (Platinum); Gold R8675"
+          }
+        ],
         "appRatings": {
           "googlePlay": "Not visible (10K+ downloads)",
           "ios": "2.4/5 (524 ratings)"
@@ -3719,7 +3943,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "45",
+        "id": "bonitas",
         "name": "Bonitas",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3769,7 +3993,12 @@
           "digital app",
           "oncology/maternity programs"
         ],
-        "pricing": "Pricing: From R1,275/mo (BonCore hospital) to R12,509/mo (BonComprehensive); child rates ~R800-R2500",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1,275/mo (BonCore hospital) to R12,509/mo (BonComprehensive); child rates ~R800-R2500"
+          }
+        ],
         "appRatings": {
           "googlePlay": "1.9/5",
           "ios": "2.0/5 (est. from reviews)"
@@ -3803,7 +4032,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "46",
+        "id": "fedhealth",
         "name": "Fedhealth",
         "category": "medical-aid",
         "category_slug": "medical-aid",
@@ -3854,9 +4083,14 @@
           "24/7 emergency",
           "DSP pharmacies"
         ],
-        "pricing": "Pricing: From R1,155/mo FlexiFED Savvy principal (2026); up to R19,393 Maxima PLUS",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R1,155/mo FlexiFED Savvy principal (2026); up to R19,393 Maxima PLUS"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
+          "googlePlay": "N/A",
           "ios": "1.5/5"
         },
         "keyStrengths": [
@@ -3897,7 +4131,7 @@
     "icon": "fa-shield-halved",
     "brands": [
       {
-        "id": "47",
+        "id": "discovery-insure",
         "name": "Discovery Insure",
         "category": "insurance",
         "category_slug": "insurance",
@@ -3947,10 +4181,15 @@
           "vehicle warranty",
           "portable possessions"
         ],
-        "pricing": "Pricing: From R499/mo Core plan; fuel cashback up to R1,500/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R499/mo Core plan; fuel cashback up to R1,500/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.42/5",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "innovative rewards model",
@@ -3981,7 +4220,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "48",
+        "id": "santam",
         "name": "Santam",
         "category": "insurance",
         "category_slug": "insurance",
@@ -4031,7 +4270,12 @@
           "app claims/SOS",
           "24/7 support"
         ],
-        "pricing": "Pricing: Theft/Hijacking from R350/mo; comprehensive car R400-R1500+/mo depending on vehicle",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Theft/Hijacking from R350/mo; comprehensive car R400-R1500+/mo depending on vehicle"
+          }
+        ],
         "appRatings": {
           "googlePlay": "Not available",
           "ios": "4.3/5 (514 ratings)"
@@ -4063,7 +4307,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "49",
+        "id": "auto-&-general",
         "name": "Auto & General",
         "category": "insurance",
         "category_slug": "insurance",
@@ -4113,7 +4357,12 @@
           "cashback options",
           "legal cover"
         ],
-        "pricing": "Pricing: Industry avg R800-R1400/mo comprehensive; personalized quotes via quote.autogen.co.za",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry avg R800-R1400/mo comprehensive; personalized quotes via quote.autogen.co.za"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.0 stars",
           "ios": "4.9 stars"
@@ -4146,7 +4395,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "50",
+        "id": "first-for-women",
         "name": "First for Women",
         "category": "insurance",
         "category_slug": "insurance",
@@ -4196,7 +4445,12 @@
           "emergency/medical assist",
           "funeral/legal cover add-ons"
         ],
-        "pricing": "Pricing: From R216/mo basic; personalized quotes at firstforwomen.co.za",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From R216/mo basic; personalized quotes at firstforwomen.co.za"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5 (5.7K reviews)",
           "ios": "4.8/5"
@@ -4228,7 +4482,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "51",
+        "id": "miway",
         "name": "MiWay",
         "category": "insurance",
         "category_slug": "insurance",
@@ -4278,10 +4532,15 @@
           "Vaps (tyre/rim/rental)",
           "online quotes/eSignature"
         ],
-        "pricing": "Pricing: Personalized quotes; competitive vs direct insurers; online quote tool",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Personalized quotes; competitive vs direct insurers; online quote tool"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.1/5 (11.4K reviews)",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "direct insurer value",
@@ -4318,7 +4577,7 @@
     "icon": "fa-spray-can-sparkles",
     "brands": [
       {
-        "id": "52",
+        "id": "cleanlab-sa",
         "name": "CleanLab SA",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4368,10 +4627,15 @@
           "nationwide residential/commercial/industrial cleaning/pest/garden",
           "satisfaction guarantee"
         ],
-        "pricing": "Pricing: Quote-based affordable rates; up to 30% loyalty discounts; no hidden fees",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Quote-based affordable rates; up to 30% loyalty discounts; no hidden fees"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "high customer ratings/testimonials",
@@ -4401,7 +4665,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "53",
+        "id": "goodapp",
         "name": "GoodApp",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4451,7 +4715,12 @@
           "facial recognition verification",
           "wide services including cleaning/plumbing/electrical"
         ],
-        "pricing": "Pricing: Upfront fixed pricing estimates during booking (specific ZAR not publicly listed)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Upfront fixed pricing estimates during booking (specific ZAR not publicly listed)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (5K+ downloads, rating not extractable)",
           "ios": "N/A (few reviews, mixed)"
@@ -4486,7 +4755,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "54",
+        "id": "maid4u",
         "name": "Maid4U",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4535,7 +4804,12 @@
           "HR/compliance handling",
           "franchise model"
         ],
-        "pricing": "Pricing: Not publicly listed; optional online interview R220. Placement fees/packages undisclosed.",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Not publicly listed; optional online interview R220. Placement fees/packages undisclosed."
+          }
+        ],
         "appRatings": {
           "googlePlay": "No rating (500+ downloads, new)",
           "ios": "No ratings (new app)"
@@ -4568,7 +4842,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "55",
+        "id": "sweepsouth",
         "name": "SweepSouth",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4619,7 +4893,12 @@
           "recurring schedules",
           "MyHome Hub"
         ],
-        "pricing": "Pricing: Tailored quotes by home size/tasks; Express R199 Mon-Thu / R299 Fri-Sun",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Tailored quotes by home size/tasks; Express R199 Mon-Thu / R299 Fri-Sun"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.4/5 (6.5K reviews)",
           "ios": "4.7/5 (522 reviews)"
@@ -4658,7 +4937,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "56",
+        "id": "click-cleaning",
         "name": "CLiCK Cleaning",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4708,7 +4987,12 @@
           "tile/stone cleaning",
           "pet urine treatment"
         ],
-        "pricing": "Pricing: Quote-based; upholstery from R165/seat; industry avg R80-300/hr ZAR",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Quote-based; upholstery from R165/seat; industry avg R80-300/hr ZAR"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -4741,7 +5025,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "57",
+        "id": "bidvest-prestige",
         "name": "Bidvest Prestige",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4791,7 +5075,12 @@
           "customizable solutions",
           "23k staff nationwide"
         ],
-        "pricing": "Pricing: No public 2025/2026 ZAR pricing; quote-based for commercial contracts",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: No public 2025/2026 ZAR pricing; quote-based for commercial contracts"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -4824,7 +5113,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "58",
+        "id": "all-maids",
         "name": "All Maids",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4874,7 +5163,12 @@
           "labour outsourcing",
           "flexible scheduling"
         ],
-        "pricing": "Pricing: Quote-based (industry avg R200-800/day Gauteng); no fixed 2025/2026 rates published",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Quote-based (industry avg R200-800/day Gauteng); no fixed 2025/2026 rates published"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no app)",
           "ios": "N/A (no app)"
@@ -4904,7 +5198,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "59",
+        "id": "skitterblink",
         "name": "Skitterblink",
         "category": "home-cleaning",
         "category_slug": "home-cleaning",
@@ -4954,10 +5248,15 @@
           "carpet/upholstery cleaning",
           "hygiene services"
         ],
-        "pricing": "Pricing: Not publicly listed; franchise starts from R25,000 per service division; described as affordable but some complaints of high costs",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Not publicly listed; franchise starts from R25,000 per service division; described as affordable but some complaints of high costs"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "wide service range",
@@ -4998,7 +5297,7 @@
     "icon": "fa-car",
     "brands": [
       {
-        "id": "60",
+        "id": "mit-mak-motors",
         "name": "Mit Mak Motors",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5048,9 +5347,14 @@
           "service history guarantee",
           "test drive booking"
         ],
-        "pricing": "Pricing: Used cars R130k-R650k (e.g. R240k Polo ~R5k/mo)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Used cars R130k-R650k (e.g. R240k Polo ~R5k/mo)"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
+          "googlePlay": "N/A",
           "ios": "New, insufficient reviews"
         },
         "keyStrengths": [
@@ -5081,7 +5385,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "61",
+        "id": "auto24.co.za",
         "name": "AUTO24.co.za",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5131,10 +5435,15 @@
           "trade-ins",
           "finance services"
         ],
-        "pricing": "Pricing: Used cars R96k - R600k ZAR, many under R200k",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Used cars R96k - R600k ZAR, many under R200k"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (pan-Africa app low downloads)",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "top ratings",
@@ -5164,7 +5473,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "62",
+        "id": "gys-pitzer-motors",
         "name": "Gys Pitzer Motors",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5214,10 +5523,15 @@
           "multiple Pretoria branches",
           "professional staff"
         ],
-        "pricing": "Pricing: Pre-owned from R150k (Suzuki) to R800k+ (SUVs/bakkies) 2024/2025 models ZAR",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Pre-owned from R150k (Suzuki) to R800k+ (SUVs/bakkies) 2024/2025 models ZAR"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "exceptional HelloPeter ratings/volume",
@@ -5244,7 +5558,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "63",
+        "id": "auto-investments-wonderboom",
         "name": "Auto Investments Wonderboom",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5294,10 +5608,15 @@
           "wide vehicle range",
           "trade-ins"
         ],
-        "pricing": "Pricing: Pre-owned cars from R70,000 e.g. Honda Brio; up to R1M+ luxury; finance from R3,000-R12,000 pm (2025/2026 listings)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Pre-owned cars from R70,000 e.g. Honda Brio; up to R1M+ luxury; finance from R3,000-R12,000 pm (2025/2026 listings)"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "strong customer service",
@@ -5327,7 +5646,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "64",
+        "id": "surf4cars",
         "name": "Surf4Cars",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5377,7 +5696,12 @@
           "mobile app",
           "price alerts"
         ],
-        "pricing": "Pricing: Free browsing; dealer listings fees (private R99-199); wide vehicle range 2025/2026",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Free browsing; dealer listings fees (private R99-199); wide vehicle range 2025/2026"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.5/5 (3.4K reviews)",
           "ios": "3.8/5"
@@ -5411,7 +5735,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "65",
+        "id": "autotrader-south-africa",
         "name": "AutoTrader South Africa",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5461,7 +5785,12 @@
           "AR car view",
           "MotorHappy warranty"
         ],
-        "pricing": "Pricing: Private listings R99-199; dealer subscriptions (vary); free browsing",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Private listings R99-199; dealer subscriptions (vary); free browsing"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.8/5 (11.4K reviews)",
           "ios": "3.8/5"
@@ -5496,7 +5825,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "66",
+        "id": "autopedigree",
         "name": "AutoPedigree",
         "category": "car-dealers",
         "category_slug": "car-dealers",
@@ -5546,10 +5875,15 @@
           "finance services",
           "trade-ins"
         ],
-        "pricing": "Pricing: Certified used cars various price points; financing from R2,500/mo; no fixed list",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Certified used cars various price points; financing from R2,500/mo; no fixed list"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "certified stock/warranty",
@@ -5586,7 +5920,7 @@
     "icon": "fa-utensils",
     "brands": [
       {
-        "id": "67",
+        "id": "zulzi",
         "name": "Zulzi",
         "category": "food-delivery",
         "category_slug": "food-delivery",
@@ -5636,7 +5970,12 @@
           "promotions",
           "6am-midnight service"
         ],
-        "pricing": "Pricing: Delivery R35-R60 + surge; free over R350-R450; supermarket prices; promotions e.g. free certain hours",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Delivery R35-R60 + surge; free over R350-R450; supermarket prices; promotions e.g. free certain hours"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.4/5 (1.43K reviews)",
           "ios": "~4.1/5"
@@ -5673,7 +6012,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "68",
+        "id": "mr-d-food",
         "name": "Mr D Food",
         "category": "food-delivery",
         "category_slug": "food-delivery",
@@ -5723,7 +6062,12 @@
           "in-app deals",
           "Smart Shopper points"
         ],
-        "pricing": "Pricing: Delivery ~R15-20, menus 20-40% > in-store, PnP in-store prices + delivery, daily deals",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Delivery ~R15-20, menus 20-40% > in-store, PnP in-store prices + delivery, daily deals"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.6 (262K reviews)",
           "ios": "4.8 (358K reviews)"
@@ -5758,7 +6102,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "69",
+        "id": "ucook",
         "name": "UCook",
         "category": "food-delivery",
         "category_slug": "food-delivery",
@@ -5808,7 +6152,12 @@
           "local/ethical ingredients",
           "nationwide delivery"
         ],
-        "pricing": "Pricing: Meals from R65/person; first order 30% off",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Meals from R65/person; first order 30% off"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (10K+ downloads, rating unavailable)",
           "ios": "Mixed reviews (no aggregate score; convenience vs bugs)"
@@ -5843,7 +6192,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "70",
+        "id": "yebo-fresh",
         "name": "Yebo Fresh",
         "category": "food-delivery",
         "category_slug": "food-delivery",
@@ -5893,7 +6242,12 @@
           "72k+ retailer network",
           "Smollan-backed distribution"
         ],
-        "pricing": "Pricing: B2B wholesale; competitive bulk pricing (no public consumer rates)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: B2B wholesale; competitive bulk pricing (no public consumer rates)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (field app, no rating; 100+ downloads)",
           "ios": "N/A (no app found)"
@@ -5926,7 +6280,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "71",
+        "id": "uber-eats",
         "name": "Uber Eats",
         "category": "food-delivery",
         "category_slug": "food-delivery",
@@ -5976,7 +6330,12 @@
           "pickup",
           "promotions"
         ],
-        "pricing": "Pricing: Delivery R20+, 20-45% menu markup, Uber One R50/mo (R0 deliv >R100)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Delivery R20+, 20-45% menu markup, Uber One R50/mo (R0 deliv >R100)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "4.6",
           "ios": "4.7"
@@ -6016,7 +6375,7 @@
     "icon": "fa-shield",
     "brands": [
       {
-        "id": "72",
+        "id": "tsu-protection-services",
         "name": "TSU Protection Services",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6066,10 +6425,15 @@
           "riot control",
           "TSU Protect app"
         ],
-        "pricing": "Pricing: Industry avg R400-1000/mo (no specific pricing published)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry avg R400-1000/mo (no specific pricing published)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (5K+ downloads)",
-          "ios": ""
+          "ios": "N/A"
         },
         "keyStrengths": [
           "PSiRA accredited",
@@ -6097,7 +6461,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "73",
+        "id": "securitas-south-africa",
         "name": "Securitas South Africa",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6147,7 +6511,12 @@
           "SOC monitoring",
           "risk management"
         ],
-        "pricing": "Pricing: Not publicly listed; industry armed response ~R400-1000/mo ZAR; SME fixed monthly fees",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Not publicly listed; industry armed response ~R400-1000/mo ZAR; SME fixed monthly fees"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no SA-specific app)",
           "ios": "N/A (no SA-specific app)"
@@ -6179,7 +6548,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "74",
+        "id": "chubb-armed-response",
         "name": "Chubb Armed Response",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6230,7 +6599,12 @@
           "PSIRA-trained officers",
           "national dispatch"
         ],
-        "pricing": "Pricing: Industry avg R700/mo (R400-1000)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry avg R700/mo (R400-1000)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (global Chubb app low downloads)",
           "ios": "4.0/5 (ChubbView, 5 ratings)"
@@ -6262,7 +6636,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "75",
+        "id": "excellerate-services",
         "name": "Excellerate Services",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6312,10 +6686,15 @@
           "5800 officers",
           "246 vehicles"
         ],
-        "pricing": "Pricing: Industry avg R400-1000/mo (R700)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Industry avg R400-1000/mo (R700)"
+          }
+        ],
         "appRatings": {
-          "googlePlay": "",
-          "ios": ""
+          "googlePlay": "N/A",
+          "ios": "N/A"
         },
         "keyStrengths": [
           "national scale (1200 sites)",
@@ -6344,7 +6723,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "76",
+        "id": "stallion-integrated-security",
         "name": "STALLion Integrated Security",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6394,7 +6773,12 @@
           "training center",
           "nationwide coverage"
         ],
-        "pricing": "Pricing: R400-R1000/mo typical for Gauteng armed response (industry avg 2025)",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: R400-R1000/mo typical for Gauteng armed response (industry avg 2025)"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no customer app found)",
           "ios": "N/A (no customer app found)"
@@ -6428,7 +6812,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "77",
+        "id": "fidelity-adt",
         "name": "Fidelity ADT",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6479,7 +6863,12 @@
           "medical assist",
           "SecureFire"
         ],
-        "pricing": "Pricing: Armed response from ~R400-R1000/mo (market avg R700), partner ex R364/mo",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Armed response from ~R400-R1000/mo (market avg R700), partner ex R364/mo"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (FidelitySecure low downloads, no rating shown)",
           "ios": "~4/5 (limited reviews)"
@@ -6512,7 +6901,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "78",
+        "id": "thorburn-security-solutions",
         "name": "Thorburn Security Solutions",
         "category": "armed-response",
         "category_slug": "armed-response",
@@ -6562,7 +6951,12 @@
           "Guard Tower solar CCTV",
           "CiiMS platform"
         ],
-        "pricing": "Pricing: Not publicly listed; industry avg R700/mo armed response ZAR",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: Not publicly listed; industry avg R700/mo armed response ZAR"
+          }
+        ],
         "appRatings": {
           "googlePlay": "N/A (no consumer app)",
           "ios": "N/A (no consumer app)"
@@ -6601,7 +6995,7 @@
     "icon": "fa-key",
     "brands": [
       {
-        "id": "79",
+        "id": "avis-south-africa",
         "name": "Avis South Africa",
         "category": "car-rentals",
         "category_slug": "car-rentals",
@@ -6651,7 +7045,12 @@
           "online booking",
           "mobile app"
         ],
-        "pricing": "Pricing: From ~R350/day economy; varies by duration/class; online discounts available",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From ~R350/day economy; varies by duration/class; online discounts available"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.5/5 (Avis Car Rental, SA branch)",
           "ios": "3.5/5"
@@ -6683,7 +7082,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "80",
+        "id": "europcar-south-africa",
         "name": "Europcar South Africa",
         "category": "car-rentals",
         "category_slug": "car-rentals",
@@ -6733,7 +7132,12 @@
           "online booking",
           "mobile app"
         ],
-        "pricing": "Pricing: From ~R300/day economy; online discounts; packages available",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From ~R300/day economy; online discounts; packages available"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.8/5",
           "ios": "3.9/5"
@@ -6765,7 +7169,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "81",
+        "id": "budget-car-rental-sa",
         "name": "Budget Car Rental SA",
         "category": "car-rentals",
         "category_slug": "car-rentals",
@@ -6814,7 +7218,12 @@
           "one-way rentals",
           "fleet variety"
         ],
-        "pricing": "Pricing: From ~R280/day economy; competitive rates",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From ~R280/day economy; competitive rates"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.2/5",
           "ios": "3.0/5"
@@ -6846,7 +7255,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "82",
+        "id": "hertz-south-africa",
         "name": "Hertz South Africa",
         "category": "car-rentals",
         "category_slug": "car-rentals",
@@ -6895,7 +7304,12 @@
           "online booking",
           "one-way rentals"
         ],
-        "pricing": "Pricing: From ~R320/day economy; Gold Plus member discounts",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From ~R320/day economy; Gold Plus member discounts"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.4/5",
           "ios": "3.6/5"
@@ -6927,7 +7341,7 @@
         "lastUpdated": "2026-03-05 00:00:00"
       },
       {
-        "id": "83",
+        "id": "tempest-car-hire",
         "name": "Tempest Car Hire",
         "category": "car-rentals",
         "category_slug": "car-rentals",
@@ -6976,7 +7390,12 @@
           "online booking",
           "Bidvest backing"
         ],
-        "pricing": "Pricing: From ~R290/day economy; local competitive rates",
+        "pricing": [
+          {
+            "name": "Standard",
+            "cost": "Pricing: From ~R290/day economy; local competitive rates"
+          }
+        ],
         "appRatings": {
           "googlePlay": "3.3/5",
           "ios": "3.1/5"
@@ -7009,4 +7428,4 @@
       }
     ]
   }
-]
+];
