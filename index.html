@@ -168,5 +168,73 @@
       document.getElementById('top-brands').innerHTML = '<div style="text-align:center;padding:var(--space-8);color:var(--red)">Error loading brands. Please refresh the page.</div>';
     });
   </script>
-</body>
+<script>
+// Direct data access - bypasses GoNoGoAPI completely
+console.log('Loading categories directly...');
+
+// Wait for BRAND_DATA to be ready
+setTimeout(function() {
+  if (typeof BRAND_DATA === 'undefined') {
+    console.error('BRAND_DATA not loaded!');
+    return;
+  }
+  
+  console.log('BRAND_DATA loaded:', BRAND_DATA.length, 'categories');
+  
+  // Load categories directly
+  var categories = BRAND_DATA.map(function(cat) {
+    return {
+      id: cat.slug,
+      name: cat.category,
+      icon: cat.icon,
+      brandCount: cat.brands.length
+    };
+  });
+  
+  console.log('Categories:', categories.length);
+  
+  // Render categories
+  var container = document.getElementById('categories-container') || document.querySelector('.categories-grid');
+  if (container) {
+    container.innerHTML = categories.map(function(cat) {
+      return '<div class="category-card" onclick="location.href=\'category.html?id=' + cat.id + '\'">' +
+        '<div class="category-icon">' + cat.icon + '</div>' +
+        '<h3>' + cat.name + '</h3>' +
+        '<p>' + cat.brandCount + ' brands</p>' +
+        '</div>';
+    }).join('');
+    console.log('Categories rendered!');
+  }
+  
+  // Load top brands directly
+  var allBrands = [];
+  BRAND_DATA.forEach(function(cat) {
+    cat.brands.forEach(function(b) { allBrands.push(b); });
+  });
+  
+  allBrands.sort(function(a, b) {
+    return (b.gonogo_score || 0) - (a.gonogo_score || 0);
+  });
+  
+  var topBrands = allBrands.slice(0, 6);
+  console.log('Top brands:', topBrands.length);
+  
+  // Render top brands
+  var brandsContainer = document.getElementById('top-brands-container') || document.querySelector('.brands-grid');
+  if (brandsContainer) {
+    brandsContainer.innerHTML = topBrands.map(function(brand) {
+      var score = brand.gonogo_score || 0;
+      var verdict = score >= 80 ? 'GO' : (score >= 60 ? 'CAUTION' : 'NOGO');
+      var color = score >= 80 ? '#10b981' : (score >= 60 ? '#f59e0b' : '#ef4444');
+      
+      return '<div class="brand-card" onclick="location.href=\'brand.html?id=' + brand.id + '\'">' +
+        '<h3>' + brand.name + '</h3>' +
+        '<div class="score" style="color:' + color + '">' + score + '</div>' +
+        '<div class="verdict" style="background:' + color + '">' + verdict + '</div>' +
+        '</div>';
+    }).join('');
+    console.log('Top brands rendered!');
+  }
+}, 500); // Wait 500ms for everything to load
+</script></body>
 </html>
