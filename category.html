@@ -4,9 +4,9 @@
 <!--
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \\/ __ `__ \\/ __ \\/ / / / __/ _ \\/ ___/
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
 / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\\____/\\____/_/ /_/ /_/ .___/\\__,_/\\__/\\___/_/
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
                     /_/
         Created with Perplexity Computer
         [https://www.perplexity.ai/computer](https://www.perplexity.ai/computer)
@@ -28,7 +28,6 @@
   </div>
   <div id="footer"></div>
 
-    
   <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -42,7 +41,11 @@
     setTimeout(function() {
       if (typeof BRAND_DATA === 'undefined') {
         console.error('BRAND_DATA not loaded!');
-        document.getElementById('page-content').innerHTML = '<section class="section"><div class="container" style="text-align:center"><h1 class="section-title">Error Loading Data</h1></div></section>';
+        document.getElementById('page-content').innerHTML =
+          '<section class="section"><div class="container" style="text-align:center">' +
+            '<h1 class="section-title">Error Loading Data</h1>' +
+            '<p class="section-subtitle">We could not load brand data at this time.</p>' +
+          '</div></section>';
         return;
       }
 
@@ -50,17 +53,17 @@
         // Show all categories grid
         document.getElementById('nav').innerHTML = Components.renderPublicNav('');
         document.title = 'All Industries — GoNoGo South Africa';
-        
+
         var categories = BRAND_DATA.map(function(cat) {
           return {
             id: cat.slug,
             name: cat.category,
             icon: cat.icon,
-            brandCount: cat.brands.length,
-            hasBrands: cat.brands.length > 0
+            brandCount: cat.brands ? cat.brands.length : 0,
+            hasBrands: cat.brands && cat.brands.length > 0
           };
         });
-        
+
         document.getElementById('page-content').innerHTML =
           '<section class="section"><div class="container">' +
             '<div class="section-header">' +
@@ -77,8 +80,9 @@
               }).join('') +
             '</div>' +
           '</div></section>';
+
       } else {
-        // Load category data directly from BRAND_DATA
+        // Load category meta from BRAND_DATA
         var catInfo = null;
         for (var i = 0; i < BRAND_DATA.length; i++) {
           if (BRAND_DATA[i].slug === slug) {
@@ -86,7 +90,8 @@
               id: BRAND_DATA[i].slug,
               name: BRAND_DATA[i].category,
               icon: BRAND_DATA[i].icon,
-              scoringCategories: BRAND_DATA[i].scoring_categories || []
+              scoringCategories: BRAND_DATA[i].scoring_categories || [],
+              rawBrands: BRAND_DATA[i].brands || []
             };
             break;
           }
@@ -106,55 +111,61 @@
         document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
         document.title = catInfo.name + ' — GoNoGo South Africa';
 
-        // Get brands for this category
-        var brands = [];
-        for (var i = 0; i < BRAND_DATA.length; i++) {
-          if (BRAND_DATA[i].slug === slug && BRAND_DATA[i].brands) {
-  brands = BRAND_DATA[i].brands.map(function(b) {
-    var score = b.gonogo_score || 0;
-    return {
-      id: b.id,
-      name: b.name,
-      gonogo_score: score,  // <-- this is what renderBrandCard now uses
-      overallScore: score,
-      verdict: b.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'CAUTION' : 'NOGO'),
-      category: catInfo.name,
-      logo: b.logo || '',
-      scores: calculatePercentageScores(b),
-      strengths: parseListField(b.strengths),
-      weaknesses: parseListField(b.concerns),
-      tags: b.tags || []
-    };
-  });
-  break;
-}
-}
-        }
+        // Map raw BRAND_DATA brands into UI brands
+        var brands = catInfo.rawBrands.map(function(b) {
+          var score = b.gonogo_score || 0;
+          return {
+            id: b.id,
+            name: b.name,
+            gonogo_score: score,
+            overallScore: score,
+            verdict: b.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'CAUTION' : 'NOGO'),
+            category: catInfo.name,
+            logo: b.logo || '',
+            // fresh radar percentages from raw fields
+            scores: calculatePercentageScores(b),
+            strengths: parseListField(b.strengths),
+            weaknesses: parseListField(b.concerns),
+            tags: b.tags || []
+          };
+        });
 
         var currentSort = 'score-desc';
 
         window.sortBrands = function(key) {
           currentSort = key;
-          if (key === 'score-desc') brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
-          else if (key === 'score-asc') brands.sort(function(a, b) { return a.overallScore - b.overallScore; });
-          else if (key === 'name-asc') brands.sort(function(a, b) { return a.name.localeCompare(b.name); });
-          else if (key === 'name-desc') brands.sort(function(a, b) { return b.name.localeCompare(a.name); });
+          if (key === 'score-desc') {
+            brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
+          } else if (key === 'score-asc') {
+            brands.sort(function(a, b) { return a.overallScore - b.overallScore; });
+          } else if (key === 'name-asc') {
+            brands.sort(function(a, b) { return a.name.localeCompare(b.name); });
+          } else if (key === 'name-desc') {
+            brands.sort(function(a, b) { return b.name.localeCompare(a.name); });
+          }
           renderBrands();
         };
 
         function renderBrands() {
           var grid = document.getElementById('brand-grid');
-          grid.innerHTML = brands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
+          grid.innerHTML = brands.map(function(brand, i) {
+            return Components.renderBrandCard(brand, i);
+          }).join('');
           brands.forEach(function(brand) {
-            Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
+            Components.createRadarChart(
+              'radar-' + brand.id,
+              brand,
+              { showTicks: false, labelSize: 9, pointRadius: 2 }
+            );
           });
           document.querySelectorAll('.sort-btn').forEach(function(btn) {
             btn.classList.toggle('active', btn.dataset.sort === currentSort);
           });
         }
 
-        // Build scoring framework display
+        // Build scoring framework display from scoring_categories
         var frameworkHTML = (catInfo.scoringCategories || []).map(function(sc) {
+          // sc.max is the maximum points for that category (e.g. 20, 25, etc.)
           var pct = Math.round((sc.max / 100) * 100);
           return '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0">' +
             '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
@@ -163,6 +174,7 @@
           '</div>';
         }).join('');
 
+        // Page content HTML
         document.getElementById('page-content').innerHTML =
           '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
             '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2)">' +
@@ -196,6 +208,8 @@
             '<div class="brand-grid" id="brand-grid"></div>' +
           '</div></section>';
 
+        // Initial render
+        brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
         renderBrands();
       }
     }, 500); // Wait for BRAND_DATA to load
