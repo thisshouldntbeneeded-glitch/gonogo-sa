@@ -50,17 +50,30 @@ function transformBrand(rawBrand, categorySlug, categoryName) {
   };
 }
 
-function getAllBrands() {
-  if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
-  var brands = [];
-  BRAND_DATA.forEach(function(cat) {
-    if (!cat.brands || !Array.isArray(cat.brands)) return;
-    cat.brands.forEach(function(rawBrand) {
-      brands.push(transformBrand(rawBrand, cat.slug, cat.category || cat.name));
-    });
-  });
-  return brands;
-}
+window.getAllBrands = function getAllBrands() {
+  // ... keep existing code ...
+};
+
+window.getCategories = function getCategories() {
+  // ... keep existing code ...
+};
+
+window.getCategoriesWithBrands = function getCategoriesWithBrands() {
+  // ... keep existing code ...
+};
+
+window.getBrandsByCategory = function getBrandsByCategory(slug) {
+  // ... keep existing code ...
+};
+
+window.getBrandById = function getBrandById(id) {
+  // ... keep existing code ...
+};
+
+window.getTopBrands = function getTopBrands(count) {
+  // ... keep existing code ...
+};
+
 
 function getCategories() {
   if (typeof BRAND_DATA === 'undefined' || !Array.isArray(BRAND_DATA)) return [];
