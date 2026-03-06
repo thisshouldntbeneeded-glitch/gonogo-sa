@@ -1,4 +1,4 @@
-// GoNoGo SA — Dual-Mode API Client (No async/await version)
+// GoNoGo SA — Dual-Mode API Client (Fixed Promise returns)
 // Mode 1: Live backend (Perplexity Computer) — full read/write
 // Mode 2: Static fallback (Vercel/GitHub Pages) — read-only from BRAND_DATA
 
@@ -80,7 +80,10 @@ var GoNoGoAPI = (function() {
     getCategories: function() {
       return _fetch('/api/categories').then(function(data) {
         if (data) return data;
-        if (typeof getCategories === 'function') return getCategories();
+        // Static fallback - MUST RETURN!
+        if (typeof window.getCategories === 'function') {
+          return window.getCategories();
+        }
         return [];
       });
     },
@@ -99,9 +102,9 @@ var GoNoGoAPI = (function() {
             };
           });
         }
-        // Static fallback
-        if (typeof getCategoriesWithBrands === 'function') {
-          return getCategoriesWithBrands();
+        // Static fallback - MUST RETURN!
+        if (typeof window.getCategoriesWithBrands === 'function') {
+          return window.getCategoriesWithBrands();
         }
         return [];
       });
@@ -110,7 +113,10 @@ var GoNoGoAPI = (function() {
     getAllBrands: function() {
       return _fetch('/api/brands').then(function(data) {
         if (data) return data;
-        if (typeof getAllBrands === 'function') return getAllBrands();
+        // Static fallback
+        if (typeof window.getAllBrands === 'function') {
+          return window.getAllBrands();
+        }
         return [];
       });
     },
@@ -118,7 +124,10 @@ var GoNoGoAPI = (function() {
     getBrandsByCategory: function(slug) {
       return _fetch('/api/brands/' + slug).then(function(data) {
         if (data) return data;
-        if (typeof getBrandsByCategory === 'function') return getBrandsByCategory(slug);
+        // Static fallback
+        if (typeof window.getBrandsByCategory === 'function') {
+          return window.getBrandsByCategory(slug);
+        }
         return [];
       });
     },
@@ -126,6 +135,7 @@ var GoNoGoAPI = (function() {
     getBrandById: function(id) {
       return _fetch('/api/brand/' + id).then(function(data) {
         if (data) return data;
+        // Static fallback
         if (typeof window.getBrandById === 'function') {
           return window.getBrandById(id);
         }
@@ -141,7 +151,10 @@ var GoNoGoAPI = (function() {
     getTopBrands: function(count) {
       return _fetch('/api/top-brands?count=' + (count || 6)).then(function(data) {
         if (data) return data;
-        if (typeof getTopBrands === 'function') return getTopBrands(count || 6);
+        // Static fallback
+        if (typeof window.getTopBrands === 'function') {
+          return window.getTopBrands(count || 6);
+        }
         return [];
       });
     },
@@ -149,7 +162,7 @@ var GoNoGoAPI = (function() {
     getStats: function() {
       return _fetch('/api/stats').then(function(data) {
         if (data) return data;
-        // Static fallback
+        // Static fallback - compute stats
         if (typeof BRAND_DATA !== 'undefined') {
           var totalBrands = 0;
           var goCount = 0;
@@ -188,3 +201,7 @@ var GoNoGoAPI = (function() {
 })();
 
 console.log('GoNoGoAPI loaded:', typeof GoNoGoAPI);
+console.log('Testing API call...');
+GoNoGoAPI.getCategoriesWithBrands().then(function(cats) {
+  console.log('API test result:', cats ? cats.length + ' categories' : 'FAILED');
+});
