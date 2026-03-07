@@ -1,9 +1,10 @@
-// GoNoGo SA - Components (FIXED FOR REAL DATA)
+// GoNoGo SA - Components (UNIFIED FOR STATIC DATA + ADMIN)
 
 var Components = (function() {
   'use strict';
 
-  // Missing helper function for score colors
+  // ---- Core utilities ----
+
   function getScoreColor(score) {
     if (score >= 80) return 'var(--green)';
     if (score >= 60) return 'var(--yellow)';
@@ -15,11 +16,87 @@ var Components = (function() {
     return urlParams.get(name);
   }
 
+  function sortData(arr, key, dir) {
+    var copy = arr.slice();
+    copy.sort(function(a, b) {
+      var av = a[key], bv = b[key];
+      if (typeof av === 'string') av = av.toLowerCase();
+      if (typeof bv === 'string') bv = bv.toLowerCase();
+      if (av < bv) return dir === 'asc' ? -1 : 1;
+      if (av > bv) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return copy;
+  }
+
+  function formatRelativeDate(dateStr) {
+    if (!dateStr) return 'Not updated';
+    var d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    var now = new Date();
+    var diffMs = now - d;
+    var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return 'Today';
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 30) return diffDays + ' days ago';
+    var diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths === 1) return '1 month ago';
+    return diffMonths + ' months ago';
+  }
+
+  function exportCSV(rows, filename) {
+    if (!rows || !rows.length) return;
+    var headers = Object.keys(rows[0]);
+    var csv = headers.join(',') + '\n' +
+      rows.map(function(r) {
+        return headers.map(function(h) {
+          var v = r[h] == null ? '' : String(r[h]);
+          if (v.indexOf('"') !== -1 || v.indexOf(',') !== -1) {
+            v = '"' + v.replace(/"/g, '""') + '"';
+          }
+          return v;
+        }).join(',');
+      }).join('\n');
+
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'export.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ---- Toasts ----
+
+  function showToast(message, type) {
+    type = type || 'info';
+    var existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.className = 'toast toast-' + type;
+    div.textContent = message;
+    document.body.appendChild(div);
+    setTimeout(function() {
+      div.classList.add('show');
+    }, 10);
+    setTimeout(function() {
+      div.classList.remove('show');
+      setTimeout(function() {
+        if (div.parentNode) div.parentNode.removeChild(div);
+      }, 300);
+    }, 3500);
+  }
+
+  // ---- Public nav + footer ----
+
   function renderPublicNav(activeSlug) {
     return '<nav class="nav"><div class="container">' +
       '<a href="index.html" class="nav-brand"><i class="fa-solid fa-circle-check"></i> GoNoGo</a>' +
       '<div class="nav-links">' +
-        '<a href="index.html" class="nav-link ' + (!activeSlug ? 'active' : '') + '">Home</a>' +
+        '<a href="index.html" class="nav-link ' + (!activeSlug || activeSlug === 'home' ? 'active' : '') + '">Home</a>' +
         '<a href="category.html" class="nav-link">Industries</a>' +
         '<a href="about.html" class="nav-link">About</a>' +
       '</div>' +
@@ -36,52 +113,101 @@ var Components = (function() {
     '</div></footer>';
   }
 
-  function renderBrandCard(brand, index) {
-  var score = brand.gonogo_score || 0;
-  var color = getScoreColor(score);
-  var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'CAUTION' : 'NOGO');
+  // ---- Brand visuals ----
 
-  return '<div class="brand-card">' +
-    '<div class="brand-card-header">' +
-      '<div class="brand-logo-wrapper">' +
-        (brand.logo ? '<img src="' + brand.logo + '" alt="' + brand.name + '" class="brand-logo">' : 
-         '<div class="brand-logo-placeholder"><i class="fa-solid fa-building"></i></div>') +
-      '</div>' +
-      '<div class="brand-info">' +
-        '<h3 class="brand-name">' + brand.name + '</h3>' +
-        '<p class="brand-category">' + (brand.category || '') + '</p>' +
-      '</div>' +
-    '</div>' +
-    '<div class="score-section">' +
-      '<div class="score-circle" style="border-color:' + color + '">' +
-        '<div class="score-value" style="color:' + color + '">' + score + '</div>' +
-        '<div class="score-label">Score</div>' +
-      '</div>' +
-      '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(' ', '-') + '">' + verdict + '</div>' +
-    '</div>' +
-    '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
-    '<div class="brand-details">' +
-      '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
-    '</div>' +
-  '</div>';
-}
+  function renderLogo(brand, className) {
+    className = className || 'brand-logo';
+    var src = brand.logo || '';
+    if (!src) {
+      return '<div class="' + className + ' brand-logo-placeholder"><i class="fa-solid fa-building"></i></div>';
+    }
+    return '<img src="' + src + '" alt="' + brand.name + '" class="' + className + '">';
+  }
 
+  function renderScoreCircle(score, size) {
+    var color = getScoreColor(score || 0);
+    var sizeClass = size === 'lg' ? 'score-circle-lg' : 'score-circle-md';
+    return '<div class="score-circle ' + sizeClass + '" style="border-color:' + color + '">' +
+      '<div class="score-value" style="color:' + color + '">' + (score || 0) + '</div>' +
+      '<div class="score-label">Score</div>' +
+    '</div>';
+  }
+
+  function renderScoreBadge(score) {
+    var color = getScoreColor(score || 0);
+    return '<span class="score-badge" style="border-color:' + color + ';color:' + color + '">' +
+      (score || 0) + '/100' +
+    '</span>';
+  }
+
+  function renderVerdictBadge(verdict) {
+    var v = (verdict || '').toUpperCase();
+    var cls = 'badge-neutral';
+    if (v === 'GO') cls = 'badge-go';
+    else if (v === 'GO WITH CAUTION') cls = 'badge-caution';
+    else if (v === 'NOGO') cls = 'badge-nogo';
+    return '<span class="badge ' + cls + '">' + (v || 'N/A') + '</span>';
+  }
+
+  function renderScoreBar(score, max) {
+    var pct = 0;
+    if (max && max > 0) pct = Math.round((score || 0) / max * 100);
+    var color = getScoreColor(pct);
+    return '<div class="score-bar"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
+  }
+
+  function renderBrandCard(brand) {
+    // Accept either raw BRAND_DATA brand or helper/API brand
+    var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
+    var color = getScoreColor(score);
+    var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'GO WITH CAUTION' : 'NOGO');
+    var categoryName = brand.categoryName || brand.category || '';
+
+    return '<div class="brand-card">' +
+      '<div class="brand-card-header">' +
+        '<div class="brand-logo-wrapper">' + renderLogo(brand, 'brand-logo') + '</div>' +
+        '<div class="brand-info">' +
+          '<h3 class="brand-name">' + brand.name + '</h3>' +
+          '<p class="brand-category">' + categoryName + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="score-section">' +
+        '<div class="score-circle" style="border-color:' + color + '">' +
+          '<div class="score-value" style="color:' + color + '">' + score + '</div>' +
+          '<div class="score-label">Score</div>' +
+        '</div>' +
+        '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(/\s+/g, '-') + '">' + verdict + '</div>' +
+      '</div>' +
+      '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
+      '<div class="brand-details">' +
+        '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
+      '</div>' +
+    '</div>';
+  }
 
   function createRadarChart(canvasId, brand, options) {
     options = options || {};
     var ctx = document.getElementById(canvasId);
-    if (!ctx) return;
+    if (!ctx || !window.Chart) return;
 
+    // Prefer precomputed percentages on brand.scores; otherwise derive from raw BRAND_DATA if present
     var scores = brand.scores || {};
     var labels = Object.keys(scores);
     var data = Object.values(scores);
 
-    if (labels.length === 0) {
+    if (!labels.length && typeof calculatePercentageScores === 'function') {
+      scores = calculatePercentageScores(brand);
+      labels = Object.keys(scores);
+      data = Object.values(scores);
+    }
+
+    if (!labels.length) {
       labels = ['N/A'];
       data = [0];
     }
 
-    var color = getScoreColor(brand.overallScore);
+    var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
+    var color = getScoreColor(score);
 
     new Chart(ctx, {
       type: 'radar',
@@ -89,7 +215,7 @@ var Components = (function() {
         labels: labels,
         datasets: [{
           data: data,
-          backgroundColor: color + '15',
+          backgroundColor: 'rgba(17,165,81,0.15)',
           borderColor: color,
           borderWidth: 2,
           pointBackgroundColor: color,
@@ -97,7 +223,7 @@ var Components = (function() {
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: color,
           pointRadius: options.pointRadius || 3,
-          pointHoverRadius: options.pointRadius ? options.pointRadius + 1 : 4
+          pointHoverRadius: (options.pointRadius || 3) + 1
         }]
       },
       options: {
@@ -116,9 +242,11 @@ var Components = (function() {
               stepSize: 20,
               font: { size: 10 }
             },
-            grid: { color: 'rgba(0,0,0,0.1)' },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            angleLines: { color: 'rgba(255,255,255,0.08)' },
             pointLabels: {
-              font: { size: options.labelSize || 11 }
+              font: { size: options.labelSize || 11 },
+              color: '#a0a0a0'
             }
           }
         }
@@ -126,13 +254,53 @@ var Components = (function() {
     });
   }
 
+  // ---- Admin helpers ----
+
+  function renderAdminSidebar(active) {
+    return '' +
+      '<aside class="admin-sidebar">' +
+        '<div class="admin-logo"><i class="fa-solid fa-circle-check"></i> GoNoGo</div>' +
+        '<nav class="admin-nav">' +
+          '<a href="admin.html" class="admin-nav-item ' + (active === 'dashboard' ? 'active' : '') + '">' +
+            '<i class="fa-solid fa-chart-line"></i> Dashboard</a>' +
+          '<a href="admin-brands.html" class="admin-nav-item ' + (active === 'brands' ? 'active' : '') + '">' +
+            '<i class="fa-solid fa-building"></i> Brands</a>' +
+          '<a href="admin-comments.html" class="admin-nav-item ' + (active === 'comments' ? 'active' : '') + '">' +
+            '<i class="fa-solid fa-comments"></i> Reviews</a>' +
+          '<a href="index.html" class="admin-nav-item">' +
+            '<i class="fa-solid fa-arrow-left"></i> Back to site</a>' +
+        '</nav>' +
+      '</aside>';
+  }
+
+  function checkAdminAuth() {
+    // For now, always allow; can be replaced with real auth later.
+    return true;
+  }
+
   return {
+    // Utilities
     getParam: getParam,
+    getScoreColor: getScoreColor,
+    sortData: sortData,
+    formatRelativeDate: formatRelativeDate,
+    exportCSV: exportCSV,
+    showToast: showToast,
+
+    // Public UI
     renderPublicNav: renderPublicNav,
     renderFooter: renderFooter,
+    renderLogo: renderLogo,
+    renderScoreCircle: renderScoreCircle,
+    renderScoreBadge: renderScoreBadge,
+    renderVerdictBadge: renderVerdictBadge,
+    renderScoreBar: renderScoreBar,
     renderBrandCard: renderBrandCard,
     createRadarChart: createRadarChart,
-    getScoreColor: getScoreColor
+
+    // Admin UI
+    renderAdminSidebar: renderAdminSidebar,
+    checkAdminAuth: checkAdminAuth
   };
 })();
 
