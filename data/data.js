@@ -1,37 +1,12 @@
-// GoNoGo SA - Brand Data (COMPLETE WITH ALL SCORES)
-// Auto-generated from Excel
+// GoNoGo SA - Brand Data (STANDARDISED)
+// Auto-generated from CSV: GoNoGo-SA-Mastersheet-Sheet1-2.csv
+// Last Updated: 2026-03-05
 
 var BRAND_DATA = [
   {
     "slug": "banking",
     "category": "Banking",
     "icon": "fa-building-columns",
-    "scoring_categories": [
-      {
-        "name": "Compliance",
-        "max": 20
-      },
-      {
-        "name": "Customer Satisfaction",
-        "max": 25
-      },
-      {
-        "name": "Product Value",
-        "max": 35
-      },
-      {
-        "name": "Innovation",
-        "max": 10
-      },
-      {
-        "name": "Customer Support",
-        "max": 15
-      },
-      {
-        "name": "Accessibility & Security",
-        "max": 10
-      }
-    ],
     "brands": [
       {
         "id": "banking-1",
@@ -61,7 +36,9 @@ var BRAND_DATA = [
         "social_sentiment": "Praise for UI/fees; complaints fraud/support on reviews/social.",
         "social_positive": "easy app; no fees; high interest; convenient deposits",
         "social_concerns": "fraud/hacks; account holds; slow support",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "TymeBank is South Africa's first fully digital bank focused on affordable, accessible banking for mass-market consumers. It operates through a cloud-based platform with in-store kiosks at major retailers and a mobile app instead of traditional branches. The bank emphasises low or no fees, high-yield savings products, and simple onboarding to attract underserved customers.",
+        "rating_summary": "TymeBank's strong score reflects its low-fee model, high savings rates, and digital innovation that resonate strongly with value-conscious customers. At the same time, mixed service reviews and fraud or account-hold complaints limit satisfaction and keep the support and security dimensions from scoring even higher. The GO verdict recognises it as a leading choice for low-cost everyday banking, provided customers are comfortable with a digital-first, branchless experience."
       },
       {
         "id": "banking-2",
@@ -91,7 +68,9 @@ var BRAND_DATA = [
         "social_sentiment": "Mix: app praised, fraud complaints increase. Strong brand loyalty.",
         "social_positive": "easy banking; great app; cashback",
         "social_concerns": "fraud; account frozen; slow support",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Capitec Bank is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "Capitec Bank's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include large customer base; app quality; innovation; low fees; extensive atm network while recurring concerns include fraud incidents; support delays; fee increases. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-3",
@@ -121,7 +100,9 @@ var BRAND_DATA = [
         "social_sentiment": "eBucks praised; fees and fraud complaints common.",
         "social_positive": "eBucks; app features; rewards",
         "social_concerns": "fraud; high fees; poor call centre",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "FNB (First National Bank) is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "FNB (First National Bank)'s score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include ebucks loyalty; innovation; app quality; compliance; wide product range while recurring concerns include high fees; fraud exposure; complex products. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-4",
@@ -151,7 +132,9 @@ var BRAND_DATA = [
         "social_sentiment": "Business banking praised; retail customer complaints common.",
         "social_positive": "business solutions; app usability; forex",
         "social_concerns": "poor service; fees; fraud",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Standard Bank is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "Standard Bank's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include pan-africa coverage; business banking; shyft app; compliance while recurring concerns include low hellopeter score; fees; customer service consistency. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-5",
@@ -181,7 +164,9 @@ var BRAND_DATA = [
         "social_sentiment": "App praised; service complaints dominate community feedback.",
         "social_positive": "app UX; ChatBanking; rewards",
         "social_concerns": "fraud; poor support; high fees",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Absa is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "Absa's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include digital features; pan-africa; rewards; compliance while recurring concerns include low hellopeter score; customer complaints; fees. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-6",
@@ -211,7 +196,9 @@ var BRAND_DATA = [
         "social_sentiment": "Greenbacks praised; service complaints and outages noted.",
         "social_positive": "Greenbacks; app features; green brand",
         "social_concerns": "outages; poor resolution; fraud",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Nedbank is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "Nedbank's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include green finance; app; greenbacks; compliance; business range while recurring concerns include support quality; fees; hellopeter score. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-7",
@@ -241,7 +228,9 @@ var BRAND_DATA = [
         "social_sentiment": "Vitality users highly positive; non-Vitality see limited value.",
         "social_positive": "rewards; dynamic interest; innovative",
         "social_concerns": "expensive; complex; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Discovery Bank is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "Discovery Bank's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include vitality integration; high savings rate; innovation; compliance while recurring concerns include high fees for non-vitality; support gaps; ecosystem lock-in. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       },
       {
         "id": "banking-8",
@@ -271,197 +260,11 @@ var BRAND_DATA = [
         "social_sentiment": "Savings praised; loan complaints dominant.",
         "social_positive": "savings interest; account pockets; accessible",
         "social_concerns": "loan rates; disputes; service",
-        "last_updated": "2026-03-05 00:00:00"
-      }
-    ]
-  },
-  {
-    "slug": "mobile-networks",
-    "category": "Mobile Networks",
-    "icon": "fa-signal",
-    "scoring_categories": [
-      {
-        "name": "Compliance",
-        "max": 20
-      },
-      {
-        "name": "Customer Satisfaction",
-        "max": 20
-      },
-      {
-        "name": "Product Value",
-        "max": 30
-      },
-      {
-        "name": "Innovation",
-        "max": 10
-      },
-      {
-        "name": "Customer Support",
-        "max": 15
-      },
-      {
-        "name": "Accessibility & Security",
-        "max": 10
+        "last_updated": "2026-03-05",
+        "overview": "African Bank is a major player in South Africa's banking sector offering everyday accounts, savings, and credit products to retail and business customers. It combines traditional branch or partner-store presence with digital channels such as mobile and internet banking to reach a broad customer base. The bank positions itself on a mix of pricing, product range, and digital convenience to compete with other mainstream and challenger banks.",
+        "rating_summary": "African Bank's score reflects a balance of solid regulatory compliance and reasonably competitive product value with more mixed customer experience feedback. Strengths highlighted in reviews and your scoring include savings rates; compliance recovery; accessible loans while recurring concerns include loan costs; limited features; historical reputation. The resulting verdict indicates that the bank can work well for many customers, but expectations around service quality and fees should be managed."
       }
     ],
-    "brands": [
-      {
-        "id": "mobile-networks-1",
-        "name": "Vodacom",
-        "website": "https://www.vodacom.co.za",
-        "logo": "logos/vodacom.jpg",
-        "gonogo_score": 63,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 16,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 8,
-        "innovation_max": 10,
-        "customer_support_score": 7,
-        "customer_support_max": 15,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "5G network; VodaPay app; fibre/home internet; generous data bundles; eSIM; roaming",
-        "pricing": "Pricing: SIM-only from R129/mo (15GB) to R399/mo (400GB); prepaid R99 (10GB anytime +10GB night owl)",
-        "googleplay_rating": "4.5/5 (319K reviews) VodaPay",
-        "ios_rating": "4.7/5 (149K ratings) VodaPay",
-        "strengths": "strong network coverage; app quality; innovation; security record; accessibility initiatives",
-        "concerns": "billing disputes; support delays; low HelloPeter score",
-        "social_sentiment": "Overwhelmingly negative on HelloPeter (billing/service); apps praised for convenience but buggy.",
-        "social_positive": "network reliability; data value; rewards; app convenience",
-        "social_concerns": "billing errors; poor support; data drain; price hikes",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "mobile-networks-2",
-        "name": "Telkom Mobile",
-        "website": "https://www.telkom.co.za",
-        "logo": "logos/telkom.jpg",
-        "gonogo_score": 62,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 5,
-        "customer_support_max": 15,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "Prepaid data bundles; LTE/Night Surfer; FreeMe/FlexOn contracts; all-network roaming; MyTelkom app",
-        "pricing": "Pricing: Prepaid data R7.50/35MB- R999/100GB; LTE 80GB R169pm; FreeMe from R157/1.5GB; price hikes April 2026",
-        "googleplay_rating": "4.5/5",
-        "ios_rating": "1.3/5",
-        "strengths": "affordable data pricing; high network availability; rapid subscriber growth; competitive bundles",
-        "concerns": "billing issues; customer support; contract handling",
-        "social_sentiment": "Mixed-negative: complaints on support/billing outweigh praises for data value.",
-        "social_positive": "cheap data; good coverage; value bundles",
-        "social_concerns": "billing errors; poor support; contract cancellations; data depletion",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "mobile-networks-3",
-        "name": "RAIN",
-        "website": "https://www.rain.co.za",
-        "logo": "logos/rain.jpg",
-        "gonogo_score": 63,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 19,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 25,
-        "product_value_score": 22,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 8,
-        "customer_support_max": 15,
-        "accessibility_security_score": 7,
-        "accessibility_security_max": 10,
-        "features": "month-to-month contracts; 4G voice/data/SMS bundles; 5G home integration; national coverage",
-        "pricing": "Pricing: From R165/mo rainGO (2GB, 60mins, 100SMS), month-to-month",
-        "googleplay_rating": "2.81/5 (my rain app, 12k reviews); 4.2/5 (rain talk, 828 reviews)",
-        "ios_rating": "No prominent iOS app found",
-        "strengths": "competitive pricing; ICASA compliance; no contracts; high response rate",
-        "concerns": "slow speeds; support resolution; outages",
-        "social_sentiment": "HelloPeter 2.37/5 poor; Trustpilot 4.3/5 mixed service focus",
-        "social_positive": "affordable pricing; good agent interactions; reliable for some users",
-        "social_concerns": "slow speeds; poor support; outages",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "mobile-networks-4",
-        "name": "Cell C",
-        "website": "https://www.cellc.co.za",
-        "logo": "logos/cell-c.jpg",
-        "gonogo_score": 57,
-        "verdict": "NOGO",
-        "compliance_score": 14,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 6,
-        "customer_support_max": 15,
-        "accessibility_security_score": 4,
-        "accessibility_security_max": 10,
-        "features": "prepaid/postpaid plans; data bundles; LTE roaming coverage; FTTH fibre; MVNO hosting; device contracts",
-        "pricing": "Pricing: Elevate+ from R229/mo (3GB), promos like 20GB R99; 1GB prepaid ~R65",
-        "googleplay_rating": "3.8/5",
-        "ios_rating": "2.7/5",
-        "strengths": "affordable pricing; improving coverage via partners; MVNO growth; financial turnaround",
-        "concerns": "billing errors; poor support; data breach",
-        "social_sentiment": "Predominantly negative on reviews sites; complaints on service/billing outweigh positives on price/coverage.",
-        "social_positive": "cheap data; improved network; helpful stores occasionally; value bundles",
-        "social_concerns": "poor customer service; billing disputes; contract cancellation issues; network outages; data breaches",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "mobile-networks-5",
-        "name": "MTN South Africa",
-        "website": "https://www.mtn.co.za",
-        "logo": "logos/mtn.jpg",
-        "gonogo_score": 50,
-        "verdict": "NOGO",
-        "compliance_score": 16,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 4,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 20,
-        "product_value_max": 30,
-        "innovation_score": 8,
-        "innovation_max": 10,
-        "customer_support_score": 4,
-        "customer_support_max": 15,
-        "accessibility_security_score": 6,
-        "accessibility_security_max": 10,
-        "features": "prepaid/postpaid voice/data plans; home LTE/5G uncapped; MoMo mobile money; DataShare; self-service app",
-        "pricing": "Pricing: Contracts from R115/mo (30GB), home uncapped from R339/mo (15Mbps); 5.4% hike Feb 2026 w/speed bonuses",
-        "googleplay_rating": "3.9/5",
-        "ios_rating": "~2.5/5",
-        "strengths": "top network speed/quality; wide coverage; 5G adoption; fintech services",
-        "concerns": "poor customer service; billing disputes; app functionality",
-        "social_sentiment": "Overwhelmingly negative on HelloPeter/Trustpilot re service/billing; positive network mentions.",
-        "social_positive": "network performance; coverage; data speeds",
-        "social_concerns": "billing errors; poor support; contract cancellations; network outages; data delivery issues",
-        "last_updated": "2026-03-05 00:00:00"
-      }
-    ]
-  },
-  {
-    "slug": "hr-software",
-    "category": "HR Software",
-    "icon": "fa-users-gear",
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -487,10 +290,208 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "mobile-networks",
+    "category": "Mobile Networks",
+    "icon": "fa-signal",
     "brands": [
       {
-        "id": "hr-software-1",
+        "id": "mobile-networks-9",
+        "name": "Vodacom",
+        "website": "https://www.vodacom.co.za",
+        "logo": "logos/vodacom.jpg",
+        "gonogo_score": 68,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 16,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 8,
+        "innovation_max": 10,
+        "customer_support_score": 7,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "5G network; VodaPay app; fibre/home internet; generous data bundles; eSIM; roaming",
+        "pricing": "Pricing: SIM-only from R129/mo (15GB) to R399/mo (400GB); prepaid R99 (10GB anytime +10GB night owl)",
+        "googleplay_rating": "4.5/5 (319K reviews) VodaPay",
+        "ios_rating": "4.7/5 (149K ratings) VodaPay",
+        "strengths": "strong network coverage; app quality; innovation; security record; accessibility initiatives",
+        "concerns": "billing disputes; support delays; low HelloPeter score",
+        "social_sentiment": "Overwhelmingly negative on HelloPeter (billing/service); apps praised for convenience but buggy.",
+        "social_positive": "network reliability; data value; rewards; app convenience",
+        "social_concerns": "billing errors; poor support; data drain; price hikes",
+        "last_updated": "2026-03-05",
+        "overview": "Vodacom is South Africa's largest mobile network operator and part of the wider Vodafone Group across Africa and beyond. It offers mobile voice, data, fibre, fintech, and converged enterprise services, underpinned by extensive 4G and 5G network infrastructure. The brand positions itself as a technology and digital leader through products like VodaPay and advanced connectivity solutions.",
+        "rating_summary": "Vodacom's mid-range score balances strong network quality, product breadth, and ongoing 5G and digital innovation against very weak customer sentiment on billing and service. While coverage, speeds, and fintech offerings are competitive strengths, persistent complaints about account issues, dispute handling, and support responsiveness drag down satisfaction. The GO WITH CAUTION verdict signals that many customers stay for network reliability, but should be prepared for potential admin and service frustrations."
+      },
+      {
+        "id": "mobile-networks-10",
+        "name": "Telkom Mobile",
+        "website": "https://www.telkom.co.za",
+        "logo": "logos/telkom.jpg",
+        "gonogo_score": 67,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 5,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "Prepaid data bundles; LTE/Night Surfer; FreeMe/FlexOn contracts; all-network roaming; MyTelkom app",
+        "pricing": "Pricing: Prepaid data R7.50/35MB- R999/100GB; LTE 80GB R169pm; FreeMe from R157/1.5GB; price hikes April 2026",
+        "googleplay_rating": "4.5/5",
+        "ios_rating": "1.3/5",
+        "strengths": "affordable data pricing; high network availability; rapid subscriber growth; competitive bundles",
+        "concerns": "billing issues; customer support; contract handling",
+        "social_sentiment": "Mixed-negative: complaints on support/billing outweigh praises for data value.",
+        "social_positive": "cheap data; good coverage; value bundles",
+        "social_concerns": "billing errors; poor support; contract cancellations; data depletion",
+        "last_updated": "2026-03-05",
+        "overview": "Telkom Mobile operates in South Africa's mobile and connectivity market, providing voice, data, and related digital services to prepaid and contract customers. The network competes on coverage, data value, and bundled services such as apps, content, and financial services. Its proposition typically mixes aggressive data offers with ongoing investment in 4G and 5G infrastructure.",
+        "rating_summary": "Telkom Mobile's score captures the trade-off between reasonably strong network or product value performance and weaker perceptions of service and support. Positive feedback centres on affordable data pricing; high network availability; rapid subscriber growth; competitive bundles whereas complaints frequently mention billing issues; customer support; contract handling. The verdict suggests that customers who prioritise pricing or coverage may find good value, but should watch out for the recurring service issues highlighted in reviews."
+      },
+      {
+        "id": "mobile-networks-11",
+        "name": "RAIN",
+        "website": "https://www.rain.co.za",
+        "logo": "logos/rain.jpg",
+        "gonogo_score": 67,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 19,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 26,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 8,
+        "customer_support_max": 15,
+        "accessibility_security_score": 7,
+        "accessibility_security_max": 10,
+        "features": "month-to-month contracts; 4G voice/data/SMS bundles; 5G home integration; national coverage",
+        "pricing": "Pricing: From R165/mo rainGO (2GB, 60mins, 100SMS), month-to-month",
+        "googleplay_rating": "2.81/5 (my rain app, 12k reviews); 4.2/5 (rain talk, 828 reviews)",
+        "ios_rating": "No prominent iOS app found",
+        "strengths": "competitive pricing; ICASA compliance; no contracts; high response rate",
+        "concerns": "slow speeds; support resolution; outages",
+        "social_sentiment": "HelloPeter 2.37/5 poor; Trustpilot 4.3/5 mixed service focus",
+        "social_positive": "affordable pricing; good agent interactions; reliable for some users",
+        "social_concerns": "slow speeds; poor support; outages",
+        "last_updated": "2026-03-05",
+        "overview": "RAIN operates in South Africa's mobile and connectivity market, providing voice, data, and related digital services to prepaid and contract customers. The network competes on coverage, data value, and bundled services such as apps, content, and financial services. Its proposition typically mixes aggressive data offers with ongoing investment in 4G and 5G infrastructure.",
+        "rating_summary": "RAIN's score captures the trade-off between reasonably strong network or product value performance and weaker perceptions of service and support. Positive feedback centres on competitive pricing; icasa compliance; no contracts; high response rate whereas complaints frequently mention slow speeds; support resolution; outages. The verdict suggests that customers who prioritise pricing or coverage may find good value, but should watch out for the recurring service issues highlighted in reviews."
+      },
+      {
+        "id": "mobile-networks-12",
+        "name": "Cell C",
+        "website": "https://www.cellc.co.za",
+        "logo": "logos/cell-c.jpg",
+        "gonogo_score": 63,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 14,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 6,
+        "customer_support_max": 15,
+        "accessibility_security_score": 4,
+        "accessibility_security_max": 10,
+        "features": "prepaid/postpaid plans; data bundles; LTE roaming coverage; FTTH fibre; MVNO hosting; device contracts",
+        "pricing": "Pricing: Elevate+ from R229/mo (3GB), promos like 20GB R99; 1GB prepaid ~R65",
+        "googleplay_rating": "3.8/5",
+        "ios_rating": "2.7/5",
+        "strengths": "affordable pricing; improving coverage via partners; MVNO growth; financial turnaround",
+        "concerns": "billing errors; poor support; data breach",
+        "social_sentiment": "Predominantly negative on reviews sites; complaints on service/billing outweigh positives on price/coverage.",
+        "social_positive": "cheap data; improved network; helpful stores occasionally; value bundles",
+        "social_concerns": "poor customer service; billing disputes; contract cancellation issues; network outages; data breaches",
+        "last_updated": "2026-03-05",
+        "overview": "Cell C operates in South Africa's mobile and connectivity market, providing voice, data, and related digital services to prepaid and contract customers. The network competes on coverage, data value, and bundled services such as apps, content, and financial services. Its proposition typically mixes aggressive data offers with ongoing investment in 4G and 5G infrastructure.",
+        "rating_summary": "Cell C's score captures the trade-off between reasonably strong network or product value performance and weaker perceptions of service and support. Positive feedback centres on affordable pricing; improving coverage via partners; mvno growth; financial turnaround whereas complaints frequently mention billing errors; poor support; data breach. The verdict suggests that customers who prioritise pricing or coverage may find good value, but should watch out for the recurring service issues highlighted in reviews."
+      },
+      {
+        "id": "mobile-networks-13",
+        "name": "MTN South Africa",
+        "website": "https://www.mtn.co.za",
+        "logo": "logos/mtn.jpg",
+        "gonogo_score": 54,
+        "verdict": "NOGO",
+        "compliance_score": 16,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 5,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 23,
+        "product_value_max": 35,
+        "innovation_score": 8,
+        "innovation_max": 10,
+        "customer_support_score": 4,
+        "customer_support_max": 15,
+        "accessibility_security_score": 6,
+        "accessibility_security_max": 10,
+        "features": "prepaid/postpaid voice/data plans; home LTE/5G uncapped; MoMo mobile money; DataShare; self-service app",
+        "pricing": "Pricing: Contracts from R115/mo (30GB), home uncapped from R339/mo (15Mbps); 5.4% hike Feb 2026 w/speed bonuses",
+        "googleplay_rating": "3.9/5",
+        "ios_rating": "~2.5/5",
+        "strengths": "top network speed/quality; wide coverage; 5G adoption; fintech services",
+        "concerns": "poor customer service; billing disputes; app functionality",
+        "social_sentiment": "Overwhelmingly negative on HelloPeter/Trustpilot re service/billing; positive network mentions.",
+        "social_positive": "network performance; coverage; data speeds",
+        "social_concerns": "billing errors; poor support; contract cancellations; network outages; data delivery issues",
+        "last_updated": "2026-03-05",
+        "overview": "MTN South Africa operates in South Africa's mobile and connectivity market, providing voice, data, and related digital services to prepaid and contract customers. The network competes on coverage, data value, and bundled services such as apps, content, and financial services. Its proposition typically mixes aggressive data offers with ongoing investment in 4G and 5G infrastructure.",
+        "rating_summary": "MTN South Africa's score captures the trade-off between reasonably strong network or product value performance and weaker perceptions of service and support. Positive feedback centres on top network speed/quality; wide coverage; 5g adoption; fintech services whereas complaints frequently mention poor customer service; billing disputes; app functionality. The verdict suggests that customers who prioritise pricing or coverage may find good value, but should watch out for the recurring service issues highlighted in reviews."
+      }
+    ],
+    "scoring_categories": [
+      {
+        "name": "Compliance",
+        "max": 20
+      },
+      {
+        "name": "Customer Satisfaction",
+        "max": 25
+      },
+      {
+        "name": "Product Value",
+        "max": 35
+      },
+      {
+        "name": "Innovation",
+        "max": 10
+      },
+      {
+        "name": "Customer Support",
+        "max": 15
+      },
+      {
+        "name": "Accessibility & Security",
+        "max": 10
+      }
+    ]
+  },
+  {
+    "slug": "hr-software",
+    "category": "HR Software",
+    "icon": "fa-users-gear",
+    "brands": [
+      {
+        "id": "hr-software-14",
         "name": "Workday",
         "website": "https://www.workday.com",
         "logo": "",
@@ -517,10 +518,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive SA news (780 orgs, partner awards); global UX frustration on Trustpilot; no major SA complaints.",
         "social_positive": "innovation; reliability; growth; AI features",
         "social_concerns": "usability issues; glitches; login problems",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Workday is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Workday's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention sa presence; ai innovation; scalability; strong security; high adoption, while concerns are more likely to focus on high enterprise pricing; ui complaints; implementation costs. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "hr-software-2",
+        "id": "hr-software-15",
         "name": "Sage HR South Africa",
         "website": "https://www.sage.com/en-za/hr",
         "logo": "https://yt3.googleusercontent.com/bwah0-dqJvfZJ15Zdv8pkn9EqegyDIPeC8x9Ph_ofwHB17jtIALgoUiGEdaN2N2HoERbWcnq=s900-c-k-c0x00ffffff-no-rj",
@@ -547,10 +550,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive in software review sites (4.4+ avg). Limited HelloPeter/Google specific to SA; app complaints minor.",
         "social_positive": "easy to use; intuitive; great support; time-saving automation; legislation updates",
         "social_concerns": "mobile app bugs; shift scheduling tricky; extra security steps slow",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Sage HR South Africa is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Sage HR South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention user-friendly; auto legislation compliance; strong support; affordable modular pricing; mobile self-service; integration with sage payroll, while concerns are more likely to focus on mobile app issues; rigid modules; occasional slow dev fixes. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "hr-software-3",
+        "id": "hr-software-16",
         "name": "SimplePay",
         "website": "https://www.simplepay.co.za",
         "logo": "https://cdn.theorg.com/6838312f-f027-474f-a72a-f7a502c87a4a_medium.jpg",
@@ -577,21 +582,23 @@ var BRAND_DATA = [
         "social_sentiment": "Positive reviews/news; praises ease/compliance/support; minor complex needs complaints.",
         "social_positive": "simple; compliant; time-saving; reliable support",
         "social_concerns": "complex payroll limitations; occasional support delays for advanced issues",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "SimplePay is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "SimplePay's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention ease of use; sa compliance; affordability smes; strong support; integrations, while concerns are more likely to focus on complex payrolls; admin pricing. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "hr-software-4",
+        "id": "hr-software-17",
         "name": "PaySpace (Deel Local Payroll, powered by PaySpace)",
         "website": "https://www.payspace.com",
         "logo": "",
-        "gonogo_score": 79,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 83,
+        "verdict": "GO",
         "compliance_score": 19,
         "compliance_max": 20,
         "customer_satisfaction_score": 16,
         "customer_satisfaction_max": 25,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
         "customer_support_score": 10,
@@ -607,21 +614,23 @@ var BRAND_DATA = [
         "social_sentiment": "No recent X posts found; review sites mixed recent (HelloPeter low, others high)",
         "social_positive": "user-friendly; accurate compliant payroll; excellent support (most); reliable; transformative for SA legislation",
         "social_concerns": "support response times; issue resolution; recent complaints on ticketing",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "PaySpace (Deel Local Payroll, powered by PaySpace) is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "PaySpace (Deel Local Payroll, powered by PaySpace)'s score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention compliance & security certifications; scalability (1-10k+ emp); deel backing/global reach; pay-per-employee transparent; seamless integrations, while concerns are more likely to focus on support delays; kpi/capture issues; emp501 submission problems. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "hr-software-5",
+        "id": "hr-software-18",
         "name": "OrangeHRM",
         "website": "https://www.orangehrm.com",
         "logo": "https://media.licdn.com/dms/image/v2/C560BAQFgTlJr2qeacg/company-logo_200_200/company-logo_200_200/0/1673255582482/orangehrm_logo?e=2147483647&v=beta&t=pk_j5FJfGClZ-Xnm5rFW5egIKtfH_Bjw8CGGYgA4408",
-        "gonogo_score": 83,
+        "gonogo_score": 87,
         "verdict": "GO",
         "compliance_score": 17,
         "compliance_max": 20,
         "customer_satisfaction_score": 20,
         "customer_satisfaction_max": 25,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
         "customer_support_score": 12,
@@ -637,21 +646,23 @@ var BRAND_DATA = [
         "social_sentiment": "Positive reviews on Capterra/GetApp; no HelloPeter/Google SA-specific complaints; high app praise on Android.",
         "social_positive": "ease of use; responsive support; feature-rich; value for small biz",
         "social_concerns": "modular add-on costs; occasional bugs/stability; updates disrupt settings",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "OrangeHRM is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "OrangeHRM's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention free starter version; comprehensive modular features; high google rating; global scale 5m+ users; strong security, while concerns are more likely to focus on lack of transparent pricing; ios app low rating; modular costs add up. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "hr-software-6",
+        "id": "hr-software-19",
         "name": "BambooHR",
         "website": "https://www.bamboohr.com",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/3/3f/BambooHR_logo.svg",
-        "gonogo_score": 75,
+        "gonogo_score": 78,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 13,
         "compliance_max": 20,
         "customer_satisfaction_score": 20,
         "customer_satisfaction_max": 25,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
         "customer_support_score": 10,
@@ -667,14 +678,11 @@ var BRAND_DATA = [
         "social_sentiment": "No SA-specific sentiment on HelloPeter/Google/X; global positive on usability, concerns on support/pricing",
         "social_positive": "easy to use; time-saving; good for SMBs; strong reporting",
         "social_concerns": "lack of SA localization; US-centric payroll; pricing opacity; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "BambooHR is an established brand in South Africa operating within the hr software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "BambooHR's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention intuitive ui; employee self-service; central data hub; global reach, while concerns are more likely to focus on no sa payroll/localization; quote-only pricing; potential compliance customizations. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "accounting-software",
-    "category": "Accounting Software",
-    "icon": "fa-calculator",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -700,10 +708,15 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "accounting-software",
+    "category": "Accounting Software",
+    "icon": "fa-calculator",
     "brands": [
       {
-        "id": "accounting-software-1",
+        "id": "accounting-software-20",
         "name": "Zoho Books",
         "website": "https://www.zoho.com/za/books",
         "logo": "https://www.zoho.com/branding/",
@@ -730,10 +743,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive on Capterra/Trustpilot; SA users highlight compliance/value; minor setup complaints.",
         "social_positive": "easy invoicing; VAT accuracy; affordable; good support",
         "social_concerns": "learning curve; payroll limitations; occasional glitches",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Zoho Books is an established brand in South Africa operating within the accounting software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Zoho Books's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention free tier; sa vat compliance; ai features; 24/7 support; competitive pricing, while concerns are more likely to focus on complex initial setup; limited payroll; occasional sync issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "accounting-software-2",
+        "id": "accounting-software-21",
         "name": "Sage Accounting SA",
         "website": "https://www.sage.com/en-za/accounting",
         "logo": "https://yt3.googleusercontent.com/bwah0-dqJvfZJ15Zdv8pkn9EqegyDIPeC8x9Ph_ofwHB17jtIALgoUiGEdaN2N2HoERbWcnq=s900-c-k-c0x00ffffff-no-rj",
@@ -760,10 +775,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive on Capterra/Trustpilot; SA users highlight compliance/support; minor feature complaints.",
         "social_positive": "reliable compliance; easy invoicing; good support; affordable",
         "social_concerns": "advanced feature gaps; update speed; payroll costs",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Sage Accounting SA is an established brand in South Africa operating within the accounting software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Sage Accounting SA's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention sa-specific compliance; trusted brand; strong support; affordable smb pricing; easy to use, while concerns are more likely to focus on limited advanced features vs xero; occasional slow updates; payroll add-on cost. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "accounting-software-3",
+        "id": "accounting-software-22",
         "name": "Xero South Africa",
         "website": "https://www.xero.com/za",
         "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Xero_software_logo.svg/1280px-Xero_software_logo.svg.png",
@@ -790,10 +807,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive globally/SA; praised for integrations/usability; minor support complaints.",
         "social_positive": "easy to use; great integrations; real-time data; good value",
         "social_concerns": "support delays; pricing for small businesses; payroll add-on",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Xero South Africa is an established brand in South Africa operating within the accounting software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Xero South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention unlimited users; extensive integrations; strong mobile app; sa compliance; user-friendly, while concerns are more likely to focus on pricing vs sage for small users; support response times; limited payroll native. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "accounting-software-4",
+        "id": "accounting-software-23",
         "name": "QuickBooks Online SA",
         "website": "https://quickbooks.intuit.com/za",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Quickbooks.svg/1280px-Quickbooks.svg.png",
@@ -820,10 +839,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive globally; SA users satisfied with ease/functionality; minor support complaints.",
         "social_positive": "easy invoicing; good integrations; mobile convenience; reliable",
         "social_concerns": "currency risk; SA-specific features; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "QuickBooks Online SA is an established brand in South Africa operating within the accounting software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "QuickBooks Online SA's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention strong mobile app; extensive integrations; ai insights; competitive pricing; sa vat compliance, while concerns are more likely to focus on usd pricing risk; sa localization gaps; support consistency. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "accounting-software-5",
+        "id": "accounting-software-24",
         "name": "Wave Financial",
         "website": "https://www.waveapps.com",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Wave_Financial_logo.svg/2560px-Wave_Financial_logo.svg.png",
@@ -850,14 +871,11 @@ var BRAND_DATA = [
         "social_sentiment": "Positive on free value globally; SA users note compliance limitations.",
         "social_positive": "free invoicing; easy to use; good for freelancers; AI features",
         "social_concerns": "SA tax compliance; limited support; feature gaps vs paid tools",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Wave Financial is an established brand in South Africa operating within the accounting software category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Wave Financial's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention free core tier; easy invoicing; ai features; strong mobile app, while concerns are more likely to focus on sa compliance gaps; limited free support; us-centric. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "property-letting",
-    "category": "Property Letting",
-    "icon": "fa-house-chimney",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -883,10 +901,15 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "property-letting",
+    "category": "Property Letting",
+    "icon": "fa-house-chimney",
     "brands": [
       {
-        "id": "property-letting-1",
+        "id": "property-letting-25",
         "name": "Chas Everitt",
         "website": "https://www.chaseveritt.co.za",
         "logo": "https://datawarehousephotos.s3.us-east-2.amazonaws.com/luxuryportfolio/broker_logos/108968.jpg",
@@ -913,25 +936,27 @@ var BRAND_DATA = [
         "social_sentiment": "Positive site testimonials; isolated complaints; no 2025/2026 scandals.",
         "social_positive": "professional agents; communication; efficiency; client focus",
         "social_concerns": "service delays; commission disputes",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Chas Everitt is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Chas Everitt's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention ppra compliance; nationwide branches; positive testimonials; ethical family business; digital safety tools, while concerns are more likely to focus on limited review data; low app ratings/adoption. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-2",
+        "id": "property-letting-26",
         "name": "Just Property",
         "website": "https://www.justproperty.co.za",
         "logo": "https://www.just.property/favicon.ico",
-        "gonogo_score": 77,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 87,
+        "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 16,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 20,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
-        "customer_support_score": 12,
-        "customer_support_max": 12,
+        "customer_support_score": 15,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "rental management; tenant vetting; rent collection; maintenance coordination; sales/lettings residential/commercial; RENTSECURE insurance",
@@ -943,21 +968,23 @@ var BRAND_DATA = [
         "social_sentiment": "Limited recent SA sentiment; isolated complaints on deposits/charges balance positive service notes.",
         "social_positive": "professional agents; good communication; comprehensive service; reliable rentals",
         "social_concerns": "deposit disputes; extra charges; maintenance fees",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Just Property is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Just Property's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention extensive office network; full-service management; long experience; regulated; broad property range, while concerns are more likely to focus on deposit withholding; unexpected fees; branch inconsistencies. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-3",
+        "id": "property-letting-27",
         "name": "Pam Golding Properties",
         "website": "https://www.pamgolding.co.za",
         "logo": "logos/pam-golding.jpg",
-        "gonogo_score": 62,
+        "gonogo_score": 67,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
         "customer_support_score": 8,
@@ -973,25 +1000,27 @@ var BRAND_DATA = [
         "social_sentiment": "Negative on review sites (deposits/service); no strong positive recent social data.",
         "social_positive": "professional network; tenant vetting; marketing reach",
         "social_concerns": "deposit disputes; maintenance delays; poor agent service",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Pam Golding Properties is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Pam Golding Properties's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention established brand; ppra licensed; national network; comprehensive services; legal compliance claims, while concerns are more likely to focus on deposit withholding; maintenance delays; agent misconduct. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-4",
+        "id": "property-letting-28",
         "name": "Harcourts | Property Letting",
         "website": "https://www.harcourts.co.za",
         "logo": "https://d21tw07c6rnmp0.cloudfront.net/media/uploads/20/theme-settings/2025/7/20_6348463733ba49f2a42d3ac0b6488fc5.png",
-        "gonogo_score": 67,
+        "gonogo_score": 75,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 12,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 15,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 7,
         "innovation_max": 10,
-        "customer_support_score": 8,
-        "customer_support_max": 12,
+        "customer_support_score": 10,
+        "customer_support_max": 15,
         "accessibility_security_score": 7,
         "accessibility_security_max": 10,
         "features": "tenant placement; property management; investor support; rental legislation compliance; nationwide branches; online property search",
@@ -1003,25 +1032,27 @@ var BRAND_DATA = [
         "social_sentiment": "Limited recent negative complaints on HelloPeter/Google; no major 2025/2026 scandals; some international poor rental feedback.",
         "social_positive": "professional service; wide coverage; compliant operations",
         "social_concerns": "poor communication; maintenance delays; deposit disputes",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Harcourts | Property Letting is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Harcourts | Property Letting's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention extensive network (135+ offices); ppra compliance; professional training academy; tech for agents, while concerns are more likely to focus on communication issues; service delays; review complaints. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-5",
+        "id": "property-letting-29",
         "name": "Seeff Property Group",
         "website": "https://www.seeff.com",
         "logo": "logos/seeff.jpg",
-        "gonogo_score": 60,
+        "gonogo_score": 67,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 22,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 26,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
-        "customer_support_score": 7,
-        "customer_support_max": 12,
+        "customer_support_score": 9,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "professional photos/virtual tours; multi-platform listings; 80k+ email alerts; full management/TPN evictions; SSLR legal support; PayProp automation",
@@ -1033,10 +1064,12 @@ var BRAND_DATA = [
         "social_sentiment": "Negative on HelloPeter/complaints (deposits/maintenance); some positive Google. News neutral-positive market.",
         "social_positive": "professional marketing; local knowledge (some branches); smooth processes",
         "social_concerns": "deposit disputes; poor maintenance response; rude agents; communication delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Seeff Property Group is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Seeff Property Group's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention established brand/network; ppra/tpn compliant; strong marketing; comprehensive letting services, while concerns are more likely to focus on deposit withholding; inconsistent service; maintenance issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-6",
+        "id": "property-letting-30",
         "name": "Jawitz Properties",
         "website": "https://www.jawitz.co.za",
         "logo": "https://www.jawitz.co.za/wp-content/themes/jawitz/assets/images/logo.png",
@@ -1063,21 +1096,23 @@ var BRAND_DATA = [
         "social_sentiment": "Negative HelloPeter rentals focus; recent X tribunal threat; employee reviews positive.",
         "social_positive": "quick sales; professional agents; supportive training",
         "social_concerns": "poor communication; deposit delays; maintenance issues; unprofessional service",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Jawitz Properties is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Jawitz Properties's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention 55+ years established; ppra compliant; 58 offices nationwide; specialized rental division; fidelity fund certified, while concerns are more likely to focus on communication failures; rental deposit/refund delays; unprofessional handling. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-7",
+        "id": "property-letting-31",
         "name": "Wakefields Property Management",
         "website": "https://www.wakefields.co.za",
         "logo": "logos/wakefields.jpg",
-        "gonogo_score": 63,
+        "gonogo_score": 69,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
         "customer_support_score": 8,
@@ -1093,21 +1128,23 @@ var BRAND_DATA = [
         "social_sentiment": "Limited recent X activity; HelloPeter mixed-negative recent; historical service awards.",
         "social_positive": "experience; personal service; transparency; dedicated teams",
         "social_concerns": "billing disputes; poor service response; deposit issues",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Wakefields Property Management is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Wakefields Property Management's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention 85+ year family-owned; ppra compliant; kzn market leader; dedicated teams; transparency focus, while concerns are more likely to focus on poor service response; billing/levy disputes; deposit refunds. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-8",
+        "id": "property-letting-32",
         "name": "Rawson Property Letting",
         "website": "https://www.rawson.co.za",
         "logo": "logos/rawson.jpg",
-        "gonogo_score": 57,
-        "verdict": "NOGO",
+        "gonogo_score": 60,
+        "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
         "customer_satisfaction_score": 8,
         "customer_satisfaction_max": 25,
-        "product_value_score": 22,
-        "product_value_max": 30,
+        "product_value_score": 26,
+        "product_value_max": 35,
         "innovation_score": 4,
         "innovation_max": 10,
         "customer_support_score": 6,
@@ -1123,21 +1160,23 @@ var BRAND_DATA = [
         "social_sentiment": "Predominantly negative from HelloPeter/Google reviews (deposits, service); neutral/positive company news/blogs.",
         "social_positive": "professional service in some cases; market knowledge; transformation efforts",
         "social_concerns": "deposit disputes; poor maintenance response; unprofessional agents; communication delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Rawson Property Letting is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Rawson Property Letting's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention national network; ppra compliance; full-service rental management; market insights via blog, while concerns are more likely to focus on deposit withholding; maintenance neglect; agent unprofessionalism. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-9",
+        "id": "property-letting-33",
         "name": "Only Realty",
         "website": "https://www.onlyrealty.co.za",
         "logo": "https://www.estate-living.co.za/wp-content/uploads/2025/12/Only_Realty_Secondary_Logo-9.png",
-        "gonogo_score": 50,
+        "gonogo_score": 55,
         "verdict": "NOGO",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 4,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 5,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 2,
         "innovation_max": 10,
         "customer_support_score": 3,
@@ -1153,21 +1192,23 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter overwhelmingly negative (1.9/5); isolated FB complaints; sparse positive employee reviews.",
         "social_positive": "none prominent",
         "social_concerns": "poor communication; deposit disputes; bad tenant placement; unresponsive accounts",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Only Realty is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Only Realty's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention wide branch network; established presence; standard real estate services, while concerns are more likely to focus on unresponsive service; deposit handling; tenant vetting failures. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-10",
+        "id": "property-letting-34",
         "name": "Tyson Properties",
         "website": "https://www.tysonprop.co.za",
         "logo": "logos/tyson-properties.jpg",
-        "gonogo_score": 49,
+        "gonogo_score": 52,
         "verdict": "NOGO",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 5,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 20,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 6,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 23,
+        "product_value_max": 35,
         "innovation_score": 5,
         "innovation_max": 10,
         "customer_support_score": 4,
@@ -1183,21 +1224,23 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter strongly negative on lettings (filthy properties, no support); no recent positive customer data; employee reviews 4.2/5 Indeed.",
         "social_positive": "efficient sales agents (rare); good office culture",
         "social_concerns": "poor maintenance; unclean properties; unresponsive service; hidden costs; delayed move-ins",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Tyson Properties is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Tyson Properties's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention 20+ years experience; large agent network (450+ pros); multi-province coverage; positive employee culture; market insights/news, while concerns are more likely to focus on unresponsive support; maintenance delays; unclean rentals. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "property-letting-11",
+        "id": "property-letting-35",
         "name": "Leapfrog Property Group",
         "website": "https://www.leapfrog.co.za",
         "logo": "https://media.agentaprd.com/sites/949/Leapfrog-logo-2023-2.webp",
-        "gonogo_score": 60,
+        "gonogo_score": 65,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
         "customer_support_score": 7,
@@ -1213,14 +1256,11 @@ var BRAND_DATA = [
         "social_sentiment": "Facebook positive testimonials; HelloPeter negative; no X data.",
         "social_positive": "exceptional individual agents; quick sales; professional in some cases",
         "social_concerns": "unprofessional agents; delays in processes/maintenance; poor response",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Leapfrog Property Group is an established brand in South Africa operating within the property letting category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Leapfrog Property Group's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention national presence; regulatory compliance; bee empowerment; active social media testimonials, while concerns are more likely to focus on poor service delivery; unprofessionalism; maintenance delays. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "online-retailers",
-    "category": "Online Retailers",
-    "icon": "fa-cart-shopping",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -1228,11 +1268,11 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Satisfaction",
-        "max": 20
+        "max": 25
       },
       {
         "name": "Product Value",
-        "max": 30
+        "max": 35
       },
       {
         "name": "Innovation",
@@ -1246,21 +1286,26 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "online-retailers",
+    "category": "Online Retailers",
+    "icon": "fa-cart-shopping",
     "brands": [
       {
-        "id": "online-retailers-1",
+        "id": "online-retailers-36",
         "name": "Superbalist",
         "website": "https://www.superbalist.com",
         "logo": "https://brandfetch.com/api/v2/brandfetch/public-resources/logos/64x64/superbalist.com.png",
-        "gonogo_score": 76,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 83,
+        "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 15,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 19,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
         "customer_support_score": 9,
@@ -1276,10 +1321,12 @@ var BRAND_DATA = [
         "social_sentiment": "App rated 4.7/4.4; Trustpilot 1.7/5; mixed on product quality; positive for deals/convenience.",
         "social_positive": "deals/discounts; easy returns; wide selection; fast delivery",
         "social_concerns": "low quality items; delayed refunds; inconsistent service",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Superbalist is an established brand in South Africa operating within the online retailers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Superbalist's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention high app ratings; wide product range; frequent deals; free returns; good customer loyalty program, while concerns are more likely to focus on trustpilot low 1.7/5; product quality issues; return processing delays. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "online-retailers-2",
+        "id": "online-retailers-37",
         "name": "Takealot",
         "website": "https://www.takealot.com",
         "logo": "https://upload.wikimedia.org/wikipedia/en/b/b7/Takealot_Logo.png",
@@ -1306,10 +1353,12 @@ var BRAND_DATA = [
         "social_sentiment": "App highly rated but Trustpilot/HelloPeter low on fraud/returns; social media mixed; positive delivery praises.",
         "social_positive": "fast delivery; wide selection; competitive pricing; easy app",
         "social_concerns": "fraudulent listings; return delays; poor support; order errors",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Takealot is an established brand in South Africa operating within the online retailers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Takealot's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention largest sa retailer; fast delivery; wide selection; strong logistics; digital innovation, while concerns are more likely to focus on trustpilot 1.4/5; return resolution; fraudulent sellers. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "online-retailers-3",
+        "id": "online-retailers-38",
         "name": "Loot.co.za",
         "website": "https://www.loot.co.za",
         "logo": "",
@@ -1336,14 +1385,11 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed HelloPeter/Trustpilot on delivery/service; app positive; niche praise for media selection.",
         "social_positive": "wide selection; competitive prices; good app; quick delivery sometimes",
         "social_concerns": "late deliveries; poor support resolution; refund delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Loot.co.za is an established brand in South Africa operating within the online retailers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Loot.co.za's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention wide product range; competitive book/media; strong app; rewards program; cpa compliant returns, while concerns are more likely to focus on delivery delays; trustpilot 2.5/5; refund issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "medical-aid",
-    "category": "Medical Aid",
-    "icon": "fa-heart-pulse",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -1351,11 +1397,11 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Satisfaction",
-        "max": 20
+        "max": 25
       },
       {
         "name": "Product Value",
-        "max": 30
+        "max": 35
       },
       {
         "name": "Innovation",
@@ -1369,21 +1415,26 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "medical-aid",
+    "category": "Medical Aid",
+    "icon": "fa-heart-pulse",
     "brands": [
       {
-        "id": "medical-aid-1",
+        "id": "medical-aid-39",
         "name": "Profmed Medical Aid",
         "website": "https://www.profmed.co.za",
         "logo": "https://rehealth.co.za/wp-content/uploads/2022/02/profmed_medicalaid.png",
-        "gonogo_score": 71,
+        "gonogo_score": 78,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 12,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 15,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 7,
         "innovation_max": 10,
         "customer_support_score": 9,
@@ -1399,10 +1450,12 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter strongly negative recent; some positive Reddit/FB; no strong X data.",
         "social_positive": "efficient claims (some); good major procedure cover; value for money",
         "social_concerns": "unresponsive support; claims delays/denials; app glitches",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Profmed Medical Aid is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Profmed Medical Aid's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable increases (6.76% 2026); strong finances (aa gcr); tailored for professionals; comprehensive oncology/maternity, while concerns are more likely to focus on poor service responsiveness; claims issues; app functionality. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-2",
+        "id": "medical-aid-40",
         "name": "Discovery Health Medical Scheme",
         "website": "https://www.discovery.co.za/medical-aid",
         "logo": "https://seeklogo.com/images/D/discovery-health-logo-1DFC1C6E6D-seeklogo.com.png",
@@ -1429,25 +1482,27 @@ var BRAND_DATA = [
         "social_sentiment": "Low HelloPeter (1.25/5), Reddit mixed (good majors/poor admin), news positive innovation but pharmacy backlash.",
         "social_positive": "major claims paid; tech innovation; affordability deferrals; network access",
         "social_concerns": "claims rejections/delays; billing errors; poor customer service; network restrictions",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Discovery Health Medical Scheme is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Discovery Health Medical Scheme's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention market leader 58%; innovative ai tools; aaa financials; 150+ hospitals network; comprehensive benefits, while concerns are more likely to focus on claims disputes; poor service ratings; billing issues; 2026 pharmacy recovery demands. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-3",
+        "id": "medical-aid-41",
         "name": "Bestmed Medical Aid",
         "website": "https://www.bestmed.co.za",
         "logo": "https://seeklogo.com/images/B/bestmed-logo-1A1A1A1A1A1A1A1A1A-seeklogo.com.svg",
-        "gonogo_score": 70,
+        "gonogo_score": 77,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 19,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 8,
         "innovation_max": 10,
-        "customer_support_score": 9,
-        "customer_support_max": 12,
+        "customer_support_score": 11,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "unlimited hospital (DSP); PMSA/savings; Tempo wellness; preventative vaccines/screens; maternity/chronic/oncology programs; Netcare911",
@@ -1459,21 +1514,23 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter/Google low ratings (service/claims complaints); internal awards (SA-csi top, Titanium); news positive on 2026 updates.",
         "social_positive": "value for money; claim payouts; wellness benefits; network coverage",
         "social_concerns": "claims delays; poor support access; app bugs/UI; communication issues",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Bestmed Medical Aid is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Bestmed Medical Aid's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable entry pricing; self-administered low costs; gcr aa solvency; extensive preventative; child rates to 24; no self-pay gaps, while concerns are more likely to focus on low review ratings; claims/support delays; app quality. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-4",
+        "id": "medical-aid-42",
         "name": "Momentum Medical Scheme",
         "website": "https://www.momentumhealth.co.za",
         "logo": "",
-        "gonogo_score": 64,
+        "gonogo_score": 70,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 19,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 24,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 28,
+        "product_value_max": 35,
         "innovation_score": 8,
         "innovation_max": 10,
         "customer_support_score": 7,
@@ -1489,21 +1546,23 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed; low HelloPeter but positive testimonials on site; recent news on admin contracts wins.",
         "social_positive": "flexible plans; affordable options; preventative care; rewards program",
         "social_concerns": "claims delays; poor service; high co-pays; billing errors",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Momentum Medical Scheme is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Momentum Medical Scheme's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable entry plans; flexible provider choices; strong financials (gcr aa); comprehensive hospital/chronic; wellness rewards, while concerns are more likely to focus on claims processing delays; rude support; low hellopeter rating. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-5",
+        "id": "medical-aid-43",
         "name": "Medshield",
         "website": "https://www.medshield.co.za",
         "logo": "https://medshield.co.za/wp-content/uploads/2023/03/blue-logo.png",
-        "gonogo_score": 64,
+        "gonogo_score": 70,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 17,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 8,
         "innovation_max": 10,
         "customer_support_score": 9,
@@ -1519,21 +1578,23 @@ var BRAND_DATA = [
         "social_sentiment": "Low HelloPeter rating; mixed app feedback; positive on stability/pricing in comparisons/news; employee reviews avg.",
         "social_positive": "prompt payments; value adds; app convenience; benefit enhancements",
         "social_concerns": "claims delays; authorizations; low savings; poor service",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Medshield is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Medshield's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable plans; strong gcr aa rating; innovative prevention benefits; wide network access, while concerns are more likely to focus on claims processing; customer service; benefit limits. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-6",
+        "id": "medical-aid-44",
         "name": "KeyHealth Medical Scheme",
         "website": "https://www.keyhealth.co.za",
         "logo": "",
-        "gonogo_score": 60,
+        "gonogo_score": 65,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 5,
         "innovation_max": 10,
         "customer_support_score": 6,
@@ -1549,21 +1610,23 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter low (2.6, claims/service issues); iOS app 2.4/5 (bugs); company testimonials positive; no major X buzz.",
         "social_positive": "affordable value; good hospital cover when paid; occasional helpful staff",
         "social_concerns": "claim denials; poor service response; app bugs; payment suspensions",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "KeyHealth Medical Scheme is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "KeyHealth Medical Scheme's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable entry-level plans; transparent no-frills cover; comprehensive hospital/pmb; free add-on programs; 95k members, while concerns are more likely to focus on claim rejections despite auth; unresponsive support; faulty app/portal. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-7",
+        "id": "medical-aid-45",
         "name": "Bonitas",
         "website": "https://www.bonitas.co.za",
         "logo": "https://cdn.brandfetch.io/id09_HhDWT/w/258/h/100/theme/dark/logo.png",
-        "gonogo_score": 63,
+        "gonogo_score": 69,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 15,
         "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 7,
         "innovation_max": 10,
         "customer_support_score": 9,
@@ -1579,21 +1642,23 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed; positive on financial strength/pricing, negative on service/app from HelloPeter/Google; news focuses on governance disputes.",
         "social_positive": "affordable pricing; good hospital cover; benefit enhancements; strong financials",
         "social_concerns": "claims delays; poor app functionality; customer service response times; governance scrutiny",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Bonitas is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Bonitas's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention affordable entry plans; strong solvency/reserves; wide plan range; high hospital claims payment speed, while concerns are more likely to focus on ongoing regulatory probe; low review ratings; app unreliability. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "medical-aid-8",
+        "id": "medical-aid-46",
         "name": "Fedhealth",
         "website": "https://www.fedhealth.co.za",
         "logo": "https://medicalaidsinsouthafrica.co.za/wp-content/uploads/2012/07/fedhealth_logo.jpg",
-        "gonogo_score": 53,
+        "gonogo_score": 57,
         "verdict": "NOGO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 5,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 20,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 6,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 23,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
         "customer_support_score": 6,
@@ -1609,14 +1674,11 @@ var BRAND_DATA = [
         "social_sentiment": "Strongly negative on HelloPeter/Google (1.3-1.9/5); complaints dominate claims/service; some positives on coverage.",
         "social_positive": "hospital coverage; flexible options; chronic support; some positive claims experiences",
         "social_concerns": "claim denials; poor service; communication delays; billing errors; coverage gaps",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Fedhealth is an established brand in South Africa operating within the medical aid category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Fedhealth's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention strong financials (aa- gcr); affordable entry plans; wide plan range; network access; sanlam partnership, while concerns are more likely to focus on claim rejections; service delays; app bugs. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "insurance",
-    "category": "Insurance",
-    "icon": "fa-shield-halved",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -1642,10 +1704,15 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "insurance",
+    "category": "Insurance",
+    "icon": "fa-shield-halved",
     "brands": [
       {
-        "id": "insurance-1",
+        "id": "insurance-47",
         "name": "Discovery Insure",
         "website": "https://www.discovery.co.za/insure",
         "logo": "https://www.discovery.co.za/gallery/discoverycoza/corporate/logos/opengraph-discovery-logo.png",
@@ -1672,10 +1739,12 @@ var BRAND_DATA = [
         "social_sentiment": "Strong positive on HelloPeter/Feefo; some group complaints on Trustpilot; praised for innovation/rewards.",
         "social_positive": "rewards cashback; efficient service; safe driving incentives; value for money",
         "social_concerns": "claims delays; support response times; excesses",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Discovery Insure is a South African insurance provider offering products such as vehicle, home, and other short-term cover to retail and business clients. It competes on a combination of premium pricing, benefits, and service features like digital self-service and emergency assistance. The brand leverages its underwriting strength and partnerships to target customers seeking reliable, value-oriented cover.",
+        "rating_summary": "Discovery Insure's high score is driven by strong perceived value and generally positive claims and service experiences relative to the market. Customers and reviews often highlight innovative rewards model; high hellopeter rating; competitive pricing; fsca compliant; digital excellence while frustrations tend to centre on claims processing delays; mediocre app rating; occasional service complaints. The verdict indicates that, on balance, the insurer delivers solid outcomes for most policyholders, with some individual exceptions during complex claims."
       },
       {
-        "id": "insurance-2",
+        "id": "insurance-48",
         "name": "Santam",
         "website": "https://www.santam.co.za",
         "logo": "https://seeklogo.com/images/S/santam-logo-619254-E1A0E1E1E1-seeklogo.com.png",
@@ -1702,10 +1771,12 @@ var BRAND_DATA = [
         "social_sentiment": "Strongly positive on HelloPeter (91% 5-star); isolated complaints on claims handling.",
         "social_positive": "excellent service; quick claims; helpful agents; reliable coverage",
         "social_concerns": "claims processing delays; assessor issues",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Santam is a South African insurance provider offering products such as vehicle, home, and other short-term cover to retail and business clients. It competes on a combination of premium pricing, benefits, and service features like digital self-service and emergency assistance. The brand leverages its underwriting strength and partnerships to target customers seeking reliable, value-oriented cover.",
+        "rating_summary": "Santam's high score is driven by strong perceived value and generally positive claims and service experiences relative to the market. Customers and reviews often highlight market leader 24% share; strong financials; high customer ratings; digital tools; international expansion while frustrations tend to centre on occasional claims delays; individual assessor complaints. The verdict indicates that, on balance, the insurer delivers solid outcomes for most policyholders, with some individual exceptions during complex claims."
       },
       {
-        "id": "insurance-3",
+        "id": "insurance-49",
         "name": "Auto & General",
         "website": "https://www.autoandgeneral.co.za",
         "logo": "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/aaa2bd14116249.5627db3d463e3.png",
@@ -1732,25 +1803,27 @@ var BRAND_DATA = [
         "social_sentiment": "Strong positive on HelloPeter/Google Play; active brand presence on social with events/promos; minor complaints balanced by high satisfaction.",
         "social_positive": "excellent service; quick claims; helpful agents; reliable app",
         "social_concerns": "claim delays; warranty issues; poor updates",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Auto & General is a South African insurance provider offering products such as vehicle, home, and other short-term cover to retail and business clients. It competes on a combination of premium pricing, benefits, and service features like digital self-service and emergency assistance. The brand leverages its underwriting strength and partnerships to target customers seeking reliable, value-oriented cover.",
+        "rating_summary": "Auto & General's high score is driven by strong perceived value and generally positive claims and service experiences relative to the market. Customers and reviews often highlight high customer ratings; innovative app; quick response times; 40+ years experience; top industry rankings while frustrations tend to centre on claim processing delays; occasional warranty disputes. The verdict indicates that, on balance, the insurer delivers solid outcomes for most policyholders, with some individual exceptions during complex claims."
       },
       {
-        "id": "insurance-4",
+        "id": "insurance-50",
         "name": "First for Women",
         "website": "https://www.firstforwomen.co.za",
         "logo": "https://www.firstforwomen.co.za/favicon.ico",
-        "gonogo_score": 84,
+        "gonogo_score": 91,
         "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 20,
-        "customer_satisfaction_max": 22,
-        "product_value_score": 30,
-        "product_value_max": 32,
+        "customer_satisfaction_score": 23,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
-        "customer_support_score": 12,
-        "customer_support_max": 13,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "Guardian Angel app; crash detection/roadside; comprehensive car/home; safe drive rewards; emergency/medical assist; funeral/legal cover add-ons",
@@ -1762,10 +1835,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive reviews on HelloPeter/app; recognized as top insurer; engaged safety community.",
         "social_positive": "helpful agents; good coverage; app features; safety benefits",
         "social_concerns": "claims delays; coverage disputes",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "First for Women is a South African insurance provider offering products such as vehicle, home, and other short-term cover to retail and business clients. It competes on a combination of premium pricing, benefits, and service features like digital self-service and emergency assistance. The brand leverages its underwriting strength and partnerships to target customers seeking reliable, value-oriented cover.",
+        "rating_summary": "First for Women's high score is driven by strong perceived value and generally positive claims and service experiences relative to the market. Customers and reviews often highlight high app ratings; strong hellopeter satisfaction; women-specific benefits; crash detection innovation; fsp compliance while frustrations tend to centre on claim delays; app update issues. The verdict indicates that, on balance, the insurer delivers solid outcomes for most policyholders, with some individual exceptions during complex claims."
       },
       {
-        "id": "insurance-5",
+        "id": "insurance-51",
         "name": "MiWay",
         "website": "https://www.miway.co.za",
         "logo": "https://www.miway.co.za/content/dam/miway-za/images/logos/Miway-stacked-logo.png",
@@ -1792,14 +1867,11 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed HelloPeter/Trustpilot on claims; positive on pricing/innovation; no major negatives.",
         "social_positive": "affordable; innovative features; easy self-service; multi-product",
         "social_concerns": "claims delays; portal problems; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "MiWay is a South African insurance provider offering products such as vehicle, home, and other short-term cover to retail and business clients. It competes on a combination of premium pricing, benefits, and service features like digital self-service and emergency assistance. The brand leverages its underwriting strength and partnerships to target customers seeking reliable, value-oriented cover.",
+        "rating_summary": "MiWay's high score is driven by strong perceived value and generally positive claims and service experiences relative to the market. Customers and reviews often highlight direct insurer value; telematics innovation; multi-product range; fsca compliance while frustrations tend to centre on claims delays; mixed service; portal issues. The verdict indicates that, on balance, the insurer delivers solid outcomes for most policyholders, with some individual exceptions during complex claims."
       }
-    ]
-  },
-  {
-    "slug": "home-cleaning",
-    "category": "Home Cleaning",
-    "icon": "fa-spray-can-sparkles",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -1807,11 +1879,11 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Satisfaction",
-        "max": 20
+        "max": 25
       },
       {
         "name": "Product Value",
-        "max": 30
+        "max": 35
       },
       {
         "name": "Innovation",
@@ -1819,31 +1891,36 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Support",
-        "max": 12
+        "max": 15
       },
       {
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "home-cleaning",
+    "category": "Home Cleaning",
+    "icon": "fa-spray-can-sparkles",
     "brands": [
       {
-        "id": "home-cleaning-1",
+        "id": "home-cleaning-52",
         "name": "CleanLab SA",
         "website": "https://www.cleanlab.co.za",
         "logo": "https://www.cleanlabsa.co.za/wp-content/uploads/2025/07/Cleanlab-Green-Circle-Icon.png",
-        "gonogo_score": 74,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 83,
+        "verdict": "GO",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 27,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 22,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 32,
+        "product_value_max": 35,
         "innovation_score": 6,
         "innovation_max": 10,
-        "customer_support_score": 10,
-        "customer_support_max": 12,
+        "customer_support_score": 12,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "vetted providers; online instant booking; transparent pricing; recurring/loyalty plans up to 30% off; nationwide residential/commercial/industrial cleaning/pest/garden; satisfaction guarantee",
@@ -1855,25 +1932,27 @@ var BRAND_DATA = [
         "social_sentiment": "Overwhelmingly positive on Subscriptionbay/Rannkly (professional, excellent results); 1 negative on HelloPeter; limited broader visibility.",
         "social_positive": "professionalism; quality results; friendly staff; value for money; easy booking",
         "social_concerns": "occasional poor service attitudes; limited review volume on some sites",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "CleanLab SA operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "CleanLab SA's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include high customer ratings/testimonials; affordable/transparent value; professional vetted services; positive resolution examples while recurring issues involve low hellopeter rating (1 review); no published pricing; no app. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-2",
+        "id": "home-cleaning-53",
         "name": "GoodApp",
         "website": "https://www.goodapp.co.za",
         "logo": "https://media.licdn.com/dms/image/v2/D4D0BAQH13ZXCz1ZbtA/company-logo_200_200/B4DZYBD95vG8AI-/0/1743774543321/goodapp_homeservices_logo",
-        "gonogo_score": 79,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 90,
+        "verdict": "GO",
         "compliance_score": 17,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 22,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
-        "customer_support_score": 11,
-        "customer_support_max": 12,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "on-demand booking; vetted/background-checked providers; fixed/upfront pricing; ratings/reviews; facial recognition verification; wide services including cleaning/plumbing/electrical",
@@ -1885,25 +1964,27 @@ var BRAND_DATA = [
         "social_sentiment": "Limited; mostly promotional positive posts on LinkedIn/FB/Instagram, company claims high satisfaction, no major negative trends on HelloPeter or social.",
         "social_positive": "reliable pros; easy booking; safety; convenience; job creation",
         "social_concerns": "limited reviews; low app downloads; isolated no-show complaints",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "GoodApp operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "GoodApp's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include rigorous provider vetting; transparency focus; positive growth/news 2025; safety features; empowers informal sector while recurring issues involve low visibility reviews; early-stage low adoption; occasional service no-shows. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-3",
+        "id": "home-cleaning-54",
         "name": "Maid4U",
         "website": "https://www.maid4u.co.za",
         "logo": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/67/d2/cb/67d2cb74-3fc0-2b5e-2767-a7e1f3c5e3e8/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1200x630wa.png",
-        "gonogo_score": 77,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 86,
+        "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 22,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 7,
         "innovation_max": 10,
-        "customer_support_score": 11,
-        "customer_support_max": 12,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 9,
         "accessibility_security_max": 10,
         "features": "Vetted/trained domestic workers; nanny/care/cleaning placement; Gold/Prestige packages with replacements; HR/compliance handling; franchise model",
@@ -1915,10 +1996,12 @@ var BRAND_DATA = [
         "social_sentiment": "Limited; positive website/HelloPeter, one recent FB complaint on support, no major issues.",
         "social_positive": "reliable staff; professional process; compliance ease; trained carers",
         "social_concerns": "rude support responses; low employee pay/management",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Maid4U operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "Maid4U's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include strong regulatory compliance; positive client feedback; multi-service; 18+ years experience; national reach while recurring issues involve limited public reviews; no transparent pricing; one support complaint. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-4",
+        "id": "home-cleaning-55",
         "name": "SweepSouth",
         "website": "https://www.sweepsouth.com",
         "logo": "https://sweepsouth.com/wp-content/uploads/2024/09/Sweepsouth-logo-vertical-full-colour-tagline.png",
@@ -1945,25 +2028,27 @@ var BRAND_DATA = [
         "social_sentiment": "App/Google reviews mixed-positive (high ratings but service complaints); HelloPeter lower; recent news positive (tech award); minor gig worker concerns in 2024 reports.",
         "social_positive": "convenience; thorough cleaning; reliable replacements; friendly workers; user-friendly app; insurance peace of mind",
         "social_concerns": "cancellation fees; inconsistent worker quality; app bugs; price increases; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "SweepSouth operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "SweepSouth's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include convenient app platform; vetted reliable workers; strong insurance/safety; high app ratings; service variety; 2025 tech award winner while recurring issues involve cancellation policies; worker performance variability; occasional support delays. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-5",
+        "id": "home-cleaning-56",
         "name": "CLiCK Cleaning",
         "website": "https://www.clickcleaning.co.za",
         "logo": "https://clickcleaning.co.za/wp-content/uploads/2017/03/Click-Cleaning-Favicon.png",
-        "gonogo_score": 70,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 81,
+        "verdict": "GO",
         "compliance_score": 17,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 27,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 22,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 32,
+        "product_value_max": 35,
         "innovation_score": 2,
         "innovation_max": 10,
-        "customer_support_score": 11,
-        "customer_support_max": 12,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 6,
         "accessibility_security_max": 10,
         "features": "quick-dry carpet cleaning; upholstery cleaning; anti-viral sanitising; leather conditioning; tile/stone cleaning; pet urine treatment",
@@ -1975,25 +2060,27 @@ var BRAND_DATA = [
         "social_sentiment": "Limited data; positive on own site, mixed HelloPeter (5-star happy, some complaints), no recent X posts.",
         "social_positive": "quality results; quick drying; professional staff; value pricing",
         "social_concerns": "limited reviews data; mixed HelloPeter feedback",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "CLiCK Cleaning operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "CLiCK Cleaning's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include certified eco-friendly products; guaranteed work; trained itc-cleared staff; multiple branches; proudly sa brand while recurring issues involve scarce independent reviews; no public pricing; no app. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-6",
+        "id": "home-cleaning-57",
         "name": "Bidvest Prestige",
         "website": "https://www.bidvestprestige.co.za",
         "logo": "",
-        "gonogo_score": 66,
+        "gonogo_score": 74,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 19,
         "compliance_max": 20,
-        "customer_satisfaction_score": 12,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 15,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
         "innovation_score": 4,
         "innovation_max": 10,
-        "customer_support_score": 8,
-        "customer_support_max": 12,
+        "customer_support_score": 10,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "contract cleaning; specialised industrial/healthcare/retail; high-level cleaning; HACCP food hygiene; customizable solutions; 23k staff nationwide",
@@ -2005,25 +2092,27 @@ var BRAND_DATA = [
         "social_sentiment": "Limited; HelloPeter negative (2), Indeed employee average 3.7/5, LinkedIn positive company posts, no recent X complaints.",
         "social_positive": "professional staff; reliable service (few praises); awards like Golden Arrow",
         "social_concerns": "admin delays; poor staff empathy (benefits); low review volume",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Bidvest Prestige operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "Bidvest Prestige's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include certifications & compliance; large scale operations; industry leadership; b-bbee level 1; tailored services while recurring issues involve limited consumer reviews; primarily commercial focus; admin complaints. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-7",
+        "id": "home-cleaning-58",
         "name": "All Maids",
         "website": "https://www.allmaids.co.za",
         "logo": "",
-        "gonogo_score": 61,
+        "gonogo_score": 69,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 17,
         "compliance_max": 20,
-        "customer_satisfaction_score": 12,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 22,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 15,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 26,
+        "product_value_max": 35,
         "innovation_score": 4,
         "innovation_max": 10,
-        "customer_support_score": 9,
-        "customer_support_max": 12,
+        "customer_support_score": 11,
+        "customer_support_max": 15,
         "accessibility_security_score": 6,
         "accessibility_security_max": 10,
         "features": "Domestic/commercial cleaning; deep/spring cleaning; carpet/upholstery/window/solar panel cleaning; domestic placements; labour outsourcing; flexible scheduling",
@@ -2035,25 +2124,27 @@ var BRAND_DATA = [
         "social_sentiment": "No recent mentions on X/Twitter or complaints found; website testimonials positive but dated.",
         "social_positive": "Reliable staff; thorough cleaning; professional service (from testimonials)",
         "social_concerns": "Lack of recent third-party reviews; no public pricing transparency",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "All Maids operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "All Maids's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include insurance & compliance handling; staff vetting; flexible pay-as-you-go; gauteng-wide service while recurring issues involve no independent reviews; quote-based pricing lacks transparency. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       },
       {
-        "id": "home-cleaning-8",
+        "id": "home-cleaning-59",
         "name": "Skitterblink",
         "website": "https://www.skitterblink.co.za",
         "logo": "https://cleaningsouthafrica.co.za/wp-content/uploads/2024/06/Skitterblink-Cleaning-Service-Team.webp",
-        "gonogo_score": 60,
+        "gonogo_score": 69,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 16,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 24,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 20,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 28,
+        "product_value_max": 35,
         "innovation_score": 2,
         "innovation_max": 10,
-        "customer_support_score": 7,
-        "customer_support_max": 12,
+        "customer_support_score": 9,
+        "customer_support_max": 15,
         "accessibility_security_score": 4,
         "accessibility_security_max": 10,
         "features": "domestic cleaning; commercial cleaning; trauma & crime scene cleaning; builders clean; carpet/upholstery cleaning; hygiene services",
@@ -2065,14 +2156,11 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed HelloPeter (3.7 overall, some branches 5/5), Snupit mixed; recent 2026 reviews include negatives on service/management.",
         "social_positive": "professional staff; thorough cleaning; reliable teams; efficiency; friendly service",
         "social_concerns": "poor communication; incomplete service; high prices; management issues; broken items not replaced",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Skitterblink operates in South Africa's home and commercial cleaning space, acting as a platform that connects customers with vetted cleaning professionals. It focuses on convenience through online booking and transparent service descriptions rather than running its own cleaning staff directly. The service is positioned around reliability, professionalism, and flexible packages for households and businesses.",
+        "rating_summary": "Skitterblink's score reflects strong perceived value and professionalism from most reviewers, offset by a smaller number of negative experiences around inconsistent service delivery. Strengths typically include wide service range; trained professional teams; worry-free guarantee; nationwide franchises; 25+ years experience while recurring issues involve inconsistent service quality; poor customer response; franchise variability. The GO WITH CAUTION verdict suggests that many customers are very satisfied, though outcomes can vary depending on the specific provider and booking."
       }
-    ]
-  },
-  {
-    "slug": "car-dealers",
-    "category": "Car Dealers",
-    "icon": "fa-car",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -2098,10 +2186,15 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "car-dealers",
+    "category": "Car Dealers",
+    "icon": "fa-car",
     "brands": [
       {
-        "id": "car-dealers-1",
+        "id": "car-dealers-60",
         "name": "Mit Mak Motors",
         "website": "https://www.mitmak.co.za",
         "logo": "https://www.mitmakmotors.co.za/wp-content/uploads/2022/05/Mit-MakLogo.png",
@@ -2128,10 +2221,12 @@ var BRAND_DATA = [
         "social_sentiment": "Strongly positive on review sites; some TikTok/FB negatives on defects.",
         "social_positive": "excellent service; quality vehicles; quick finance; hospitality",
         "social_concerns": "vehicle defects; transparency; past compliance issues",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Mit Mak Motors is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Mit Mak Motors's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention top hellopeter/autotrader ratings/awards; fast responsive support; quality guarantees; competitive pricing, while concerns are more likely to focus on defects in some cars; transparency issues; old fic penalty. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-2",
+        "id": "car-dealers-61",
         "name": "AUTO24.co.za",
         "website": "https://www.auto24.co.za",
         "logo": "https://africabusinesscommunities.com/Images/Key%20Logos/Auto24.png",
@@ -2158,10 +2253,12 @@ var BRAND_DATA = [
         "social_sentiment": "Positive reviews dominate; no major negatives; promotional X activity.",
         "social_positive": "excellent service; quality cars; trustworthy; efficient process",
         "social_concerns": "none-prominent; new-company",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "AUTO24.co.za is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "AUTO24.co.za's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention top ratings; transparency; warranties; multi-brand range; locations jhb/cpt, while concerns are more likely to focus on new entrant (2023); limited app; low social engagement. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-3",
+        "id": "car-dealers-62",
         "name": "Gys Pitzer Motors",
         "website": "https://www.gyspitzer.co.za",
         "logo": "https://www.gyspitzermotorslindopark.co.za/wp-content/themes/vmg-theme-2025/images/logo.png",
@@ -2188,25 +2285,27 @@ var BRAND_DATA = [
         "social_sentiment": "HelloPeter/Google/AutoTrader: highly positive (4.7+ avg weighted), recent 2026 reviews praise service; minimal complaints.",
         "social_positive": "fast service; friendly/professional staff; hassle-free buying; excellent experience",
         "social_concerns": "occasional service delays; low % negative reviews",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Gys Pitzer Motors is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Gys Pitzer Motors's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention exceptional hellopeter ratings/volume; consistent positive recent feedback; value pricing/warranty, while concerns are more likely to focus on minor negative reviews (3%); branch rating variance. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-4",
+        "id": "car-dealers-63",
         "name": "Auto Investments Wonderboom",
         "website": "https://www.autoinvestments.co.za",
         "logo": "https://s3-us-west-2.amazonaws.com/hp-cdn-01/uploads/orgs/auto-investments-wonderboom_logo.jpg",
-        "gonogo_score": 77,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 87,
+        "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 22,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 5,
         "innovation_max": 10,
-        "customer_support_score": 11,
-        "customer_support_max": 12,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "certified pre-owned vehicles; finance solutions; home test drives; nationwide group; wide vehicle range; trade-ins",
@@ -2218,10 +2317,12 @@ var BRAND_DATA = [
         "social_sentiment": "Limited recent X data; website testimonials positive; AutoTrader 4.1/5 mixed but positive leaning.",
         "social_positive": "professional sales; home test drive convenience; quality finance; good selection",
         "social_concerns": "staff attitude issues; isolated dishonesty",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Auto Investments Wonderboom is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Auto Investments Wonderboom's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention strong customer service; competitive finance; quality checked cars; convenient processes; positive majority reviews; group backing, while concerns are more likely to focus on staff rudeness; isolated dishonesty claims. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-5",
+        "id": "car-dealers-64",
         "name": "Surf4Cars",
         "website": "https://www.surf4cars.co.za",
         "logo": "https://www.surf4cars.co.za/img/surf4carslogo.png",
@@ -2248,10 +2349,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed HelloPeter; social complaints about fraud/fake listings; positive for selection/value browsing.",
         "social_positive": "wide selection; easy browsing; price comparison; quick responses from dealers",
         "social_concerns": "scam/fraud dealers; poor vetting; support delays; unresolved complaints",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Surf4Cars is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Surf4Cars's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention large selection; long-established; app features; finance tools, while concerns are more likely to focus on fraud/scam risks; hellopeter complaints; no buyer protection as marketplace. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-6",
+        "id": "car-dealers-65",
         "name": "AutoTrader South Africa",
         "website": "https://www.autotrader.co.za",
         "logo": "https://www.autotrader.co.za/content/images/ATlogo_rgb_transparent_bg.png",
@@ -2278,10 +2381,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed: complaints on HelloPeter/Trustpilot (scams/fraud/admin); app rated 3.8 mixed; positive for selection.",
         "social_positive": "wide selection; easy interface; helpful valuation; dealer accountability tools",
         "social_concerns": "fraudulent seller listings; poor dispute resolution; admin issues; limited buyer protections",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "AutoTrader South Africa is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "AutoTrader South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention largest sa marketplace; ai tools; trusted brand; dealer ratings/reviews; app innovation, while concerns are more likely to focus on fraudulent listings; poor hellopeter ratings; buyer protections as marketplace. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-dealers-7",
+        "id": "car-dealers-66",
         "name": "AutoPedigree",
         "website": "https://www.autopedigree.co.za",
         "logo": "https://www.autopedigree.co.za/images/logonew.png",
@@ -2308,14 +2413,11 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed HelloPeter NPS 38; positive on quality/warranty when good; negative on poor staff attitudes, logistics.",
         "social_positive": "quality certified cars; smooth purchase when good; warranty value",
         "social_concerns": "dishonest staff; logistics failures; branch variability; poor follow-up",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "AutoPedigree is an established brand in South Africa operating within the car dealers category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "AutoPedigree's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention certified stock/warranty; large national network; imperial backing; digital access, while concerns are more likely to focus on mixed hellopeter reviews; complaints on logistics/support; dishonesty claims. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
-    ]
-  },
-  {
-    "slug": "food-delivery",
-    "category": "Food Delivery",
-    "icon": "fa-utensils",
+    ],
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -2323,11 +2425,11 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Satisfaction",
-        "max": 22
+        "max": 25
       },
       {
         "name": "Product Value",
-        "max": 32
+        "max": 35
       },
       {
         "name": "Innovation",
@@ -2335,31 +2437,36 @@ var BRAND_DATA = [
       },
       {
         "name": "Customer Support",
-        "max": 13
+        "max": 15
       },
       {
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "food-delivery",
+    "category": "Food Delivery",
+    "icon": "fa-utensils",
     "brands": [
       {
-        "id": "food-delivery-1",
+        "id": "food-delivery-67",
         "name": "Zulzi",
         "website": "https://www.zulzi.com",
         "logo": "https://zulzi.com/images/logo/large_logo.png",
-        "gonogo_score": 81,
+        "gonogo_score": 87,
         "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 18,
-        "customer_satisfaction_max": 22,
-        "product_value_score": 28,
-        "product_value_max": 32,
+        "customer_satisfaction_score": 20,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 31,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
-        "customer_support_score": 12,
-        "customer_support_max": 13,
+        "customer_support_score": 14,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "15-30min grocery/liquor/pharma delivery; real-time tracking; med aid integration; wide product range (brands/locals); promotions; 6am-midnight service",
@@ -2371,10 +2478,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed: promotions positive, complaints on items/support; responsive on X/HelloPeter; no major backlash.",
         "social_positive": "quick delivery; convenience; fresh products; late-night availability; professional drivers",
         "social_concerns": "high fees/surge pricing; late/wrong deliveries; app crashes/tracking issues; refund delays; expired/fake products",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Zulzi is an established brand in South Africa operating within the food delivery category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Zulzi's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention fast delivery speed; responsive support; strong hellopeter ratings; innovative tech (sixty60); local partnerships, while concerns are more likely to focus on surge pricing; app reliability; delivery delays/quality issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "food-delivery-2",
+        "id": "food-delivery-68",
         "name": "Mr D Food",
         "website": "https://www.mrdfood.com",
         "logo": "https://www.brandsoftheworld.com/logo/mr-d-food-new-logo",
@@ -2401,21 +2510,23 @@ var BRAND_DATA = [
         "social_sentiment": "App reviews mixed-positive; Trustpilot/HelloPeter negative on service/refunds; ARB ad issues.",
         "social_positive": "convenience; speed; variety; promos; fresh food",
         "social_concerns": "missing/wrong orders; refunds/support delays; pricing markups",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Mr D Food is an established brand in South Africa operating within the food delivery category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Mr D Food's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention wide coverage; high ratings; variety; fast delivery; integrations, while concerns are more likely to focus on misleading promos; support delays; order inaccuracies. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "food-delivery-3",
+        "id": "food-delivery-69",
         "name": "UCook",
         "website": "https://www.ucook.co.za",
         "logo": "https://images.ucook.co.za/images/width=1000%7Cencoding=jpeg/c6088170/c6088170-6aa1-43b6-975a-a4c8c6998c6a.jpeg",
-        "gonogo_score": 72,
+        "gonogo_score": 78,
         "verdict": "GO WITH CAUTION",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 17,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 21,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 21,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 24,
+        "product_value_max": 35,
         "innovation_score": 8,
         "innovation_max": 10,
         "customer_support_score": 11,
@@ -2431,25 +2542,27 @@ var BRAND_DATA = [
         "social_sentiment": "Positive on Reddit/Trustpilot for convenience/recipes (3.8/5); concerns on cost/quality; improved CS.",
         "social_positive": "tasty recipes; fresh ingredients; time-saving; variety; flexibility",
         "social_concerns": "high price; packaging waste; occasional poor produce/delayed delivery",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "UCook is an established brand in South Africa operating within the food delivery category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "UCook's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention convenience no waste; recipe variety; flexible plans; good cs resolution; ethical sourcing, while concerns are more likely to focus on premium pricing; inconsistent produce quality; app connectivity issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "food-delivery-4",
+        "id": "food-delivery-70",
         "name": "Yebo Fresh",
         "website": "https://www.yebofresh.co.za",
         "logo": "https://www.yebofresh.co.za/logo.png",
-        "gonogo_score": 72,
-        "verdict": "GO WITH CAUTION",
+        "gonogo_score": 80,
+        "verdict": "GO",
         "compliance_score": 18,
         "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 28,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 33,
+        "product_value_max": 35,
         "innovation_score": 9,
         "innovation_max": 10,
-        "customer_support_score": 10,
-        "customer_support_max": 12,
+        "customer_support_score": 12,
+        "customer_support_max": 15,
         "accessibility_security_score": 8,
         "accessibility_security_max": 10,
         "features": "WhatsApp/web ordering; last-mile logistics to townships; field sales activation; real-time analytics; 72k+ retailer network; Smollan-backed distribution",
@@ -2461,21 +2574,23 @@ var BRAND_DATA = [
         "social_sentiment": "No HelloPeter/Google reviews found. Positive media on expansion/impact; no recent complaints on social/news.",
         "social_positive": "Inclusive growth; tech adoption in informal economy; efficient supply chain; community upliftment",
         "social_concerns": "Limited public reviews; employee management complaints",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Yebo Fresh is an established brand in South Africa operating within the food delivery category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Yebo Fresh's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention township market penetration; major brand partnerships (unilever, mtn); rapid scaling/growth; acquisition by smollan; job creation, while concerns are more likely to focus on scarce public feedback; b2c shift post-acquisition; niche b2b model. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "food-delivery-5",
+        "id": "food-delivery-71",
         "name": "Uber Eats",
         "website": "https://www.ubereats.com",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Uber_Eats_2018_logo.svg/1280px-Uber_Eats_2018_logo.svg.png",
-        "gonogo_score": 51,
+        "gonogo_score": 55,
         "verdict": "NOGO",
         "compliance_score": 16,
         "compliance_max": 20,
-        "customer_satisfaction_score": 5,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 18,
-        "product_value_max": 30,
+        "customer_satisfaction_score": 6,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 21,
+        "product_value_max": 35,
         "innovation_score": 8,
         "innovation_max": 10,
         "customer_support_score": 4,
@@ -2484,264 +2599,18 @@ var BRAND_DATA = [
         "accessibility_security_max": 10,
         "features": "real-time tracking; Uber One; grocery delivery; wide restaurant range; pickup; promotions",
         "pricing": "Pricing: Delivery R20+, 20-45% menu markup, Uber One R50/mo (R0 deliv >R100)",
-        "googleplay_rating": 4.6,
-        "ios_rating": 4.7,
+        "googleplay_rating": "4.6",
+        "ios_rating": "4.7",
         "strengths": "convenience; variety; app usability; economic scale",
         "concerns": "delivery issues; high markups; refund failures",
         "social_sentiment": "Strongly negative on HelloPeter/Google (delivery/refund fails); app ratings contradict but review themes poor.",
         "social_positive": "variety; promotions; fast when works",
         "social_concerns": "delivery failures; no refunds; high prices; poor support",
-        "last_updated": "2026-03-05 00:00:00"
-      }
-    ]
-  },
-  {
-    "slug": "armed-response",
-    "category": "Armed Response",
-    "icon": "fa-shield",
-    "scoring_categories": [
-      {
-        "name": "Compliance",
-        "max": 20
-      },
-      {
-        "name": "Customer Satisfaction",
-        "max": 20
-      },
-      {
-        "name": "Product Value",
-        "max": 30
-      },
-      {
-        "name": "Innovation",
-        "max": 10
-      },
-      {
-        "name": "Customer Support",
-        "max": 12
-      },
-      {
-        "name": "Accessibility & Security",
-        "max": 10
+        "last_updated": "2026-03-05",
+        "overview": "Uber Eats is an established brand in South Africa operating within the food delivery category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Uber Eats's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention convenience; variety; app usability; economic scale, while concerns are more likely to focus on delivery issues; high markups; refund failures. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       }
     ],
-    "brands": [
-      {
-        "id": "armed-response-1",
-        "name": "TSU Protection Services",
-        "website": "https://www.tsu.co.za",
-        "logo": "https://tsuafrica.com/wp-content/uploads/2021/03/cropped-TSU-Protection-Services-Logo-07-500x504.png",
-        "gonogo_score": 74,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 10,
-        "customer_support_max": 12,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "armed response; tactical units; executive protection; 24/7 monitoring; riot control; TSU Protect app",
-        "pricing": "Pricing: Industry avg R400-1000/mo (no specific pricing published)",
-        "googleplay_rating": "N/A (5K+ downloads)",
-        "ios_rating": "",
-        "strengths": "PSiRA accredited; ex-SAPS expertise; strong employee ratings; corporate reputation",
-        "concerns": "scarce customer reviews; no public pricing; low app adoption",
-        "social_sentiment": "Positive employee feedback; active hiring/recruitment posts; no customer complaints or negative news",
-        "social_positive": "professional training; reliable armed response; career growth",
-        "social_concerns": "long hours for staff; limited customer feedback",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-2",
-        "name": "Securitas South Africa",
-        "website": "https://www.securitas.co.za",
-        "logo": "https://cdn.theorg.com/9e0591bd-0d2a-49b9-8320-dcc5358b4b7b_small.jpg",
-        "gonogo_score": 72,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 9,
-        "customer_support_max": 12,
-        "accessibility_security_score": 7,
-        "accessibility_security_max": 10,
-        "features": "Mobile guarding/alarm response; remote video surveillance; manned guarding; electronic security; SOC monitoring; risk management",
-        "pricing": "Pricing: Not publicly listed; industry armed response ~R400-1000/mo ZAR; SME fixed monthly fees",
-        "googleplay_rating": "N/A (no SA-specific app)",
-        "ios_rating": "N/A (no SA-specific app)",
-        "strengths": "Global leader (3800+ SA employees); PSIRA training centers; integrated tech+guarding; tailored SME solutions",
-        "concerns": "sparse local reviews; unclear armed response branding; pricing not public",
-        "social_sentiment": "No recent SA-specific negative news; global mixed employee feedback; limited consumer visibility.",
-        "social_positive": "reliable operations; tech adoption; large scale presence",
-        "social_concerns": "limited customer reviews; no specific SA ratings data; global complaints on support",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-3",
-        "name": "Chubb Armed Response",
-        "website": "https://www.chubb.co.za",
-        "logo": "https://media.licdn.com/dms/image/v2/C560BAQFJTEV_mrcDwQ/company-logo_200_200/company-logo_200_200/0/1631347446412",
-        "gonogo_score": 74,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 17,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 16,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 24,
-        "product_value_max": 30,
-        "innovation_score": 5,
-        "innovation_max": 10,
-        "customer_support_score": 9,
-        "customer_support_max": 15,
-        "accessibility_security_score": 7,
-        "accessibility_security_max": 10,
-        "features": "24/7 alarm monitoring; armed response; electronic security; CCTV; fire protection; PSIRA-trained officers; national dispatch",
-        "pricing": "Pricing: Industry avg R700/mo (R400-1000)",
-        "googleplay_rating": "N/A (global Chubb app low downloads)",
-        "ios_rating": "4.0/5 (ChubbView, 5 ratings)",
-        "strengths": "national footprint; integrated fire/security; rigorous training; ISO accredited",
-        "concerns": "slow armed response; billing after cancellation; service post-rebrand",
-        "social_sentiment": "Legacy positive on footprint; recent reviews mixed-negative on service. Rebrand 2018. Employee feedback average.",
-        "social_positive": "professional training; national coverage; reliable monitoring",
-        "social_concerns": "slow response times; billing disputes; poor management",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-4",
-        "name": "Excellerate Services",
-        "website": "https://www.excellerate.co.za",
-        "logo": "",
-        "gonogo_score": 65,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 17,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 20,
-        "product_value_max": 30,
-        "innovation_score": 6,
-        "innovation_max": 10,
-        "customer_support_score": 9,
-        "customer_support_max": 15,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "armed/tactical response; manned guarding; remote monitoring; 24/7 control rooms; 5800 officers; 246 vehicles",
-        "pricing": "Pricing: Industry avg R400-1000/mo (R700)",
-        "googleplay_rating": "",
-        "ios_rating": "",
-        "strengths": "national scale (1200 sites); PSIRA/SAIDSA compliant; POPIA compliant; advanced control rooms/tech",
-        "concerns": "rude/unprofessional staff; negative employee sentiment; limited recent customer reviews",
-        "social_sentiment": "Mixed employee reviews (3.1/5 Indeed), sparse negative customer feedback on HelloPeter; company promotes positive incidents/responses.",
-        "social_positive": "reliable scale; fast response; technology adoption",
-        "social_concerns": "rude guards; poor service attitude; payment/management issues",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-5",
-        "name": "STALLion Integrated Security",
-        "website": "https://www.stallion.co.za",
-        "logo": "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png",
-        "gonogo_score": 69,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 10,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 6,
-        "customer_support_max": 15,
-        "accessibility_security_score": 6,
-        "accessibility_security_max": 10,
-        "features": "armed response units; guarding with 7500 officers; specialised ops (riot/VIP); tech integration; training center; nationwide coverage",
-        "pricing": "Pricing: R400-R1000/mo typical for Gauteng armed response (industry avg 2025)",
-        "googleplay_rating": "N/A (no customer app found)",
-        "ios_rating": "N/A (no customer app found)",
-        "strengths": "established 30+ years; large scale deployment; PSIRA accredited; specialised high-risk services; B-BBEE Level 1",
-        "concerns": "poor service response; rude staff; ineffective theft prevention",
-        "social_sentiment": "HelloPeter poor (3/5, all recent negative); Indeed employee positive (4/5); limited other social/customer data.",
-        "social_positive": "professional training; large workforce; specialised capabilities",
-        "social_concerns": "arrogant guards; poor response; admin delays; theft despite security",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-6",
-        "name": "Fidelity ADT",
-        "website": "https://www.fidelity-adt.co.za",
-        "logo": "",
-        "gonogo_score": 71,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 8,
-        "customer_satisfaction_max": 20,
-        "product_value_score": 25,
-        "product_value_max": 30,
-        "innovation_score": 8,
-        "innovation_max": 10,
-        "customer_support_score": 8,
-        "customer_support_max": 15,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "24hr armed response; CCTV monitoring; app remote control; electric fencing; VumaCam LPR; medical assist; SecureFire",
-        "pricing": "Pricing: Armed response from ~R400-R1000/mo (market avg R700), partner ex R364/mo",
-        "googleplay_rating": "N/A (FidelitySecure low downloads, no rating shown)",
-        "ios_rating": "~4/5 (limited reviews)",
-        "strengths": "PSIRA compliant; largest SA provider (>5000 officers); national coverage; BEE1; recent expansions/awards",
-        "concerns": "slow response; billing issues; poor service resolution",
-        "social_sentiment": "Mixed-negative customer reviews on forums/HelloPeter (response/service), positive news on expansions.",
-        "social_positive": "large reliable company; tech features; quick growth",
-        "social_concerns": "slow response times; poor customer service; billing/cancellation issues",
-        "last_updated": "2026-03-05 00:00:00"
-      },
-      {
-        "id": "armed-response-7",
-        "name": "Thorburn Security Solutions",
-        "website": "https://www.thorburn.co.za",
-        "logo": "",
-        "gonogo_score": 62,
-        "verdict": "GO WITH CAUTION",
-        "compliance_score": 18,
-        "compliance_max": 20,
-        "customer_satisfaction_score": 4,
-        "customer_satisfaction_max": 10,
-        "product_value_score": 20,
-        "product_value_max": 30,
-        "innovation_score": 7,
-        "innovation_max": 10,
-        "customer_support_score": 8,
-        "customer_support_max": 12,
-        "accessibility_security_score": 8,
-        "accessibility_security_max": 10,
-        "features": "24/7 monitoring & armed response; AI/IoT surveillance; manned guarding; facilities management; Guard Tower solar CCTV; CiiMS platform",
-        "pricing": "Pricing: Not publicly listed; industry avg R700/mo armed response ZAR",
-        "googleplay_rating": "N/A (no consumer app)",
-        "ios_rating": "N/A (no consumer app)",
-        "strengths": "multiple certifications; AI/IoT tech; B-BBEE Level 1; national scale (10k officers); POPIA compliant",
-        "concerns": "one recent no-response complaint; no consumer app; pricing opacity",
-        "social_sentiment": "Sparse reviews; positive on LinkedIn, Indeed employees positive (4/5); HelloPeter critical.",
-        "social_positive": "AI tech adoption; reliable guarding; professional staff",
-        "social_concerns": "delayed armed response; limited consumer visibility",
-        "last_updated": "2026-03-05 00:00:00"
-      }
-    ]
-  },
-  {
-    "slug": "car-rentals",
-    "category": "Car Rentals",
-    "icon": "fa-key",
     "scoring_categories": [
       {
         "name": "Compliance",
@@ -2767,10 +2636,272 @@ var BRAND_DATA = [
         "name": "Accessibility & Security",
         "max": 10
       }
-    ],
+    ]
+  },
+  {
+    "slug": "armed-response",
+    "category": "Armed Response",
+    "icon": "fa-shield",
     "brands": [
       {
-        "id": "car-rentals-1",
+        "id": "armed-response-72",
+        "name": "TSU Protection Services",
+        "website": "https://www.tsu.co.za",
+        "logo": "https://tsuafrica.com/wp-content/uploads/2021/03/cropped-TSU-Protection-Services-Logo-07-500x504.png",
+        "gonogo_score": 75,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 12,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "armed response; tactical units; executive protection; 24/7 monitoring; riot control; TSU Protect app",
+        "pricing": "Pricing: Industry avg R400-1000/mo (no specific pricing published)",
+        "googleplay_rating": "N/A (5K+ downloads)",
+        "ios_rating": "",
+        "strengths": "PSiRA accredited; ex-SAPS expertise; strong employee ratings; corporate reputation",
+        "concerns": "scarce customer reviews; no public pricing; low app adoption",
+        "social_sentiment": "Positive employee feedback; active hiring/recruitment posts; no customer complaints or negative news",
+        "social_positive": "professional training; reliable armed response; career growth",
+        "social_concerns": "long hours for staff; limited customer feedback",
+        "last_updated": "2026-03-05",
+        "overview": "TSU Protection Services is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "TSU Protection Services's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention psira accredited; ex-saps expertise; strong employee ratings; corporate reputation, while concerns are more likely to focus on scarce customer reviews; no public pricing; low app adoption. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-73",
+        "name": "Securitas South Africa",
+        "website": "https://www.securitas.co.za",
+        "logo": "https://cdn.theorg.com/9e0591bd-0d2a-49b9-8320-dcc5358b4b7b_small.jpg",
+        "gonogo_score": 73,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 11,
+        "customer_support_max": 15,
+        "accessibility_security_score": 7,
+        "accessibility_security_max": 10,
+        "features": "Mobile guarding/alarm response; remote video surveillance; manned guarding; electronic security; SOC monitoring; risk management",
+        "pricing": "Pricing: Not publicly listed; industry armed response ~R400-1000/mo ZAR; SME fixed monthly fees",
+        "googleplay_rating": "N/A (no SA-specific app)",
+        "ios_rating": "N/A (no SA-specific app)",
+        "strengths": "Global leader (3800+ SA employees); PSIRA training centers; integrated tech+guarding; tailored SME solutions",
+        "concerns": "sparse local reviews; unclear armed response branding; pricing not public",
+        "social_sentiment": "No recent SA-specific negative news; global mixed employee feedback; limited consumer visibility.",
+        "social_positive": "reliable operations; tech adoption; large scale presence",
+        "social_concerns": "limited customer reviews; no specific SA ratings data; global complaints on support",
+        "last_updated": "2026-03-05",
+        "overview": "Securitas South Africa is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Securitas South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention global leader (3800+ sa employees); psira training centers; integrated tech+guarding; tailored sme solutions, while concerns are more likely to focus on sparse local reviews; unclear armed response branding; pricing not public. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-74",
+        "name": "Chubb Armed Response",
+        "website": "https://www.chubb.co.za",
+        "logo": "https://media.licdn.com/dms/image/v2/C560BAQFJTEV_mrcDwQ/company-logo_200_200/company-logo_200_200/0/1631347446412",
+        "gonogo_score": 75,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 17,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 20,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 28,
+        "product_value_max": 35,
+        "innovation_score": 5,
+        "innovation_max": 10,
+        "customer_support_score": 9,
+        "customer_support_max": 15,
+        "accessibility_security_score": 7,
+        "accessibility_security_max": 10,
+        "features": "24/7 alarm monitoring; armed response; electronic security; CCTV; fire protection; PSIRA-trained officers; national dispatch",
+        "pricing": "Pricing: Industry avg R700/mo (R400-1000)",
+        "googleplay_rating": "N/A (global Chubb app low downloads)",
+        "ios_rating": "4.0/5 (ChubbView, 5 ratings)",
+        "strengths": "national footprint; integrated fire/security; rigorous training; ISO accredited",
+        "concerns": "slow armed response; billing after cancellation; service post-rebrand",
+        "social_sentiment": "Legacy positive on footprint; recent reviews mixed-negative on service. Rebrand 2018. Employee feedback average.",
+        "social_positive": "professional training; national coverage; reliable monitoring",
+        "social_concerns": "slow response times; billing disputes; poor management",
+        "last_updated": "2026-03-05",
+        "overview": "Chubb Armed Response is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Chubb Armed Response's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention national footprint; integrated fire/security; rigorous training; iso accredited, while concerns are more likely to focus on slow armed response; billing after cancellation; service post-rebrand. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-75",
+        "name": "Excellerate Services",
+        "website": "https://www.excellerate.co.za",
+        "logo": "",
+        "gonogo_score": 63,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 17,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 23,
+        "product_value_max": 35,
+        "innovation_score": 6,
+        "innovation_max": 10,
+        "customer_support_score": 9,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "armed/tactical response; manned guarding; remote monitoring; 24/7 control rooms; 5800 officers; 246 vehicles",
+        "pricing": "Pricing: Industry avg R400-1000/mo (R700)",
+        "googleplay_rating": "",
+        "ios_rating": "",
+        "strengths": "national scale (1200 sites); PSIRA/SAIDSA compliant; POPIA compliant; advanced control rooms/tech",
+        "concerns": "rude/unprofessional staff; negative employee sentiment; limited recent customer reviews",
+        "social_sentiment": "Mixed employee reviews (3.1/5 Indeed), sparse negative customer feedback on HelloPeter; company promotes positive incidents/responses.",
+        "social_positive": "reliable scale; fast response; technology adoption",
+        "social_concerns": "rude guards; poor service attitude; payment/management issues",
+        "last_updated": "2026-03-05",
+        "overview": "Excellerate Services is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Excellerate Services's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention national scale (1200 sites); psira/saidsa compliant; popia compliant; advanced control rooms/tech, while concerns are more likely to focus on rude/unprofessional staff; negative employee sentiment; limited recent customer reviews. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-76",
+        "name": "STALLion Integrated Security",
+        "website": "https://www.stallion.co.za",
+        "logo": "https://www.stallion.co.za/wp-content/uploads/2025/03/Stallion-Integrated-Logo-RGB_FC-Horizontal-Black.png",
+        "gonogo_score": 68,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 12,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 6,
+        "customer_support_max": 15,
+        "accessibility_security_score": 6,
+        "accessibility_security_max": 10,
+        "features": "armed response units; guarding with 7500 officers; specialised ops (riot/VIP); tech integration; training center; nationwide coverage",
+        "pricing": "Pricing: R400-R1000/mo typical for Gauteng armed response (industry avg 2025)",
+        "googleplay_rating": "N/A (no customer app found)",
+        "ios_rating": "N/A (no customer app found)",
+        "strengths": "established 30+ years; large scale deployment; PSIRA accredited; specialised high-risk services; B-BBEE Level 1",
+        "concerns": "poor service response; rude staff; ineffective theft prevention",
+        "social_sentiment": "HelloPeter poor (3/5, all recent negative); Indeed employee positive (4/5); limited other social/customer data.",
+        "social_positive": "professional training; large workforce; specialised capabilities",
+        "social_concerns": "arrogant guards; poor response; admin delays; theft despite security",
+        "last_updated": "2026-03-05",
+        "overview": "STALLion Integrated Security is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "STALLion Integrated Security's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention established 30+ years; large scale deployment; psira accredited; specialised high-risk services; b-bbee level 1, while concerns are more likely to focus on poor service response; rude staff; ineffective theft prevention. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-77",
+        "name": "Fidelity ADT",
+        "website": "https://www.fidelity-adt.co.za",
+        "logo": "",
+        "gonogo_score": 70,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 29,
+        "product_value_max": 35,
+        "innovation_score": 8,
+        "innovation_max": 10,
+        "customer_support_score": 8,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "24hr armed response; CCTV monitoring; app remote control; electric fencing; VumaCam LPR; medical assist; SecureFire",
+        "pricing": "Pricing: Armed response from ~R400-R1000/mo (market avg R700), partner ex R364/mo",
+        "googleplay_rating": "N/A (FidelitySecure low downloads, no rating shown)",
+        "ios_rating": "~4/5 (limited reviews)",
+        "strengths": "PSIRA compliant; largest SA provider (>5000 officers); national coverage; BEE1; recent expansions/awards",
+        "concerns": "slow response; billing issues; poor service resolution",
+        "social_sentiment": "Mixed-negative customer reviews on forums/HelloPeter (response/service), positive news on expansions.",
+        "social_positive": "large reliable company; tech features; quick growth",
+        "social_concerns": "slow response times; poor customer service; billing/cancellation issues",
+        "last_updated": "2026-03-05",
+        "overview": "Fidelity ADT is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Fidelity ADT's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention psira compliant; largest sa provider (>5000 officers); national coverage; bee1; recent expansions/awards, while concerns are more likely to focus on slow response; billing issues; poor service resolution. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      },
+      {
+        "id": "armed-response-78",
+        "name": "Thorburn Security Solutions",
+        "website": "https://www.thorburn.co.za",
+        "logo": "",
+        "gonogo_score": 66,
+        "verdict": "GO WITH CAUTION",
+        "compliance_score": 18,
+        "compliance_max": 20,
+        "customer_satisfaction_score": 10,
+        "customer_satisfaction_max": 25,
+        "product_value_score": 23,
+        "product_value_max": 35,
+        "innovation_score": 7,
+        "innovation_max": 10,
+        "customer_support_score": 10,
+        "customer_support_max": 15,
+        "accessibility_security_score": 8,
+        "accessibility_security_max": 10,
+        "features": "24/7 monitoring & armed response; AI/IoT surveillance; manned guarding; facilities management; Guard Tower solar CCTV; CiiMS platform",
+        "pricing": "Pricing: Not publicly listed; industry avg R700/mo armed response ZAR",
+        "googleplay_rating": "N/A (no consumer app)",
+        "ios_rating": "N/A (no consumer app)",
+        "strengths": "multiple certifications; AI/IoT tech; B-BBEE Level 1; national scale (10k officers); POPIA compliant",
+        "concerns": "one recent no-response complaint; no consumer app; pricing opacity",
+        "social_sentiment": "Sparse reviews; positive on LinkedIn, Indeed employees positive (4/5); HelloPeter critical.",
+        "social_positive": "AI tech adoption; reliable guarding; professional staff",
+        "social_concerns": "delayed armed response; limited consumer visibility",
+        "last_updated": "2026-03-05",
+        "overview": "Thorburn Security Solutions is an established brand in South Africa operating within the armed response category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Thorburn Security Solutions's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention multiple certifications; ai/iot tech; b-bbee level 1; national scale (10k officers); popia compliant, while concerns are more likely to focus on one recent no-response complaint; no consumer app; pricing opacity. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      }
+    ],
+    "scoring_categories": [
+      {
+        "name": "Compliance",
+        "max": 20
+      },
+      {
+        "name": "Customer Satisfaction",
+        "max": 25
+      },
+      {
+        "name": "Product Value",
+        "max": 35
+      },
+      {
+        "name": "Innovation",
+        "max": 10
+      },
+      {
+        "name": "Customer Support",
+        "max": 15
+      },
+      {
+        "name": "Accessibility & Security",
+        "max": 10
+      }
+    ]
+  },
+  {
+    "slug": "car-rentals",
+    "category": "Car Rentals",
+    "icon": "fa-key",
+    "brands": [
+      {
+        "id": "car-rentals-79",
         "name": "Avis South Africa",
         "website": "https://www.avis.co.za",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Avis_logo.svg/1280px-Avis_logo.svg.png",
@@ -2797,10 +2928,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed: HelloPeter complaints on charges/service; some positive branch experiences; app mixed.",
         "social_positive": "easy booking; fleet variety; airport convenience",
         "social_concerns": "hidden fees; vehicle condition; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Avis South Africa is an established brand in South Africa operating within the car rentals category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Avis South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention national footprint; fleet variety; loyalty program; online convenience, while concerns are more likely to focus on hidden charges; hellopeter complaints; billing disputes. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-rentals-2",
+        "id": "car-rentals-80",
         "name": "Europcar South Africa",
         "website": "https://www.europcar.co.za",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Europcar_logo.svg/2560px-Europcar_logo.svg.png",
@@ -2827,10 +2960,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed-negative on HelloPeter; some positive branch experiences; good for tourists.",
         "social_positive": "easy booking; fleet variety; airport service",
         "social_concerns": "hidden charges; poor support; car condition",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Europcar South Africa is an established brand in South Africa operating within the car rentals category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Europcar South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention ev fleet option; national footprint; loyalty program; motus backing, while concerns are more likely to focus on billing disputes; car condition complaints; hellopeter rating. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-rentals-3",
+        "id": "car-rentals-81",
         "name": "Budget Car Rental SA",
         "website": "https://www.budget.co.za",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Budget_Rent_a_Car_logo.svg/2560px-Budget_Rent_a_Car_logo.svg.png",
@@ -2857,10 +2992,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed-negative; value praised but service concerns on HelloPeter.",
         "social_positive": "affordable rates; availability; easy booking",
         "social_concerns": "billing issues; car condition; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Budget Car Rental SA is an established brand in South Africa operating within the car rentals category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Budget Car Rental SA's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention competitive pricing; avis group backing; airport presence; wide locations, while concerns are more likely to focus on service quality; billing disputes; lower hellopeter rating. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-rentals-4",
+        "id": "car-rentals-82",
         "name": "Hertz South Africa",
         "website": "https://www.hertz.co.za",
         "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Hertz_logo.svg/1280px-Hertz_logo.svg.png",
@@ -2887,10 +3024,12 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed; brand recognition positive but service complaints common.",
         "social_positive": "easy booking; loyalty benefits; fleet variety",
         "social_concerns": "billing issues; service consistency; car condition",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Hertz South Africa is an established brand in South Africa operating within the car rentals category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Hertz South Africa's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention brand recognition; loyalty program; fleet variety; global presence, while concerns are more likely to focus on inconsistent service; billing disputes; hellopeter score. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
       },
       {
-        "id": "car-rentals-5",
+        "id": "car-rentals-83",
         "name": "Tempest Car Hire",
         "website": "https://www.tempestcarhire.co.za",
         "logo": "https://www.tempestcarhire.co.za/img/logo.png",
@@ -2917,11 +3056,36 @@ var BRAND_DATA = [
         "social_sentiment": "Mixed; local brand appreciation but service complaints noted.",
         "social_positive": "local service; competitive rates; availability",
         "social_concerns": "billing disputes; car condition; support delays",
-        "last_updated": "2026-03-05 00:00:00"
+        "last_updated": "2026-03-05",
+        "overview": "Tempest Car Hire is an established brand in South Africa operating within the car rentals category. It offers a core range of products and services tailored to local customer needs, using a mix of physical and digital channels. The brand competes on a blend of value, convenience, and trust relative to other players in its space.",
+        "rating_summary": "Tempest Car Hire's score summarises the balance between its product strengths and the main issues raised by customers in reviews and social feedback. On the positive side, customers often mention local sa focus; bidvest group backing; competitive pricing; national footprint, while concerns are more likely to focus on service consistency; hellopeter complaints; billing issues. The resulting verdict shows it can be a good option for some segments, provided the known pain points are acceptable or manageable."
+      }
+    ],
+    "scoring_categories": [
+      {
+        "name": "Compliance",
+        "max": 20
+      },
+      {
+        "name": "Customer Satisfaction",
+        "max": 25
+      },
+      {
+        "name": "Product Value",
+        "max": 35
+      },
+      {
+        "name": "Innovation",
+        "max": 10
+      },
+      {
+        "name": "Customer Support",
+        "max": 15
+      },
+      {
+        "name": "Accessibility & Security",
+        "max": 10
       }
     ]
   }
 ];
-
-console.log('BRAND_DATA loaded successfully');
-console.log('Total categories:', BRAND_DATA.length);
