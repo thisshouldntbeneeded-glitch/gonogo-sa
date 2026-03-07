@@ -1,25 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-ZA">
 <head>
-<!--
-   ______                            __
-  / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
-/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
-                    /_/
-        Created with Perplexity Computer
-        https://www.perplexity.ai/computer
--->
-<meta name="generator" content="Perplexity Computer">
-<meta name="author" content="Perplexity Computer">
-<meta property="og:see_also" content="https://www.perplexity.ai/computer">
-<link rel="author" href="https://www.perplexity.ai/computer">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoNoGo SA — Review Moderation</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Created with Perplexity Computer -->
+  <meta name="generator" content="Perplexity Computer">
+  <meta name="author" content="Perplexity Computer">
+  <meta property="og:see_also" content="https://www.perplexity.ai/computer">
+  <link rel="author" href="https://www.perplexity.ai/computer">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoNoGo SA — Review Moderation</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
   <div class="admin-layout">
@@ -64,7 +55,6 @@
     </main>
   </div>
 
-    
   <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   <script src="components.js"></script>
@@ -81,20 +71,24 @@
     async function initAdminPage() {
       document.getElementById('admin-content').style.display = '';
 
-      // Load all reviews from API
-      var reviews = await GoNoGoAPI.getAllReviews();
-      allComments = reviews.map(function(r) {
-        return {
-          id: r.id,
-          author: r.reviewer_name,
-          text: r.review_text,
-          date: r.created_at,
-          brandName: r.brand_name,
-          category: r.category,
-          status: r.status || 'pending',
-          averageScore: r.average_score
-        };
-      });
+      // Static/demo: if no backend, show empty state
+      if (!GoNoGoAPI.getAllReviews) {
+        allComments = [];
+      } else {
+        var reviews = await GoNoGoAPI.getAllReviews();
+        allComments = reviews.map(function(r) {
+          return {
+            id: r.id,
+            author: r.reviewer_name,
+            text: r.review_text,
+            date: r.created_at,
+            brandName: r.brand_name,
+            category: r.category,
+            status: r.status || 'pending',
+            averageScore: r.average_score
+          };
+        });
+      }
 
       // Populate brand filter
       var brandFilter = document.getElementById('brand-filter');
@@ -186,22 +180,21 @@
           '</div>' +
           '<div class="comment-text">' + c.text + '</div>' +
           '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);">' +
-            (c.status === 'pending' ?
-              '<button class="btn btn-sm" style="background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-dim);" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
-                '<i class="fa-solid fa-check"></i> Approve' +
-              '</button>' +
-              '<button class="btn btn-sm" style="background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-dim);" onclick="moderateComment(\'' + c.id + '\', \'rejected\')">' +
-                '<i class="fa-solid fa-xmark"></i> Reject' +
-              '</button>'
-            : '') +
-            (c.status !== 'flagged' ?
-              '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'flagged\')">' +
-                '<i class="fa-solid fa-flag"></i> Flag' +
-              '</button>'
-            :
-              '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
-                '<i class="fa-solid fa-check"></i> Unflag' +
-              '</button>'
+            (c.status === 'pending'
+              ? '<button class="btn btn-sm" style="background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-dim);" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
+                  '<i class="fa-solid fa-check"></i> Approve' +
+                '</button>' +
+                '<button class="btn btn-sm" style="background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-dim);" onclick="moderateComment(\'' + c.id + '\', \'rejected\')">' +
+                  '<i class="fa-solid fa-xmark"></i> Reject' +
+                '</button>'
+              : '') +
+            (c.status !== 'flagged'
+              ? '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'flagged\')">' +
+                  '<i class="fa-solid fa-flag"></i> Flag' +
+                '</button>'
+              : '<button class="btn btn-ghost btn-sm" onclick="moderateComment(\'' + c.id + '\', \'approved\')">' +
+                  '<i class="fa-solid fa-check"></i> Unflag' +
+                '</button>'
             ) +
           '</div>' +
         '</div>';
@@ -209,20 +202,15 @@
     }
 
     async function moderateComment(reviewId, newStatus) {
-      try {
-        await GoNoGoAPI.updateReviewStatus(reviewId, newStatus);
-        // Update local state
-        for (var i = 0; i < allComments.length; i++) {
-          if (allComments[i].id === reviewId) {
-            allComments[i].status = newStatus;
-            break;
-          }
+      // Static/demo: update local state only
+      for (var i = 0; i < allComments.length; i++) {
+        if (allComments[i].id === reviewId) {
+          allComments[i].status = newStatus;
+          break;
         }
-        Components.showToast('Review ' + newStatus);
-        filterComments();
-      } catch (e) {
-        Components.showToast('Error updating review status', 'error');
       }
+      Components.showToast('Review ' + newStatus + ' (local only — backend wiring still to come)');
+      filterComments();
     }
   </script>
 </body>
