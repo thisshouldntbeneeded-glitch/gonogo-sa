@@ -42,316 +42,306 @@
   <script src="api.js"></script>
   
   <script>
-    document.getElementById('nav').innerHTML = Components.renderPublicNav('');
-    document.getElementById('footer').innerHTML = Components.renderFooter();
+  document.getElementById('nav').innerHTML = Components.renderPublicNav('');
+  document.getElementById('footer').innerHTML = Components.renderFooter();
 
-    var brandId = Components.getParam('id');
+  var brandId = Components.getParam('id');
 
-    (async function() {
-      if (!brandId) {
-        document.getElementById('page-content').innerHTML =
-          '<section class="section"><div class="container" style="text-align:center">' +
-            '<h1 class="section-title">Brand Not Found</h1>' +
-            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
-            '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
-          '</div></section>';
-        return;
-      }
+  (async function() {
+    if (!brandId) {
+      document.getElementById('page-content').innerHTML =
+        '<section class="section"><div class="container" style="text-align:center">' +
+          '<h1 class="section-title">Brand Not Found</h1>' +
+          '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
+          '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+        '</div></section>';
+      return;
+    }
 
-      var brand = await GoNoGoAPI.getBrandById(brandId);
+    var brand = await GoNoGoAPI.getBrandById(brandId);
 
-      if (!brand) {
-        document.getElementById('page-content').innerHTML =
-          '<section class="section"><div class="container" style="text-align:center">' +
-            '<h1 class="section-title">Brand Not Found</h1>' +
-            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
-            '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
-          '</div></section>';
-        return;
-      }
+    if (!brand) {
+      document.getElementById('page-content').innerHTML =
+        '<section class="section"><div class="container" style="text-align:center">' +
+          '<h1 class="section-title">Brand Not Found</h1>' +
+          '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
+          '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+        '</div></section>';
+      return;
+    }
 
-      document.title = brand.name + ' — GoNoGo South Africa';
-      var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
+    document.title = brand.name + ' — GoNoGo South Africa';
+    var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
 
-      // Category score cards (with descriptions from framework_breakdown)
-      var categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
-        var name = entry[0], data = entry[1];
-        var pct = Math.round((data.score / data.max) * 100);
-        var color = getScoreColor(pct);
-        
-        // Get description from original data
-        var desc = '';
-        BRAND_DATA.forEach(function(cat) {
-          (cat.brands || []).forEach(function(b) {
-            if (b.name === brand.name && b.framework_breakdown) {
-              var item = b.framework_breakdown.find(function(fb) { return fb.category === name; });
-              if (item) desc = item.description;
-            }
-          });
-        });
-        
-        return '<div class="category-card">' +
-          '<div class="category-card-header">' +
-            '<span class="category-card-name">' + name + '</span>' +
-            '<span class="category-card-score" style="color:' + color + '">' + data.score + '/' + data.max + '</span>' +
-          '</div>' +
-          Components.renderScoreBar(data.score, data.max) +
-          (desc ? '<p class="category-card-desc">' + desc + '</p>' : '') +
-        '</div>';
-      }).join('');
+    var categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
+      var name = entry[0], data = entry[1];
+      var pct = Math.round((data.score / data.max) * 100);
+      var color = getScoreColor(pct);
 
-      // Strengths & Concerns
-      var strengthsHTML = (brand.keyStrengths || []).map(function(s) {
-        return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + s + '</li>';
-      }).join('');
-      var concernsHTML = (brand.keyConcerns || []).map(function(c) {
-        return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + c + '</li>';
-      }).join('');
-
-      // Pricing
-      var pricingHTML = (brand.pricing && brand.pricing.length > 0) ? brand.pricing.map(function(p) {
-        var features = typeof p.features === 'string' && p.features
-          ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
-          : (Array.isArray(p.features) ? p.features : []);
-        return '<div class="pricing-card">' +
-          '<div class="pricing-card-name">' + (p.name || 'Standard') + '</div>' +
-          '<div class="pricing-card-price">' + (p.cost || 'Contact for pricing') + '</div>' +
-          (features.length > 0 ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>' : '') +
-        '</div>';
-      }).join('') : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
-
-      // App ratings
-      var gpScore = brand.appRatings.googlePlay.split('/')[0];
-      var iosScore = brand.appRatings.ios.split('/')[0];
-      var gpStars = renderStars(parseFloat(gpScore));
-      var iosStars = renderStars(parseFloat(iosScore));
-
-      // Social sentiment
-      var sentiment = brand.socialSentiment || {};
-      var posThemes = (sentiment.positive_themes || []).map(function(t) {
-        return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + t + '</li>';
-      }).join('');
-      var negThemes = (sentiment.common_concerns || []).map(function(t) {
-        return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + t + '</li>';
-      }).join('');
-
-      // Get category icon
-      var categoryIcon = 'fa-tags';
+      var desc = '';
       BRAND_DATA.forEach(function(cat) {
-        if (cat.slug === brand.category_slug) categoryIcon = cat.icon || 'fa-tags';
+        (cat.brands || []).forEach(function(b) {
+          if (b.name === brand.name && b.framework_breakdown) {
+            var item = b.framework_breakdown.find(function(fb) { return fb.category === name; });
+            if (item) desc = item.description;
+          }
+        });
       });
 
-      document.getElementById('page-content').innerHTML =
-        '<!-- Brand Hero -->' +
-        '<section class="brand-hero"><div class="container">' +
-          '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
-            '<a href="category.html?cat=' + brand.category_slug + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
-              '<i class="fa-solid fa-arrow-left"></i> ' + brand.categoryName +
-            '</a>' +
-          '</div>' +
-          '<div class="brand-hero-inner">' +
-            '<div class="brand-hero-score">' + Components.renderScoreCircle(brand.overallScore, 'lg') + '</div>' +
-            '<div class="brand-hero-info">' +
-              '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">' +
-                logoHTML +
-                '<h1 class="brand-hero-name">' + brand.name + '</h1>' +
-              '</div>' +
-              '<div class="brand-hero-badges">' +
-                Components.renderVerdictBadge(brand.verdict) +
-                Components.renderScoreBadge(brand.overallScore) +
-                '<span class="badge" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary)">' +
-                  '<i class="fa-solid ' + categoryIcon + '"></i> ' + brand.categoryName +
-                '</span>' +
-              '</div>' +
-              '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap">' +
-                '<a href="compare.html?brands=' + brand.id + '" class="btn btn-secondary btn-sm"><i class="fa-solid fa-code-compare"></i> Compare</a>' +
-                (brand.website ? '<a href="' + brand.website + '" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>' : '') +
-              '</div>' +
+      return '<div class="category-card">' +
+        '<div class="category-card-header">' +
+          '<span class="category-card-name">' + name + '</span>' +
+          '<span class="category-card-score" style="color:' + color + '">' + data.score + '/' + data.max + '</span>' +
+        '</div>' +
+        Components.renderScoreBar(data.score, data.max) +
+        (desc ? '<p class="category-card-desc">' + desc + '</p>' : '') +
+      '</div>';
+    }).join('');
+
+    var strengthsHTML = (brand.keyStrengths || []).map(function(s) {
+      return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + s + '</li>';
+    }).join('');
+    var concernsHTML = (brand.keyConcerns || []).map(function(c) {
+      return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + c + '</li>';
+    }).join('');
+
+    var pricingHTML = (brand.pricing && brand.pricing.length > 0) ? brand.pricing.map(function(p) {
+      var features = typeof p.features === 'string' && p.features
+        ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
+        : (Array.isArray(p.features) ? p.features : []);
+      return '<div class="pricing-card">' +
+        '<div class="pricing-card-name">' + (p.name || 'Standard') + '</div>' +
+        '<div class="pricing-card-price">' + (p.cost || 'Contact for pricing') + '</div>' +
+        (features.length > 0 ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>' : '') +
+      '</div>';
+    }).join('') : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
+
+    var gpScore = brand.appRatings.googlePlay.split('/')[0];
+    var iosScore = brand.appRatings.ios.split('/')[0];
+    var gpStars = renderStars(parseFloat(gpScore));
+    var iosStars = renderStars(parseFloat(iosScore));
+
+    var sentiment = brand.socialSentiment || {};
+    var posThemes = (sentiment.positive_themes || []).map(function(t) {
+      return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + t + '</li>';
+    }).join('');
+    var negThemes = (sentiment.common_concerns || []).map(function(t) {
+      return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + t + '</li>';
+    }).join('');
+
+    var categoryIcon = 'fa-tags';
+    BRAND_DATA.forEach(function(cat) {
+      if (cat.slug === brand.category_slug) categoryIcon = cat.icon || 'fa-tags';
+    });
+
+    document.getElementById('page-content').innerHTML =
+      '<!-- Brand Hero -->' +
+      '<section class="brand-hero"><div class="container">' +
+        '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
+          '<a href="category.html?cat=' + brand.category_slug + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
+            '<i class="fa-solid fa-arrow-left"></i> ' + brand.categoryName +
+          '</a>' +
+        '</div>' +
+        '<div class="brand-hero-inner">' +
+          '<div class="brand-hero-score">' + Components.renderScoreCircle(brand.overallScore, 'lg') + '</div>' +
+          '<div class="brand-hero-info">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">' +
+              logoHTML +
+              '<h1 class="brand-hero-name">' + brand.name + '</h1>' +
+            '</div>' +
+            '<div class="brand-hero-badges">' +
+              Components.renderVerdictBadge(brand.verdict) +
+              Components.renderScoreBadge(brand.overallScore) +
+              '<span class="badge" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary)">' +
+                '<i class="fa-solid ' + categoryIcon + '"></i> ' + brand.categoryName +
+              '</span>' +
+            '</div>' +
+            '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap">' +
+              '<a href="compare.html?brands=' + brand.id + '" class="btn btn-secondary btn-sm"><i class="fa-solid fa-code-compare"></i> Compare</a>' +
+              (brand.website ? '<a href="' + brand.website + '" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>' : '') +
             '</div>' +
           '</div>' +
-        '</div></section>' +
+        '</div>' +
+      '</div></section>' +
 
-        '<!-- Tabs -->' +
-        '<section class="section-sm"><div class="container">' +
-          '<div class="tabs" id="tabs">' +
-            '<button class="tab active" data-tab="overview" onclick="switchTab(\\'overview\\')">Overview</button>' +
-            '<button class="tab" data-tab="pricing" onclick="switchTab(\\'pricing\\')">Pricing</button>' +
-            '<button class="tab" data-tab="ratings" onclick="switchTab(\\'ratings\\')">Ratings</button>' +
-            '<button class="tab" data-tab="reviews" onclick="switchTab(\\'reviews\\')">Reviews</button>' +
-          '</div>' +
+      '<!-- Tabs -->' +
+      '<section class="section-sm"><div class="container">' +
+        '<div class="tabs" id="tabs">' +
+          '<button class="tab active" data-tab="overview" onclick="switchTab(\'overview\')">Overview</button>' +
+          '<button class="tab" data-tab="pricing" onclick="switchTab(\'pricing\')">Pricing</button>' +
+          '<button class="tab" data-tab="ratings" onclick="switchTab(\'ratings\')">Ratings</button>' +
+          '<button class="tab" data-tab="reviews" onclick="switchTab(\'reviews\')">Reviews</button>' +
+        '</div>' +
 
-          '<!-- Overview Tab -->' +
-          '<div class="tab-content" id="tab-overview">' +
-            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-8)">' +
-              '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Score Breakdown</h3>' +
-                '<div style="height:280px;position:relative"><canvas id="brand-radar"></canvas></div>' +
-              '</div>' +
-              '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Key Features</h3>' +
-                '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">' +
-                  (brand.keyFeatures || []).map(function(f) {
-                    return '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)">' + f + '</span>';
-                  }).join('') +
-                '</div>' +
-                (brand.lastUpdated ? '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)">Last updated: ' + brand.lastUpdated + '</p>' : '') +
-              '</div>' +
+        '<!-- Overview Tab -->' +
+        '<div class="tab-content" id="tab-overview">' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-8)">' +
+            '<div>' +
+              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Score Breakdown</h3>' +
+              '<div style="height:280px;position:relative"><canvas id="brand-radar"></canvas></div>' +
             '</div>' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Category Scores</h3>' +
-            '<div class="category-grid" style="margin-bottom:var(--space-8)">' + categoryCardsHTML + '</div>' +
-            '<div class="sc-grid">' +
-              '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Strengths</h3>' +
-                '<ul class="sc-list">' + (strengthsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
+            '<div>' +
+              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Key Features</h3>' +
+              '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">' +
+                (brand.keyFeatures || []).map(function(f) {
+                  return '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)">' + f + '</span>';
+                }).join('') +
               '</div>' +
-              '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> Concerns</h3>' +
-                '<ul class="sc-list">' + (concernsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
-              '</div>' +
+              (brand.lastUpdated ? '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)">Last updated: ' + brand.lastUpdated + '</p>' : '') +
             '</div>' +
           '</div>' +
-
-          '<!-- Pricing Tab -->' +
-          '<div class="tab-content" id="tab-pricing" style="display:none">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Pricing Plans</h3>' +
-            '<div class="pricing-grid">' + pricingHTML + '</div>' +
-          '</div>' +
-
-          '<!-- Ratings Tab -->' +
-          '<div class="tab-content" id="tab-ratings" style="display:none">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">App Ratings</h3>' +
-            '<div class="ratings-grid" style="margin-bottom:var(--space-8)">' +
-              '<div class="rating-card">' +
-                '<div class="rating-card-platform"><i class="fa-brands fa-google-play"></i> Google Play</div>' +
-                '<div class="rating-card-score">' + brand.appRatings.googlePlay + '</div>' +
-                '<div class="star-rating">' + gpStars + '</div>' +
-              '</div>' +
-              '<div class="rating-card">' +
-                '<div class="rating-card-platform"><i class="fa-brands fa-apple"></i> iOS App Store</div>' +
-                '<div class="rating-card-score">' + brand.appRatings.ios + '</div>' +
-                '<div class="star-rating">' + iosStars + '</div>' +
-              '</div>' +
+          '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Category Scores</h3>' +
+          '<div class="category-grid" style="margin-bottom:var(--space-8)">' + categoryCardsHTML + '</div>' +
+          '<div class="sc-grid">' +
+            '<div>' +
+              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Strengths</h3>' +
+              '<ul class="sc-list">' + (strengthsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
             '</div>' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Social Sentiment</h3>' +
-            (sentiment.summary ? '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">' + sentiment.summary + '</p>' : '') +
-            '<div class="sc-grid">' +
-              '<div>' +
-                '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--green-text)"><i class="fa-solid fa-thumbs-up"></i> Positive Themes</h4>' +
-                '<ul class="sc-list">' + (posThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
-              '</div>' +
-              '<div>' +
-                '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--orange-text)"><i class="fa-solid fa-thumbs-down"></i> Common Concerns</h4>' +
-                '<ul class="sc-list">' + (negThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
-              '</div>' +
+            '<div>' +
+              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> Concerns</h3>' +
+              '<ul class="sc-list">' + (concernsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
             '</div>' +
           '</div>' +
+        '</div>' +
 
-          '<!-- Reviews Tab -->' +
-          '<div class="tab-content" id="tab-reviews" style="display:none">' +
-            '<div id="review-list" style="margin-bottom:var(--space-6)"></div>' +
-            '<div class="card" style="max-width:600px">' +
-              '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Leave a Review</h4>' +
-              '<div class="form-group">' +
-                '<label class="form-label">Your Name</label>' +
-                '<input type="text" id="review-name" placeholder="Enter your name">' +
-              '</div>' +
-              '<div class="form-group">' +
-                '<label class="form-label">Your Review</label>' +
-                '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="4"></textarea>' +
-              '</div>' +
-              '<button class="btn btn-primary" onclick="submitReview()">' +
-                '<i class="fa-solid fa-paper-plane"></i> Submit Review' +
-              '</button>' +
+        '<!-- Pricing Tab -->' +
+        '<div class="tab-content" id="tab-pricing" style="display:none">' +
+          '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Pricing Plans</h3>' +
+          '<div class="pricing-grid">' + pricingHTML + '</div>' +
+        '</div>' +
+
+        '<!-- Ratings Tab -->' +
+        '<div class="tab-content" id="tab-ratings" style="display:none">' +
+          '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">App Ratings</h3>' +
+          '<div class="ratings-grid" style="margin-bottom:var(--space-8)">' +
+            '<div class="rating-card">' +
+              '<div class="rating-card-platform"><i class="fa-brands fa-google-play"></i> Google Play</div>' +
+              '<div class="rating-card-score">' + brand.appRatings.googlePlay + '</div>' +
+              '<div class="star-rating">' + gpStars + '</div>' +
+            '</div>' +
+            '<div class="rating-card">' +
+              '<div class="rating-card-platform"><i class="fa-brands fa-apple"></i> iOS App Store</div>' +
+              '<div class="rating-card-score">' + brand.appRatings.ios + '</div>' +
+              '<div class="star-rating">' + iosStars + '</div>' +
             '</div>' +
           '</div>' +
-        '</div></section>';
+          '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Social Sentiment</h3>' +
+          (sentiment.summary ? '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">' + sentiment.summary + '</p>' : '') +
+          '<div class="sc-grid">' +
+            '<div>' +
+              '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--green-text)"><i class="fa-solid fa-thumbs-up"></i> Positive Themes</h4>' +
+              '<ul class="sc-list">' + (posThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
+            '</div>' +
+            '<div>' +
+              '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--orange-text)"><i class="fa-solid fa-thumbs-down"></i> Common Concerns</h4>' +
+              '<ul class="sc-list">' + (negThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
 
-      // Init radar chart
-      Components.createRadarChart('brand-radar', brand, { showTicks: true, labelSize: 11, pointRadius: 4 });
+        '<!-- Reviews Tab -->' +
+        '<div class="tab-content" id="tab-reviews" style="display:none">' +
+          '<div id="review-list" style="margin-bottom:var(--space-6)"></div>' +
+          '<div class="card" style="max-width:600px">' +
+            '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Leave a Review</h4>' +
+            '<div class="form-group">' +
+              '<label class="form-label">Your Name</label>' +
+              '<input type="text" id="review-name" placeholder="Enter your name">' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label class="form-label">Your Review</label>' +
+              '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="4"></textarea>' +
+            '</div>' +
+            '<button class="btn btn-primary" onclick="submitReview()">' +
+              '<i class="fa-solid fa-paper-plane"></i> Submit Review' +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div></section>';
 
-      // Tab switching
-      window.switchTab = function(tab) {
-        document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
-        document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
-        document.getElementById('tab-' + tab).style.display = 'block';
-        document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
-      };
+    Components.createRadarChart('brand-radar', brand, { showTicks: true, labelSize: 11, pointRadius: 4 });
 
-      // Load and render reviews from API
-      async function loadReviews() {
-        var reviews = await GoNoGoAPI.getReviews(brand.name, brand.category_slug);
-        var list = document.getElementById('review-list');
-        if (!reviews || reviews.length === 0) {
-          list.innerHTML =
-            '<div style="text-align:center;padding:var(--space-10) 0;margin-bottom:var(--space-4)">' +
-              '<i class="fa-solid fa-comments" style="font-size:var(--text-3xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block"></i>' +
-              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">No Reviews Yet</h3>' +
-              '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to leave a review for ' + brand.name + '.</p>' +
-            '</div>';
-          return;
-        }
-        list.innerHTML = '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-3)">' + reviews.length + ' User Review' + (reviews.length !== 1 ? 's' : '') + '</h4>' +
-          reviews.map(function(r) {
-            return Components.renderCommentCard({
-              author: r.reviewer_name,
-              text: r.review_text,
-              date: r.created_at,
-              sentiment: r.status === 'approved' ? 'positive' : 'neutral'
-            }, brand.name);
-          }).join('');
+    window.switchTab = function(tab) {
+      document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
+      document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
+      document.getElementById('tab-' + tab).style.display = 'block';
+      document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    };
+
+    async function loadReviews() {
+      var reviews = await GoNoGoAPI.getReviews(brand.name, brand.category_slug);
+      var list = document.getElementById('review-list');
+      if (!reviews || reviews.length === 0) {
+        list.innerHTML =
+          '<div style="text-align:center;padding:var(--space-10) 0;margin-bottom:var(--space-4)">' +
+            '<i class="fa-solid fa-comments" style="font-size:var(--text-3xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block"></i>' +
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">No Reviews Yet</h3>' +
+            '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to leave a review for ' + brand.name + '.</p>' +
+          '</div>';
+        return;
       }
-
-      window.submitReview = async function() {
-        var name = document.getElementById('review-name').value.trim();
-        var text = document.getElementById('review-text').value.trim();
-        if (!name || !text) {
-          Components.showToast('Please fill in both fields', 'error');
-          return;
-        }
-        // Check if backend is available
-        if (!GoNoGoAPI.isLive()) {
-          Components.showToast('Reviews require the live GoNoGo platform. This static version is read-only.', 'error');
-          return;
-        }
-        try {
-          await GoNoGoAPI.submitReview({
-            category: brand.category_slug,
-            brand_name: brand.name,
-            reviewer_name: name,
-            scores: {},
-            review_text: text
-          });
-          document.getElementById('review-name').value = '';
-          document.getElementById('review-text').value = '';
-          Components.showToast('Review submitted — thank you!');
-          await loadReviews();
-        } catch (e) {
-          var msg = e.message || 'Error submitting review. Please try again.';
-          if (msg.indexOf('live platform') !== -1 || msg.indexOf('require') !== -1) {
-            Components.showToast(msg, 'error');
-          } else {
-            Components.showToast('Error submitting review. Please try again.', 'error');
-          }
-          console.error('Review submission error:', e);
-        }
-      };
-
-      await loadReviews();
-    })();
-
-    function renderStars(score) {
-      var val = parseFloat(score) || 0;
-      var full = Math.floor(val);
-      var half = val - full >= 0.3;
-      var html = '';
-      for (var i = 1; i <= 5; i++) {
-        if (i <= full) html += '<i class="fa-solid fa-star active"></i>';
-        else if (i === full + 1 && half) html += '<i class="fa-solid fa-star-half-stroke active"></i>';
-        else html += '<i class="fa-regular fa-star"></i>';
-      }
-      return html;
+      list.innerHTML = '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-3)">' + reviews.length + ' User Review' + (reviews.length !== 1 ? 's' : '') + '</h4>' +
+        reviews.map(function(r) {
+          return Components.renderCommentCard({
+            author: r.reviewer_name,
+            text: r.review_text,
+            date: r.created_at,
+            sentiment: r.status === 'approved' ? 'positive' : 'neutral'
+          }, brand.name);
+        }).join('');
     }
-  </script>
+
+    window.submitReview = async function() {
+      var name = document.getElementById('review-name').value.trim();
+      var text = document.getElementById('review-text').value.trim();
+      if (!name || !text) {
+        Components.showToast('Please fill in both fields', 'error');
+        return;
+      }
+      if (!GoNoGoAPI.isLive()) {
+        Components.showToast('Reviews require the live GoNoGo platform. This static version is read-only.', 'error');
+        return;
+      }
+      try {
+        await GoNoGoAPI.submitReview({
+          category: brand.category_slug,
+          brand_name: brand.name,
+          reviewer_name: name,
+          scores: {},
+          review_text: text
+        });
+        document.getElementById('review-name').value = '';
+        document.getElementById('review-text').value = '';
+        Components.showToast('Review submitted — thank you!');
+        await loadReviews();
+      } catch (e) {
+        var msg = e.message || 'Error submitting review. Please try again.';
+        if (msg.indexOf('live platform') !== -1 || msg.indexOf('require') !== -1) {
+          Components.showToast(msg, 'error');
+        } else {
+          Components.showToast('Error submitting review. Please try again.', 'error');
+        }
+        console.error('Review submission error:', e);
+      }
+    };
+
+    await loadReviews();
+  })();
+
+  function renderStars(score) {
+    var val = parseFloat(score) || 0;
+    var full = Math.floor(val);
+    var half = val - full >= 0.3;
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+      if (i <= full) html += '<i class="fa-solid fa-star active"></i>';
+      else if (i === full + 1 && half) html += '<i class="fa-solid fa-star-half-stroke active"></i>';
+      else html += '<i class="fa-regular fa-star"></i>';
+    }
+    return html;
+  }
+</script>
+
   <style>
     @media (max-width: 768px) {
       #tab-overview > div:first-child {
