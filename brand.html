@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-ZA">
 <head>
-  <!-- Created with Perplexity Computer -->
+  <!--
+     ______                            __
+    / ____/___  ____ ___  ____  __  __/ /____  _____
+   / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+  / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+  \____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                      /_/
+          Created with Perplexity Computer
+          https://www.perplexity.ai/computer
+  -->
   <meta name="generator" content="Perplexity Computer">
   <meta name="author" content="Perplexity Computer">
   <meta property="og:see_also" content="https://www.perplexity.ai/computer">
@@ -64,12 +73,11 @@
 
       document.title = brand.name + ' — GoNoGo South Africa';
 
-      // Expect helpers to provide these; fallback if needed
       var categorySlug = brand.categorySlug || brand.category_slug || '';
       var categoryName = brand.categoryName || brand.category || '';
       var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
 
-      // Category score cards – if you have raw per-category max/score in brand.categoryScores
+      // Category score cards (only if categoryScores present)
       var categoryCardsHTML = '';
       if (brand.categoryScores) {
         categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
@@ -107,18 +115,30 @@
         return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + c + '</li>';
       }).join('');
 
-      var pricingHTML = (brand.pricing && brand.pricing.length > 0) ? brand.pricing.map(function(p) {
-        var features = typeof p.features === 'string' && p.features
-          ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
-          : (Array.isArray(p.features) ? p.features : []);
-        return '<div class="pricing-card">' +
-          '<div class="pricing-card-name">' + (p.name || 'Standard') + '</div>' +
-          '<div class="pricing-card-price">' + (p.cost || 'Contact for pricing') + '</div>' +
-          (features.length > 0 ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>' : '') +
-        '</div>';
-      }).join('') : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
+      // Robust pricing handling
+      var pricingArray = [];
+      if (Array.isArray(brand.pricing)) {
+        pricingArray = brand.pricing;
+      } else if (brand.pricing && typeof brand.pricing === 'string') {
+        pricingArray = [{ name: 'Standard', cost: brand.pricing, features: [] }];
+      }
 
-      // App ratings – expect helpers to map these to strings like "4.2/5"
+      var pricingHTML = pricingArray.length > 0
+        ? pricingArray.map(function(p) {
+            var features = typeof p.features === 'string' && p.features
+              ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
+              : (Array.isArray(p.features) ? p.features : []);
+            return '<div class="pricing-card">' +
+              '<div class="pricing-card-name">' + (p.name || 'Standard') + '</div>' +
+              '<div class="pricing-card-price">' + (p.cost || 'Contact for pricing') + '</div>' +
+              (features.length > 0
+                ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>'
+                : '') +
+            '</div>';
+          }).join('')
+        : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
+
+      // App ratings
       var gpRating = brand.googlePlayRating || (brand.appRatings && brand.appRatings.googlePlay) || 'N/A';
       var iosRating = brand.iosRating || (brand.appRatings && brand.appRatings.ios) || 'N/A';
       var gpScore = parseFloat(gpRating.split('/')[0]) || 0;
@@ -126,6 +146,7 @@
       var gpStars = renderStars(gpScore);
       var iosStars = renderStars(iosScore);
 
+      // Social sentiment
       var sentiment = brand.socialSentiment || {};
       var posThemes = (sentiment.positive_themes || brand.socialPositive || []).map(function(t) {
         return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + t + '</li>';
@@ -286,7 +307,6 @@
       // Reviews – static for now
       async function loadReviews() {
         if (!GoNoGoAPI.getReviews) {
-          // No backend; just show empty state
           var list = document.getElementById('review-list');
           list.innerHTML =
             '<div style="text-align:center;padding:var(--space-10) 0;margin-bottom:var(--space-4)">' +
@@ -310,7 +330,6 @@
         }
         list.innerHTML = '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-3)">' + reviews.length + ' user review' + (reviews.length !== 1 ? 's' : '') + '</h4>' +
           reviews.map(function(r) {
-            // Fallback simple rendering; can be replaced with renderCommentCard later
             return '<div class="comment-card">' +
               '<div class="comment-header">' +
                 '<span class="comment-author">' + r.reviewer_name + '</span>' +
