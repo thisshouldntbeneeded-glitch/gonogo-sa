@@ -71,6 +71,9 @@ function normalizeBrand(brand, category) {
     website: brand.website_url || '',
     overallScore: brand.gonogo_score,
     verdict: brand.verdict,
+    // NEW FIELDS from API / Supabase:
+    overview: brand.overview || '',
+    ratingSummary: brand.rating_summary || '',
     categoryScores: categoryScores,
     scoringCategories: category.scoring_categories,
     keyFeatures: brand.key_features || [],
@@ -86,6 +89,7 @@ function normalizeBrand(brand, category) {
     socialSentiment: brand.social_sentiment || {},
     lastUpdated: '2026-03-01'
   };
+
 }
 
 function slugify(name) {
