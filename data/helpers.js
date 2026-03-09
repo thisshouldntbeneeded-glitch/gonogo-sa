@@ -4,6 +4,28 @@
 // ============================================================
 // CATEGORY / INDUSTRY HELPERS
 // ============================================================
+// ============================================================
+// DATA SOURCE: fetch from live GoNoGo API
+// ============================================================
+
+const API_URL = "https://gonogo-api.vercel.app/api/brand-data";
+
+async function fetchBrandData() {
+  // Simple in-memory cache so we only fetch once per page load
+  let cached = GoNoGoStorage.get("brand_data");
+  if (cached) return cached;
+
+  const response = await fetch(API_URL);
+  if (!response.ok) {
+    console.error("Failed to fetch brand data from API", response.status);
+    return [];
+  }
+
+  const data = await response.json();
+  GoNoGoStorage.set("brand_data", data);
+  return data;
+}
+
 function getCategories() {
   return BRAND_DATA.map(cat => ({
     id: cat.slug,
