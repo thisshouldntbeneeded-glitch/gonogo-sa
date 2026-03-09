@@ -1,4 +1,4 @@
-// GoNoGo SA - Data Helpers (FIXED SCORE CALCULATIONS)
+// GoNoGo SA - Data Helpers (FIXED SCORE CALCULATIONS + OVERVIEW/RATING SUMMARY)
 
 // Transform BRAND_DATA into proper structure with calculated percentage scores
 window.getBrandById = function(id) {
@@ -27,7 +27,10 @@ window.getBrandById = function(id) {
             socialSentiment: b.social_sentiment || '',
             socialPositive: parseListField(b.social_positive),
             socialConcerns: parseListField(b.social_concerns),
-            lastUpdated: b.last_updated || ''
+            lastUpdated: b.last_updated || '',
+            // NEW FIELDS
+            overview: b.overview || '',
+            ratingSummary: b.ratingSummary || ''
           };
         }
       }
@@ -50,7 +53,10 @@ window.getBrandsByCategory = function(slug) {
           logo: b.logo || '',
           scores: calculatePercentageScores(b),
           strengths: parseListField(b.strengths),
-          weaknesses: parseListField(b.concerns)
+          weaknesses: parseListField(b.concerns),
+          // NEW FIELDS
+          overview: b.overview || '',
+          ratingSummary: b.ratingSummary || ''
         };
       });
     }
@@ -71,7 +77,10 @@ window.getAllBrands = function() {
           overallScore: b.gonogo_score || 0,
           verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
           logo: b.logo || '',
-          scores: calculatePercentageScores(b)
+          scores: calculatePercentageScores(b),
+          // NEW FIELDS
+          overview: b.overview || '',
+          ratingSummary: b.ratingSummary || ''
         });
       });
     }
