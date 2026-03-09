@@ -242,7 +242,7 @@ def apply_research_to_brand(brand_data: dict, research: dict) -> dict:
                 brand_data['appRatings'] = {}
             brand_data['appRatings']['googlePlay'] = new
             brand_data['appRatings']['googlePlayScore'] = float(new.replace('/5', ''))
-            changes.append(f'Google Play: {old} -> {new}')
+            changes.append(f'Google Play: {old} → {new}')
 
     if 'ios' in data:
         old = brand_data.get('appRatings', {}).get('ios', 'N/A')
@@ -252,7 +252,7 @@ def apply_research_to_brand(brand_data: dict, research: dict) -> dict:
                 brand_data['appRatings'] = {}
             brand_data['appRatings']['ios'] = new
             brand_data['appRatings']['iosScore'] = float(new.replace('/5', ''))
-            changes.append(f'iOS: {old} -> {new}')
+            changes.append(f'iOS: {old} → {new}')
 
     # Update last updated
     brand_data['lastUpdated'] = data.get('lastUpdated', datetime.now().strftime('%Y-%m-%d'))
