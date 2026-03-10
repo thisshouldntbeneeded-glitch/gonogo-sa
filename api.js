@@ -1,4 +1,4 @@
-// GoNoGo SA - API Client (LIVE + STATIC HYBRID)
+// force vercel redeploy// GoNoGo SA - API Client (LIVE + STATIC HYBRID)
 var GoNoGoAPI = (function () {
     'use strict';
 
