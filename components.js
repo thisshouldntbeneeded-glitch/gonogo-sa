@@ -161,15 +161,19 @@ var Components = (function() {
     return '<div class="score-bar"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
   }
 
-  // Accept either raw BRAND_DATA brand or helper/API brand
+// Accept either raw BRAND_DATA brand or helper/API brand
 function renderBrandCard(brand, index) {
-  // Accept either raw BRAND_DATA brand or helper/API brand
-  var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
+  // Normalise score
+  var rawScore = brand.overallScore != null
+    ? brand.overallScore
+    : (brand.gonogo_score || brand.gonogoScore || 0);
+  var score = typeof rawScore === 'string' ? parseFloat(rawScore) : rawScore;
+  if (!score || isNaN(score)) score = 0;
+
   var color = getScoreColor(score);
   var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'GO WITH CAUTION' : 'NOGO');
   var categoryName = brand.categoryName || brand.category || '';
 
-  // New: short summary line, falls back safely
   var ratingSummary = brand.ratingSummary || '';
   var summaryHtml = ratingSummary
     ? '<p class="brand-summary">' + ratingSummary + '</p>'
@@ -178,13 +182,12 @@ function renderBrandCard(brand, index) {
   var logoHtml = renderLogo(brand, 'brand-logo-lg');
 
   return (
-    '<div class="brand-card" onclick="window.location.href=\\\'brand.html?id=' + brand.id + '\\\'">' +
+    "<div class=\"brand-card\" onclick=\"window.location.href='brand.html?id=" + brand.id + "'\">" +
       '<div class="brand-card-top">' +
         '<div class="brand-card-info">' +
           '<div class="brand-card-name">' + brand.name + '</div>' +
           '<div class="brand-card-meta">' +
             '<span>' + categoryName + '</span>' +
-            // COLOURED SCORE TEXT
             '<span style="color:' + color + ';">' + score + '/100</span>' +
           '</div>' +
         '</div>' +
@@ -195,14 +198,10 @@ function renderBrandCard(brand, index) {
           '">' + verdict + '</div>' +
         '</div>' +
       '</div>' +
-
-      // Rating summary line
       summaryHtml +
-
       '<div class="brand-card-chart">' +
         '<canvas id="radar-' + brand.id + '"></canvas>' +
       '</div>' +
-
       '<div class="brand-card-stats">' +
         '<span><i class="fa-solid fa-gauge-high"></i> Overall score</span>' +
         '<span><i class="fa-solid fa-scale-balanced"></i> Weighted by category</span>' +
@@ -210,6 +209,7 @@ function renderBrandCard(brand, index) {
     '</div>'
   );
 }
+
 
   function createRadarChart(canvasId, brand, options) {
   options = options || {};
