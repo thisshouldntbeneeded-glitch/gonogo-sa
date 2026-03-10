@@ -181,8 +181,9 @@ function renderBrandCard(brand, index) {
 
   var logoHtml = renderLogo(brand, 'brand-logo-lg');
 
-  return (
-    "<div class=\"brand-card\" onclick=\"window.location.href='brand.html?id=" + brand.id + "'\">" +
+    return (
+    '<div class="brand-card" onclick="window.location.href=\'brand.html?id=' + brand.id + '\'">' +
+
       '<div class="brand-card-top">' +
         '<div class="brand-card-info">' +
           '<div class="brand-card-name">' + brand.name + '</div>' +
