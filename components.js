@@ -216,21 +216,109 @@ function renderBrandCard(brand, index) {
   var canvas = document.getElementById(canvasId);
   if (!canvas || !window.Chart) return;
 
-  // Prefer precomputed percentages on brand.scores, otherwise derive
-  var scores = brand.scores || {};
-  var labels = Object.keys(scores);
-  var data = Object.values(scores);
+  var labels = [];
+  var data = [];
 
-  if (!labels.length && typeof calculatePercentageScores === 'function') {
-    scores = calculatePercentageScores(brand);
+  // Prefer explicit categoryScores: { Compliance: {score, max}, ... }
+  if (brand.categoryScores && Object.keys(brand.categoryScores).length) {
+    Object.keys(brand.categoryScores).forEach(function (name) {
+      var cs = brand.categoryScores[name];
+      if (!cs || !cs.max) return;
+      labels.push(name);
+      data.push(Math.round((cs.score / cs.max) * 100)); // % of that category's max
+    });
+  } else {
+    // Fallback to precomputed percentage scores if present
+    var scores = brand.scores || {};
     labels = Object.keys(scores);
-    data = Object.values(scores);
+    data = Object.values(scores).map(function (v) {
+      var n = typeof v === 'string' ? parseFloat(v) : v;
+      return isNaN(n) ? 0 : Math.round(n);
+    });
+
+    if (!labels.length && typeof calculatePercentageScores === 'function') {
+      scores = calculatePercentageScores(brand);
+      labels = Object.keys(scores);
+      data = Object.values(scores).map(function (v) {
+        var n = typeof v === 'string' ? parseFloat(v) : v;
+        return isNaN(n) ? 0 : Math.round(n);
+      });
+    }
   }
 
   if (!labels.length) {
     labels = ['No data'];
     data = [0];
   }
+
+  // Overall score for colour
+  var rawScore = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || brand.gonogoScore || 0);
+  var overall = typeof rawScore === 'string' ? parseFloat(rawScore) : rawScore;
+  if (!overall || isNaN(overall)) overall = 0;
+
+  var borderColor, fillColor;
+  if (overall >= 80) {
+    borderColor = '#11a551';           // green
+    fillColor   = 'rgba(17,165,81,0.18)';
+  } else if (overall >= 60) {
+    borderColor = '#ff9800';           // amber
+    fillColor   = 'rgba(255,152,0,0.18)';
+  } else {
+    borderColor = '#e74c3c';           // red
+    fillColor   = 'rgba(231,76,60,0.18)';
+  }
+
+  new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: fillColor,
+        borderColor: borderColor,
+        borderWidth: 2,
+        pointBackgroundColor: borderColor,
+        pointBorderColor: '#ffffff',
+        pointHoverBackgroundColor: '#ffffff',
+        pointHoverBorderColor: borderColor,
+        pointRadius: options.pointRadius || 3,
+        pointHoverRadius: (options.pointRadius || 3) + 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true }
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,                    // all categories expressed as % of their own max
+          ticks: {
+            display: options.showTicks !== false,
+            stepSize: 20,
+            color: '#666',
+            backdropColor: 'rgba(0,0,0,0)'
+          },
+          grid: {
+            color: 'rgba(255,255,255,0.08)',
+            circular: false
+          },
+          angleLines: {
+            color: 'rgba(255,255,255,0.08)'
+          },
+          pointLabels: {
+            font: { size: options.labelSize || 11 },
+            color: '#a0a0a0'
+          }
+        }
+      }
+    }
+  });
+}
+
 
   // Color based on verdict / overall score
   var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
