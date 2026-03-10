@@ -156,34 +156,49 @@ var Components = (function() {
     return '<div class="score-bar"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
   }
 
-  function renderBrandCard(brand) {
-    // Accept either raw BRAND_DATA brand or helper/API brand
-    var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
-    var color = getScoreColor(score);
-    var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'GO WITH CAUTION' : 'NOGO');
-    var categoryName = brand.categoryName || brand.category || '';
+  // Accept either raw BRAND_DATA brand or helper/API brand
+function renderBrandCard(brand, index) {
+  var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
+  var color = getScoreColor(score);
+  var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'GO WITH CAUTION' : 'NOGO');
+  var categoryName = brand.categoryName || brand.category || '';
 
-    return '<div class="brand-card">' +
+  // New: short summary line, falls back safely
+  var ratingSummary = brand.ratingSummary || '';
+  var summaryHtml = ratingSummary
+    ? '<p class="brand-summary">' + ratingSummary + '</p>'
+    : '';
+
+  return (
+    '<div class="brand-card">' +
       '<div class="brand-card-header">' +
-        '<div class="brand-logo-wrapper">' + renderLogo(brand, 'brand-logo') + '</div>' +
+        '<div class="brand-logo-wrapper">' +
+          renderLogo(brand, 'brand-logo') +
+        '</div>' +
         '<div class="brand-info">' +
           '<h3 class="brand-name">' + brand.name + '</h3>' +
           '<p class="brand-category">' + categoryName + '</p>' +
         '</div>' +
-      '</div>' +
-      '<div class="score-section">' +
-        '<div class="score-circle" style="border-color:' + color + '">' +
-          '<div class="score-value" style="color:' + color + '">' + score + '</div>' +
-          '<div class="score-label">Score</div>' +
+        '<div class="score-section">' +
+          '<div class="score-circle" style="border-color:' + color + ';">' +
+            '<div class="score-value" style="color:' + color + ';">' + score + '</div>' +
+            '<div class="score-label">Score</div>' +
+          '</div>' +
+          '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(/\s+/g, '-') + '">' +
+            verdict +
+          '</div>' +
         '</div>' +
-        '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(/\s+/g, '-') + '">' + verdict + '</div>' +
       '</div>' +
-      '<div class="radar-wrapper"><canvas id="radar-' + brand.id + '"></canvas></div>' +
       '<div class="brand-details">' +
+        summaryHtml +
+        '<div class="radar-wrapper">' +
+          '<canvas id="radar-' + brand.id + '"></canvas>' +
+        '</div>' +
         '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
       '</div>' +
-    '</div>';
-  }
+    '</div>'
+  );
+}
 
   function createRadarChart(canvasId, brand, options) {
     options = options || {};
