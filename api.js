@@ -25,8 +25,8 @@ var GoNoGoAPI = (function() {
 
     // Always static for brand data (until backend is added)
     isLive: function() {
-      return false;
-    },
+    return true;
+},
 
     // ---------------- BRAND DATA (STATIC) ----------------
 
