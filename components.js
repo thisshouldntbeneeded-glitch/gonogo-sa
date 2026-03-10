@@ -125,13 +125,18 @@ var Components = (function() {
   }
 
   function renderScoreCircle(score, size) {
-    var color = getScoreColor(score || 0);
-    var sizeClass = size === 'lg' ? 'score-circle-lg' : 'score-circle-md';
-    return '<div class="score-circle ' + sizeClass + '" style="border-color:' + color + '">' +
-      '<div class="score-value" style="color:' + color + '">' + (score || 0) + '</div>' +
-      '<div class="score-label">Score</div>' +
-    '</div>';
-  }
+  var rawScore = score != null ? score : 0;
+  var value = typeof rawScore === 'string' ? parseFloat(rawScore) : rawScore;
+  if (!value || isNaN(value)) value = 0;
+
+  var color = getScoreColor(value);
+  var sizeClass = size === 'lg' ? 'score-circle-lg' : 'score-circle-md';
+
+  return '<div class="score-circle ' + sizeClass + '" style="border-color:' + color + '">' +
+    '<div class="score-value" style="color:' + color + '">' + value + '</div>' +
+    '<div class="score-label">Score</div>' +
+  '</div>';
+}
 
   function renderScoreBadge(score) {
     var color = getScoreColor(score || 0);
