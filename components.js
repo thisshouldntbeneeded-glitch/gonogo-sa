@@ -201,73 +201,91 @@ function renderBrandCard(brand, index) {
 }
 
   function createRadarChart(canvasId, brand, options) {
-    options = options || {};
-    var ctx = document.getElementById(canvasId);
-    if (!ctx || !window.Chart) return;
+  options = options || {};
+  var canvas = document.getElementById(canvasId);
+  if (!canvas || !window.Chart) return;
 
-    // Prefer precomputed percentages on brand.scores; otherwise derive from raw BRAND_DATA if present
-    var scores = brand.scores || {};
-    var labels = Object.keys(scores);
-    var data = Object.values(scores);
+  // Prefer precomputed percentages on brand.scores, otherwise derive
+  var scores = brand.scores || {};
+  var labels = Object.keys(scores);
+  var data = Object.values(scores);
 
-    if (!labels.length && typeof calculatePercentageScores === 'function') {
-      scores = calculatePercentageScores(brand);
-      labels = Object.keys(scores);
-      data = Object.values(scores);
-    }
+  if (!labels.length && typeof calculatePercentageScores === 'function') {
+    scores = calculatePercentageScores(brand);
+    labels = Object.keys(scores);
+    data = Object.values(scores);
+  }
 
-    if (!labels.length) {
-      labels = ['N/A'];
-      data = [0];
-    }
+  if (!labels.length) {
+    labels = ['No data'];
+    data = [0];
+  }
 
-    var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
-    var color = getScoreColor(score);
+  // Color based on verdict / overall score
+  var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
+  var baseColor = getScoreColor(score); // uses your green / orange / red tokens
+  var fillColor = 'rgba(17, 165, 81, 0.15)';   // default green
+  var borderColor = baseColor;
 
-    new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: 'rgba(17,165,81,0.15)',
-          borderColor: color,
-          borderWidth: 2,
-          pointBackgroundColor: color,
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: color,
-          pointRadius: options.pointRadius || 3,
-          pointHoverRadius: (options.pointRadius || 3) + 1
-        }]
+  if (baseColor.indexOf('ff9800') !== -1 || baseColor.indexOf('orange') !== -1) {
+    fillColor = 'rgba(255, 152, 0, 0.15)';
+  } else if (baseColor.indexOf('e74c3c') !== -1 || baseColor.indexOf('red') !== -1) {
+    fillColor = 'rgba(231, 76, 60, 0.15)';
+  }
+
+  new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: fillColor,
+        borderColor: borderColor,
+        borderWidth: 2,
+        pointBackgroundColor: borderColor,
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: borderColor,
+        pointRadius: options.pointRadius || 3,
+        pointHoverRadius: (options.pointRadius || 3) + 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,  // lets the 280px container dictate height
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: true }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: true }
-        },
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              display: options.showTicks !== false,
-              stepSize: 20,
-              font: { size: 10 }
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            display: options.showTicks !== false,
+            stepSize: 20,
+            color: '#666',
+            backdropColor: 'rgba(0,0,0,0)'
+          },
+          grid: {
+            color: 'rgba(255,255,255,0.08)',
+            circular: false
+          },
+          angleLines: {
+            color: 'rgba(255,255,255,0.08)'
+          },
+          pointLabels: {
+            font: {
+              size: options.labelSize || 11
             },
-            grid: { color: 'rgba(255,255,255,0.08)' },
-            angleLines: { color: 'rgba(255,255,255,0.08)' },
-            pointLabels: {
-              font: { size: options.labelSize || 11 },
-              color: '#a0a0a0'
-            }
+            color: '#a0a0a0'
           }
         }
       }
-    });
-  }
+    }
+  });
+}
+
 
   // ---- Admin helpers ----
 
