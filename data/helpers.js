@@ -16,6 +16,35 @@ window.getBrandById = function(id) {
             verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
             logo: b.logo || '',
             website: b.website || '',
+
+            // Raw per‑category scores for radar
+            categoryScores: {
+              'Compliance': {
+                score: b.compliance_score,
+                max: b.compliance_max
+              },
+              'Customer Satisfaction': {
+                score: b.customer_satisfaction_score,
+                max: b.customer_satisfaction_max
+              },
+              'Product Value': {
+                score: b.product_value_score,
+                max: b.product_value_max
+              },
+              'Innovation': {
+                score: b.innovation_score,
+                max: b.innovation_max
+              },
+              'Customer Support': {
+                score: b.customer_support_score,
+                max: b.customer_support_max
+              },
+              'Accessibility & Security': {
+                score: b.accessibility_security_score,
+                max: b.accessibility_security_max
+              }
+            },
+
             scores: calculatePercentageScores(b),
             strengths: parseListField(b.strengths),
             weaknesses: parseListField(b.concerns),
@@ -51,6 +80,35 @@ window.getBrandsByCategory = function(slug) {
           overallScore: b.gonogo_score || 0,
           verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
           logo: b.logo || '',
+
+          // Raw per‑category scores for radar (list view)
+          categoryScores: {
+            'Compliance': {
+              score: b.compliance_score,
+              max: b.compliance_max
+            },
+            'Customer Satisfaction': {
+              score: b.customer_satisfaction_score,
+              max: b.customer_satisfaction_max
+            },
+            'Product Value': {
+              score: b.product_value_score,
+              max: b.product_value_max
+            },
+            'Innovation': {
+              score: b.innovation_score,
+              max: b.innovation_max
+            },
+            'Customer Support': {
+              score: b.customer_support_score,
+              max: b.customer_support_max
+            },
+            'Accessibility & Security': {
+              score: b.accessibility_security_score,
+              max: b.accessibility_security_max
+            }
+          },
+
           scores: calculatePercentageScores(b),
           strengths: parseListField(b.strengths),
           weaknesses: parseListField(b.concerns),
@@ -77,6 +135,35 @@ window.getAllBrands = function() {
           overallScore: b.gonogo_score || 0,
           verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
           logo: b.logo || '',
+
+          // Raw per‑category scores for radar (global list)
+          categoryScores: {
+            'Compliance': {
+              score: b.compliance_score,
+              max: b.compliance_max
+            },
+            'Customer Satisfaction': {
+              score: b.customer_satisfaction_score,
+              max: b.customer_satisfaction_max
+            },
+            'Product Value': {
+              score: b.product_value_score,
+              max: b.product_value_max
+            },
+            'Innovation': {
+              score: b.innovation_score,
+              max: b.innovation_max
+            },
+            'Customer Support': {
+              score: b.customer_support_score,
+              max: b.customer_support_max
+            },
+            'Accessibility & Security': {
+              score: b.accessibility_security_score,
+              max: b.accessibility_security_max
+            }
+          },
+
           scores: calculatePercentageScores(b),
           // NEW FIELDS
           overview: b.overview || '',
