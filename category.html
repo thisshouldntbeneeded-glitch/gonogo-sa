@@ -100,10 +100,13 @@
 
         // Brands via API wrapper (helpers)
         var brands = await GoNoGoAPI.getBrandsByCategory(slug);
-        // Enrich with category name for cards
+        // Enrich with category name and text fields for cards
         brands = brands.map(function(b) {
-          b.categoryName = catInfo.name;
-          return b;
+          return Object.assign({}, b, {
+            categoryName: catInfo.name,
+            overview: b.overview || '',
+            ratingSummary: b.ratingSummary || ''
+          });
         });
 
         document.title = catInfo.name + ' — GoNoGo South Africa';
