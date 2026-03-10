@@ -158,6 +158,7 @@ var Components = (function() {
 
   // Accept either raw BRAND_DATA brand or helper/API brand
 function renderBrandCard(brand, index) {
+  // Accept either raw BRAND_DATA brand or helper/API brand
   var score = brand.overallScore != null ? brand.overallScore : (brand.gonogo_score || 0);
   var color = getScoreColor(score);
   var verdict = brand.verdict || (score >= 80 ? 'GO' : score >= 60 ? 'GO WITH CAUTION' : 'NOGO');
@@ -169,32 +170,37 @@ function renderBrandCard(brand, index) {
     ? '<p class="brand-summary">' + ratingSummary + '</p>'
     : '';
 
+  var logoHtml = renderLogo(brand, 'brand-logo-lg');
+
   return (
-    '<div class="brand-card">' +
-      '<div class="brand-card-header">' +
-        '<div class="brand-logo-wrapper">' +
-          renderLogo(brand, 'brand-logo') +
-        '</div>' +
-        '<div class="brand-info">' +
-          '<h3 class="brand-name">' + brand.name + '</h3>' +
-          '<p class="brand-category">' + categoryName + '</p>' +
-        '</div>' +
-        '<div class="score-section">' +
-          '<div class="score-circle" style="border-color:' + color + ';">' +
-            '<div class="score-value" style="color:' + color + ';">' + score + '</div>' +
-            '<div class="score-label">Score</div>' +
+    '<div class="brand-card" onclick="window.location.href=\'brand.html?id=' + brand.id + '\'">' +
+      '<div class="brand-card-top">' +
+        '<div class="brand-card-info">' +
+          '<div class="brand-card-name">' + brand.name + '</div>' +
+          '<div class="brand-card-meta">' +
+            '<span>' + categoryName + '</span>' +
+            // COLOURED SCORE TEXT
+            '<span style="color:' + color + ';">' + score + '/100</span>' +
           '</div>' +
-          '<div class="verdict-badge verdict-' + verdict.toLowerCase().replace(/\s+/g, '-') + '">' +
-            verdict +
-          '</div>' +
+        '</div>' +
+        '<div class="brand-card-score">' +
+          logoHtml +
+          '<div class="badge-score ' +
+            (score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low') +
+          '">' + verdict + '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="brand-details">' +
-        summaryHtml +
-        '<div class="radar-wrapper">' +
-          '<canvas id="radar-' + brand.id + '"></canvas>' +
-        '</div>' +
-        '<a href="brand.html?id=' + brand.id + '" class="btn btn-primary btn-block">View Full Report</a>' +
+
+      // Rating summary line
+      summaryHtml +
+
+      '<div class="brand-card-chart">' +
+        '<canvas id="radar-' + brand.id + '"></canvas>' +
+      '</div>' +
+
+      '<div class="brand-card-stats">' +
+        '<span><i class="fa-solid fa-gauge-high"></i> Overall score</span>' +
+        '<span><i class="fa-solid fa-scale-balanced"></i> Weighted by category</span>' +
       '</div>' +
     '</div>'
   );
