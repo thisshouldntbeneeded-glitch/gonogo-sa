@@ -224,8 +224,13 @@
                 (brand.lastUpdated ? '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)">Last updated: ' + brand.lastUpdated + '</p>' : '') +
               '</div>' +
             '</div>' +
-            (categoryCardsHTML ? '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Category scores</h3>' +
-            '<div class="category-grid" style="margin-bottom:var(--space-8)">' + categoryCardsHTML + '</div>' : '') +
+            (categoryCardsHTML
+  ? '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">Category scores</h3>' +
+    '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">' +
+      'Each score shows this brand’s performance out of the maximum for that category in our framework.' +
+    '</p>' +
+    '<div class="category-grid" style="margin-bottom:var(--space-8)">' + categoryCardsHTML + '</div>'
+  : '') +
             '<div class="sc-grid">' +
               '<div>' +
                 '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Strengths</h3>' +
