@@ -1,48 +1,20 @@
-// force vercel redeploy// GoNoGo SA - API Client (LIVE + STATIC HYBRID)
-var SUPABASE_URL = "https://kkpbzttwljxvyjbvggqr.supabase.co";
-var SUPABASE_ANON_KEY = "sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW";
-
 var GoNoGoAPI = (function () {
     'use strict';
 
-    // ---- Supabase setup ----
-    var SUPABASE_URL = "https://kkpbzttwljxvyjbvggqr.supabase.co";
-    var SUPABASE_ANON_KEY = "sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe";
-
-    var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     // --- INTERNAL HELPERS ------------------------------------------------------
 
+    // For now, POST actions are disabled so the site does not break.
+    // submitReview will just resolve with ok:false.
     function post(action, data) {
         if (action === "submitReview") {
-            return supabaseClient
-                .from("reviews")
-                .insert([
-                    {
-                        brand_id: data.brandId || null,
-                        brand_name: data.brandName,
-                        category: data.category || null,
-                        reviewer_name: data.reviewerName,
-                        review_text: data.reviewText,
-                        verdict: data.verdict || null
-                    }
-                ])
-                .then(function (result) {
-                    if (result.error) {
-                        throw result.error;
-                    }
-                    var inserted = result.data && result.data[0];
-                    return { ok: true, review: inserted };
-                });
+            return Promise.resolve({ ok: false, error: "Reviews not yet wired up" });
         }
-
-        // For now, other actions are not implemented
         return Promise.reject(new Error("Unknown action"));
     }
 
+    // GET is not used for live backend right now; all reads are from BRAND_DATA/helpers.
     function get(action) {
-        // Not used right now; left here so the rest of the API shape stays intact.
-        return Promise.reject(new Error("GET actions not implemented with Supabase yet"));
+        return Promise.reject(new Error("Live GET actions not implemented"));
     }
 
     // --- PUBLIC API ------------------------------------------------------------
@@ -51,7 +23,7 @@ var GoNoGoAPI = (function () {
 
         // Enable live backend
         isLive: function () {
-            return true;
+            return false; // effectively “static only” for now
         },
 
         // ---------------- BRAND DATA (STATIC) ----------------
@@ -137,28 +109,26 @@ var GoNoGoAPI = (function () {
             });
         },
 
-        // ---------------- REVIEWS (LIVE) ----------------
+        // ---------------- REVIEWS (TEMP DISABLED) ----------------
 
         submitReview: function (reviewData) {
+            // UI can call this; it just won’t save yet.
             return post("submitReview", reviewData);
         },
 
-        moderateReview: function (ReviewID, status, moderatedBy) {
-            // Not implemented yet with Supabase; placeholder to keep API shape.
+        moderateReview: function () {
             return Promise.reject(new Error("moderateReview not implemented"));
         },
 
         getAllReviews: function () {
-            // Not implemented yet with Supabase; placeholder.
-            return Promise.reject(new Error("getAllReviews not implemented"));
+            return Promise.resolve([]); // no reviews yet
         },
 
-        getReviewsForBrand: function (brandName) {
-            // Not implemented yet with Supabase; placeholder.
-            return Promise.reject(new Error("getReviewsForBrand not implemented"));
+        getReviewsForBrand: function () {
+            return Promise.resolve([]);
         }
     };
 
 })();
 
-console.log("GoNoGoAPI loaded successfully");
+console.log("GoNoGoAPI loaded safely (static mode)");
