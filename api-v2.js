@@ -1,4 +1,7 @@
 // force vercel redeploy// GoNoGo SA - API Client (LIVE + STATIC HYBRID)
+var SUPABASE_URL = "https://kkpbzttwljxvyjbvggqr.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW";
+
 var GoNoGoAPI = (function () {
     'use strict';
 
