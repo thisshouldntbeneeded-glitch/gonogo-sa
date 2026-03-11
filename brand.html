@@ -358,12 +358,20 @@
         }
         try {
           await GoNoGoAPI.submitReview({
-            category: categorySlug,
-            brand_name: brand.name,
-            reviewer_name: name,
-            scores: {},
-            review_text: text
-          });
+  category: categorySlug,
+  brandName: brand.name,
+  reviewerName: name,
+  reviewText: text,
+  // temporary blanks until we add scoring later
+  compliance: '',
+  customerSatisfaction: '',
+  productValue: '',
+  innovation: '',
+  customerSupport: '',
+  accessibilitySecurity: '',
+  averageScore: ''
+});
+
           document.getElementById('review-name').value = '';
           document.getElementById('review-text').value = '';
           Components.showToast('Review submitted — thank you!');
