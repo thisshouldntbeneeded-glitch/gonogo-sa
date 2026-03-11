@@ -3,7 +3,8 @@ var GoNoGoAPI = (function () {
     'use strict';
 
     // Your Google Apps Script Web App URL (EXACT from deployment panel)
-    var API_BASE = "https://script.google.com/macros/s/AKfycbz9OK1Sa3lq40EkXM4ZKc18zbc2AkURf1R1fxy8UI7rSeO63lhsJzmhB-EiHMuPcqk3_w/exec";
+    var API_BASE = "https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrSGO49vSMHIDw5wcLXKYWbzHf2lzZKABV6X7ph-iJ9hkW96KdjtqVZf7nLv1YY4f7v2CD4ESUJGB8MEPFNNfMMTQVRy1ks6MaRFt32fJ8nuYgUQs8K1fx6TJ4dByDtSN5KOXjw2PgXSHgpX3CFq7bm8LjxXpWNXeHZc33bYl0foks7aoaiIM3-gAdpB5EveXxuXZyt-Dkpt3G6x4FfDvUzKKDKnGI5V007zdJ7-2XVoNHJmlEujYE3-p3i_CGk-7RZ9S00sUpxb6O3kAP2jL8BttqAB2dChZw4uXtzW&lib=MBgU2Nh06ksitQiPJOqCYsxANaReUugMB";
+
 
 
     // --- INTERNAL HELPERS ------------------------------------------------------
