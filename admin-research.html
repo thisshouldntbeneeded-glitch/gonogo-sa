@@ -310,12 +310,18 @@
     </div>
   </main>
 
-  <script src="data/data.js"></script>
+    <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   <script src="components.js"></script>
+
+  <!-- Supabase + API wrapper -->
+  <script src="https://esm.sh/@supabase/supabase-js@2.48.0"></script>
   <script src="api-v2.js"></script>
+
   <script>
     document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('dashboard');
+    ...
+
 
     if (!Components.checkAdminAuth()) {
       initAdminPage();
