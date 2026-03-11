@@ -3,7 +3,8 @@ var GoNoGoAPI = (function () {
     'use strict';
 
     // Your Google Apps Script Web App URL (EXACT from deployment panel)
-    var API_BASE = "https://script.google.com/macros/s/AKfycbxS_aGR8urDRsJwkdrAR1wASn4K07EZcDlWjcC7NVgNGEXmtC17HqrgUOpYraweyRkg/exec";
+    var API_BASE = "https://script.google.com/macros/s/AKfycbz9OK1Sa3lq40EkXM4ZKc18zbc2AkURf1R1fxy8UI7rSeO63lhsJzmhB-EiHMuPcqk3_w/exec";
+
 
     // --- INTERNAL HELPERS ------------------------------------------------------
 
