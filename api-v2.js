@@ -10,11 +10,15 @@ var GoNoGoAPI = (function () {
     // --- INTERNAL HELPERS ------------------------------------------------------
 
     function post(action, data) {
-        return fetch(API_BASE, {
-            method: "POST",
-            body: JSON.stringify(Object.assign({ action: action }, data))
-        }).then(r => r.json());
-    }
+  if (action === "submitReview") {
+    return fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (r) { return r.json(); });
+  }
+  return Promise.reject(new Error("Unknown action"));
+}
 
     function get(action) {
         return fetch(API_BASE + "?action=" + action)
