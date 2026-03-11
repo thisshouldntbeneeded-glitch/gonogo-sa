@@ -5,27 +5,44 @@ var SUPABASE_ANON_KEY = "sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW";
 var GoNoGoAPI = (function () {
     'use strict';
 
-    // Your Google Apps Script Web App URL (EXACT from deployment panel)
-    var API_BASE = "https://gonogo-sa.vercel.app/api/submit-review";
+    // ---- Supabase setup ----
+    var SUPABASE_URL = "https://kkpbzttwljxvyjbvggqr.supabase.co";
+    var SUPABASE_ANON_KEY = "sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe";
 
-
+    var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- INTERNAL HELPERS ------------------------------------------------------
 
     function post(action, data) {
-  if (action === "submitReview") {
-    return fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).then(function (r) { return r.json(); });
-  }
-  return Promise.reject(new Error("Unknown action"));
-}
+        if (action === "submitReview") {
+            return supabaseClient
+                .from("reviews")
+                .insert([
+                    {
+                        brand_id: data.brandId || null,
+                        brand_name: data.brandName,
+                        category: data.category || null,
+                        reviewer_name: data.reviewerName,
+                        review_text: data.reviewText,
+                        verdict: data.verdict || null
+                    }
+                ])
+                .then(function (result) {
+                    if (result.error) {
+                        throw result.error;
+                    }
+                    var inserted = result.data && result.data[0];
+                    return { ok: true, review: inserted };
+                });
+        }
+
+        // For now, other actions are not implemented
+        return Promise.reject(new Error("Unknown action"));
+    }
 
     function get(action) {
-        return fetch(API_BASE + "?action=" + action)
-            .then(r => r.json());
+        // Not used right now; left here so the rest of the API shape stays intact.
+        return Promise.reject(new Error("GET actions not implemented with Supabase yet"));
     }
 
     // --- PUBLIC API ------------------------------------------------------------
@@ -127,25 +144,18 @@ var GoNoGoAPI = (function () {
         },
 
         moderateReview: function (ReviewID, status, moderatedBy) {
-            return post("moderateReview", {
-                ReviewID: ReviewID,
-                status: status,
-                moderatedBy: moderatedBy || "Admin"
-            });
+            // Not implemented yet with Supabase; placeholder to keep API shape.
+            return Promise.reject(new Error("moderateReview not implemented"));
         },
 
         getAllReviews: function () {
-            return get("getAllReviews").then(function (res) {
-                return res.reviews || [];
-            });
+            // Not implemented yet with Supabase; placeholder.
+            return Promise.reject(new Error("getAllReviews not implemented"));
         },
 
         getReviewsForBrand: function (brandName) {
-            return this.getAllReviews().then(function (all) {
-                return all.filter(function (r) {
-                    return r.BrandName === brandName && r.Status === "approved";
-                });
-            });
+            // Not implemented yet with Supabase; placeholder.
+            return Promise.reject(new Error("getReviewsForBrand not implemented"));
         }
     };
 
