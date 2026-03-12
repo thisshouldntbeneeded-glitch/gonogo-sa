@@ -15,656 +15,674 @@
 <meta name="author" content="Perplexity Computer">
 <meta property="og:see_also" content="https://www.perplexity.ai/computer">
 <link rel="author" href="https://www.perplexity.ai/computer">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brand Research — GoNoGo Admin</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    .research-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-6);
-      margin-bottom: var(--space-6);
-    }
-
-    .research-card {
-      background: var(--surface-2);
-      border: 1px solid var(--border-primary);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-    }
-
-    .research-card h3 {
-      font-size: var(--text-lg);
-      font-weight: 700;
-      margin-bottom: var(--space-4);
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-    }
-
-    .brand-select-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: var(--space-3);
-      margin-top: var(--space-4);
-      max-height: 400px;
-      overflow-y: auto;
-      padding: var(--space-3);
-      background: var(--surface-1);
-      border-radius: var(--radius-md);
-    }
-
-    .brand-checkbox {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .brand-checkbox:hover {
-      background: var(--surface-3);
-    }
-
-    .brand-checkbox input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    .research-log {
-      background: var(--surface-1);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      max-height: 500px;
-      overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: var(--text-sm);
-    }
-
-    .log-entry {
-      padding: var(--space-2);
-      border-bottom: 1px solid var(--border-primary);
-      display: flex;
-      gap: var(--space-3);
-    }
-
-    .log-entry:last-child {
-      border-bottom: none;
-    }
-
-    .log-time {
-      color: var(--text-muted);
-      min-width: 80px;
-    }
-
-    .log-success {
-      color: var(--green);
-    }
-
-    .log-error {
-      color: var(--red);
-    }
-
-    .log-info {
-      color: var(--blue);
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: var(--space-4);
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-      padding: var(--space-3);
-      text-align: left;
-      border: 1px solid var(--border-primary);
-    }
-
-    .comparison-table th {
-      background: var(--surface-3);
-      font-weight: 600;
-    }
-
-    .value-changed {
-      background: rgba(255, 193, 7, 0.1);
-      font-weight: 600;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: var(--surface-3);
-      border-radius: var(--radius-full);
-      overflow: hidden;
-      margin-top: var(--space-2);
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      transition: width 0.3s;
-    }
-
-    .research-status {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-3);
-      background: var(--surface-3);
-      border-radius: var(--radius-md);
-      margin-top: var(--space-4);
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid var(--surface-3);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 768px) {
-      .research-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoNoGo SA — Research Status</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  .research-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .research-modal-overlay.active {
+    display: flex;
+  }
+  .research-modal {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    max-width: 560px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .research-log {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .research-log .log-entry {
+    padding: 2px 0;
+    color: var(--text-secondary);
+  }
+  .research-log .log-entry.success {
+    color: var(--green-text);
+  }
+  .research-log .log-entry.error {
+    color: var(--red-text);
+  }
+  .research-log .log-entry.info {
+    color: var(--blue-text, var(--text-primary));
+  }
+  .research-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-primary);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: rspin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes rspin {
+    to { transform: rotate(360deg); }
+  }
+  .batch-progress {
+    margin-top: var(--space-4);
+    height: 6px;
+    background: var(--surface-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .batch-progress-bar {
+    height: 100%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .research-result-card {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-top: var(--space-3);
+  }
+  .result-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .result-field:last-child {
+    border-bottom: none;
+  }
+  .result-label {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .result-value {
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .btn-researching {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+</style>
 </head>
 <body>
-  <div id="sidebar-container"></div>
-
-  <main class="admin-main">
-    <div class="admin-header">
-      <h1 class="admin-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Brand Research</h1>
-      <p class="admin-subtitle">Search and update brand data automatically</p>
-    </div>
-
-    <div id="admin-content">
-      <!-- Quick Actions -->
-      <div class="research-card" style="margin-bottom: var(--space-6);">
-        <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
-        <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="researchSingleBrand()">
-            <i class="fa-solid fa-search"></i> Research Single Brand
+  <div class="admin-layout">
+    <div id="sidebar-container"></div>
+    <main class="admin-main" id="admin-content" style="display:none;">
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">Research Status</h1>
+          <p class="text-sm text-secondary">Track data freshness and trigger automated research</p>
+        </div>
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-secondary btn-sm" id="btn-batch-stale" onclick="triggerBatchResearch('stale')">
+            <i class="fa-solid fa-clock"></i> Refresh Stale
           </button>
-          <button class="btn btn-secondary" onclick="showBulkResearch()">
-            <i class="fa-solid fa-layer-group"></i> Bulk Research
-          </button>
-          <button class="btn btn-ghost" onclick="scheduleAutoUpdate()">
-            <i class="fa-solid fa-clock"></i> Schedule Auto-Update
-          </button>
-          <button class="btn btn-ghost" onclick="exportData()">
-            <i class="fa-solid fa-download"></i> Export Updated Data
+          <button class="btn btn-primary btn-sm" id="btn-batch-all" onclick="triggerBatchResearch('outdated')">
+            <i class="fa-solid fa-robot"></i> Auto-Research Outdated
           </button>
         </div>
       </div>
 
-      <div class="research-grid">
-        <!-- Single Brand Research -->
-        <div class="research-card" id="single-research-card">
-          <h3><i class="fa-solid fa-search"></i> Single Brand Research</h3>
-          <div class="form-group">
-            <label class="form-label">Select Brand</label>
-            <select id="brand-select" class="form-select">
-              <option value="">Choose a brand...</option>
+      <!-- KPIs -->
+      <div class="kpi-grid" style="margin-bottom:var(--space-6);" id="research-kpis"></div>
+
+      <!-- Alerts -->
+      <div id="alerts" style="margin-bottom:var(--space-6);"></div>
+
+      <!-- Research Table -->
+      <div class="table-wrapper">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <select id="freshness-filter" style="width:auto;max-width:180px;" onchange="filterResearch()">
+              <option value="">All Status</option>
+              <option value="fresh">Fresh</option>
+              <option value="stale">Stale</option>
+              <option value="outdated">Outdated</option>
+            </select>
+            <select id="research-industry-filter" style="width:auto;max-width:180px;" onchange="filterResearch()">
+              <option value="">All Industries</option>
+            </select>
+            <select id="verdict-filter" style="width:auto;max-width:150px;" onchange="filterResearch()">
+              <option value="">All Verdicts</option>
+              <option value="GO">GO</option>
+              <option value="GO WITH CAUTION">Go with Caution</option>
+              <option value="NOGO">NOGO</option>
             </select>
           </div>
-          <div class="form-group">
-            <label class="form-label">Data to Update</label>
-            <div style="display: flex; flex-direction: column; gap: var(--space-2);">
-              <label style="display: flex; align-items: center; gap: var(--space-2);">
-                <input type="checkbox" checked value="ratings"> App Ratings (Google Play & iOS)
-              </label>
-              <label style="display: flex; align-items: center; gap: var(--space-2);">
-                <input type="checkbox" checked value="reviews"> Social Sentiment & Reviews
-              </label>
-              <label style="display: flex; align-items: center; gap: var(--space-2);">
-                <input type="checkbox" checked value="pricing"> Pricing Information
-              </label>
-              <label style="display: flex; align-items: center; gap: var(--space-2);">
-                <input type="checkbox" value="features"> Features & Updates
-              </label>
+          <span class="text-xs text-muted" id="research-count"></span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table" id="research-table">
+            <thead>
+              <tr>
+                <th onclick="sortResearch('name')">Brand <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th onclick="sortResearch('categoryName')">Industry <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th onclick="sortResearch('overallScore')">Score <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th>Verdict</th>
+                <th onclick="sortResearch('lastUpdated')">Last Researched <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th>Data Freshness</th>
+                <th onclick="sortResearch('daysSince')">Days Since <i class="fa-solid fa-sort" style="opacity:0.3;font-size:10px;"></i></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="research-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Google Sheets Link -->
+      <div class="card" style="margin-top:var(--space-8);border-color:var(--border-primary);padding:var(--space-6);">
+        <div style="display:flex;align-items:center;gap:var(--space-4);">
+          <i class="fa-solid fa-table" style="font-size:var(--text-xl);color:var(--green);"></i>
+          <div style="flex:1;">
+            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-1);">SA Mastersheet</h3>
+            <p class="text-xs text-muted">All brand data is synced from this Google Sheet. Edit scores, add brands, and update research directly in the sheet.</p>
+          </div>
+          <a href="https://docs.google.com/spreadsheets/d/1V6uzslhnwEu4BYShWZi4ZS58xy9A8yeL-N6uIWEgHdw/edit" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Sheet
+          </a>
+        </div>
+      </div>
+
+      <!-- Research Info -->
+      <div class="card" style="margin-top:var(--space-6);border-color:var(--border-primary);padding:var(--space-6);">
+        <div style="display:flex;align-items:flex-start;gap:var(--space-4);">
+          <i class="fa-solid fa-circle-info" style="font-size:var(--text-lg);color:var(--green);margin-top:2px;"></i>
+          <div>
+            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-2);">How Auto-Research Works</h3>
+            <div class="text-xs text-secondary" style="line-height:1.8;">
+              <p style="margin-bottom:var(--space-2);">When you click <strong>Refresh</strong> on a brand, the system automatically:</p>
+              <ol style="padding-left:var(--space-5);margin-bottom:var(--space-2);">
+                <li>Checks the <strong>Google Play Store</strong> for current app rating</li>
+                <li>Queries the <strong>Apple App Store</strong> (iTunes API) for iOS rating</li>
+                <li>Looks up <strong>Hellopeter</strong> trust index and review count</li>
+                <li>Verifies <strong>website accessibility</strong> and HTTPS status</li>
+                <li>Updates the brand's <strong>Last Researched</strong> date</li>
+              </ol>
+              <p>Updated data syncs to Google Sheets via the daily auto-sync. Use <strong>Auto-Research Outdated</strong> to refresh all brands over 30 days old (up to 10 at a time).</p>
             </div>
           </div>
-          <button class="btn btn-primary btn-block" onclick="startSingleResearch()">
-            <i class="fa-solid fa-play"></i> Start Research
-          </button>
-        </div>
-
-        <!-- Bulk Research -->
-        <div class="research-card" id="bulk-research-card" style="display: none;">
-          <h3><i class="fa-solid fa-layer-group"></i> Bulk Research</h3>
-          <div class="form-group">
-            <label class="form-label">Select Category</label>
-            <select id="category-select" class="form-select" onchange="filterBrandsByCategory()">
-              <option value="all">All Categories</option>
-            </select>
-          </div>
-          <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3);">
-            <button class="btn btn-sm btn-ghost" onclick="selectAllBrands()">Select All</button>
-            <button class="btn btn-sm btn-ghost" onclick="deselectAllBrands()">Deselect All</button>
-          </div>
-          <div class="brand-select-grid" id="brand-checkboxes"></div>
-          <button class="btn btn-primary btn-block" onclick="startBulkResearch()">
-            <i class="fa-solid fa-play"></i> Start Bulk Research
-          </button>
-        </div>
-
-        <!-- Research Progress -->
-        <div class="research-card" id="progress-card" style="display: none;">
-          <h3><i class="fa-solid fa-chart-line"></i> Research Progress</h3>
-          <div id="progress-status"></div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-          </div>
-          <div style="margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary);">
-            <span id="progress-text">0 of 0 brands researched</span>
-          </div>
-        </div>
-
-        <!-- Comparison Preview -->
-        <div class="research-card" id="comparison-card" style="display: none;">
-          <h3><i class="fa-solid fa-code-compare"></i> Changes Preview</h3>
-          <div id="comparison-content"></div>
-          <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
-            <button class="btn btn-primary" onclick="applyChanges()">
-              <i class="fa-solid fa-check"></i> Apply Changes
-            </button>
-            <button class="btn btn-secondary" onclick="discardChanges()">
-              <i class="fa-solid fa-times"></i> Discard
-            </button>
-          </div>
         </div>
       </div>
 
-      <!-- Research Log -->
-      <div class="research-card">
-        <h3><i class="fa-solid fa-terminal"></i> Research Log</h3>
-        <div class="research-log" id="research-log">
-          <div class="log-entry">
-            <span class="log-time">12:00:00</span>
-            <span class="log-info">System ready. Select a brand to begin research.</span>
-          </div>
-        </div>
-        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-3);">
-          <button class="btn btn-sm btn-ghost" onclick="clearLog()">
-            <i class="fa-solid fa-broom"></i> Clear Log
-          </button>
-          <button class="btn btn-sm btn-ghost" onclick="exportLog()">
-            <i class="fa-solid fa-download"></i> Export Log
-          </button>
-        </div>
+      <div style="padding:var(--space-6) 0;text-align:center;">
+        <p class="text-xs text-muted">
+          &copy; 2026 GoNoGo South Africa |
+          <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);">Created with Perplexity Computer</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Research Modal -->
+  <div class="research-modal-overlay" id="research-modal">
+    <div class="research-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+        <h3 class="text-lg font-semibold" id="modal-title">Researching Brand</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeResearchModal()" id="modal-close-btn" style="display:none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modal-status" class="text-sm text-secondary" style="margin-bottom:var(--space-3);">
+        <span class="research-spinner"></span> Collecting data from public sources...
+      </div>
+      <div class="batch-progress" id="modal-progress" style="display:none;">
+        <div class="batch-progress-bar" id="modal-progress-bar"></div>
+      </div>
+      <div class="research-log" id="modal-log"></div>
+      <div id="modal-results" style="display:none;"></div>
+      <div id="modal-actions" style="margin-top:var(--space-4);display:none;text-align:right;">
+        <button class="btn btn-primary btn-sm" onclick="closeResearchModal()">Done</button>
       </div>
     </div>
-  </main>
+  </div>
 
-    <script src="data/data.js"></script>
+  <script src="data/data_partA1a.js"></script>
+  <script src="data/data_partA1b.js"></script>
+  <script src="data/data_partA1.js"></script>
+  <script src="data/data_partA2.js"></script>
+  <script src="data/data_partA.js"></script>
+  <script src="data/data_partB1.js"></script>
+  <script src="data/data_partB2a.js"></script>
+  <script src="data/data_partB2b.js"></script>
+  <script src="data/data_partB2.js"></script>
+  <script src="data/data_partB3.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC1a.js"></script>
+  <script src="data/data_partC1b.js"></script>
+  <script src="data/data_partC1.js"></script>
+  <script src="data/data_partC2.js"></script>
+  <script src="data/data_partC3a.js"></script>
+  <script src="data/data_partC3b.js"></script>
+  <script src="data/data_partC3.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD1.js"></script>
+  <script src="data/data_partD2.js"></script>
+  <script src="data/data_partD3.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   <script src="components.js"></script>
-
-  <!-- Supabase + API wrapper -->
-  <script src="https://esm.sh/@supabase/supabase-js@2.48.0"></script>
-  <script src="api-v2.js"></script>
-
+  <script src="api.js"></script>
   <script>
-    document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('dashboard');
-    ...
+    document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('research');
 
-
-    if (!Components.checkAdminAuth()) {
+    if (Components.checkAdminAuth()) {
       initAdminPage();
     }
 
-    let researchResults = [];
-    let originalData = {};
+    var researchData = [];
+    var currentSort = { key: 'daysSince', dir: 'desc' };
+    var activeResearch = {};
 
-    // Initialize
-    (function() {
-      populateBrandSelect();
-      populateCategorySelect();
-      addLog('info', 'Admin research panel initialized');
-    })();
+    async function initAdminPage() {
+      document.getElementById('admin-content').style.display = '';
 
-    function populateBrandSelect() {
-      const select = document.getElementById('brand-select');
-      BRAND_DATA.forEach(cat => {
-        cat.brands.forEach(brand => {
-          const option = document.createElement('option');
-          option.value = brand.id;
-          option.textContent = `${brand.name} (${cat.category})`;
-          select.appendChild(option);
-        });
+      var allBrands = await GoNoGoAPI.getAllBrands();
+      var now = new Date();
+
+      researchData = allBrands.map(function(b) {
+        var lastDate = new Date(b.lastUpdated);
+        var daysSince = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+        var freshness = 'fresh';
+        if (daysSince > 30) freshness = 'outdated';
+        else if (daysSince > 14) freshness = 'stale';
+
+        return {
+          id: b.id,
+          name: b.name,
+          logo: b.logo,
+          website: b.website,
+          categorySlug: b.categorySlug,
+          categoryName: b.categoryName,
+          overallScore: b.overallScore,
+          verdict: b.verdict,
+          lastUpdated: b.lastUpdated,
+          daysSince: daysSince,
+          freshness: freshness
+        };
       });
-    }
 
-    function populateCategorySelect() {
-      const select = document.getElementById('category-select');
-      BRAND_DATA.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.slug;
-        option.textContent = cat.category;
-        select.appendChild(option);
+      // Populate industry filter
+      var indFilter = document.getElementById('research-industry-filter');
+      var cats = await GoNoGoAPI.getCategories();
+      cats.forEach(function(cat) {
+        indFilter.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
       });
+
+      // KPIs
+      renderKPIs();
+      filterResearch();
     }
 
-    function filterBrandsByCategory() {
-      const category = document.getElementById('category-select').value;
-      const container = document.getElementById('brand-checkboxes');
-      container.innerHTML = '';
+    function renderKPIs() {
+      var fresh = researchData.filter(function(r) { return r.freshness === 'fresh'; }).length;
+      var stale = researchData.filter(function(r) { return r.freshness === 'stale'; }).length;
+      var outdated = researchData.filter(function(r) { return r.freshness === 'outdated'; }).length;
+      var avgDays = Math.round(researchData.reduce(function(a, r) { return a + r.daysSince; }, 0) / researchData.length);
 
-      BRAND_DATA.forEach(cat => {
-        if (category === 'all' || cat.slug === category) {
-          cat.brands.forEach(brand => {
-            const label = document.createElement('label');
-            label.className = 'brand-checkbox';
-            label.innerHTML = `
-              <input type="checkbox" value="${brand.id}" data-brand="${brand.name}">
-              <span style="font-size: var(--text-sm);">${brand.name}</span>
-            `;
-            container.appendChild(label);
-          });
-        }
+      document.getElementById('research-kpis').innerHTML =
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Fresh Data</div>' +
+          '<div class="kpi-value" style="color:var(--green-text);">' + fresh + '</div>' +
+          '<div class="kpi-delta text-green">Updated within 14 days</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Stale Data</div>' +
+          '<div class="kpi-value" style="color:var(--orange-text);">' + stale + '</div>' +
+          '<div class="kpi-delta" style="color:var(--orange-text);">15-30 days old</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Outdated</div>' +
+          '<div class="kpi-value" style="color:var(--red-text);">' + outdated + '</div>' +
+          '<div class="kpi-delta" style="color:var(--red-text);">Over 30 days old</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-label">Avg Age</div>' +
+          '<div class="kpi-value">' + avgDays + '<span class="text-sm text-muted"> days</span></div>' +
+        '</div>';
+
+      // Alerts
+      var needsResearch = researchData.filter(function(r) { return r.freshness !== 'fresh'; });
+      if (needsResearch.length > 0) {
+        var brandList = needsResearch.slice(0, 10).map(function(r) { return r.name; }).join(', ');
+        var extra = needsResearch.length > 10 ? ' and ' + (needsResearch.length - 10) + ' more' : '';
+        document.getElementById('alerts').innerHTML =
+          '<div class="card" style="border-color:var(--orange-dim);background:var(--orange-bg);">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-3);">' +
+              '<i class="fa-solid fa-triangle-exclamation" style="color:var(--orange-text);font-size:var(--text-lg);"></i>' +
+              '<div>' +
+                '<div class="text-sm font-semibold" style="color:var(--orange-text);">Research Needed</div>' +
+                '<div class="text-xs" style="color:var(--orange-text);opacity:0.8;">' +
+                  needsResearch.length + ' brand' + (needsResearch.length > 1 ? 's need' : ' needs') + ' data refresh: ' +
+                  brandList + extra +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      } else {
+        document.getElementById('alerts').innerHTML = '';
+      }
+    }
+
+    function sortResearch(key) {
+      if (currentSort.key === key) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.key = key;
+        currentSort.dir = key === 'name' ? 'asc' : 'desc';
+      }
+      filterResearch();
+    }
+
+    function filterResearch() {
+      var freshness = document.getElementById('freshness-filter').value;
+      var industry = document.getElementById('research-industry-filter').value;
+      var verdict = document.getElementById('verdict-filter').value;
+
+      var filtered = researchData.filter(function(r) {
+        var matchFreshness = !freshness || r.freshness === freshness;
+        var matchIndustry = !industry || r.categorySlug === industry;
+        var matchVerdict = !verdict || r.verdict === verdict;
+        return matchFreshness && matchIndustry && matchVerdict;
       });
+
+      // Apply sort
+      filtered = Components.sortData(filtered, currentSort.key, currentSort.dir);
+
+      document.getElementById('research-count').textContent = filtered.length + ' brands';
+      renderResearchTable(filtered);
     }
 
-    function selectAllBrands() {
-      document.querySelectorAll('#brand-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = true);
+    function renderResearchTable(data) {
+      var tbody = document.getElementById('research-tbody');
+      tbody.innerHTML = data.map(function(r) {
+        var logoHtml = Components.renderLogo(r, 'brand-logo');
+        var freshnessIcon = r.freshness === 'fresh' ? 'fa-circle-check' : r.freshness === 'stale' ? 'fa-clock' : 'fa-triangle-exclamation';
+        var daysColor = r.daysSince > 30 ? 'color:var(--red-text)' : r.daysSince > 14 ? 'color:var(--orange-text)' : 'color:var(--green-text)';
+        var isResearching = activeResearch[r.id];
+        var btnClass = isResearching ? 'btn-researching' : (r.freshness !== 'fresh' ? 'btn-primary' : 'btn-ghost');
+        var btnIcon = isResearching ? '<span class="research-spinner"></span>' : '<i class="fa-solid fa-rotate"></i> ';
+        var btnText = isResearching ? 'Researching...' : (r.freshness !== 'fresh' ? 'Refresh' : 'Re-check');
+        var escapedName = r.name.replace(/'/g, "\\'");
+
+        return '<tr id="row-' + r.id + '">' +
+          '<td>' +
+            '<div class="brand-cell">' +
+              logoHtml +
+              '<span class="font-semibold text-sm">' + r.name + '</span>' +
+            '</div>' +
+          '</td>' +
+          '<td class="text-sm">' + r.categoryName + '</td>' +
+          '<td>' + Components.renderScoreBadge(r.overallScore) + '</td>' +
+          '<td>' + Components.renderVerdictBadge(r.verdict) + '</td>' +
+          '<td class="text-sm text-muted">' + Components.formatDate(r.lastUpdated) + '</td>' +
+          '<td>' +
+            '<span class="freshness-badge freshness-' + r.freshness + '">' +
+              '<i class="fa-solid ' + freshnessIcon + '" style="font-size:10px;"></i> ' +
+              r.freshness.charAt(0).toUpperCase() + r.freshness.slice(1) +
+            '</span>' +
+          '</td>' +
+          '<td><span class="text-sm tabular-nums" style="' + daysColor + '">' + r.daysSince + ' days</span></td>' +
+          '<td>' +
+            '<button class="btn btn-sm ' + btnClass + '" id="btn-' + r.id + '" onclick="triggerResearch(\'' + r.id + '\', \'' + escapedName + '\')">' +
+              btnIcon + btnText +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
     }
 
-    function deselectAllBrands() {
-      document.querySelectorAll('#brand-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
-    }
+    // ============================================================
+    // RESEARCH ACTIONS
+    // ============================================================
 
-    function researchSingleBrand() {
-      document.getElementById('single-research-card').style.display = 'block';
-      document.getElementById('bulk-research-card').style.display = 'none';
-    }
+    async function triggerResearch(brandId, brandName) {
+      if (activeResearch[brandId]) return;
 
-    function showBulkResearch() {
-      document.getElementById('single-research-card').style.display = 'none';
-      document.getElementById('bulk-research-card').style.display = 'block';
-      filterBrandsByCategory();
-    }
-
-    async function startSingleResearch() {
-      const brandId = document.getElementById('brand-select').value;
-      if (!brandId) {
-        Components.showToast('Please select a brand', 'error');
+      // Check if backend is available
+      var isLive = GoNoGoAPI.isLive();
+      if (!isLive) {
+        Components.showToast('Auto-Research requires the live platform backend. Currently running in static mode.', 'error');
         return;
       }
 
-      const brand = getBrandById(brandId);
-      if (!brand) {
-        Components.showToast('Brand not found', 'error');
-        return;
+      activeResearch[brandId] = true;
+
+      // Update button state
+      var btn = document.getElementById('btn-' + brandId);
+      if (btn) {
+        btn.className = 'btn btn-sm btn-researching';
+        btn.innerHTML = '<span class="research-spinner"></span> Researching...';
       }
 
-      addLog('info', `Starting research for ${brand.name}...`);
-      showProgress([brandId]);
+      // Show modal
+      showResearchModal(brandName);
+      addLog('Starting research for ' + brandName + '...', 'info');
+      addLog('Checking Google Play Store...', '');
+      addLog('Querying Apple App Store (iTunes API)...', '');
+      addLog('Looking up Hellopeter data...', '');
+      addLog('Verifying website status...', '');
 
       try {
-        const result = await researchBrand(brand);
-        researchResults = [result];
-        addLog('success', `Research completed for ${brand.name}`);
-        showComparison(result);
-      } catch (error) {
-        addLog('error', `Research failed: ${error.message}`);
-        Components.showToast('Research failed. See log for details.', 'error');
+        var rawBase = '__PORT_8000__';
+        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
+        var resp = await fetch(API_BASE + '/api/admin/research/' + brandId, { method: 'POST' });
+        var result = await resp.json();
+
+        if (result.status === 'completed') {
+          addLog('', '');
+          addLog('Research completed successfully', 'success');
+
+          var fieldsUpdated = result.fields_updated || [];
+          if (fieldsUpdated.length > 0) {
+            fieldsUpdated.forEach(function(field) {
+              addLog('  Updated: ' + field, 'success');
+            });
+          }
+
+          var changes = result.changes || [];
+          if (changes.length > 0) {
+            addLog('', '');
+            addLog('Changes:', 'info');
+            changes.forEach(function(change) {
+              addLog('  ' + change, 'info');
+            });
+          }
+
+          // Show result details
+          showResearchResults(result);
+
+          // Update local data
+          var rd = researchData.find(function(r) { return r.id === brandId; });
+          if (rd) {
+            rd.lastUpdated = new Date().toISOString().split('T')[0];
+            rd.daysSince = 0;
+            rd.freshness = 'fresh';
+          }
+
+          renderKPIs();
+          filterResearch();
+
+          Components.showToast('Research complete for ' + brandName, 'success');
+        } else if (result.status === 'error') {
+          addLog('', '');
+          addLog('Error: ' + (result.error || 'Unknown error'), 'error');
+          Components.showToast('Research failed for ' + brandName, 'error');
+        }
+      } catch (e) {
+        addLog('', '');
+        addLog('Request failed: ' + e.message, 'error');
+        Components.showToast('Failed to reach research API', 'error');
       }
 
-      hideProgress();
+      activeResearch[brandId] = false;
+      completeModal();
     }
 
-    async function startBulkResearch() {
-      const selected = Array.from(document.querySelectorAll('#brand-checkboxes input:checked'))
-        .map(cb => cb.value);
-
-      if (selected.length === 0) {
-        Components.showToast('Please select at least one brand', 'error');
+    async function triggerBatchResearch(freshness) {
+      var isLive = GoNoGoAPI.isLive();
+      if (!isLive) {
+        Components.showToast('Auto-Research requires the live platform backend.', 'error');
         return;
       }
 
-      addLog('info', `Starting bulk research for ${selected.length} brands...`);
-      showProgress(selected);
+      var label = freshness === 'stale' ? 'stale (15-30 days)' : 'outdated (30+ days)';
+      var count = researchData.filter(function(r) {
+        if (freshness === 'stale') return r.freshness === 'stale' || r.freshness === 'outdated';
+        return r.freshness === 'outdated';
+      }).length;
 
-      researchResults = [];
-      let completed = 0;
-
-      for (const brandId of selected) {
-        const brand = getBrandById(brandId);
-        try {
-          addLog('info', `Researching ${brand.name}...`);
-          const result = await researchBrand(brand);
-          researchResults.push(result);
-          completed++;
-          updateProgress(completed, selected.length);
-          addLog('success', `✓ ${brand.name} completed`);
-        } catch (error) {
-          addLog('error', `✗ ${brand.name} failed: ${error.message}`);
-          completed++;
-          updateProgress(completed, selected.length);
-        }
-
-        // Delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-
-      addLog('success', `Bulk research completed: ${researchResults.length}/${selected.length} successful`);
-      hideProgress();
-
-      if (researchResults.length > 0) {
-        showBulkComparison();
-      }
-    }
-
-    async function researchBrand(brand) {
-      // Simulate API research (in production, this would call Perplexity API or web scraping)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const updates = {
-            brandId: brand.id,
-            brandName: brand.name,
-            old: {
-              googlePlay: brand.appRatings.googlePlay,
-              ios: brand.appRatings.ios,
-              pricing: brand.pricing,
-              sentiment: brand.socialSentiment?.summary || ''
-            },
-            new: {
-              googlePlay: generateMockRating(),
-              ios: generateMockRating(),
-              pricing: brand.pricing, // Would update from web
-              sentiment: 'Updated sentiment analysis from recent reviews...'
-            },
-            changed: []
-          };
-
-          // Detect changes
-          if (updates.old.googlePlay !== updates.new.googlePlay) updates.changed.push('Google Play rating');
-          if (updates.old.ios !== updates.new.ios) updates.changed.push('iOS rating');
-          if (updates.old.sentiment !== updates.new.sentiment) updates.changed.push('Sentiment');
-
-          resolve(updates);
-        }, 1000);
-      });
-    }
-
-    function generateMockRating() {
-      const rating = (Math.random() * 1.5 + 3.5).toFixed(1);
-      return `${rating}/5`;
-    }
-
-    function showProgress(brandIds) {
-      document.getElementById('progress-card').style.display = 'block';
-      updateProgress(0, brandIds.length);
-    }
-
-    function updateProgress(current, total) {
-      const percent = (current / total) * 100;
-      document.getElementById('progress-fill').style.width = percent + '%';
-      document.getElementById('progress-text').textContent = `${current} of ${total} brands researched`;
-    }
-
-    function hideProgress() {
-      setTimeout(() => {
-        document.getElementById('progress-card').style.display = 'none';
-      }, 2000);
-    }
-
-    function showComparison(result) {
-      document.getElementById('comparison-card').style.display = 'block';
-      const content = document.getElementById('comparison-content');
-
-      let html = `<h4 style="margin-bottom: var(--space-3);">${result.brandName}</h4>`;
-
-      if (result.changed.length === 0) {
-        html += '<p style="color: var(--text-muted);">No changes detected</p>';
-      } else {
-        html += '<table class="comparison-table">';
-        html += '<tr><th>Field</th><th>Current</th><th>New</th></tr>';
-
-        if (result.changed.includes('Google Play rating')) {
-          html += `<tr>
-            <td>Google Play</td>
-            <td>${result.old.googlePlay}</td>
-            <td class="value-changed">${result.new.googlePlay}</td>
-          </tr>`;
-        }
-
-        if (result.changed.includes('iOS rating')) {
-          html += `<tr>
-            <td>iOS Rating</td>
-            <td>${result.old.ios}</td>
-            <td class="value-changed">${result.new.ios}</td>
-          </tr>`;
-        }
-
-        if (result.changed.includes('Sentiment')) {
-          html += `<tr>
-            <td>Sentiment</td>
-            <td>${result.old.sentiment.substring(0, 50)}...</td>
-            <td class="value-changed">${result.new.sentiment.substring(0, 50)}...</td>
-          </tr>`;
-        }
-
-        html += '</table>';
-      }
-
-      content.innerHTML = html;
-    }
-
-    function showBulkComparison() {
-      const changedBrands = researchResults.filter(r => r.changed.length > 0);
-
-      if (changedBrands.length === 0) {
-        Components.showToast('No changes detected in any brands', 'info');
+      if (count === 0) {
+        Components.showToast('No ' + label + ' brands to research', 'info');
         return;
       }
 
-      document.getElementById('comparison-card').style.display = 'block';
-      const content = document.getElementById('comparison-content');
+      showResearchModal('Batch Research — ' + label);
+      addLog('Starting batch research for ' + count + ' brands...', 'info');
+      addLog('Processing up to 10 brands at a time...', '');
 
-      let html = `<p style="margin-bottom: var(--space-3);">${changedBrands.length} brands have changes:</p>`;
-      html += '<ul style="list-style: none; padding: 0;">';
+      document.getElementById('modal-progress').style.display = 'block';
 
-      changedBrands.forEach(result => {
-        html += `<li style="padding: var(--space-2); background: var(--surface-3); margin-bottom: var(--space-2); border-radius: var(--radius-sm);">
-          <strong>${result.brandName}</strong>: ${result.changed.join(', ')}
-        </li>`;
-      });
+      try {
+        var rawBase = '__PORT_8000__';
+        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
+        var resp = await fetch(API_BASE + '/api/admin/research-batch?freshness=' + freshness, { method: 'POST' });
+        var result = await resp.json();
 
-      html += '</ul>';
-      content.innerHTML = html;
-    }
+        if (result.status === 'completed') {
+          var total = result.total_researched || 0;
+          document.getElementById('modal-progress-bar').style.width = '100%';
 
-    function applyChanges() {
-      if (researchResults.length === 0) {
-        Components.showToast('No changes to apply', 'error');
-        return;
+          addLog('', '');
+          addLog('Batch research completed: ' + total + ' brands processed', 'success');
+
+          if (result.total_remaining > 0) {
+            addLog(result.total_remaining + ' brands remaining — run again to continue', 'info');
+          }
+
+          (result.results || []).forEach(function(r) {
+            if (r.status === 'completed') {
+              var changeStr = (r.changes || []).join(', ');
+              addLog('  ' + r.brand + ': ' + (changeStr || 'updated'), 'success');
+            } else {
+              addLog('  ' + r.brand + ': ' + (r.error || 'failed'), 'error');
+            }
+          });
+
+          // Refresh the whole page data
+          await initAdminPage();
+          Components.showToast('Batch research complete: ' + total + ' brands updated', 'success');
+        } else if (result.status === 'no_targets') {
+          addLog('No brands match the criteria', 'info');
+        }
+      } catch (e) {
+        addLog('Batch request failed: ' + e.message, 'error');
+        Components.showToast('Batch research request failed', 'error');
       }
 
-      addLog('info', 'Applying changes to brand data...');
-
-      // In production, this would update the database
-      researchResults.forEach(result => {
-        if (result.changed.length > 0) {
-          addLog('success', `Updated ${result.brandName}`);
-        }
-      });
-
-      Components.showToast(`Successfully updated ${researchResults.length} brands`, 'success');
-      document.getElementById('comparison-card').style.display = 'none';
-      researchResults = [];
+      completeModal();
     }
 
-    function discardChanges() {
-      researchResults = [];
-      document.getElementById('comparison-card').style.display = 'none';
-      addLog('info', 'Changes discarded');
+    // ============================================================
+    // MODAL HELPERS
+    // ============================================================
+
+    function showResearchModal(title) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-status').innerHTML = '<span class="research-spinner"></span> Collecting data from public sources...';
+      document.getElementById('modal-log').innerHTML = '';
+      document.getElementById('modal-results').style.display = 'none';
+      document.getElementById('modal-results').innerHTML = '';
+      document.getElementById('modal-actions').style.display = 'none';
+      document.getElementById('modal-close-btn').style.display = 'none';
+      document.getElementById('modal-progress').style.display = 'none';
+      document.getElementById('modal-progress-bar').style.width = '0%';
+      document.getElementById('research-modal').classList.add('active');
     }
 
-    function scheduleAutoUpdate() {
-      Components.showToast('Auto-update scheduling coming soon!', 'info');
-      addLog('info', 'Auto-update feature requires backend API setup');
+    function closeResearchModal() {
+      document.getElementById('research-modal').classList.remove('active');
     }
 
-    function exportData() {
-      const dataStr = JSON.stringify(BRAND_DATA, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `gonogo-data-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      addLog('success', 'Data exported successfully');
+    function completeModal() {
+      document.getElementById('modal-status').innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--green);"></i> Research complete';
+      document.getElementById('modal-close-btn').style.display = '';
+      document.getElementById('modal-actions').style.display = '';
     }
 
-    function addLog(type, message) {
-      const log = document.getElementById('research-log');
-      const time = new Date().toLocaleTimeString();
-      const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      entry.innerHTML = `
-        <span class="log-time">${time}</span>
-        <span class="log-${type}">${message}</span>
-      `;
+    function addLog(message, type) {
+      var log = document.getElementById('modal-log');
+      var entry = document.createElement('div');
+      entry.className = 'log-entry' + (type ? ' ' + type : '');
+      var timestamp = new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      entry.textContent = (message ? '[' + timestamp + '] ' + message : '');
       log.appendChild(entry);
       log.scrollTop = log.scrollHeight;
     }
 
-    function clearLog() {
-      document.getElementById('research-log').innerHTML = '';
-      addLog('info', 'Log cleared');
-    }
+    function showResearchResults(result) {
+      var container = document.getElementById('modal-results');
+      var data = result.data || {};
+      var html = '<div class="research-result-card">';
+      html += '<h4 class="text-sm font-semibold" style="margin-bottom:var(--space-3);">Research Results</h4>';
 
-    function exportLog() {
-      const log = document.getElementById('research-log').innerText;
-      const blob = new Blob([log], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `research-log-${new Date().toISOString()}.txt`;
-      a.click();
-    }
-
-    function getBrandById(id) {
-      for (const cat of BRAND_DATA) {
-        const brand = cat.brands.find(b => b.id === id);
-        if (brand) return brand;
+      if (data.googlePlay) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-google-play" style="margin-right:4px;"></i> Google Play</span><span class="result-value">' + data.googlePlay + '</span></div>';
       }
-      return null;
+      if (data.ios) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-apple" style="margin-right:4px;"></i> iOS App Store</span><span class="result-value">' + data.ios + '</span></div>';
+      }
+      if (data.hellopeter) {
+        var hp = data.hellopeter;
+        var hpStr = '';
+        if (hp.trust_index) hpStr += 'Trust: ' + hp.trust_index;
+        if (hp.star_rating) hpStr += (hpStr ? ' | ' : '') + hp.star_rating + '/5';
+        if (hp.review_count) hpStr += (hpStr ? ' | ' : '') + hp.review_count + ' reviews';
+        if (hpStr) {
+          html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-comments" style="margin-right:4px;"></i> Hellopeter</span><span class="result-value">' + hpStr + '</span></div>';
+        }
+      }
+      if (data.website_status) {
+        var ws = data.website_status;
+        var statusIcon = ws.accessible ? '<span style="color:var(--green);">Online</span>' : '<span style="color:var(--red-text);">Offline</span>';
+        var details = statusIcon;
+        if (ws.response_time_ms) details += ' (' + ws.response_time_ms + 'ms)';
+        if (ws.https) details += ' <i class="fa-solid fa-lock" style="color:var(--green);font-size:10px;"></i>';
+        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-globe" style="margin-right:4px;"></i> Website</span><span class="result-value">' + details + '</span></div>';
+      }
+      if (data.lastUpdated) {
+        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-calendar" style="margin-right:4px;"></i> Updated</span><span class="result-value">' + data.lastUpdated + '</span></div>';
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
+      container.style.display = '';
     }
   </script>
 </body>
