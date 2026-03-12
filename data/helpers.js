@@ -1,229 +1,180 @@
-// GoNoGo SA - Data Helpers (FIXED SCORE CALCULATIONS + OVERVIEW/RATING SUMMARY)
+// GoNoGo SA — Data Access Layer
+// Works with the BRAND_DATA array from data_part[A-F].js
 
-// Transform BRAND_DATA into proper structure with calculated percentage scores
-window.getBrandById = function(id) {
-  for (var i = 0; i < BRAND_DATA.length; i++) {
-    var cat = BRAND_DATA[i];
-    if (cat.brands) {
-      for (var j = 0; j < cat.brands.length; j++) {
-        if (cat.brands[j].id === id) {
-          var b = cat.brands[j];
-          return {
-            id: b.id,
-            name: b.name,
-            category: cat.category,
-            overallScore: b.gonogo_score || 0,
-            verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
-            logo: b.logo || '',
-            website: b.website || '',
+// ============================================================
+// CATEGORY / INDUSTRY HELPERS
+// ============================================================
+function getCategories() {
+  return BRAND_DATA.map(cat => ({
+    id: cat.slug,
+    name: cat.category,
+    icon: cat.icon,
+    brandCount: cat.brands.length,
+    scoringCategories: cat.scoring_categories
+  }));
+}
 
-            // Raw per‑category scores for radar
-            categoryScores: {
-              'Compliance': {
-                score: b.compliance_score,
-                max: b.compliance_max
-              },
-              'Customer Satisfaction': {
-                score: b.customer_satisfaction_score,
-                max: b.customer_satisfaction_max
-              },
-              'Product Value': {
-                score: b.product_value_score,
-                max: b.product_value_max
-              },
-              'Innovation': {
-                score: b.innovation_score,
-                max: b.innovation_max
-              },
-              'Customer Support': {
-                score: b.customer_support_score,
-                max: b.customer_support_max
-              },
-              'Accessibility & Security': {
-                score: b.accessibility_security_score,
-                max: b.accessibility_security_max
-              }
-            },
+function getCategoriesWithBrands() {
+  return BRAND_DATA.map(cat => ({
+    id: cat.slug,
+    name: cat.category,
+    icon: cat.icon,
+    brandCount: cat.brands.length,
+    hasBrands: cat.brands.length > 0,
+    scoringCategories: cat.scoring_categories
+  }));
+}
 
-            scores: calculatePercentageScores(b),
-            strengths: parseListField(b.strengths),
-            weaknesses: parseListField(b.concerns),
-            features: parseListField(b.features),
-            pricing: b.pricing || '',
-            googlePlayRating: b.googleplay_rating || '',
-            iosRating: b.ios_rating || '',
-            tags: parseListField(b.tags),
-            socialSentiment: b.social_sentiment || '',
-            socialPositive: parseListField(b.social_positive),
-            socialConcerns: parseListField(b.social_concerns),
-            lastUpdated: b.last_updated || '',
-            // NEW FIELDS
-            overview: b.overview || '',
-            ratingSummary: b.ratingSummary || ''
-          };
-        }
+function getCategoryBySlug(slug) {
+  const cat = BRAND_DATA.find(c => c.slug === slug);
+  if (!cat) return null;
+  return {
+    id: cat.slug,
+    name: cat.category,
+    icon: cat.icon,
+    brandCount: cat.brands.length,
+    scoringCategories: cat.scoring_categories,
+    brands: cat.brands.map(b => normalizeBrand(b, cat))
+  };
+}
+
+// ============================================================
+// BRAND NORMALIZATION
+// Converts SA brand data into a flat, consistent format
+// ============================================================
+function normalizeBrand(brand, category) {
+  // Parse framework_breakdown scores
+  const categoryScores = {};
+  const categoryDescriptions = {};
+  (brand.framework_breakdown || []).forEach(fb => {
+    const parts = fb.score.split('/');
+    const score = parseFloat(parts[0]);
+    const max = parseFloat(parts[1]);
+    const key = fb.category;
+    categoryScores[key] = { score, max, description: fb.description };
+    categoryDescriptions[key] = fb.description;
+  });
+
+  // Parse app ratings
+  const gpRaw = (brand.app_ratings && brand.app_ratings.google_play) || 'N/A';
+  const iosRaw = (brand.app_ratings && brand.app_ratings.ios) || 'N/A';
+  const gpScore = parseFloat(gpRaw) || 0;
+  const iosScore = parseFloat(iosRaw) || 0;
+
+  return {
+    id: slugify(brand.name),
+    name: brand.name,
+    categorySlug: category.slug,
+    categoryName: category.category,
+    categoryIcon: category.icon,
+    logo: brand.logo_url || '',
+    website: brand.website_url || '',
+    overallScore: brand.gonogo_score,
+    verdict: brand.verdict,
+    categoryScores: categoryScores,
+    scoringCategories: category.scoring_categories,
+    keyFeatures: brand.key_features || [],
+    pricing: brand.pricing || [],
+    appRatings: {
+      googlePlay: gpRaw,
+      ios: iosRaw,
+      googlePlayScore: gpScore,
+      iosScore: iosScore
+    },
+    strengths: brand.key_strengths || [],
+    concerns: brand.key_concerns || [],
+    socialSentiment: brand.social_sentiment || {},
+    lastUpdated: '2026-03-01'
+  };
+}
+
+function slugify(name) {
+  return name.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+// ============================================================
+// BRAND ACCESS
+// ============================================================
+function getAllBrands() {
+  const all = [];
+  BRAND_DATA.forEach(cat => {
+    cat.brands.forEach(b => {
+      all.push(normalizeBrand(b, cat));
+    });
+  });
+  return all;
+}
+
+function getBrandsByCategory(slug) {
+  const cat = BRAND_DATA.find(c => c.slug === slug);
+  if (!cat) return [];
+  return cat.brands.map(b => normalizeBrand(b, cat));
+}
+
+function getBrandById(id) {
+  for (const cat of BRAND_DATA) {
+    for (const b of cat.brands) {
+      if (slugify(b.name) === id) {
+        return normalizeBrand(b, cat);
       }
     }
   }
   return null;
-};
-
-window.getBrandsByCategory = function(slug) {
-  for (var i = 0; i < BRAND_DATA.length; i++) {
-    if (BRAND_DATA[i].slug === slug) {
-      var cat = BRAND_DATA[i];
-      return (cat.brands || []).map(function(b) {
-        return {
-          id: b.id,
-          name: b.name,
-          category: cat.category,
-          overallScore: b.gonogo_score || 0,
-          verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
-          logo: b.logo || '',
-
-          // Raw per‑category scores for radar (list view)
-          categoryScores: {
-            'Compliance': {
-              score: b.compliance_score,
-              max: b.compliance_max
-            },
-            'Customer Satisfaction': {
-              score: b.customer_satisfaction_score,
-              max: b.customer_satisfaction_max
-            },
-            'Product Value': {
-              score: b.product_value_score,
-              max: b.product_value_max
-            },
-            'Innovation': {
-              score: b.innovation_score,
-              max: b.innovation_max
-            },
-            'Customer Support': {
-              score: b.customer_support_score,
-              max: b.customer_support_max
-            },
-            'Accessibility & Security': {
-              score: b.accessibility_security_score,
-              max: b.accessibility_security_max
-            }
-          },
-
-          scores: calculatePercentageScores(b),
-          strengths: parseListField(b.strengths),
-          weaknesses: parseListField(b.concerns),
-          // NEW FIELDS
-          overview: b.overview || '',
-          ratingSummary: b.ratingSummary || ''
-        };
-      });
-    }
-  }
-  return [];
-};
-
-window.getAllBrands = function() {
-  var allBrands = [];
-  for (var i = 0; i < BRAND_DATA.length; i++) {
-    var cat = BRAND_DATA[i];
-    if (cat.brands) {
-      cat.brands.forEach(function(b) {
-        allBrands.push({
-          id: b.id,
-          name: b.name,
-          category: cat.category,
-          overallScore: b.gonogo_score || 0,
-          verdict: b.verdict || (b.gonogo_score >= 80 ? 'GO' : b.gonogo_score >= 60 ? 'GO WITH CAUTION' : 'NOGO'),
-          logo: b.logo || '',
-
-          // Raw per‑category scores for radar (global list)
-          categoryScores: {
-            'Compliance': {
-              score: b.compliance_score,
-              max: b.compliance_max
-            },
-            'Customer Satisfaction': {
-              score: b.customer_satisfaction_score,
-              max: b.customer_satisfaction_max
-            },
-            'Product Value': {
-              score: b.product_value_score,
-              max: b.product_value_max
-            },
-            'Innovation': {
-              score: b.innovation_score,
-              max: b.innovation_max
-            },
-            'Customer Support': {
-              score: b.customer_support_score,
-              max: b.customer_support_max
-            },
-            'Accessibility & Security': {
-              score: b.accessibility_security_score,
-              max: b.accessibility_security_max
-            }
-          },
-
-          scores: calculatePercentageScores(b),
-          // NEW FIELDS
-          overview: b.overview || '',
-          ratingSummary: b.ratingSummary || ''
-        });
-      });
-    }
-  }
-  return allBrands;
-};
-
-window.getTopBrands = function(count) {
-  var all = getAllBrands();
-  all.sort(function(a, b) { return b.overallScore - a.overallScore; });
-  return all.slice(0, count || 6);
-};
-
-window.getCategoriesWithBrands = function() {
-  return BRAND_DATA.map(function(cat) {
-    return {
-      id: cat.slug,
-      name: cat.category,
-      icon: cat.icon,
-      brandCount: cat.brands ? cat.brands.length : 0,
-      hasBrands: cat.brands && cat.brands.length > 0
-    };
-  });
-};
-
-// Calculate percentage scores for radar chart
-function calculatePercentageScores(brand) {
-  var scores = {};
-  var scoreFields = [
-    {name: 'Compliance', score: 'compliance_score', max: 'compliance_max'},
-    {name: 'Customer Satisfaction', score: 'customer_satisfaction_score', max: 'customer_satisfaction_max'},
-    {name: 'Product Value', score: 'product_value_score', max: 'product_value_max'},
-    {name: 'Innovation', score: 'innovation_score', max: 'innovation_max'},
-    {name: 'Customer Support', score: 'customer_support_score', max: 'customer_support_max'},
-    {name: 'Accessibility & Security', score: 'accessibility_security_score', max: 'accessibility_security_max'}
-  ];
-
-  scoreFields.forEach(function(field) {
-    if (brand[field.score] !== undefined && brand[field.max] && brand[field.max] > 0) {
-      scores[field.name] = Math.round((brand[field.score] / brand[field.max]) * 100);
-    }
-  });
-
-  return scores;
 }
 
-// Parse semicolon-separated list fields
-function parseListField(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  return value.toString().split(';').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+function getBrandByName(name) {
+  for (const cat of BRAND_DATA) {
+    for (const b of cat.brands) {
+      if (b.name === name) {
+        return normalizeBrand(b, cat);
+      }
+    }
+  }
+  return null;
 }
 
-console.log('helpers.js loaded - testing now...');
-console.log('Test window.getCategoriesWithBrands():');
-var testCats = window.getCategoriesWithBrands();
-console.log('getCategoriesWithBrands called, BRAND_DATA:', typeof BRAND_DATA);
-console.log('getCategoriesWithBrands returning:', testCats.length, 'categories');
-console.log('Result:', testCats.length, 'categories');
+function getTopBrands(count = 6) {
+  return getAllBrands()
+    .sort((a, b) => b.overallScore - a.overallScore)
+    .slice(0, count);
+}
+
+function getTotalBrandCount() {
+  return BRAND_DATA.reduce((sum, cat) => sum + cat.brands.length, 0);
+}
+
+// ============================================================
+// SCORE HELPERS
+// ============================================================
+function getScoreColor(score) {
+  if (score >= 80) return '#11a551';
+  if (score >= 60) return '#ff9800';
+  return '#e74c3c';
+}
+
+function getScoreLabel(score) {
+  if (score >= 80) return 'Excellent';
+  if (score >= 70) return 'Good';
+  if (score >= 60) return 'Fair';
+  return 'Poor';
+}
+
+function getVerdictFromScore(score) {
+  if (score >= 80) return 'GO';
+  if (score >= 60) return 'GO WITH CAUTION';
+  return 'NOGO';
+}
+
+// ============================================================
+// IN-MEMORY STORAGE (no persistent storage in sandbox)
+// ============================================================
+const GoNoGoStorage = {
+  _store: {},
+  get(key) { return this._store[key] !== undefined ? this._store[key] : null; },
+  set(key, value) { this._store[key] = value; },
+  remove(key) { delete this._store[key]; },
+  getLocal(key) { return this._store['local_' + key] !== undefined ? this._store['local_' + key] : null; },
+  setLocal(key, value) { this._store['local_' + key] = value; }
+};
