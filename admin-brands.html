@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html lang="en-ZA">
 <head>
-  <!-- Created with Perplexity Computer -->
-  <meta name="generator" content="Perplexity Computer">
-  <meta name="author" content="Perplexity Computer">
-  <meta property="og:see_also" content="https://www.perplexity.ai/computer">
-  <link rel="author" href="https://www.perplexity.ai/computer">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoNoGo SA — Brand Management</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoNoGo SA — Brand Management</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
   <div class="admin-layout">
@@ -26,7 +35,8 @@
             <i class="fa-solid fa-download"></i> Export CSV
           </button>
           <button class="btn btn-primary btn-sm" onclick="openAddModal()">
-            <i class="fa-solid fa-plus"></i> Add Brand</button>
+            <i class="fa-solid fa-plus"></i> Add Brand
+          </button>
         </div>
       </div>
 
@@ -132,19 +142,37 @@
     </div>
   </div>
 
-    <script src="data/data.js"></script>
+    <script src="data/data_partA1a.js"></script>
+  <script src="data/data_partA1b.js"></script>
+  <script src="data/data_partA1.js"></script>
+  <script src="data/data_partA2.js"></script>
+  <script src="data/data_partA.js"></script>
+  <script src="data/data_partB1.js"></script>
+  <script src="data/data_partB2a.js"></script>
+  <script src="data/data_partB2b.js"></script>
+  <script src="data/data_partB2.js"></script>
+  <script src="data/data_partB3.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC1a.js"></script>
+  <script src="data/data_partC1b.js"></script>
+  <script src="data/data_partC1.js"></script>
+  <script src="data/data_partC2.js"></script>
+  <script src="data/data_partC3a.js"></script>
+  <script src="data/data_partC3b.js"></script>
+  <script src="data/data_partC3.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD1.js"></script>
+  <script src="data/data_partD2.js"></script>
+  <script src="data/data_partD3.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
   <script src="data/helpers.js"></script>
   <script src="components.js"></script>
-
-  <!-- Supabase + API wrapper -->
-  <script src="https://esm.sh/@supabase/supabase-js@2.48.0"></script>
-  <script src="api-v2.js"></script>
-
+  <script src="api.js"></script>
   <script>
     document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('brands');
-    // keep the rest of the page-specific JS here if there is any
-  </script>
-
 
     if (Components.checkAdminAuth()) {
       initAdminPage();
@@ -190,11 +218,9 @@
       var verdict = document.getElementById('verdict-filter').value;
 
       var filtered = allBrandsData.filter(function(b) {
-        var categoryName = b.categoryName || b.category || '';
-        var categorySlug = b.categorySlug || b.category_slug || '';
-        var matchSearch = !search || b.name.toLowerCase().indexOf(search) !== -1 || categoryName.toLowerCase().indexOf(search) !== -1;
-        var matchIndustry = !industry || categorySlug === industry;
-        var matchVerdict = !verdict || (b.verdict || '').toUpperCase() === verdict;
+        var matchSearch = !search || b.name.toLowerCase().indexOf(search) !== -1 || b.categoryName.toLowerCase().indexOf(search) !== -1;
+        var matchIndustry = !industry || b.categorySlug === industry;
+        var matchVerdict = !verdict || b.verdict === verdict;
         return matchSearch && matchIndustry && matchVerdict;
       });
 
@@ -218,9 +244,6 @@
 
       tbody.innerHTML = data.map(function(b) {
         var logoHtml = Components.renderLogo(b, 'brand-logo');
-        var categoryName = b.categoryName || b.category || '';
-        var appGp = (b.googlePlayRating || (b.appRatings && b.appRatings.googlePlay) || 'N/A');
-        var appIos = (b.iosRating || (b.appRatings && b.appRatings.ios) || 'N/A');
         return '<tr>' +
           '<td>' +
             '<div class="brand-cell">' +
@@ -231,13 +254,13 @@
               '</div>' +
             '</div>' +
           '</td>' +
-          '<td><span class="text-sm">' + categoryName + '</span></td>' +
-          '<td>' + Components.renderScoreBadge(b.overallScore || b.gonogo_score || 0) + '</td>' +
+          '<td><span class="text-sm">' + b.categoryName + '</span></td>' +
+          '<td>' + Components.renderScoreBadge(b.overallScore) + '</td>' +
           '<td>' + Components.renderVerdictBadge(b.verdict) + '</td>' +
           '<td>' +
             '<div style="display:flex;flex-direction:column;gap:2px;font-size:var(--text-xs)">' +
-              '<span><i class="fa-brands fa-google-play" style="width:14px;opacity:0.5"></i> ' + appGp + '</span>' +
-              '<span><i class="fa-brands fa-apple" style="width:14px;opacity:0.5"></i> ' + appIos + '</span>' +
+              '<span><i class="fa-brands fa-google-play" style="width:14px;opacity:0.5"></i> ' + b.appRatings.googlePlay + '</span>' +
+              '<span><i class="fa-brands fa-apple" style="width:14px;opacity:0.5"></i> ' + b.appRatings.ios + '</span>' +
             '</div>' +
           '</td>' +
           '<td><span class="text-xs text-muted">' + Components.formatRelativeDate(b.lastUpdated) + '</span></td>' +
@@ -267,36 +290,21 @@
       editingBrandId = id;
       document.getElementById('modal-title').textContent = 'Edit: ' + b.name;
       document.getElementById('f-name').value = b.name;
-      document.getElementById('f-industry').value = b.categorySlug || b.category_slug || '';
+      document.getElementById('f-industry').value = b.categorySlug;
       document.getElementById('f-website').value = b.website || '';
       document.getElementById('f-logo').value = b.logo || '';
+      document.getElementById('f-googleplay').value = b.appRatings.googlePlayScore || '';
+      document.getElementById('f-ios').value = b.appRatings.iosScore || '';
 
-      // app ratings (expect just numeric score before /5)
-      var gpScore = (b.googlePlayRating || '').split('/')[0] || (b.appRatings && b.appRatings.googlePlayScore) || '';
-      var iosScore = (b.iosRating || '').split('/')[0] || (b.appRatings && b.appRatings.iosScore) || '';
-      document.getElementById('f-googleplay').value = gpScore;
-      document.getElementById('f-ios').value = iosScore;
-
-      // Clear score inputs
-      var defaultCats = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
-      defaultCats.forEach(function(catName) {
-        var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
+      // Fill in category scores
+      Object.entries(b.categoryScores).forEach(function(entry) {
+        var name = entry[0], data = entry[1];
+        var fieldId = 'f-' + name.toLowerCase().replace(/[^a-z]+/g, '-');
         var scoreEl = document.getElementById(fieldId + '-score');
         var maxEl = document.getElementById(fieldId + '-max');
-        if (scoreEl) scoreEl.value = '';
-        if (maxEl) maxEl.value = '';
+        if (scoreEl) scoreEl.value = data.score;
+        if (maxEl) maxEl.value = data.max;
       });
-
-      if (b.categoryScores) {
-        Object.entries(b.categoryScores).forEach(function(entry) {
-          var name = entry[0], data = entry[1];
-          var fieldId = 'f-' + name.toLowerCase().replace(/[^a-z]+/g, '-');
-          var scoreEl = document.getElementById(fieldId + '-score');
-          var maxEl = document.getElementById(fieldId + '-max');
-          if (scoreEl) scoreEl.value = data.score;
-          if (maxEl) maxEl.value = data.max;
-        });
-      }
 
       document.getElementById('brand-modal').classList.add('open');
     }
@@ -311,9 +319,50 @@
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
-      // Static/demo mode: just show a toast and close; real persistence will come later
-      Components.showToast('Static demo: brand saving will be wired to the data backend in the next phase.');
-      closeModal();
+      // Collect scores
+      var scoreCategories = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
+      var scores = {};
+      scoreCategories.forEach(function(catName) {
+        var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
+        var scoreEl = document.getElementById(fieldId + '-score');
+        var maxEl = document.getElementById(fieldId + '-max');
+        if (scoreEl && maxEl && scoreEl.value && maxEl.value) {
+          scores[catName] = {
+            score: parseFloat(scoreEl.value),
+            max: parseFloat(maxEl.value),
+            description: ''
+          };
+        }
+      });
+
+      var gpVal = document.getElementById('f-googleplay').value;
+      var iosVal = document.getElementById('f-ios').value;
+
+      var brandData = {
+        name: document.getElementById('f-name').value.trim(),
+        categorySlug: document.getElementById('f-industry').value,
+        website: document.getElementById('f-website').value.trim(),
+        logo: document.getElementById('f-logo').value.trim(),
+        scores: scores,
+        googlePlayRating: gpVal ? gpVal + '/5' : 'N/A',
+        iosRating: iosVal ? iosVal + '/5' : 'N/A',
+        keyFeatures: [],
+        pricing: [],
+        keyStrengths: [],
+        keyConcerns: []
+      };
+
+      try {
+        var result = await GoNoGoAPI.saveBrand(brandData);
+        Components.showToast('Brand saved — ' + result.verdict + ' (' + result.gonogo_score + '/100)');
+        closeModal();
+
+        // Refresh the brand list
+        allBrandsData = await GoNoGoAPI.getAllBrands();
+        filterBrands();
+      } catch (err) {
+        Components.showToast('Error saving brand: ' + err.message, 'error');
+      }
 
       saveBtn.disabled = false;
       saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Brand';
@@ -321,16 +370,13 @@
 
     function exportBrands() {
       var data = allBrandsData.map(function(b) {
-        var categoryName = b.categoryName || b.category || '';
-        var appGp = (b.googlePlayRating || (b.appRatings && b.appRatings.googlePlay) || 'N/A');
-        var appIos = (b.iosRating || (b.appRatings && b.appRatings.ios) || 'N/A');
         return {
           Name: b.name,
-          Industry: categoryName,
-          Score: b.overallScore || b.gonogo_score || 0,
+          Industry: b.categoryName,
+          Score: b.overallScore,
           Verdict: b.verdict,
-          GooglePlay: appGp,
-          iOS: appIos,
+          GooglePlay: b.appRatings.googlePlay,
+          iOS: b.appRatings.ios,
           Website: b.website,
           LastUpdated: b.lastUpdated
         };
