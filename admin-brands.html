@@ -334,6 +334,7 @@
       };
 
       try {
+        if (editingBrandId) brandData.id = editingBrandId;
         var result = await GoNoGoAPI.saveBrand(brandData);
         Components.showToast('Brand saved — ' + result.verdict + ' (' + result.gonogo_score + '/100)');
         closeModal();

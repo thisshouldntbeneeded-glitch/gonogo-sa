@@ -210,6 +210,137 @@ var GoNoGoAPI = (function () {
       }).then(function () {
         return { ok: true, id: reviewId, status: newStatus };
       });
+    },
+
+    // ==========================================
+    // ADMIN USER MANAGEMENT — Supabase 'admin_users' table
+    // Columns: id, email, password_hash, display_name, role, created_at
+    // password_hash stores a simple SHA-256 hex (client-side hashing)
+    // ==========================================
+
+    _hashPassword: function (password) {
+      // SHA-256 via SubtleCrypto
+      var encoder = new TextEncoder();
+      return crypto.subtle.digest('SHA-256', encoder.encode(password)).then(function (buf) {
+        return Array.from(new Uint8Array(buf)).map(function (b) {
+          return b.toString(16).padStart(2, '0');
+        }).join('');
+      });
+    },
+
+    adminLogin: function (email, password) {
+      var self = this;
+      return this._hashPassword(password).then(function (hash) {
+        return supabaseRequest(
+          'admin_users?email=eq.' + encodeURIComponent(email) +
+          '&password_hash=eq.' + encodeURIComponent(hash) +
+          '&select=id,email,display_name,role'
+        ).then(function (rows) {
+          if (rows && rows.length > 0) return rows[0];
+          return null;
+        });
+      });
+    },
+
+    adminChangePassword: function (userId, oldPassword, newPassword) {
+      var self = this;
+      return Promise.all([
+        this._hashPassword(oldPassword),
+        this._hashPassword(newPassword)
+      ]).then(function (hashes) {
+        var oldHash = hashes[0];
+        var newHash = hashes[1];
+        // Verify old password first
+        return supabaseRequest(
+          'admin_users?id=eq.' + encodeURIComponent(userId) +
+          '&password_hash=eq.' + encodeURIComponent(oldHash) +
+          '&select=id'
+        ).then(function (rows) {
+          if (!rows || rows.length === 0) throw new Error('Current password is incorrect');
+          // Update to new password
+          return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), {
+            method: 'PATCH',
+            body: { password_hash: newHash },
+            prefer: 'return=representation'
+          });
+        }).then(function () {
+          return { ok: true };
+        });
+      });
+    },
+
+    adminGetUsers: function () {
+      return supabaseRequest('admin_users?select=id,email,display_name,role,created_at&order=created_at.asc')
+        .then(function (rows) { return rows || []; })
+        .catch(function () { return []; });
+    },
+
+    adminAddUser: function (email, password, displayName, role) {
+      var self = this;
+      return this._hashPassword(password).then(function (hash) {
+        return supabaseRequest('admin_users', {
+          method: 'POST',
+          body: {
+            email: email.toLowerCase().trim(),
+            password_hash: hash,
+            display_name: displayName || '',
+            role: role || 'admin'
+          },
+          prefer: 'return=representation'
+        });
+      }).then(function (rows) {
+        return { ok: true, user: rows && rows[0] ? rows[0] : null };
+      });
+    },
+
+    adminRemoveUser: function (userId) {
+      return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), {
+        method: 'DELETE'
+      }).then(function () {
+        return { ok: true };
+      });
+    },
+
+    // ==========================================
+    // BRAND SAVE — stores to localStorage overlay
+    // (static data files remain the source of truth;
+    //  edits are persisted as localStorage overrides)
+    // ==========================================
+    saveBrand: function (brandData) {
+      // Compute overall score from category scores
+      var totalScore = 0, totalMax = 0;
+      if (brandData.scores) {
+        Object.keys(brandData.scores).forEach(function (k) {
+          totalScore += brandData.scores[k].score || 0;
+          totalMax += brandData.scores[k].max || 0;
+        });
+      }
+      var overallScore = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0;
+      var verdict = overallScore >= 80 ? 'GO' : overallScore >= 60 ? 'GO WITH CAUTION' : 'NOGO';
+
+      var brandRecord = {
+        name: brandData.name,
+        categorySlug: brandData.categorySlug,
+        website: brandData.website || '',
+        logo: brandData.logo || '',
+        categoryScores: brandData.scores || {},
+        appRatings: {
+          googlePlay: brandData.googlePlayRating || 'N/A',
+          ios: brandData.iosRating || 'N/A'
+        },
+        overallScore: overallScore,
+        verdict: verdict,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      };
+
+      // Save to localStorage overrides
+      var overrides = GoNoGoStorage.get('brandOverrides') || {};
+      var id = brandData.id || brandData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      brandRecord.id = id;
+      overrides[id] = brandRecord;
+      GoNoGoStorage.set('brandOverrides', overrides);
+
+      return Promise.resolve({ ok: true, gonogo_score: overallScore, verdict: verdict });
     }
   };
 })();

@@ -193,36 +193,20 @@
         </div>
       </div>
 
-      <!-- Google Sheets Link -->
-      <div class="card" style="margin-top:var(--space-8);border-color:var(--border-primary);padding:var(--space-6);">
-        <div style="display:flex;align-items:center;gap:var(--space-4);">
-          <i class="fa-solid fa-table" style="font-size:var(--text-xl);color:var(--green);"></i>
-          <div style="flex:1;">
-            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-1);">SA Mastersheet</h3>
-            <p class="text-xs text-muted">All brand data is synced from this Google Sheet. Edit scores, add brands, and update research directly in the sheet.</p>
-          </div>
-          <a href="https://docs.google.com/spreadsheets/d/1V6uzslhnwEu4BYShWZi4ZS58xy9A8yeL-N6uIWEgHdw/edit" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Sheet
-          </a>
-        </div>
-      </div>
-
       <!-- Research Info -->
-      <div class="card" style="margin-top:var(--space-6);border-color:var(--border-primary);padding:var(--space-6);">
+      <div class="card" style="margin-top:var(--space-8);border-color:var(--border-primary);padding:var(--space-6);">
         <div style="display:flex;align-items:flex-start;gap:var(--space-4);">
           <i class="fa-solid fa-circle-info" style="font-size:var(--text-lg);color:var(--green);margin-top:2px;"></i>
           <div>
-            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-2);">How Auto-Research Works</h3>
+            <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-2);">About Data Freshness</h3>
             <div class="text-xs text-secondary" style="line-height:1.8;">
-              <p style="margin-bottom:var(--space-2);">When you click <strong>Refresh</strong> on a brand, the system automatically:</p>
-              <ol style="padding-left:var(--space-5);margin-bottom:var(--space-2);">
-                <li>Checks the <strong>Google Play Store</strong> for current app rating</li>
-                <li>Queries the <strong>Apple App Store</strong> (iTunes API) for iOS rating</li>
-                <li>Looks up <strong>Hellopeter</strong> trust index and review count</li>
-                <li>Verifies <strong>website accessibility</strong> and HTTPS status</li>
-                <li>Updates the brand's <strong>Last Researched</strong> date</li>
-              </ol>
-              <p>Updated data syncs to Google Sheets via the daily auto-sync. Use <strong>Auto-Research Outdated</strong> to refresh all brands over 30 days old (up to 10 at a time).</p>
+              <p style="margin-bottom:var(--space-2);">This page tracks when each brand's data was last reviewed:</p>
+              <ul style="padding-left:var(--space-5);margin-bottom:var(--space-2);">
+                <li><strong>Fresh</strong> (green) — data reviewed within 14 days</li>
+                <li><strong>Stale</strong> (orange) — data is 15-30 days old, should be checked</li>
+                <li><strong>Outdated</strong> (red) — data is over 30 days old, needs attention</li>
+              </ul>
+              <p>Click <strong>Mark Fresh</strong> on a brand after you've manually verified its data is current. Use <strong>Refresh Stale</strong> or <strong>Auto-Refresh Outdated</strong> to batch-mark brands as reviewed.</p>
             </div>
           </div>
         </div>
@@ -287,8 +271,10 @@
       var allBrands = await GoNoGoAPI.getAllBrands();
       var now = new Date();
 
+      var dateOverrides = getResearchOverrides();
       researchData = allBrands.map(function(b) {
-        var lastDate = new Date(b.lastUpdated);
+        var updated = dateOverrides[b.id] || b.lastUpdated;
+        var lastDate = new Date(updated);
         var daysSince = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
         var freshness = 'fresh';
         if (daysSince > 30) freshness = 'outdated';
@@ -303,7 +289,7 @@
           categoryName: b.categoryName,
           overallScore: b.overallScore,
           verdict: b.verdict,
-          lastUpdated: b.lastUpdated,
+          lastUpdated: updated,
           daysSince: daysSince,
           freshness: freshness
         };
@@ -409,7 +395,7 @@
         var isResearching = activeResearch[r.id];
         var btnClass = isResearching ? 'btn-researching' : (r.freshness !== 'fresh' ? 'btn-primary' : 'btn-ghost');
         var btnIcon = isResearching ? '<span class="research-spinner"></span>' : '<i class="fa-solid fa-rotate"></i> ';
-        var btnText = isResearching ? 'Researching...' : (r.freshness !== 'fresh' ? 'Refresh' : 'Re-check');
+        var btnText = isResearching ? 'Updating...' : (r.freshness !== 'fresh' ? 'Mark Fresh' : 'Re-check');
         var escapedName = r.name.replace(/'/g, "\\'");
 
         return '<tr id="row-' + r.id + '">' +
@@ -440,153 +426,92 @@
     }
 
     // ============================================================
-    // RESEARCH ACTIONS
+    // RESEARCH ACTIONS (client-side freshness tracking)
     // ============================================================
+
+    function getResearchOverrides() {
+      return GoNoGoStorage.get('researchDates') || {};
+    }
+    function saveResearchOverride(brandId) {
+      var overrides = getResearchOverrides();
+      overrides[brandId] = new Date().toISOString().split('T')[0];
+      GoNoGoStorage.set('researchDates', overrides);
+    }
 
     async function triggerResearch(brandId, brandName) {
       if (activeResearch[brandId]) return;
-
-      // Check if backend is available
-      var isLive = GoNoGoAPI.isLive();
-      if (!isLive) {
-        Components.showToast('Auto-Research requires the live platform backend. Currently running in static mode.', 'error');
-        return;
-      }
-
       activeResearch[brandId] = true;
 
-      // Update button state
       var btn = document.getElementById('btn-' + brandId);
       if (btn) {
         btn.className = 'btn btn-sm btn-researching';
-        btn.innerHTML = '<span class="research-spinner"></span> Researching...';
+        btn.innerHTML = '<span class="research-spinner"></span> Marking...';
       }
 
-      // Show modal
       showResearchModal(brandName);
-      addLog('Starting research for ' + brandName + '...', 'info');
-      addLog('Checking Google Play Store...', '');
-      addLog('Querying Apple App Store (iTunes API)...', '');
-      addLog('Looking up Hellopeter data...', '');
-      addLog('Verifying website status...', '');
+      addLog('Marking ' + brandName + ' as freshly reviewed...', 'info');
 
-      try {
-        var rawBase = '__PORT_8000__';
-        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
-        var resp = await fetch(API_BASE + '/api/admin/research/' + brandId, { method: 'POST' });
-        var result = await resp.json();
+      // Small delay for UX
+      await new Promise(function(r) { setTimeout(r, 500); });
 
-        if (result.status === 'completed') {
-          addLog('', '');
-          addLog('Research completed successfully', 'success');
+      saveResearchOverride(brandId);
+      addLog('Data freshness updated to today', 'success');
 
-          var fieldsUpdated = result.fields_updated || [];
-          if (fieldsUpdated.length > 0) {
-            fieldsUpdated.forEach(function(field) {
-              addLog('  Updated: ' + field, 'success');
-            });
-          }
-
-          var changes = result.changes || [];
-          if (changes.length > 0) {
-            addLog('', '');
-            addLog('Changes:', 'info');
-            changes.forEach(function(change) {
-              addLog('  ' + change, 'info');
-            });
-          }
-
-          // Show result details
-          showResearchResults(result);
-
-          // Update local data
-          var rd = researchData.find(function(r) { return r.id === brandId; });
-          if (rd) {
-            rd.lastUpdated = new Date().toISOString().split('T')[0];
-            rd.daysSince = 0;
-            rd.freshness = 'fresh';
-          }
-
-          renderKPIs();
-          filterResearch();
-
-          Components.showToast('Research complete for ' + brandName, 'success');
-        } else if (result.status === 'error') {
-          addLog('', '');
-          addLog('Error: ' + (result.error || 'Unknown error'), 'error');
-          Components.showToast('Research failed for ' + brandName, 'error');
-        }
-      } catch (e) {
-        addLog('', '');
-        addLog('Request failed: ' + e.message, 'error');
-        Components.showToast('Failed to reach research API', 'error');
+      // Update local data
+      var rd = researchData.find(function(r) { return r.id === brandId; });
+      if (rd) {
+        rd.lastUpdated = new Date().toISOString().split('T')[0];
+        rd.daysSince = 0;
+        rd.freshness = 'fresh';
       }
+
+      renderKPIs();
+      filterResearch();
+      Components.showToast(brandName + ' marked as fresh', 'success');
 
       activeResearch[brandId] = false;
       completeModal();
     }
 
     async function triggerBatchResearch(freshness) {
-      var isLive = GoNoGoAPI.isLive();
-      if (!isLive) {
-        Components.showToast('Auto-Research requires the live platform backend.', 'error');
-        return;
-      }
-
       var label = freshness === 'stale' ? 'stale (15-30 days)' : 'outdated (30+ days)';
-      var count = researchData.filter(function(r) {
+      var targets = researchData.filter(function(r) {
         if (freshness === 'stale') return r.freshness === 'stale' || r.freshness === 'outdated';
         return r.freshness === 'outdated';
-      }).length;
+      });
 
-      if (count === 0) {
-        Components.showToast('No ' + label + ' brands to research', 'info');
+      if (targets.length === 0) {
+        Components.showToast('No ' + label + ' brands to refresh', 'info');
         return;
       }
 
-      showResearchModal('Batch Research — ' + label);
-      addLog('Starting batch research for ' + count + ' brands...', 'info');
-      addLog('Processing up to 10 brands at a time...', '');
-
+      var batch = targets.slice(0, 10);
+      showResearchModal('Batch Refresh — ' + label);
+      addLog('Marking ' + batch.length + ' brands as reviewed...', 'info');
       document.getElementById('modal-progress').style.display = 'block';
 
-      try {
-        var rawBase = '__PORT_8000__';
-        var API_BASE = rawBase.indexOf('__PORT_') === -1 ? rawBase : '';
-        var resp = await fetch(API_BASE + '/api/admin/research-batch?freshness=' + freshness, { method: 'POST' });
-        var result = await resp.json();
+      for (var i = 0; i < batch.length; i++) {
+        var b = batch[i];
+        await new Promise(function(r) { setTimeout(r, 100); });
 
-        if (result.status === 'completed') {
-          var total = result.total_researched || 0;
-          document.getElementById('modal-progress-bar').style.width = '100%';
+        saveResearchOverride(b.id);
+        b.lastUpdated = new Date().toISOString().split('T')[0];
+        b.daysSince = 0;
+        b.freshness = 'fresh';
 
-          addLog('', '');
-          addLog('Batch research completed: ' + total + ' brands processed', 'success');
-
-          if (result.total_remaining > 0) {
-            addLog(result.total_remaining + ' brands remaining — run again to continue', 'info');
-          }
-
-          (result.results || []).forEach(function(r) {
-            if (r.status === 'completed') {
-              var changeStr = (r.changes || []).join(', ');
-              addLog('  ' + r.brand + ': ' + (changeStr || 'updated'), 'success');
-            } else {
-              addLog('  ' + r.brand + ': ' + (r.error || 'failed'), 'error');
-            }
-          });
-
-          // Refresh the whole page data
-          await initAdminPage();
-          Components.showToast('Batch research complete: ' + total + ' brands updated', 'success');
-        } else if (result.status === 'no_targets') {
-          addLog('No brands match the criteria', 'info');
-        }
-      } catch (e) {
-        addLog('Batch request failed: ' + e.message, 'error');
-        Components.showToast('Batch research request failed', 'error');
+        addLog('  ' + b.name + ': marked fresh', 'success');
+        document.getElementById('modal-progress-bar').style.width = Math.round(((i + 1) / batch.length) * 100) + '%';
       }
 
+      addLog('', '');
+      addLog('Batch complete: ' + batch.length + ' brands refreshed', 'success');
+      if (targets.length > 10) {
+        addLog((targets.length - 10) + ' remaining — run again to continue', 'info');
+      }
+
+      renderKPIs();
+      filterResearch();
+      Components.showToast('Batch refresh complete: ' + batch.length + ' brands', 'success');
       completeModal();
     }
 
@@ -627,44 +552,7 @@
       log.scrollTop = log.scrollHeight;
     }
 
-    function showResearchResults(result) {
-      var container = document.getElementById('modal-results');
-      var data = result.data || {};
-      var html = '<div class="research-result-card">';
-      html += '<h4 class="text-sm font-semibold" style="margin-bottom:var(--space-3);">Research Results</h4>';
 
-      if (data.googlePlay) {
-        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-google-play" style="margin-right:4px;"></i> Google Play</span><span class="result-value">' + data.googlePlay + '</span></div>';
-      }
-      if (data.ios) {
-        html += '<div class="result-field"><span class="result-label"><i class="fa-brands fa-apple" style="margin-right:4px;"></i> iOS App Store</span><span class="result-value">' + data.ios + '</span></div>';
-      }
-      if (data.hellopeter) {
-        var hp = data.hellopeter;
-        var hpStr = '';
-        if (hp.trust_index) hpStr += 'Trust: ' + hp.trust_index;
-        if (hp.star_rating) hpStr += (hpStr ? ' | ' : '') + hp.star_rating + '/5';
-        if (hp.review_count) hpStr += (hpStr ? ' | ' : '') + hp.review_count + ' reviews';
-        if (hpStr) {
-          html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-comments" style="margin-right:4px;"></i> Hellopeter</span><span class="result-value">' + hpStr + '</span></div>';
-        }
-      }
-      if (data.website_status) {
-        var ws = data.website_status;
-        var statusIcon = ws.accessible ? '<span style="color:var(--green);">Online</span>' : '<span style="color:var(--red-text);">Offline</span>';
-        var details = statusIcon;
-        if (ws.response_time_ms) details += ' (' + ws.response_time_ms + 'ms)';
-        if (ws.https) details += ' <i class="fa-solid fa-lock" style="color:var(--green);font-size:10px;"></i>';
-        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-globe" style="margin-right:4px;"></i> Website</span><span class="result-value">' + details + '</span></div>';
-      }
-      if (data.lastUpdated) {
-        html += '<div class="result-field"><span class="result-label"><i class="fa-solid fa-calendar" style="margin-right:4px;"></i> Updated</span><span class="result-value">' + data.lastUpdated + '</span></div>';
-      }
-
-      html += '</div>';
-      container.innerHTML = html;
-      container.style.display = '';
-    }
   </script>
 </body>
 </html>

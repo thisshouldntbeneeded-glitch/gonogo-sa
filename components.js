@@ -37,7 +37,7 @@ const Components = {
       { href: 'category.html?cat=medical-aid', label: 'Medical Aid', icon: 'fa-heart-pulse', id: 'medical-aid' },
       { href: 'category.html?cat=insurance', label: 'Insurance', icon: 'fa-umbrella', id: 'insurance' },
       { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
-      { href: 'admin.html', label: 'Admin', icon: 'fa-lock', id: 'admin' }
+      // Admin link hidden from public nav — access via /admin.html directly
     ];
 
     return `
@@ -75,7 +75,9 @@ const Components = {
       { href: 'admin.html', label: 'Dashboard', icon: 'fa-gauge', id: 'dashboard' },
       { href: 'admin-brands.html', label: 'Brands', icon: 'fa-tags', id: 'brands' },
       { href: 'admin-comments.html', label: 'Comments', icon: 'fa-comments', id: 'comments' },
-      { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' }
+      { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' },
+      { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
+      { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' }
     ];
 
     return `
@@ -477,18 +479,29 @@ const Components = {
   },
 
   // ============================================================
-  // ADMIN AUTH
+  // ADMIN AUTH (Supabase-backed multi-user)
   // ============================================================
+  _adminUser: null,
+
+  getAdminUser() {
+    if (this._adminUser) return this._adminUser;
+    try {
+      var stored = GoNoGoStorage.get('adminUser');
+      if (stored) this._adminUser = stored;
+    } catch(e) {}
+    return this._adminUser;
+  },
+
   checkAdminAuth() {
-    const isAuth = GoNoGoStorage.get('adminAuth');
-    if (!isAuth) {
-      this.showPasswordPrompt();
+    var user = this.getAdminUser();
+    if (!user) {
+      this.showLoginPrompt();
       return false;
     }
     return true;
   },
 
-  showPasswordPrompt() {
+  showLoginPrompt() {
     const overlay = document.createElement('div');
     overlay.className = 'password-overlay';
     overlay.id = 'password-overlay';
@@ -497,37 +510,68 @@ const Components = {
         <div class="logo" style="justify-content:center">
           <img src="${LOGO_URL}" alt="GoNoGo" style="height:32px;width:auto;">
         </div>
-        <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-5)">Enter password to access the admin dashboard</p>
+        <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-5)">Sign in to access the admin dashboard</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="admin-email" placeholder="admin@gonogo.co.za" onkeydown="if(event.key==='Enter')document.getElementById('admin-password').focus()">
+        </div>
         <div class="form-group">
           <label class="form-label">Password</label>
-          <input type="password" id="admin-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')Components.submitPassword()">
-          <div class="password-error" id="password-error">Incorrect password. Try again.</div>
+          <input type="password" id="admin-password" placeholder="Enter password" onkeydown="if(event.key==='Enter')Components.submitLogin()">
+          <div class="password-error" id="password-error">Incorrect credentials. Try again.</div>
         </div>
-        <button class="btn btn-primary w-full" onclick="Components.submitPassword()">
+        <button class="btn btn-primary w-full" id="login-btn" onclick="Components.submitLogin()">
           <i class="fa-solid fa-lock"></i> Sign In
         </button>
       </div>
     `;
     document.body.appendChild(overlay);
-    setTimeout(() => document.getElementById('admin-password').focus(), 100);
+    setTimeout(() => document.getElementById('admin-email').focus(), 100);
   },
 
-  submitPassword() {
-    const input = document.getElementById('admin-password');
+  async submitLogin() {
+    const emailInput = document.getElementById('admin-email');
+    const passInput = document.getElementById('admin-password');
     const error = document.getElementById('password-error');
-    if (input.value === 'gonogo2026') {
-      GoNoGoStorage.set('adminAuth', true);
-      document.getElementById('password-overlay').remove();
-      if (typeof initAdminPage === 'function') initAdminPage();
-    } else {
+    const btn = document.getElementById('login-btn');
+    var email = emailInput.value.trim().toLowerCase();
+    var password = passInput.value;
+
+    if (!email || !password) {
+      error.textContent = 'Please enter both email and password.';
       error.style.display = 'block';
-      input.value = '';
-      input.focus();
+      return;
     }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+    error.style.display = 'none';
+
+    try {
+      var user = await GoNoGoAPI.adminLogin(email, password);
+      if (user) {
+        Components._adminUser = user;
+        GoNoGoStorage.set('adminUser', user);
+        document.getElementById('password-overlay').remove();
+        if (typeof initAdminPage === 'function') initAdminPage();
+      } else {
+        error.textContent = 'Incorrect credentials. Try again.';
+        error.style.display = 'block';
+        passInput.value = '';
+        passInput.focus();
+      }
+    } catch(e) {
+      error.textContent = 'Login error: ' + e.message;
+      error.style.display = 'block';
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-lock"></i> Sign In';
   },
 
   adminLogout() {
-    GoNoGoStorage.remove('adminAuth');
+    this._adminUser = null;
+    GoNoGoStorage.remove('adminUser');
     window.location.href = 'index.html';
   },
 
