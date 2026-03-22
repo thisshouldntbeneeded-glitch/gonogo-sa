@@ -1,16 +1,17 @@
-// GoNoGo SA — API Client (Supabase Edition)
-// Brand data = static from data.js/helpers.js
+// GoNoGo SA — API Client (Supabase Edition v2)
+// Brands + Categories = Supabase tables (with static JS fallback)
 // Reviews = Supabase 'reviews' table
+// Admin Users = Supabase 'admin_users' table (with local fallback)
+
 var GoNoGoAPI = (function () {
   'use strict';
 
-  // =============================================
-  // SUPABASE CONFIG (Customer Ratings project)
-  // =============================================
   var SUPABASE_URL = 'https://kkpbzttwljxvyjbvggqr.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW';
 
-  // -- Supabase REST helper --
+  // Track whether Supabase brands table is available
+  var _supabaseBrandsAvailable = null; // null = unknown, true/false = tested
+
   function supabaseRequest(path, options) {
     options = options || {};
     var url = SUPABASE_URL + '/rest/v1/' + path;
@@ -37,112 +38,255 @@ var GoNoGoAPI = (function () {
     });
   }
 
-  return {
+  // Check if Supabase brands table exists (cached)
+  function checkSupabaseBrands() {
+    if (_supabaseBrandsAvailable !== null) return Promise.resolve(_supabaseBrandsAvailable);
+    return supabaseRequest('brands?select=slug&limit=1').then(function (rows) {
+      _supabaseBrandsAvailable = true;
+      console.log('Supabase brands table: AVAILABLE');
+      return true;
+    }).catch(function () {
+      _supabaseBrandsAvailable = false;
+      console.log('Supabase brands table: NOT AVAILABLE — using static data fallback');
+      return false;
+    });
+  }
 
-    // ==========================================
-    // BRAND DATA — 100% static, from data.js + helpers.js
-    // ==========================================
+  // Normalize a Supabase brand row to match the format the UI expects
+  function normalizeSBBrand(row, categoryName, categoryIcon, scoringCategories) {
+    var categoryScores = {};
+    (row.framework_breakdown || []).forEach(function (fb) {
+      var parts = fb.score.split('/');
+      categoryScores[fb.category] = { score: parseFloat(parts[0]), max: parseFloat(parts[1]), description: fb.description };
+    });
+    var gp = (row.app_ratings && row.app_ratings.google_play) || 'N/A';
+    var ios = (row.app_ratings && row.app_ratings.ios) || 'N/A';
+    return {
+      id: row.slug,
+      name: row.name,
+      categorySlug: row.category_slug,
+      categoryName: categoryName || '',
+      categoryIcon: categoryIcon || 'fa-tag',
+      logo: row.logo_url || '',
+      website: row.website_url || '',
+      overallScore: row.gonogo_score,
+      verdict: row.verdict,
+      categoryScores: categoryScores,
+      scoringCategories: scoringCategories || [],
+      keyFeatures: row.key_features || [],
+      pricing: row.pricing || [],
+      appRatings: { googlePlay: gp, ios: ios, googlePlayScore: parseFloat(gp) || 0, iosScore: parseFloat(ios) || 0 },
+      strengths: row.key_strengths || [],
+      concerns: row.key_concerns || [],
+      socialSentiment: row.social_sentiment || {},
+      overview: row.overview || '',
+      ratingSummary: row.rating_summary || '',
+      lastUpdated: row.last_updated || '2026-03-01'
+    };
+  }
+
+  // Category cache for Supabase mode
+  var _categoryCache = null;
+  function loadCategoryCache() {
+    if (_categoryCache) return Promise.resolve(_categoryCache);
+    return supabaseRequest('categories?select=*&order=name.asc').then(function (rows) {
+      _categoryCache = {};
+      rows.forEach(function (c) {
+        _categoryCache[c.slug] = { name: c.name, icon: c.icon, scoring_categories: c.scoring_categories };
+      });
+      return _categoryCache;
+    });
+  }
+
+  return {
 
     isLive: function () { return true; },
 
+    // Force re-check of Supabase availability (useful after running setup)
+    resetCache: function () {
+      _supabaseBrandsAvailable = null;
+      _categoryCache = null;
+    },
+
+    // ==========================================
+    // CATEGORIES
+    // ==========================================
     getCategoriesWithBrands: function () {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof getCategoriesWithBrands === 'function') return resolve(getCategoriesWithBrands());
-          reject(new Error('getCategoriesWithBrands not available'));
-        } catch (e) { reject(e); }
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          // Get categories with brand counts from Supabase
+          return Promise.all([
+            supabaseRequest('categories?select=*&order=name.asc'),
+            supabaseRequest('brands?select=slug,category_slug')
+          ]).then(function (results) {
+            var cats = results[0], brands = results[1];
+            var counts = {};
+            brands.forEach(function (b) { counts[b.category_slug] = (counts[b.category_slug] || 0) + 1; });
+            return cats.map(function (c) {
+              return {
+                id: c.slug, name: c.name, icon: c.icon,
+                brandCount: counts[c.slug] || 0,
+                hasBrands: (counts[c.slug] || 0) > 0,
+                scoringCategories: c.scoring_categories
+              };
+            });
+          });
+        }
+        // Fallback to static
+        if (typeof getCategoriesWithBrands === 'function') return getCategoriesWithBrands();
+        throw new Error('No data source available');
       });
     },
 
     getCategories: function () { return this.getCategoriesWithBrands(); },
 
+    // ==========================================
+    // BRANDS
+    // ==========================================
     getTopBrands: function (count) {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof getTopBrands === 'function') return resolve(getTopBrands(count || 6));
-          reject(new Error('getTopBrands not available'));
-        } catch (e) { reject(e); }
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return Promise.all([
+            supabaseRequest('brands?select=*&order=gonogo_score.desc&limit=' + (count || 6)),
+            loadCategoryCache()
+          ]).then(function (results) {
+            var rows = results[0], cats = results[1];
+            return rows.map(function (r) {
+              var c = cats[r.category_slug] || {};
+              return normalizeSBBrand(r, c.name, c.icon, c.scoring_categories);
+            });
+          });
+        }
+        if (typeof getTopBrands === 'function') return getTopBrands(count || 6);
+        throw new Error('No data source available');
       });
     },
 
     getAllBrands: function () {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof getAllBrands === 'function') return resolve(getAllBrands());
-          reject(new Error('getAllBrands not available'));
-        } catch (e) { reject(e); }
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return Promise.all([
+            supabaseRequest('brands?select=*&order=gonogo_score.desc'),
+            loadCategoryCache()
+          ]).then(function (results) {
+            var rows = results[0], cats = results[1];
+            return rows.map(function (r) {
+              var c = cats[r.category_slug] || {};
+              return normalizeSBBrand(r, c.name, c.icon, c.scoring_categories);
+            });
+          });
+        }
+        if (typeof getAllBrands === 'function') return getAllBrands();
+        throw new Error('No data source available');
       });
     },
 
     getBrandsByCategory: function (slug) {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof getBrandsByCategory === 'function') return resolve(getBrandsByCategory(slug));
-          reject(new Error('getBrandsByCategory not available'));
-        } catch (e) { reject(e); }
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return Promise.all([
+            supabaseRequest('brands?category_slug=eq.' + encodeURIComponent(slug) + '&select=*&order=gonogo_score.desc'),
+            loadCategoryCache()
+          ]).then(function (results) {
+            var rows = results[0], cats = results[1];
+            var c = cats[slug] || {};
+            return rows.map(function (r) {
+              return normalizeSBBrand(r, c.name, c.icon, c.scoring_categories);
+            });
+          });
+        }
+        if (typeof getBrandsByCategory === 'function') return getBrandsByCategory(slug);
+        throw new Error('No data source available');
       });
     },
 
     getBrandById: function (id) {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof getBrandById === 'function') return resolve(getBrandById(id));
-          reject(new Error('getBrandById not available'));
-        } catch (e) { reject(e); }
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return Promise.all([
+            supabaseRequest('brands?slug=eq.' + encodeURIComponent(id) + '&select=*&limit=1'),
+            loadCategoryCache()
+          ]).then(function (results) {
+            var rows = results[0], cats = results[1];
+            if (!rows || rows.length === 0) return null;
+            var r = rows[0], c = cats[r.category_slug] || {};
+            return normalizeSBBrand(r, c.name, c.icon, c.scoring_categories);
+          });
+        }
+        if (typeof getBrandById === 'function') return getBrandById(id);
+        throw new Error('No data source available');
       });
     },
 
     getStats: function () {
-      return new Promise(function (resolve, reject) {
-        try {
-          if (typeof BRAND_DATA === 'undefined') return reject(new Error('BRAND_DATA not available'));
-          var totalBrands = 0, totalScore = 0;
-          var goCount = 0, cautionCount = 0, nogoCount = 0;
-          BRAND_DATA.forEach(function (c) {
-            if (c.brands) c.brands.forEach(function (b) {
-              totalBrands++;
-              var score = b.gonogo_score || 0;
-              totalScore += score;
-              var verdict = (b.verdict || '').toUpperCase().trim();
-              if (verdict === 'CAUTION') verdict = 'GO WITH CAUTION';
-              if (verdict === 'GO') goCount++;
-              else if (verdict === 'GO WITH CAUTION') cautionCount++;
-              else if (verdict === 'NOGO') nogoCount++;
-              else if (score >= 80) goCount++;
-              else if (score >= 60) cautionCount++;
-              else nogoCount++;
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return Promise.all([
+            supabaseRequest('brands?select=gonogo_score,verdict,category_slug'),
+            supabaseRequest('categories?select=slug')
+          ]).then(function (results) {
+            var brands = results[0], cats = results[1];
+            var total = 0, scoreSum = 0, go = 0, caution = 0, nogo = 0;
+            brands.forEach(function (b) {
+              total++;
+              scoreSum += b.gonogo_score || 0;
+              var v = (b.verdict || '').toUpperCase().trim();
+              if (v === 'CAUTION') v = 'GO WITH CAUTION';
+              if (v === 'GO') go++;
+              else if (v === 'GO WITH CAUTION') caution++;
+              else if (v === 'NOGO') nogo++;
+              else if (b.gonogo_score >= 80) go++;
+              else if (b.gonogo_score >= 60) caution++;
+              else nogo++;
             });
+            return {
+              totalCategories: cats.length,
+              totalBrands: total,
+              totalReviews: 0,
+              averageScore: total > 0 ? Math.round((scoreSum / total) * 10) / 10 : 0,
+              goCount: go, cautionCount: caution, nogoCount: nogo
+            };
           });
-          resolve({
-            totalCategories: BRAND_DATA.length,
-            totalBrands: totalBrands,
-            totalReviews: 0,
-            averageScore: totalBrands > 0 ? Math.round((totalScore / totalBrands) * 10) / 10 : 0,
-            goCount: goCount,
-            cautionCount: cautionCount,
-            nogoCount: nogoCount
+        }
+        // Fallback to static
+        if (typeof BRAND_DATA === 'undefined') throw new Error('No data source available');
+        var totalBrands = 0, totalScore = 0, goCount = 0, cautionCount = 0, nogoCount = 0;
+        BRAND_DATA.forEach(function (c) {
+          if (c.brands) c.brands.forEach(function (b) {
+            totalBrands++;
+            var score = b.gonogo_score || 0;
+            totalScore += score;
+            var verdict = (b.verdict || '').toUpperCase().trim();
+            if (verdict === 'CAUTION') verdict = 'GO WITH CAUTION';
+            if (verdict === 'GO') goCount++;
+            else if (verdict === 'GO WITH CAUTION') cautionCount++;
+            else if (verdict === 'NOGO') nogoCount++;
+            else if (score >= 80) goCount++;
+            else if (score >= 60) cautionCount++;
+            else nogoCount++;
           });
-        } catch (e) { reject(e); }
+        });
+        return {
+          totalCategories: BRAND_DATA.length, totalBrands: totalBrands, totalReviews: 0,
+          averageScore: totalBrands > 0 ? Math.round((totalScore / totalBrands) * 10) / 10 : 0,
+          goCount: goCount, cautionCount: cautionCount, nogoCount: nogoCount
+        };
       });
     },
 
     // ==========================================
     // REVIEWS — Supabase 'reviews' table
-    // Columns: id, brand_name, category_slug, reviewer_name,
-    //          review_text, status, moderated_by, created_at
     // ==========================================
-
     submitReview: function (reviewData) {
-      var newReview = {
-        brand_name: reviewData.brandName || reviewData.brand_name || reviewData.brandname || '',
-        category_slug: reviewData.categorySlug || reviewData.category_slug || reviewData.category || '',
-        reviewer_name: reviewData.reviewerName || reviewData.reviewer_name || reviewData.reviewername || '',
-        review_text: reviewData.reviewText || reviewData.review_text || reviewData.reviewtext || '',
-        status: 'pending'
-      };
       return supabaseRequest('reviews', {
         method: 'POST',
-        body: newReview,
+        body: {
+          brand_name: reviewData.brandName || reviewData.brand_name || '',
+          category_slug: reviewData.categorySlug || reviewData.category_slug || reviewData.category || '',
+          reviewer_name: reviewData.reviewerName || reviewData.reviewer_name || '',
+          review_text: reviewData.reviewText || reviewData.review_text || '',
+          status: 'pending'
+        },
         prefer: 'return=representation'
       }).then(function () {
         return { ok: true, status: 'pending', message: 'Review submitted — it will appear after approval.' };
@@ -150,49 +294,32 @@ var GoNoGoAPI = (function () {
     },
 
     getReviews: function (brandName) {
-      var query = 'reviews?brand_name=eq.' + encodeURIComponent(brandName)
-        + '&status=eq.approved&order=created_at.desc';
-      return supabaseRequest(query).then(function (data) {
-        return (data || []).map(function (r) {
-          return {
-            id: r.id,
-            category: r.category_slug,
-            brandname: r.brand_name,
-            reviewername: r.reviewer_name,
-            reviewtext: r.review_text,
-            date: r.created_at
-              ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
-              : '',
-            status: r.status
-          };
-        });
-      }).catch(function () { return []; });
+      return supabaseRequest('reviews?brand_name=eq.' + encodeURIComponent(brandName) + '&status=eq.approved&order=created_at.desc')
+        .then(function (data) {
+          return (data || []).map(function (r) {
+            return {
+              id: r.id, category: r.category_slug, brandname: r.brand_name,
+              reviewername: r.reviewer_name, reviewtext: r.review_text,
+              date: r.created_at ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+              status: r.status
+            };
+          });
+        }).catch(function () { return []; });
     },
 
-    getReviewsForBrand: function (brandName) {
-      return this.getReviews(brandName);
-    },
+    getReviewsForBrand: function (brandName) { return this.getReviews(brandName); },
 
     getAllReviews: function () {
       return supabaseRequest('reviews?order=created_at.desc')
         .then(function (data) {
           return (data || []).map(function (r) {
             return {
-              id: r.id,
-              category: r.category_slug,
-              brandname: r.brand_name,
-              brand_name: r.brand_name,
-              BrandName: r.brand_name,
-              reviewername: r.reviewer_name,
-              ReviewerName: r.reviewer_name,
-              reviewtext: r.review_text,
-              ReviewText: r.review_text,
-              createdat: r.created_at
-                ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })
-                : '',
-              created_at: r.created_at,
-              status: r.status,
-              Status: r.status
+              id: r.id, category: r.category_slug,
+              brandname: r.brand_name, brand_name: r.brand_name, BrandName: r.brand_name,
+              reviewername: r.reviewer_name, ReviewerName: r.reviewer_name,
+              reviewtext: r.review_text, ReviewText: r.review_text,
+              createdat: r.created_at ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+              created_at: r.created_at, status: r.status, Status: r.status
             };
           });
         }).catch(function () { return []; });
@@ -201,50 +328,32 @@ var GoNoGoAPI = (function () {
     moderateReview: function (reviewId, newStatus, moderatedBy) {
       return supabaseRequest('reviews?id=eq.' + encodeURIComponent(reviewId), {
         method: 'PATCH',
-        body: {
-          status: newStatus,
-          moderated_by: moderatedBy || 'admin',
-          moderated_at: new Date().toISOString()
-        },
+        body: { status: newStatus, moderated_by: moderatedBy || 'admin', moderated_at: new Date().toISOString() },
         prefer: 'return=representation'
-      }).then(function () {
-        return { ok: true, id: reviewId, status: newStatus };
-      });
+      }).then(function () { return { ok: true, id: reviewId, status: newStatus }; });
     },
 
     // ==========================================
-    // ADMIN USER MANAGEMENT — Supabase 'admin_users' table
-    // Columns: id, email, password_hash, display_name, role, created_at
-    // password_hash stores a simple SHA-256 hex (client-side hashing)
+    // ADMIN AUTH — Supabase with local fallback
     // ==========================================
-
     _hashPassword: function (password) {
-      // SHA-256 via SubtleCrypto
       var encoder = new TextEncoder();
       return crypto.subtle.digest('SHA-256', encoder.encode(password)).then(function (buf) {
-        return Array.from(new Uint8Array(buf)).map(function (b) {
-          return b.toString(16).padStart(2, '0');
-        }).join('');
+        return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
       });
     },
 
     adminLogin: function (email, password) {
       var self = this;
       return this._hashPassword(password).then(function (hash) {
-        // Try Supabase first, fall back to local admin if table missing
         return supabaseRequest(
-          'admin_users?email=eq.' + encodeURIComponent(email) +
-          '&password_hash=eq.' + encodeURIComponent(hash) +
-          '&select=id,email,display_name,role'
+          'admin_users?email=eq.' + encodeURIComponent(email) + '&password_hash=eq.' + encodeURIComponent(hash) + '&select=id,email,display_name,role'
         ).then(function (rows) {
           if (rows && rows.length > 0) return rows[0];
           return null;
         }).catch(function () {
-          // Supabase admin_users table not yet created — use local fallback
-          var LOCAL_ADMIN = {
-            email: 'admin@gonogo.co.za',
-            password_hash: '7e716a4d519a3b21539308c8a969e50567c747b1e04492a4bfcf67f92981c6d1'
-          };
+          // Fallback if admin_users table doesn't exist
+          var LOCAL_ADMIN = { email: 'admin@gonogo.co.za', password_hash: '7e716a4d519a3b21539308c8a969e50567c747b1e04492a4bfcf67f92981c6d1' };
           if (email.toLowerCase().trim() === LOCAL_ADMIN.email && hash === LOCAL_ADMIN.password_hash) {
             return { id: 'local-admin', email: LOCAL_ADMIN.email, display_name: 'Admin', role: 'admin' };
           }
@@ -255,34 +364,13 @@ var GoNoGoAPI = (function () {
 
     adminChangePassword: function (userId, oldPassword, newPassword) {
       var self = this;
-      return Promise.all([
-        this._hashPassword(oldPassword),
-        this._hashPassword(newPassword)
-      ]).then(function (hashes) {
-        var oldHash = hashes[0];
-        var newHash = hashes[1];
-        // For local admin, just validate old password matches
-        if (userId === 'local-admin') {
-          var LOCAL_HASH = '7e716a4d519a3b21539308c8a969e50567c747b1e04492a4bfcf67f92981c6d1';
-          if (oldHash !== LOCAL_HASH) throw new Error('Current password is incorrect');
-          return { ok: true, message: 'Password change requires Supabase admin_users table. Please set it up for persistent password management.' };
-        }
-        // Verify old password first
-        return supabaseRequest(
-          'admin_users?id=eq.' + encodeURIComponent(userId) +
-          '&password_hash=eq.' + encodeURIComponent(oldHash) +
-          '&select=id'
-        ).then(function (rows) {
-          if (!rows || rows.length === 0) throw new Error('Current password is incorrect');
-          // Update to new password
-          return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), {
-            method: 'PATCH',
-            body: { password_hash: newHash },
-            prefer: 'return=representation'
-          });
-        }).then(function () {
-          return { ok: true };
-        });
+      return Promise.all([this._hashPassword(oldPassword), this._hashPassword(newPassword)]).then(function (hashes) {
+        if (userId === 'local-admin') throw new Error('Run supabase-setup.sql first to enable password changes');
+        return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId) + '&password_hash=eq.' + encodeURIComponent(hashes[0]) + '&select=id')
+          .then(function (rows) {
+            if (!rows || rows.length === 0) throw new Error('Current password is incorrect');
+            return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), { method: 'PATCH', body: { password_hash: hashes[1] } });
+          }).then(function () { return { ok: true }; });
       });
     },
 
@@ -290,7 +378,6 @@ var GoNoGoAPI = (function () {
       return supabaseRequest('admin_users?select=id,email,display_name,role,created_at&order=created_at.asc')
         .then(function (rows) { return rows || []; })
         .catch(function () {
-          // Table not yet created — return local admin as fallback
           var stored = GoNoGoStorage.get('adminUser');
           if (stored) return [{ id: stored.id, email: stored.email, display_name: stored.display_name, role: stored.role, created_at: new Date().toISOString() }];
           return [];
@@ -298,73 +385,107 @@ var GoNoGoAPI = (function () {
     },
 
     adminAddUser: function (email, password, displayName, role) {
-      var self = this;
       return this._hashPassword(password).then(function (hash) {
         return supabaseRequest('admin_users', {
           method: 'POST',
-          body: {
-            email: email.toLowerCase().trim(),
-            password_hash: hash,
-            display_name: displayName || '',
-            role: role || 'admin'
-          },
-          prefer: 'return=representation'
+          body: { email: email.toLowerCase().trim(), password_hash: hash, display_name: displayName || '', role: role || 'admin' }
         });
-      }).then(function (rows) {
-        return { ok: true, user: rows && rows[0] ? rows[0] : null };
-      });
+      }).then(function (rows) { return { ok: true, user: rows && rows[0] ? rows[0] : null }; });
     },
 
     adminRemoveUser: function (userId) {
-      return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), {
-        method: 'DELETE'
-      }).then(function () {
-        return { ok: true };
-      });
+      return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), { method: 'DELETE' })
+        .then(function () { return { ok: true }; });
     },
 
     // ==========================================
-    // BRAND SAVE — stores to localStorage overlay
-    // (static data files remain the source of truth;
-    //  edits are persisted as localStorage overrides)
+    // BRAND SAVE — writes to Supabase (with localStorage fallback)
     // ==========================================
     saveBrand: function (brandData) {
-      // Compute overall score from category scores
       var totalScore = 0, totalMax = 0;
+      var frameworkBreakdown = [];
       if (brandData.scores) {
         Object.keys(brandData.scores).forEach(function (k) {
-          totalScore += brandData.scores[k].score || 0;
-          totalMax += brandData.scores[k].max || 0;
+          var s = brandData.scores[k];
+          totalScore += s.score || 0;
+          totalMax += s.max || 0;
+          frameworkBreakdown.push({ category: k, score: (s.score||0) + '/' + (s.max||0), description: s.description || '' });
         });
       }
       var overallScore = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0;
       var verdict = overallScore >= 80 ? 'GO' : overallScore >= 60 ? 'GO WITH CAUTION' : 'NOGO';
+      var slug = brandData.id || brandData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-      var brandRecord = {
+      var record = {
+        slug: slug,
         name: brandData.name,
-        categorySlug: brandData.categorySlug,
-        website: brandData.website || '',
-        logo: brandData.logo || '',
-        categoryScores: brandData.scores || {},
-        appRatings: {
-          googlePlay: brandData.googlePlayRating || 'N/A',
-          ios: brandData.iosRating || 'N/A'
-        },
-        overallScore: overallScore,
+        category_slug: brandData.categorySlug,
+        gonogo_score: overallScore,
         verdict: verdict,
-        lastUpdated: new Date().toISOString().split('T')[0]
+        logo_url: brandData.logo || '',
+        website_url: brandData.website || '',
+        framework_breakdown: frameworkBreakdown,
+        key_features: brandData.keyFeatures || [],
+        pricing: brandData.pricing || [],
+        app_ratings: { google_play: brandData.googlePlayRating || 'N/A', ios: brandData.iosRating || 'N/A' },
+        key_strengths: brandData.strengths || [],
+        key_concerns: brandData.concerns || [],
+        social_sentiment: brandData.socialSentiment || {},
+        last_updated: new Date().toISOString().split('T')[0]
       };
 
-      // Save to localStorage overrides
-      var overrides = GoNoGoStorage.get('brandOverrides') || {};
-      var id = brandData.id || brandData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      brandRecord.id = id;
-      overrides[id] = brandRecord;
-      GoNoGoStorage.set('brandOverrides', overrides);
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          // Upsert to Supabase
+          return supabaseRequest('brands?slug=eq.' + encodeURIComponent(slug), {
+            method: 'PATCH',
+            body: record,
+            prefer: 'return=representation'
+          }).then(function (rows) {
+            if (rows && rows.length > 0) return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
+            // Brand doesn't exist yet, INSERT
+            return supabaseRequest('brands', { method: 'POST', body: record }).then(function () {
+              return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
+            });
+          });
+        }
+        // Fallback to localStorage
+        var overrides = GoNoGoStorage.get('brandOverrides') || {};
+        overrides[slug] = record;
+        GoNoGoStorage.set('brandOverrides', overrides);
+        return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'localStorage' };
+      });
+    },
 
-      return Promise.resolve({ ok: true, gonogo_score: overallScore, verdict: verdict });
+    // ==========================================
+    // BRAND DELETE
+    // ==========================================
+    deleteBrand: function (slug) {
+      return checkSupabaseBrands().then(function (hasSB) {
+        if (hasSB) {
+          return supabaseRequest('brands?slug=eq.' + encodeURIComponent(slug), { method: 'DELETE' })
+            .then(function () { return { ok: true }; });
+        }
+        throw new Error('Cannot delete brands without Supabase');
+      });
+    },
+
+    // ==========================================
+    // CATEGORY MANAGEMENT
+    // ==========================================
+    saveCategory: function (categoryData) {
+      return supabaseRequest('categories?slug=eq.' + encodeURIComponent(categoryData.slug), {
+        method: 'PATCH',
+        body: { name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] }
+      }).then(function (rows) {
+        if (rows && rows.length > 0) return { ok: true };
+        return supabaseRequest('categories', {
+          method: 'POST',
+          body: { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] }
+        }).then(function () { return { ok: true }; });
+      });
     }
   };
 })();
 
-console.log('GoNoGoAPI loaded (Supabase edition)');
+console.log('GoNoGoAPI loaded (Supabase v2 — auto-detects brands table)');
