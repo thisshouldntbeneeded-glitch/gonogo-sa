@@ -270,10 +270,10 @@
         list.innerHTML = '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-3)">' + reviews.length + ' User Review' + (reviews.length !== 1 ? 's' : '') + '</h4>' +
           reviews.map(function(r) {
             return Components.renderCommentCard({
-              author: r.reviewer_name,
-              text: r.review_text,
-              date: r.created_at,
-              sentiment: r.status === 'approved' ? 'positive' : 'neutral'
+              author: r.reviewername || r.reviewer_name || 'Anonymous',
+              text: r.reviewtext || r.review_text || '',
+              date: r.date || r.created_at,
+              sentiment: 'positive'
             }, brand.name);
           }).join('');
       }
