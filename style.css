@@ -345,6 +345,15 @@ input:focus, select:focus, textarea:focus {
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-size: 1.25rem;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.hamburger:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
 }
 
 .mobile-nav {

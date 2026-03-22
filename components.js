@@ -8,7 +8,11 @@ const Components = {
   // LOGO HELPER
   // ============================================================
   getBrandInitials(name) {
-    return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    // Strip parenthesised text and non-alpha chars, then take first letters
+    const clean = name.replace(/\s*\([^)]*\)/g, '').trim();
+    const words = clean.split(/\s+/).filter(w => /^[A-Za-z]/.test(w));
+    if (words.length === 0) return name.substring(0, 2).toUpperCase();
+    return words.map(w => w[0]).join('').substring(0, 2).toUpperCase();
   },
 
   getLogoFallback(name, size = 48) {
