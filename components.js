@@ -21,10 +21,12 @@ const Components = {
   },
 
   renderLogo(brand, className = 'brand-logo') {
+    const size = className.includes('lg') ? 48 : 32;
+    const fallback = this.getLogoFallback(brand.name, size);
     if (brand.logo) {
-      return `<img src="${brand.logo}" alt="${brand.name}" class="${className}" onerror="this.src='${this.getLogoFallback(brand.name, className.includes('lg') ? 48 : 32)}'">`;
+      return `<img src="${brand.logo}" alt="${brand.name}" class="${className}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">`;
     }
-    return `<img src="${this.getLogoFallback(brand.name, className.includes('lg') ? 48 : 32)}" alt="${brand.name}" class="${className}">`;
+    return `<img src="${fallback}" alt="${brand.name}" class="${className}">`;
   },
 
   // ============================================================
