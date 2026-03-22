@@ -11,12 +11,6 @@
     { "source": "/admin-comments", "destination": "/admin-comments.html" },
     { "source": "/admin-research", "destination": "/admin-research.html" }
   ],
-  "routes": [
-  {
-    "src": "/api/submit-review",
-    "dest": "api/submit-review.js"
-  }
-],
   "headers": [
     {
       "source": "/data/(.*)",

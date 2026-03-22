@@ -168,13 +168,12 @@ function getVerdictFromScore(score) {
 }
 
 // ============================================================
-// IN-MEMORY STORAGE (no persistent storage in sandbox)
+// PERSISTENT STORAGE (localStorage)
 // ============================================================
 const GoNoGoStorage = {
-  _store: {},
-  get(key) { return this._store[key] !== undefined ? this._store[key] : null; },
-  set(key, value) { this._store[key] = value; },
-  remove(key) { delete this._store[key]; },
-  getLocal(key) { return this._store['local_' + key] !== undefined ? this._store['local_' + key] : null; },
-  setLocal(key, value) { this._store['local_' + key] = value; }
+  get(key) { try { var v = localStorage.getItem('gonogo_' + key); return v ? JSON.parse(v) : null; } catch(e) { return null; } },
+  set(key, value) { try { localStorage.setItem('gonogo_' + key, JSON.stringify(value)); } catch(e) {} },
+  remove(key) { try { localStorage.removeItem('gonogo_' + key); } catch(e) {} },
+  getLocal(key) { return this.get('local_' + key); },
+  setLocal(key, value) { this.set('local_' + key, value); }
 };
