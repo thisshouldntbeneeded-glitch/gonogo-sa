@@ -231,12 +231,23 @@ var GoNoGoAPI = (function () {
     adminLogin: function (email, password) {
       var self = this;
       return this._hashPassword(password).then(function (hash) {
+        // Try Supabase first, fall back to local admin if table missing
         return supabaseRequest(
           'admin_users?email=eq.' + encodeURIComponent(email) +
           '&password_hash=eq.' + encodeURIComponent(hash) +
           '&select=id,email,display_name,role'
         ).then(function (rows) {
           if (rows && rows.length > 0) return rows[0];
+          return null;
+        }).catch(function () {
+          // Supabase admin_users table not yet created — use local fallback
+          var LOCAL_ADMIN = {
+            email: 'admin@gonogo.co.za',
+            password_hash: '7e716a4d519a3b21539308c8a969e50567c747b1e04492a4bfcf67f92981c6d1'
+          };
+          if (email.toLowerCase().trim() === LOCAL_ADMIN.email && hash === LOCAL_ADMIN.password_hash) {
+            return { id: 'local-admin', email: LOCAL_ADMIN.email, display_name: 'Admin', role: 'admin' };
+          }
           return null;
         });
       });
@@ -250,6 +261,12 @@ var GoNoGoAPI = (function () {
       ]).then(function (hashes) {
         var oldHash = hashes[0];
         var newHash = hashes[1];
+        // For local admin, just validate old password matches
+        if (userId === 'local-admin') {
+          var LOCAL_HASH = '7e716a4d519a3b21539308c8a969e50567c747b1e04492a4bfcf67f92981c6d1';
+          if (oldHash !== LOCAL_HASH) throw new Error('Current password is incorrect');
+          return { ok: true, message: 'Password change requires Supabase admin_users table. Please set it up for persistent password management.' };
+        }
         // Verify old password first
         return supabaseRequest(
           'admin_users?id=eq.' + encodeURIComponent(userId) +
@@ -272,7 +289,12 @@ var GoNoGoAPI = (function () {
     adminGetUsers: function () {
       return supabaseRequest('admin_users?select=id,email,display_name,role,created_at&order=created_at.asc')
         .then(function (rows) { return rows || []; })
-        .catch(function () { return []; });
+        .catch(function () {
+          // Table not yet created — return local admin as fallback
+          var stored = GoNoGoStorage.get('adminUser');
+          if (stored) return [{ id: stored.id, email: stored.email, display_name: stored.display_name, role: stored.role, created_at: new Date().toISOString() }];
+          return [];
+        });
     },
 
     adminAddUser: function (email, password, displayName, role) {
