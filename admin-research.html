@@ -445,29 +445,65 @@
       var btn = document.getElementById('btn-' + brandId);
       if (btn) {
         btn.className = 'btn btn-sm btn-researching';
-        btn.innerHTML = '<span class="research-spinner"></span> Marking...';
+        btn.innerHTML = '<span class="research-spinner"></span> Researching...';
       }
+
+      // Find category info
+      var rd = researchData.find(function(r) { return r.id === brandId; });
+      var catSlug = rd ? rd.categorySlug : '';
 
       showResearchModal(brandName);
-      addLog('Marking ' + brandName + ' as freshly reviewed...', 'info');
+      addLog('Starting AI research for ' + brandName + '...', 'info');
+      addLog('Querying public sources for latest data...', 'info');
 
-      // Small delay for UX
-      await new Promise(function(r) { setTimeout(r, 500); });
+      try {
+        var response = await fetch('/api/research', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brandName: brandName, categorySlug: catSlug, brandSlug: brandId })
+        });
 
-      saveResearchOverride(brandId);
-      addLog('Data freshness updated to today', 'success');
+        var result = await response.json();
 
-      // Update local data
-      var rd = researchData.find(function(r) { return r.id === brandId; });
-      if (rd) {
-        rd.lastUpdated = new Date().toISOString().split('T')[0];
-        rd.daysSince = 0;
-        rd.freshness = 'fresh';
+        if (!response.ok || !result.ok) {
+          addLog('Error: ' + (result.error || 'Research failed'), 'error');
+          if (result.details) addLog('Details: ' + result.details, 'error');
+          activeResearch[brandId] = false;
+          completeModal();
+          return;
+        }
+
+        if (result.mode === 'mark-fresh') {
+          addLog(result.message, 'info');
+          addLog('Brand marked as fresh', 'success');
+        } else {
+          // AI research completed
+          var r = result.research;
+          addLog('Research complete — new score: ' + r.gonogo_score + '/100 (' + r.verdict + ')', 'success');
+          if (r.overview) addLog('Overview: ' + r.overview, 'info');
+          if (r.key_strengths) addLog('Strengths: ' + r.key_strengths.join(', '), 'success');
+          if (r.key_concerns) addLog('Concerns: ' + r.key_concerns.join(', '), 'error');
+        }
+
+        // Update local data
+        if (rd) {
+          rd.lastUpdated = new Date().toISOString().split('T')[0];
+          rd.daysSince = 0;
+          rd.freshness = 'fresh';
+          if (result.research) {
+            rd.overallScore = result.research.gonogo_score;
+            rd.verdict = result.research.verdict;
+          }
+        }
+
+        saveResearchOverride(brandId);
+        renderKPIs();
+        filterResearch();
+        Components.showToast(brandName + ' research complete', 'success');
+
+      } catch (err) {
+        addLog('Network error: ' + err.message, 'error');
       }
-
-      renderKPIs();
-      filterResearch();
-      Components.showToast(brandName + ' marked as fresh', 'success');
 
       activeResearch[brandId] = false;
       completeModal();
@@ -485,33 +521,54 @@
         return;
       }
 
-      var batch = targets.slice(0, 10);
-      showResearchModal('Batch Refresh — ' + label);
-      addLog('Marking ' + batch.length + ' brands as reviewed...', 'info');
+      var batch = targets.slice(0, 5); // 5 at a time to avoid API limits
+      showResearchModal('Batch Research — ' + label);
+      addLog('Researching ' + batch.length + ' brands (of ' + targets.length + ' total)...', 'info');
       document.getElementById('modal-progress').style.display = 'block';
 
       for (var i = 0; i < batch.length; i++) {
         var b = batch[i];
-        await new Promise(function(r) { setTimeout(r, 100); });
+        addLog('Researching ' + b.name + '...', 'info');
 
-        saveResearchOverride(b.id);
-        b.lastUpdated = new Date().toISOString().split('T')[0];
-        b.daysSince = 0;
-        b.freshness = 'fresh';
+        try {
+          var response = await fetch('/api/research', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ brandName: b.name, categorySlug: b.categorySlug, brandSlug: b.id })
+          });
+          var result = await response.json();
 
-        addLog('  ' + b.name + ': marked fresh', 'success');
+          if (result.ok) {
+            saveResearchOverride(b.id);
+            b.lastUpdated = new Date().toISOString().split('T')[0];
+            b.daysSince = 0;
+            b.freshness = 'fresh';
+            if (result.research) {
+              b.overallScore = result.research.gonogo_score;
+              b.verdict = result.research.verdict;
+              addLog('  ' + b.name + ': ' + result.research.gonogo_score + '/100 (' + result.research.verdict + ')', 'success');
+            } else {
+              addLog('  ' + b.name + ': marked fresh', 'success');
+            }
+          } else {
+            addLog('  ' + b.name + ': error — ' + (result.error || 'unknown'), 'error');
+          }
+        } catch (err) {
+          addLog('  ' + b.name + ': network error', 'error');
+        }
+
         document.getElementById('modal-progress-bar').style.width = Math.round(((i + 1) / batch.length) * 100) + '%';
       }
 
       addLog('', '');
-      addLog('Batch complete: ' + batch.length + ' brands refreshed', 'success');
-      if (targets.length > 10) {
-        addLog((targets.length - 10) + ' remaining — run again to continue', 'info');
+      addLog('Batch complete: ' + batch.length + ' brands researched', 'success');
+      if (targets.length > 5) {
+        addLog((targets.length - 5) + ' remaining — run again to continue', 'info');
       }
 
       renderKPIs();
       filterResearch();
-      Components.showToast('Batch refresh complete: ' + batch.length + ' brands', 'success');
+      Components.showToast('Batch research complete: ' + batch.length + ' brands', 'success');
       completeModal();
     }
 
