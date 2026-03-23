@@ -134,6 +134,16 @@
           </div>
         </div>
 
+        <!-- NEW: Overview & Rating Summary -->
+        <div class="form-group" style="margin-top:var(--space-4)">
+          <label class="form-label">Brand Overview</label>
+          <textarea id="f-overview" rows="3" placeholder="2-3 sentence brand description"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rating Summary</label>
+          <textarea id="f-rating-summary" rows="3" placeholder="Explain the rating rationale"></textarea>
+        </div>
+
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
           <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
           <button type="submit" class="btn btn-primary" id="save-btn"><i class="fa-solid fa-check"></i> Save Brand</button>
@@ -258,6 +268,7 @@
 
     function openAddModal() {
       editingBrandId = null;
+      editingBrandData = null;
       document.getElementById('modal-title').textContent = 'Add Brand';
       document.getElementById('brand-form').reset();
       document.getElementById('brand-modal').classList.add('open');
@@ -278,6 +289,8 @@
       document.getElementById('f-logo').value = b.logo || '';
       document.getElementById('f-googleplay').value = b.appRatings.googlePlayScore || '';
       document.getElementById('f-ios').value = b.appRatings.iosScore || '';
+      document.getElementById('f-overview').value = b.overview || '';
+      document.getElementById('f-rating-summary').value = b.ratingSummary || '';
 
       // Fill in category scores
       Object.entries(b.categoryScores).forEach(function(entry) {
@@ -338,7 +351,9 @@
         logo: document.getElementById('f-logo').value.trim(),
         scores: scores,
         googlePlayRating: gpVal ? gpVal + '/5' : 'N/A',
-        iosRating: iosVal ? iosVal + '/5' : 'N/A'
+        iosRating: iosVal ? iosVal + '/5' : 'N/A',
+        overview: document.getElementById('f-overview').value.trim(),
+        ratingSummary: document.getElementById('f-rating-summary').value.trim()
       };
 
       try {
