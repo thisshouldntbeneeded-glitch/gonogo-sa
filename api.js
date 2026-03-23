@@ -402,48 +402,54 @@ var GoNoGoAPI = (function () {
     // BRAND SAVE — writes to Supabase (with localStorage fallback)
     // ==========================================
     saveBrand: function (brandData) {
-      var totalScore = 0, totalMax = 0;
+      var totalScore = 0;
       var frameworkBreakdown = [];
       if (brandData.scores) {
         Object.keys(brandData.scores).forEach(function (k) {
           var s = brandData.scores[k];
           totalScore += s.score || 0;
-          totalMax += s.max || 0;
           frameworkBreakdown.push({ category: k, score: (s.score||0) + '/' + (s.max||0), description: s.description || '' });
         });
       }
-      var overallScore = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0;
+      // GoNoGo score = sum of raw category scores (NOT a percentage)
+      var overallScore = Math.round(totalScore);
       var verdict = overallScore >= 80 ? 'GO' : overallScore >= 60 ? 'GO WITH CAUTION' : 'NOGO';
       var slug = brandData.id || brandData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+      // Build the update record — only include fields that were actually provided
       var record = {
-        slug: slug,
-        name: brandData.name,
-        category_slug: brandData.categorySlug,
         gonogo_score: overallScore,
         verdict: verdict,
-        logo_url: brandData.logo || '',
-        website_url: brandData.website || '',
         framework_breakdown: frameworkBreakdown,
-        key_features: brandData.keyFeatures || [],
-        pricing: brandData.pricing || [],
-        app_ratings: { google_play: brandData.googlePlayRating || 'N/A', ios: brandData.iosRating || 'N/A' },
-        key_strengths: brandData.strengths || [],
-        key_concerns: brandData.concerns || [],
-        social_sentiment: brandData.socialSentiment || {},
         last_updated: new Date().toISOString().split('T')[0]
       };
+      // Always include these basic fields
+      if (brandData.name) record.name = brandData.name;
+      if (brandData.categorySlug) record.category_slug = brandData.categorySlug;
+      // Only overwrite optional fields if they were explicitly provided (not empty defaults)
+      if (brandData.logo) record.logo_url = brandData.logo;
+      if (brandData.website) record.website_url = brandData.website;
+      if (brandData.googlePlayRating || brandData.iosRating) {
+        record.app_ratings = { google_play: brandData.googlePlayRating || 'N/A', ios: brandData.iosRating || 'N/A' };
+      }
+      // Only overwrite arrays if they have content (don't wipe existing data with empty arrays)
+      if (brandData.keyFeatures && brandData.keyFeatures.length > 0) record.key_features = brandData.keyFeatures;
+      if (brandData.pricing && brandData.pricing.length > 0) record.pricing = brandData.pricing;
+      if (brandData.strengths && brandData.strengths.length > 0) record.key_strengths = brandData.strengths;
+      if (brandData.concerns && brandData.concerns.length > 0) record.key_concerns = brandData.concerns;
+      if (brandData.socialSentiment && Object.keys(brandData.socialSentiment).length > 0) record.social_sentiment = brandData.socialSentiment;
 
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
-          // Upsert to Supabase
+          // Try PATCH first (existing brand)
           return supabaseRequest('brands?slug=eq.' + encodeURIComponent(slug), {
             method: 'PATCH',
             body: record,
             prefer: 'return=representation'
           }).then(function (rows) {
             if (rows && rows.length > 0) return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
-            // Brand doesn't exist yet, INSERT
+            // Brand doesn't exist — INSERT with full record + slug
+            record.slug = slug;
             return supabaseRequest('brands', { method: 'POST', body: record }).then(function () {
               return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
             });
