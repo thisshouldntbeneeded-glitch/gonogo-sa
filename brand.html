@@ -118,26 +118,6 @@
         return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + t + '</li>';
       }).join('');
 
-      // NEW: build overview + rating summary cards safely
-      var overviewHTML = '';
-      if (brand.overview) {
-        overviewHTML =
-          '<div class="card" style="margin-bottom:var(--space-6);padding:var(--space-5)">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-3)">Brand Overview</h3>' +
-            '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + brand.overview + '</p>' +
-          '</div>';
-      }
-      var ratingSummaryHTML = '';
-      if (brand.ratingSummary) {
-        ratingSummaryHTML =
-          '<div class="card" style="margin-bottom:var(--space-6);padding:var(--space-5);border-color:var(--green-dim)">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-3)">' +
-              '<i class="fa-solid fa-clipboard-check" style="color:var(--green)"></i> Rating Summary' +
-            '</h3>' +
-            '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + brand.ratingSummary + '</p>' +
-          '</div>';
-      }
-
       document.getElementById('page-content').innerHTML =
         '<!-- Brand Hero -->' +
         '<section class="brand-hero"><div class="container">' +
@@ -171,16 +151,14 @@
         '<!-- Tabs -->' +
         '<section class="section-sm"><div class="container">' +
           '<div class="tabs" id="tabs">' +
-            '<button class="tab active" data-tab="overview" onclick="switchTab(\\'overview\\')">Overview</button>' +
-            '<button class="tab" data-tab="pricing" onclick="switchTab(\\'pricing\\')">Pricing</button>' +
-            '<button class="tab" data-tab="ratings" onclick="switchTab(\\'ratings\\')">Ratings</button>' +
-            '<button class="tab" data-tab="reviews" onclick="switchTab(\\'reviews\\')">Reviews</button>' +
+            '<button class="tab active" data-tab="overview" onclick="switchTab(\'overview\')">Overview</button>' +
+            '<button class="tab" data-tab="pricing" onclick="switchTab(\'pricing\')">Pricing</button>' +
+            '<button class="tab" data-tab="ratings" onclick="switchTab(\'ratings\')">Ratings</button>' +
+            '<button class="tab" data-tab="reviews" onclick="switchTab(\'reviews\')">Reviews</button>' +
           '</div>' +
 
           '<!-- Overview Tab -->' +
           '<div class="tab-content" id="tab-overview">' +
-            overviewHTML +
-            ratingSummaryHTML +
             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-8)">' +
               '<div>' +
                 '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Score Breakdown</h3>' +
