@@ -453,8 +453,8 @@ var GoNoGoAPI = (function () {
       if (brandData.strengths && brandData.strengths.length > 0) record.key_strengths = brandData.strengths;
       if (brandData.concerns && brandData.concerns.length > 0) record.key_concerns = brandData.concerns;
       if (brandData.socialSentiment && Object.keys(brandData.socialSentiment).length > 0) record.social_sentiment = brandData.socialSentiment;
-            if (brandData.overview) record.overview = brandData.overview;
-      if (brandData.ratingSummary) record.rating_summary = brandData.ratingSummary;
+      if ('overview' in brandData) record.overview = brandData.overview || '';
+      if ('ratingSummary' in brandData) record.rating_summary = brandData.ratingSummary || '';
 
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
