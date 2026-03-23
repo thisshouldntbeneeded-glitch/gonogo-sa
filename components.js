@@ -37,28 +37,14 @@ const Components = {
   // NAVIGATION
   // ============================================================
   renderPublicNav(activePage) {
-    const mainLinks = [
+    const links = [
       { href: 'index.html', label: 'Home', icon: 'fa-house', id: 'home' },
+      { href: 'category.html?cat=banking', label: 'Banking', icon: 'fa-building-columns', id: 'banking' },
+      { href: 'category.html?cat=medical-aid', label: 'Medical Aid', icon: 'fa-heart-pulse', id: 'medical-aid' },
+      { href: 'category.html?cat=insurance', label: 'Insurance', icon: 'fa-umbrella', id: 'insurance' },
       { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
+      // Admin link hidden from public nav — access via /admin.html directly
     ];
-
-    const categoryLinks = [
-      { href: 'category.html?cat=banking', label: 'Banking', icon: 'fa-building-columns' },
-      { href: 'category.html?cat=mobile-networks', label: 'Mobile Networks', icon: 'fa-signal' },
-      { href: 'category.html?cat=insurance', label: 'Insurance', icon: 'fa-shield-halved' },
-      { href: 'category.html?cat=medical-aid', label: 'Medical Aid', icon: 'fa-heart-pulse' },
-      { href: 'category.html?cat=online-retailers', label: 'Online Retailers', icon: 'fa-cart-shopping' },
-      { href: 'category.html?cat=property-letting', label: 'Property Letting', icon: 'fa-house-chimney' },
-      { href: 'category.html?cat=hr-software', label: 'HR Software', icon: 'fa-users-gear' },
-      { href: 'category.html?cat=accounting-software', label: 'Accounting', icon: 'fa-calculator' },
-      { href: 'category.html?cat=car-dealers', label: 'Car Dealers', icon: 'fa-car' },
-      { href: 'category.html?cat=car-rentals', label: 'Car Rentals', icon: 'fa-key' },
-      { href: 'category.html?cat=food-delivery', label: 'Food Delivery', icon: 'fa-utensils' },
-      { href: 'category.html?cat=home-cleaning', label: 'Home Cleaning', icon: 'fa-spray-can-sparkles' },
-      { href: 'category.html?cat=armed-response', label: 'Armed Response', icon: 'fa-shield' },
-    ];
-
-    const allLinks = [...mainLinks, ...categoryLinks.map(c => ({...c, id: c.label.toLowerCase().replace(/\s+/g,'-')}))];
 
     return `
       <header class="site-header">
@@ -68,16 +54,11 @@ const Components = {
           </a>
           <nav>
             <ul class="nav-links">
-              <li><a href="index.html" class="${activePage === 'home' ? 'active' : ''}"><i class="fa-solid fa-house"></i> Home</a></li>
-              <li class="nav-dropdown">
-                <a href="#" class="nav-dropdown-trigger" onclick="event.preventDefault()">
-                  <i class="fa-solid fa-grid-2"></i> Categories <i class="fa-solid fa-chevron-down" style="font-size:9px;opacity:0.5;margin-left:2px"></i>
-                </a>
-                <div class="nav-dropdown-menu">
-                  ${categoryLinks.map(c => `<a href="${c.href}"><i class="fa-solid ${c.icon}"></i> ${c.label}</a>`).join('')}
-                </div>
-              </li>
-              <li><a href="compare.html" class="${activePage === 'compare' ? 'active' : ''}"><i class="fa-solid fa-code-compare"></i> Compare</a></li>
+              ${links.map(l => `
+                <li><a href="${l.href}" class="${activePage === l.id ? 'active' : ''}">
+                  <i class="fa-solid ${l.icon}"></i> ${l.label}
+                </a></li>
+              `).join('')}
             </ul>
           </nav>
           <button class="hamburger" onclick="Components.toggleMobileNav()" aria-label="Menu">
@@ -86,11 +67,11 @@ const Components = {
         </div>
       </header>
       <div class="mobile-nav" id="mobile-nav">
-        <a href="index.html" class="${activePage === 'home' ? 'active' : ''}"><i class="fa-solid fa-house"></i> Home</a>
-        <div class="mobile-nav-label">Categories</div>
-        ${categoryLinks.map(c => `<a href="${c.href}"><i class="fa-solid ${c.icon}"></i> ${c.label}</a>`).join('')}
-        <div class="mobile-nav-divider"></div>
-        <a href="compare.html" class="${activePage === 'compare' ? 'active' : ''}"><i class="fa-solid fa-code-compare"></i> Compare</a>
+        ${links.map(l => `
+          <a href="${l.href}" class="${activePage === l.id ? 'active' : ''}">
+            <i class="fa-solid ${l.icon}"></i> ${l.label}
+          </a>
+        `).join('')}
       </div>
     `;
   },
@@ -149,37 +130,18 @@ const Components = {
     return `
       <footer class="site-footer">
         <div class="container">
-          <div class="footer-grid">
-            <div class="footer-col">
-              <img src="${LOGO_URL}" alt="GoNoGo" style="height:28px;width:auto;margin-bottom:var(--space-3)">
-              <p class="text-xs text-muted" style="line-height:1.6">Independent brand ratings for South Africa. Transparent, data-driven, and always honest.</p>
-            </div>
-            <div class="footer-col">
-              <h4 class="footer-heading">Popular Categories</h4>
+          <div class="footer-content">
+            <div class="footer-links">
+              <a href="index.html">Home</a>
               <a href="category.html?cat=banking">Banking</a>
-              <a href="category.html?cat=insurance">Insurance</a>
               <a href="category.html?cat=medical-aid">Medical Aid</a>
-              <a href="category.html?cat=mobile-networks">Mobile Networks</a>
-              <a href="category.html?cat=online-retailers">Online Retailers</a>
+              <a href="category.html?cat=insurance">Insurance</a>
+              <a href="compare.html">Compare</a>
             </div>
-            <div class="footer-col">
-              <h4 class="footer-heading">More</h4>
-              <a href="category.html?cat=property-letting">Property Letting</a>
-              <a href="category.html?cat=car-dealers">Car Dealers</a>
-              <a href="category.html?cat=food-delivery">Food Delivery</a>
-              <a href="category.html?cat=home-cleaning">Home Cleaning</a>
-              <a href="category.html?cat=armed-response">Armed Response</a>
+            <div class="footer-attribution">
+              &copy; 2026 GoNoGo South Africa. All rights reserved.<br>
+              <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);font-size:var(--text-xs)">Created with Perplexity Computer</a>
             </div>
-            <div class="footer-col">
-              <h4 class="footer-heading">GoNoGo</h4>
-              <a href="compare.html">Compare Brands</a>
-              <a href="#how-we-score">How We Score</a>
-              <a href="https://www.gonogo.co.uk" target="_blank">GoNoGo UK</a>
-            </div>
-          </div>
-          <div class="footer-bottom">
-            <p>&copy; 2026 GoNoGo South Africa. All rights reserved.</p>
-            <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
           </div>
         </div>
       </footer>
