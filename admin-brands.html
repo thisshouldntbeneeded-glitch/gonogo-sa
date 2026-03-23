@@ -97,7 +97,7 @@
 
   <!-- Add/Edit Modal -->
   <div class="modal-overlay" id="brand-modal">
-    <div class="modal" style="max-width:700px;">
+    <div class="modal" style="max-width:800px;max-height:90vh;overflow-y:auto;">
       <div class="modal-header">
         <h2 class="modal-title" id="modal-title">Add Brand</h2>
         <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -124,13 +124,12 @@
           </div>
         </div>
 
-        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);">Category Scores</h4>
-        <p class="text-xs text-muted" style="margin-bottom:var(--space-3);">
-          Scores vary by industry. Enter raw score and max for each category.
-        </p>
-        <div id="score-fields" style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);"></div>
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-chart-simple"></i> Category Scores</h4>
+        <p class="text-xs text-muted" style="margin-bottom:var(--space-3);">Enter raw score, max, and a one-line description for each category.</p>
+        <div id="score-fields"></div>
 
-        <div class="form-row" style="margin-top:var(--space-5);">
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-mobile-screen"></i> App Ratings</h4>
+        <div class="form-row">
           <div class="form-group">
             <label class="form-label">Google Play Rating</label>
             <input type="number" id="f-googleplay" step="0.1" min="0" max="5" placeholder="4.2">
@@ -141,14 +140,52 @@
           </div>
         </div>
 
-        <!-- NEW: Overview & Rating Summary -->
-        <div class="form-group" style="margin-top:var(--space-4)">
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-file-lines"></i> Brand Content</h4>
+        <div class="form-group">
           <label class="form-label">Brand Overview</label>
           <textarea id="f-overview" rows="3" placeholder="2-3 sentence brand description"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Rating Summary</label>
           <textarea id="f-rating-summary" rows="3" placeholder="Explain the rating rationale"></textarea>
+        </div>
+
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-tags"></i> Features, Strengths &amp; Concerns</h4>
+        <div class="form-group">
+          <label class="form-label">Key Features <span class="text-xs text-muted">(comma-separated)</span></label>
+          <input type="text" id="f-features" placeholder="e.g. no monthly fees, GoalSave 10%+, PayShap, Visa debit">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Strengths <span class="text-xs text-muted">(comma-separated)</span></label>
+            <textarea id="f-strengths" rows="2" placeholder="e.g. low fees, innovation, compliance"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Concerns <span class="text-xs text-muted">(comma-separated)</span></label>
+            <textarea id="f-concerns" rows="2" placeholder="e.g. fraud vulnerabilities, support response"></textarea>
+          </div>
+        </div>
+
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-coins"></i> Pricing</h4>
+        <div class="form-group">
+          <label class="form-label">Pricing Info</label>
+          <textarea id="f-pricing" rows="2" placeholder="e.g. No monthly fee; ATM R10, card replace R100, intl 2% FX"></textarea>
+        </div>
+
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-comments"></i> Social Sentiment</h4>
+        <div class="form-group">
+          <label class="form-label">Sentiment Summary</label>
+          <input type="text" id="f-sentiment-summary" placeholder="e.g. Praise for UI/fees; complaints about fraud/support">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Positive Themes <span class="text-xs text-muted">(comma-separated)</span></label>
+            <input type="text" id="f-sentiment-positive" placeholder="e.g. easy app, no fees, high interest">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Common Concerns <span class="text-xs text-muted">(comma-separated)</span></label>
+            <input type="text" id="f-sentiment-concerns" placeholder="e.g. fraud, account holds, slow support">
+          </div>
         </div>
 
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
@@ -243,12 +280,13 @@
       defaultCats.forEach(function(catName) {
         var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
         scoreFields.innerHTML +=
-          '<div class="form-group">' +
-            '<label class="form-label">' + catName + '</label>' +
-            '<div style="display:flex;gap:var(--space-2)">' +
+          '<div style="background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-2)">' +
+            '<label class="form-label" style="margin-bottom:var(--space-2)">' + catName + '</label>' +
+            '<div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-2)">' +
               '<input type="number" id="' + fieldId + '-score" min="0" max="35" placeholder="Score" style="flex:1">' +
               '<input type="number" id="' + fieldId + '-max" min="0" max="35" placeholder="Max" style="flex:1">' +
             '</div>' +
+            '<input type="text" id="' + fieldId + '-desc" placeholder="One-line description" style="font-size:12px">' +
           '</div>';
       });
 
@@ -342,15 +380,25 @@
       document.getElementById('f-ios').value = b.appRatings.iosScore || '';
       document.getElementById('f-overview').value = b.overview || '';
       document.getElementById('f-rating-summary').value = b.ratingSummary || '';
+      document.getElementById('f-features').value = (b.keyFeatures || []).join(', ');
+      document.getElementById('f-strengths').value = (b.strengths || []).join(', ');
+      document.getElementById('f-concerns').value = (b.concerns || []).join(', ');
+      document.getElementById('f-pricing').value = (b.pricing || []).map(function(p) { return p.cost || p.name || ''; }).join('; ');
+      var ss = b.socialSentiment || {};
+      document.getElementById('f-sentiment-summary').value = ss.summary || '';
+      document.getElementById('f-sentiment-positive').value = (ss.positive_themes || []).join(', ');
+      document.getElementById('f-sentiment-concerns').value = (ss.common_concerns || []).join(', ');
 
-      // Fill in category scores
+      // Fill in category scores + descriptions
       Object.entries(b.categoryScores).forEach(function(entry) {
         var name = entry[0], data = entry[1];
         var fieldId = 'f-' + name.toLowerCase().replace(/[^a-z]+/g, '-');
         var scoreEl = document.getElementById(fieldId + '-score');
         var maxEl = document.getElementById(fieldId + '-max');
+        var descEl = document.getElementById(fieldId + '-desc');
         if (scoreEl) scoreEl.value = data.score;
         if (maxEl) maxEl.value = data.max;
+        if (descEl) descEl.value = data.description || '';
       });
 
       document.getElementById('brand-modal').classList.add('open');
@@ -373,11 +421,12 @@
         var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
         var scoreEl = document.getElementById(fieldId + '-score');
         var maxEl = document.getElementById(fieldId + '-max');
+        var descEl = document.getElementById(fieldId + '-desc');
         if (scoreEl && maxEl && scoreEl.value && maxEl.value) {
           scores[catName] = {
             score: parseFloat(scoreEl.value),
             max: parseFloat(maxEl.value),
-            description: ''
+            description: descEl ? descEl.value.trim() : ''
           };
         }
       });
@@ -395,6 +444,15 @@
         });
       }
 
+      // Parse comma-separated fields
+      function csvToArr(id) {
+        var val = document.getElementById(id).value.trim();
+        return val ? val.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+      }
+
+      var pricingText = document.getElementById('f-pricing').value.trim();
+      var pricingArr = pricingText ? [{ name: 'Pricing', cost: pricingText, features: '' }] : [];
+
       var brandData = {
         name: document.getElementById('f-name').value.trim(),
         categorySlug: document.getElementById('f-industry').value,
@@ -404,7 +462,16 @@
         googlePlayRating: gpVal ? gpVal + '/5' : 'N/A',
         iosRating: iosVal ? iosVal + '/5' : 'N/A',
         overview: document.getElementById('f-overview').value.trim(),
-        ratingSummary: document.getElementById('f-rating-summary').value.trim()
+        ratingSummary: document.getElementById('f-rating-summary').value.trim(),
+        keyFeatures: csvToArr('f-features'),
+        strengths: csvToArr('f-strengths'),
+        concerns: csvToArr('f-concerns'),
+        pricing: pricingArr,
+        socialSentiment: {
+          summary: document.getElementById('f-sentiment-summary').value.trim(),
+          positive_themes: csvToArr('f-sentiment-positive'),
+          common_concerns: csvToArr('f-sentiment-concerns')
+        }
       };
 
       try {

@@ -447,12 +447,12 @@ var GoNoGoAPI = (function () {
       if (brandData.googlePlayRating || brandData.iosRating) {
         record.app_ratings = { google_play: brandData.googlePlayRating || 'N/A', ios: brandData.iosRating || 'N/A' };
       }
-      // Only overwrite arrays if they have content (don't wipe existing data with empty arrays)
-      if (brandData.keyFeatures && brandData.keyFeatures.length > 0) record.key_features = brandData.keyFeatures;
-      if (brandData.pricing && brandData.pricing.length > 0) record.pricing = brandData.pricing;
-      if (brandData.strengths && brandData.strengths.length > 0) record.key_strengths = brandData.strengths;
-      if (brandData.concerns && brandData.concerns.length > 0) record.key_concerns = brandData.concerns;
-      if (brandData.socialSentiment && Object.keys(brandData.socialSentiment).length > 0) record.social_sentiment = brandData.socialSentiment;
+      // Save arrays/objects if they're explicitly provided in the form data
+      if ('keyFeatures' in brandData) record.key_features = brandData.keyFeatures || [];
+      if ('pricing' in brandData) record.pricing = brandData.pricing || [];
+      if ('strengths' in brandData) record.key_strengths = brandData.strengths || [];
+      if ('concerns' in brandData) record.key_concerns = brandData.concerns || [];
+      if ('socialSentiment' in brandData) record.social_sentiment = brandData.socialSentiment || {};
       if ('overview' in brandData) record.overview = brandData.overview || '';
       if ('ratingSummary' in brandData) record.rating_summary = brandData.ratingSummary || '';
 
