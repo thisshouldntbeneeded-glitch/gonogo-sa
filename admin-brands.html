@@ -30,9 +30,16 @@
           <h1 class="admin-title">Brand Management</h1>
           <p class="text-sm text-secondary">Manage all rated brands across SA industries</p>
         </div>
-        <div style="display:flex;gap:var(--space-2);">
+        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('csv-file').click()">
+            <i class="fa-solid fa-file-csv"></i> Import CSV
+          </button>
+          <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="importCSV(event)">
           <button class="btn btn-secondary btn-sm" onclick="exportBrands()">
             <i class="fa-solid fa-download"></i> Export CSV
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openCategoryModal()">
+            <i class="fa-solid fa-folder-plus"></i> Add Category
           </button>
           <button class="btn btn-primary btn-sm" onclick="openAddModal()">
             <i class="fa-solid fa-plus"></i> Add Brand
@@ -151,6 +158,50 @@
       </form>
     </div>
   </div>
+  <!-- Category Modal -->
+  <div class="modal-overlay" id="category-modal">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Category</h2>
+        <button class="modal-close" onclick="closeCategoryModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="category-form" onsubmit="saveCategory(event)">
+        <div class="form-group">
+          <label class="form-label">Category Name</label>
+          <input type="text" id="fc-name" required placeholder="e.g. Telecommunications">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon (Font Awesome class)</label>
+          <input type="text" id="fc-icon" required placeholder="fa-tower-cell" value="fa-tag">
+          <p class="text-xs text-muted" style="margin-top:var(--space-1)">Browse icons at <a href="https://fontawesome.com/search?o=r&m=free&s=solid" target="_blank" style="color:var(--green)">fontawesome.com</a></p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon Preview</label>
+          <div style="font-size:24px;color:var(--green);padding:var(--space-2)" id="fc-icon-preview"><i class="fa-solid fa-tag"></i></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
+          <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-cat-btn"><i class="fa-solid fa-check"></i> Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CSV Import Modal -->
+  <div class="modal-overlay" id="csv-modal">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">CSV Import</h2>
+        <button class="modal-close" onclick="closeCSVModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="csv-status" style="margin-bottom:var(--space-4)"></div>
+      <div id="csv-log" style="background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4);max-height:300px;overflow-y:auto;font-family:monospace;font-size:12px;line-height:1.6;"></div>
+      <div style="margin-top:var(--space-4);text-align:right;">
+        <button class="btn btn-primary btn-sm" onclick="closeCSVModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -394,6 +445,285 @@
     document.getElementById('brand-modal').addEventListener('click', function(e) {
       if (e.target === this) closeModal();
     });
+    document.getElementById('category-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeCategoryModal();
+    });
+    document.getElementById('csv-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeCSVModal();
+    });
+
+    // Icon preview live update
+    document.getElementById('fc-icon').addEventListener('input', function() {
+      document.getElementById('fc-icon-preview').innerHTML = '<i class="fa-solid ' + this.value + '"></i>';
+    });
+
+    // ============================================================
+    // CATEGORY MANAGEMENT
+    // ============================================================
+    function openCategoryModal() {
+      document.getElementById('category-form').reset();
+      document.getElementById('fc-icon').value = 'fa-tag';
+      document.getElementById('fc-icon-preview').innerHTML = '<i class="fa-solid fa-tag"></i>';
+      document.getElementById('category-modal').classList.add('open');
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('category-modal').classList.remove('open');
+    }
+
+    async function saveCategory(e) {
+      e.preventDefault();
+      var btn = document.getElementById('save-cat-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      var name = document.getElementById('fc-name').value.trim();
+      var icon = document.getElementById('fc-icon').value.trim();
+      var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      try {
+        await GoNoGoAPI.saveCategory({
+          slug: slug,
+          name: name,
+          icon: icon,
+          scoringCategories: [
+            { name: 'Compliance', max: 20 },
+            { name: 'Customer Satisfaction', max: 25 },
+            { name: 'Product Value', max: 35 },
+            { name: 'Innovation', max: 10 },
+            { name: 'Customer Support', max: 15 },
+            { name: 'Accessibility & Security', max: 10 }
+          ]
+        });
+        Components.showToast('Category "' + name + '" created');
+        closeCategoryModal();
+
+        // Refresh industry filter and form dropdown
+        var cats = await GoNoGoAPI.getCategories();
+        var industryFilter = document.getElementById('industry-filter');
+        var fIndustry = document.getElementById('f-industry');
+        industryFilter.innerHTML = '<option value="">All Industries</option>';
+        fIndustry.innerHTML = '';
+        cats.forEach(function(cat) {
+          industryFilter.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+          fIndustry.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+        });
+      } catch (err) {
+        Components.showToast('Error: ' + err.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Category';
+    }
+
+    // ============================================================
+    // CSV IMPORT
+    // ============================================================
+    function closeCSVModal() {
+      document.getElementById('csv-modal').classList.remove('open');
+    }
+
+    function csvLog(msg, type) {
+      var log = document.getElementById('csv-log');
+      var color = type === 'success' ? 'var(--green-text)' : type === 'error' ? 'var(--red-text)' : 'var(--text-secondary)';
+      log.innerHTML += '<div style="color:' + color + '">' + msg + '</div>';
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function importCSV(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      event.target.value = ''; // reset for re-upload
+
+      document.getElementById('csv-log').innerHTML = '';
+      document.getElementById('csv-status').innerHTML = '<span class="text-sm"><i class="fa-solid fa-spinner fa-spin"></i> Processing ' + file.name + '...</span>';
+      document.getElementById('csv-modal').classList.add('open');
+
+      var text = await file.text();
+      var lines = text.split('\n').filter(function(l) { return l.trim(); });
+      if (lines.length < 2) {
+        csvLog('Error: CSV must have a header row and at least one data row', 'error');
+        document.getElementById('csv-status').innerHTML = '<span class="text-sm" style="color:var(--red-text)">Import failed</span>';
+        return;
+      }
+
+      // Parse header
+      var headers = parseCSVLine(lines[0]).map(function(h) { return h.trim().toLowerCase(); });
+      csvLog('Found ' + (lines.length - 1) + ' rows, ' + headers.length + ' columns', 'info');
+      csvLog('Columns: ' + headers.join(', '), 'info');
+
+      // Required columns
+      var nameCol = findCol(headers, ['brandname', 'brand_name', 'brand', 'name']);
+      var catCol = findCol(headers, ['categoryslug', 'category_slug', 'category', 'categoryname', 'industry']);
+      if (nameCol === -1) {
+        csvLog('Error: No brand name column found. Expected: BrandName, Brand, or Name', 'error');
+        document.getElementById('csv-status').innerHTML = '<span class="text-sm" style="color:var(--red-text)">Import failed</span>';
+        return;
+      }
+
+      // Map columns
+      var colMap = {
+        name: nameCol,
+        category: catCol,
+        website: findCol(headers, ['websiteurl', 'website_url', 'website']),
+        logo: findCol(headers, ['logourl', 'logo_url', 'logo']),
+        score: findCol(headers, ['gonogoscore', 'gonogo_score', 'score', 'overallscore']),
+        verdict: findCol(headers, ['verdict']),
+        overview: findCol(headers, ['overview', 'brand_overview', 'description']),
+        ratingSummary: findCol(headers, ['ratingsummary', 'rating_summary', 'rating_overview']),
+        googlePlay: findCol(headers, ['googleplay_rating', 'google_play', 'googleplay', 'gp_rating']),
+        ios: findCol(headers, ['ios_rating', 'ios', 'appstore_rating']),
+        compliance_score: findCol(headers, ['compliance_score']),
+        compliance_max: findCol(headers, ['compliance_max']),
+        compliance_desc: findCol(headers, ['compliance_description']),
+        satisfaction_score: findCol(headers, ['customersatisfaction_score']),
+        satisfaction_max: findCol(headers, ['customersatisfaction_max']),
+        satisfaction_desc: findCol(headers, ['customersatisfaction_description']),
+        value_score: findCol(headers, ['productvalue_score']),
+        value_max: findCol(headers, ['productvalue_max']),
+        value_desc: findCol(headers, ['productvalue_description']),
+        innovation_score: findCol(headers, ['innovation_score']),
+        innovation_max: findCol(headers, ['innovation_max']),
+        innovation_desc: findCol(headers, ['innovation_description']),
+        support_score: findCol(headers, ['customersupport_score']),
+        support_max: findCol(headers, ['customersupport_max']),
+        support_desc: findCol(headers, ['customersupport_description']),
+        security_score: findCol(headers, ['accessibilitysecurity_score']),
+        security_max: findCol(headers, ['accessibilitysecurity_max']),
+        security_desc: findCol(headers, ['accessibilitysecurity_description']),
+        keyFeatures: findCol(headers, ['keyfeatures', 'key_features']),
+        keyStrengths: findCol(headers, ['keystrengths', 'key_strengths']),
+        keyConcerns: findCol(headers, ['keyconcerns', 'key_concerns']),
+      };
+
+      // Process rows
+      var created = 0, updated = 0, errors = 0, catsCreated = 0;
+      var seenCategories = {};
+
+      for (var i = 1; i < lines.length; i++) {
+        var cols = parseCSVLine(lines[i]);
+        var brandName = cols[colMap.name] ? cols[colMap.name].trim() : '';
+        if (!brandName) continue;
+
+        var catSlug = '';
+        if (colMap.category !== -1 && cols[colMap.category]) {
+          var catRaw = cols[colMap.category].trim();
+          catSlug = catRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+          // Auto-create category if new
+          if (!seenCategories[catSlug]) {
+            seenCategories[catSlug] = true;
+            try {
+              await GoNoGoAPI.saveCategory({
+                slug: catSlug,
+                name: catRaw,
+                icon: 'fa-tag',
+                scoringCategories: [
+                  { name: 'Compliance', max: 20 },
+                  { name: 'Customer Satisfaction', max: 25 },
+                  { name: 'Product Value', max: 35 },
+                  { name: 'Innovation', max: 10 },
+                  { name: 'Customer Support', max: 15 },
+                  { name: 'Accessibility & Security', max: 10 }
+                ]
+              });
+              catsCreated++;
+            } catch(e) { /* category may already exist */ }
+          }
+        }
+
+        // Build scores
+        var scores = {};
+        function addScore(label, sIdx, mIdx, dIdx) {
+          if (sIdx !== -1 && cols[sIdx]) {
+            scores[label] = {
+              score: parseFloat(cols[sIdx]) || 0,
+              max: mIdx !== -1 && cols[mIdx] ? parseFloat(cols[mIdx]) || 0 : 0,
+              description: dIdx !== -1 && cols[dIdx] ? cols[dIdx].trim() : ''
+            };
+          }
+        }
+        addScore('Compliance', colMap.compliance_score, colMap.compliance_max, colMap.compliance_desc);
+        addScore('Customer Satisfaction', colMap.satisfaction_score, colMap.satisfaction_max, colMap.satisfaction_desc);
+        addScore('Product Value', colMap.value_score, colMap.value_max, colMap.value_desc);
+        addScore('Innovation', colMap.innovation_score, colMap.innovation_max, colMap.innovation_desc);
+        addScore('Customer Support', colMap.support_score, colMap.support_max, colMap.support_desc);
+        addScore('Accessibility & Security', colMap.security_score, colMap.security_max, colMap.security_desc);
+
+        var brandData = {
+          name: brandName,
+          categorySlug: catSlug,
+          scores: scores
+        };
+        if (colMap.website !== -1 && cols[colMap.website]) brandData.website = cols[colMap.website].trim();
+        if (colMap.logo !== -1 && cols[colMap.logo]) brandData.logo = cols[colMap.logo].trim();
+        if (colMap.overview !== -1 && cols[colMap.overview]) brandData.overview = cols[colMap.overview].trim();
+        if (colMap.ratingSummary !== -1 && cols[colMap.ratingSummary]) brandData.ratingSummary = cols[colMap.ratingSummary].trim();
+        if (colMap.googlePlay !== -1 && cols[colMap.googlePlay]) brandData.googlePlayRating = cols[colMap.googlePlay].trim();
+        if (colMap.ios !== -1 && cols[colMap.ios]) brandData.iosRating = cols[colMap.ios].trim();
+        if (colMap.keyFeatures !== -1 && cols[colMap.keyFeatures]) brandData.keyFeatures = cols[colMap.keyFeatures].split(',').map(function(s){return s.trim();}).filter(Boolean);
+        if (colMap.keyStrengths !== -1 && cols[colMap.keyStrengths]) brandData.strengths = cols[colMap.keyStrengths].split(',').map(function(s){return s.trim();}).filter(Boolean);
+        if (colMap.keyConcerns !== -1 && cols[colMap.keyConcerns]) brandData.concerns = cols[colMap.keyConcerns].split(',').map(function(s){return s.trim();}).filter(Boolean);
+
+        try {
+          await GoNoGoAPI.saveBrand(brandData);
+          csvLog('Row ' + i + ': ' + brandName + ' — saved', 'success');
+          created++;
+        } catch (err) {
+          csvLog('Row ' + i + ': ' + brandName + ' — ERROR: ' + err.message, 'error');
+          errors++;
+        }
+      }
+
+      csvLog('', '');
+      csvLog('Import complete: ' + created + ' brands saved, ' + errors + ' errors' + (catsCreated > 0 ? ', ' + catsCreated + ' categories created' : ''), created > 0 ? 'success' : 'error');
+      document.getElementById('csv-status').innerHTML = '<span class="text-sm" style="color:var(--green-text)"><i class="fa-solid fa-circle-check"></i> Import complete</span>';
+
+      // Refresh data
+      allBrandsData = await GoNoGoAPI.getAllBrands();
+      var cats = await GoNoGoAPI.getCategories();
+      var industryFilter = document.getElementById('industry-filter');
+      var fIndustry = document.getElementById('f-industry');
+      industryFilter.innerHTML = '<option value="">All Industries</option>';
+      fIndustry.innerHTML = '';
+      cats.forEach(function(cat) {
+        industryFilter.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+        fIndustry.innerHTML += '<option value="' + cat.id + '">' + cat.name + '</option>';
+      });
+      filterBrands();
+    }
+
+    function findCol(headers, names) {
+      for (var i = 0; i < names.length; i++) {
+        var idx = headers.indexOf(names[i]);
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    }
+
+    function parseCSVLine(line) {
+      var result = [];
+      var current = '';
+      var inQuotes = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current);
+      return result;
+    }
   </script>
 </body>
 </html>
