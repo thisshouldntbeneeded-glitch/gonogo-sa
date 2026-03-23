@@ -27,10 +27,20 @@
 
   <!-- Hero -->
   <section class="hero">
-    <div class="container">
-      <h1 class="hero-title">GoNoGo <span style="color:var(--green)">South Africa</span></h1>
-      <p class="hero-subtitle">Honest brand comparisons for the SA market. We rate every brand on a transparent 100-point scoring framework so you can decide: Go, or No Go.</p>
-      <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;position:relative">
+    <div class="container" style="position:relative;">
+      <div class="hero-logo-wrap">
+        <img src="https://images.squarespace-cdn.com/content/6814797d734d653e60269f66/efd76cb6-403f-443c-8319-6461cf330bca/Dark+mode+full+logo+long+no+boarder.png?content-type=image%2Fpng" alt="GoNoGo" class="hero-logo-img">
+      </div>
+      <div class="hero-sa-outline">
+        <svg viewBox="0 0 400 420" class="sa-map" aria-hidden="true">
+          <path d="M200 10 L260 30 L310 60 L340 100 L370 150 L390 210 L380 270 L350 320 L310 360 L260 390 L200 410 L140 390 L90 360 L50 320 L20 270 L10 210 L30 150 L60 100 L90 60 L140 30 Z" fill="none" stroke="var(--green)" stroke-width="1.5" opacity="0.15"/>
+        </svg>
+        <div class="hero-sa-content">
+          <h1 class="hero-tagline">Honest brand comparisons<br>for the <span style="color:var(--green)">SA market</span></h1>
+          <p class="hero-subtitle">We rate every brand on a transparent 100-point scoring framework so you can decide: Go, or No Go.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;margin-top:var(--space-6)">
         <a href="#industries" class="btn btn-primary btn-lg"><i class="fa-solid fa-compass"></i> Explore Brands</a>
         <a href="#how-we-score" class="btn btn-secondary btn-lg"><i class="fa-solid fa-chart-simple"></i> How We Score</a>
       </div>
@@ -41,10 +51,10 @@
   <section class="section" id="industries">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Browse by Industry</h2>
-        <p class="section-subtitle">Explore brands across 13 South African industries</p>
+        <h2 class="section-title" style="color:var(--green)">Explore brands by category</h2>
+        <p class="section-subtitle">See how the 100-point framework is applied across major SA industries</p>
       </div>
-      <div class="industry-grid" id="industry-grid">
+      <div class="industry-grid-v2" id="industry-grid">
         <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading industries...</div>
       </div>
     </div>
@@ -54,7 +64,7 @@
   <section class="section" style="background:var(--surface-1)">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Top Rated Brands</h2>
+        <h2 class="section-title" style="color:var(--green)">Top rated brands in the framework</h2>
         <p class="section-subtitle">The highest-scoring brands across all industries</p>
       </div>
       <div class="brand-grid" id="top-brands">
@@ -67,7 +77,7 @@
   <section class="section" id="how-we-score">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">How We Score</h2>
+        <h2 class="section-title" style="color:var(--green)">How We Score</h2>
         <p class="section-subtitle">Every brand is evaluated on a 100-point framework across multiple weighted categories</p>
       </div>
       <div class="category-grid" id="scoring-grid">
@@ -121,6 +131,18 @@
   </section>
 
   <div id="footer"></div>
+
+  <!-- Cookie Banner -->
+  <div class="cookie-banner" id="cookie-banner">
+    <div class="cookie-content">
+      <p>We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies.</p>
+      <div style="display:flex;gap:var(--space-2)">
+        <button class="btn btn-primary btn-sm" onclick="acceptCookies()">Accept</button>
+        <button class="btn btn-ghost btn-sm" onclick="dismissCookies()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -137,15 +159,64 @@
     document.getElementById('nav').innerHTML = Components.renderPublicNav('home');
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
+    // Cookie banner
+    if (localStorage.getItem('gonogo_cookies') === 'accepted') {
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
+    function acceptCookies() {
+      localStorage.setItem('gonogo_cookies', 'accepted');
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
+    function dismissCookies() {
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
+
+    // Category descriptions for richer cards
+    var categoryDescriptions = {
+      'banking': 'Digital banks, traditional banks, credit cards.',
+      'mobile-networks': 'Coverage, data plans, customer service.',
+      'hr-software': 'Human resources management, payroll, employee engagement.',
+      'accounting-software': 'Business accounting, invoicing, financial reporting tools.',
+      'property-letting': 'Estate agents, property management, rental platforms.',
+      'online-retailers': 'Online platforms, payment systems, digital marketplaces.',
+      'medical-aid': 'Medical schemes, hospital plans, gap cover.',
+      'insurance': 'Home, auto, life, and travel coverage.',
+      'home-cleaning': 'Domestic cleaning, commercial cleaning, specialised services.',
+      'car-dealers': 'New and used vehicles, dealership networks, online platforms.',
+      'food-delivery': 'Meal delivery, grocery delivery, restaurant platforms.',
+      'armed-response': 'Security companies, armed response, monitoring services.',
+      'car-rentals': 'Vehicle hire, short and long term rental, fleet services.'
+    };
+
+    // Category icon colors for visual variety
+    var categoryColors = {
+      'banking': '#11a551',
+      'mobile-networks': '#3b82f6',
+      'hr-software': '#8b5cf6',
+      'accounting-software': '#06b6d4',
+      'property-letting': '#ec4899',
+      'online-retailers': '#f59e0b',
+      'medical-aid': '#ef4444',
+      'insurance': '#14b8a6',
+      'home-cleaning': '#f97316',
+      'car-dealers': '#6366f1',
+      'food-delivery': '#e74c3c',
+      'armed-response': '#64748b',
+      'car-rentals': '#0ea5e9'
+    };
+
     (async function() {
-      // Industry grid
+      // Industry grid — UK-style cards
       var categories = await GoNoGoAPI.getCategoriesWithBrands();
       var industryGrid = document.getElementById('industry-grid');
       industryGrid.innerHTML = categories.map(function(cat) {
-        return '<a href="category.html?cat=' + cat.id + '" class="industry-card ' + (cat.hasBrands ? '' : 'no-data') + '">' +
-          '<i class="fa-solid ' + cat.icon + '"></i>' +
-          '<div class="name">' + cat.name + '</div>' +
-          '<div class="count">' + cat.brandCount + ' brand' + (cat.brandCount !== 1 ? 's' : '') + '</div>' +
+        var desc = categoryDescriptions[cat.id] || cat.brandCount + ' brands reviewed';
+        var color = categoryColors[cat.id] || '#11a551';
+        return '<a href="category.html?cat=' + cat.id + '" class="industry-card-v2">' +
+          '<div class="ic-icon" style="color:' + color + '"><i class="fa-solid ' + cat.icon + '"></i></div>' +
+          '<div class="ic-name">' + cat.name + '</div>' +
+          '<div class="ic-desc">' + desc + '</div>' +
+          '<div class="ic-arrow"><i class="fa-solid fa-arrow-right"></i></div>' +
         '</a>';
       }).join('');
 
@@ -154,7 +225,6 @@
       var topGrid = document.getElementById('top-brands');
       topGrid.innerHTML = topBrands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
 
-      // Init radar charts for top brands
       topBrands.forEach(function(brand) {
         Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
       });
