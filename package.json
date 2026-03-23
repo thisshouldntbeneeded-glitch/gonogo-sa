@@ -1,0 +1,23 @@
+{
+  "name": "primary",
+  "version": "1.0.0",
+  "description": "Honest brand comparisons for the South African market. GoNoGo rates every brand on a transparent 100-point scoring framework across 6 key categories.",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisshouldntbeneeded-glitch/gonogo-sa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thisshouldntbeneeded-glitch/gonogo-sa/issues"
+  },
+  "homepage": "https://github.com/thisshouldntbeneeded-glitch/gonogo-sa#readme",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}
