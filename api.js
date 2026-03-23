@@ -6,18 +6,22 @@
 var GoNoGoAPI = (function () {
   'use strict';
 
-  var SUPABASE_URL = 'https://kkpbzttwljxvyjbvggqr.supabase.co';
-  var SUPABASE_ANON_KEY = 'sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW';
+  var SUPABASE_URL = 'https://fnpxaneextqidbessnej.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_132Gl37kwIXtdJc5VHtGCw_iXPxa6cW';
+
+  // Reviews are on the original customer ratings project
+  var REVIEWS_SUPABASE_URL = 'https://kkpbzttwljxvyjbvggqr.supabase.co';
+  var REVIEWS_SUPABASE_KEY = 'sb_publishable_y5JnEvpF37HMKB2rcWbrog_6Oe0KYJW';
 
   // Track whether Supabase brands table is available
   var _supabaseBrandsAvailable = null; // null = unknown, true/false = tested
 
-  function supabaseRequest(path, options) {
+  function _sbFetch(baseUrl, apiKey, path, options) {
     options = options || {};
-    var url = SUPABASE_URL + '/rest/v1/' + path;
+    var url = baseUrl + '/rest/v1/' + path;
     var headers = {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'apikey': apiKey,
+      'Authorization': 'Bearer ' + apiKey,
       'Content-Type': 'application/json',
       'Prefer': options.prefer || 'return=representation'
     };
@@ -36,6 +40,16 @@ var GoNoGoAPI = (function () {
       if (ct.indexOf('json') !== -1) return r.json();
       return r.text();
     });
+  }
+
+  // Main project (brands, categories, admin_users)
+  function supabaseRequest(path, options) {
+    return _sbFetch(SUPABASE_URL, SUPABASE_ANON_KEY, path, options);
+  }
+
+  // Reviews project
+  function reviewsRequest(path, options) {
+    return _sbFetch(REVIEWS_SUPABASE_URL, REVIEWS_SUPABASE_KEY, path, options);
   }
 
   // Check if Supabase brands table exists (cached)
@@ -278,7 +292,7 @@ var GoNoGoAPI = (function () {
     // REVIEWS — Supabase 'reviews' table
     // ==========================================
     submitReview: function (reviewData) {
-      return supabaseRequest('reviews', {
+      return reviewsRequest('reviews', {
         method: 'POST',
         body: {
           brand_name: reviewData.brandName || reviewData.brand_name || '',
@@ -294,7 +308,7 @@ var GoNoGoAPI = (function () {
     },
 
     getReviews: function (brandName) {
-      return supabaseRequest('reviews?brand_name=eq.' + encodeURIComponent(brandName) + '&status=eq.approved&order=created_at.desc')
+      return reviewsRequest('reviews?brand_name=eq.' + encodeURIComponent(brandName) + '&status=eq.approved&order=created_at.desc')
         .then(function (data) {
           return (data || []).map(function (r) {
             return {
@@ -310,7 +324,7 @@ var GoNoGoAPI = (function () {
     getReviewsForBrand: function (brandName) { return this.getReviews(brandName); },
 
     getAllReviews: function () {
-      return supabaseRequest('reviews?order=created_at.desc')
+      return reviewsRequest('reviews?order=created_at.desc')
         .then(function (data) {
           return (data || []).map(function (r) {
             return {
@@ -326,7 +340,7 @@ var GoNoGoAPI = (function () {
     },
 
     moderateReview: function (reviewId, newStatus, moderatedBy) {
-      return supabaseRequest('reviews?id=eq.' + encodeURIComponent(reviewId), {
+      return reviewsRequest('reviews?id=eq.' + encodeURIComponent(reviewId), {
         method: 'PATCH',
         body: { status: newStatus, moderated_by: moderatedBy || 'admin', moderated_at: new Date().toISOString() },
         prefer: 'return=representation'
