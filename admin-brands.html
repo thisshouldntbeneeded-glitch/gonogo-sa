@@ -162,6 +162,7 @@
     var currentSort = { key: 'overallScore', dir: 'desc' };
     var allBrandsData = [];
     var editingBrandId = null;
+    var editingBrandData = null; // preserve existing data during edit
 
     async function initAdminPage() {
       document.getElementById('admin-content').style.display = '';
@@ -269,6 +270,7 @@
       }
       if (!b) return;
       editingBrandId = id;
+      editingBrandData = b; // store full brand data for preserving fields
       document.getElementById('modal-title').textContent = 'Edit: ' + b.name;
       document.getElementById('f-name').value = b.name;
       document.getElementById('f-industry').value = b.categorySlug;
@@ -319,6 +321,16 @@
       var gpVal = document.getElementById('f-googleplay').value;
       var iosVal = document.getElementById('f-ios').value;
 
+      // When editing, preserve descriptions from existing framework_breakdown
+      if (editingBrandData && editingBrandData.categoryScores) {
+        Object.keys(scores).forEach(function(catName) {
+          var existing = editingBrandData.categoryScores[catName];
+          if (existing && existing.description && !scores[catName].description) {
+            scores[catName].description = existing.description;
+          }
+        });
+      }
+
       var brandData = {
         name: document.getElementById('f-name').value.trim(),
         categorySlug: document.getElementById('f-industry').value,
@@ -326,16 +338,13 @@
         logo: document.getElementById('f-logo').value.trim(),
         scores: scores,
         googlePlayRating: gpVal ? gpVal + '/5' : 'N/A',
-        iosRating: iosVal ? iosVal + '/5' : 'N/A',
-        keyFeatures: [],
-        pricing: [],
-        keyStrengths: [],
-        keyConcerns: []
+        iosRating: iosVal ? iosVal + '/5' : 'N/A'
       };
 
       try {
         if (editingBrandId) brandData.id = editingBrandId;
         var result = await GoNoGoAPI.saveBrand(brandData);
+        editingBrandData = null;
         Components.showToast('Brand saved — ' + result.verdict + ' (' + result.gonogo_score + '/100)');
         closeModal();
 

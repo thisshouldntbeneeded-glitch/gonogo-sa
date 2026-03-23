@@ -416,17 +416,18 @@ var GoNoGoAPI = (function () {
     // BRAND SAVE — writes to Supabase (with localStorage fallback)
     // ==========================================
     saveBrand: function (brandData) {
-      var totalScore = 0;
+      var totalScore = 0, totalMax = 0;
       var frameworkBreakdown = [];
       if (brandData.scores) {
         Object.keys(brandData.scores).forEach(function (k) {
           var s = brandData.scores[k];
           totalScore += s.score || 0;
+          totalMax += s.max || 0;
           frameworkBreakdown.push({ category: k, score: (s.score||0) + '/' + (s.max||0), description: s.description || '' });
         });
       }
-      // GoNoGo score = sum of raw category scores (NOT a percentage)
-      var overallScore = Math.round(totalScore);
+      // GoNoGo score = percentage of points earned vs max possible
+      var overallScore = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0;
       var verdict = overallScore >= 80 ? 'GO' : overallScore >= 60 ? 'GO WITH CAUTION' : 'NOGO';
       var slug = brandData.id || brandData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
