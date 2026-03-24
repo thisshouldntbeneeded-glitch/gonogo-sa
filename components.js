@@ -39,10 +39,8 @@ const Components = {
   renderPublicNav(activePage) {
     const links = [
       { href: 'index.html', label: 'Home', icon: 'fa-house', id: 'home' },
-      { href: 'category.html?cat=banking', label: 'Banking', icon: 'fa-building-columns', id: 'banking' },
-      { href: 'category.html?cat=medical-aid', label: 'Medical Aid', icon: 'fa-heart-pulse', id: 'medical-aid' },
-      { href: 'category.html?cat=insurance', label: 'Insurance', icon: 'fa-umbrella', id: 'insurance' },
       { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
+      { href: 'about.html', label: 'About', icon: 'fa-circle-info', id: 'about' },
       // Admin link hidden from public nav — access via /admin.html directly
     ];
 
@@ -136,13 +134,14 @@ const Components = {
           <div class="footer-content">
             <div class="footer-links">
               <a href="index.html">Home</a>
-              <a href="category.html?cat=banking">Banking</a>
-              <a href="category.html?cat=medical-aid">Medical Aid</a>
-              <a href="category.html?cat=insurance">Insurance</a>
               <a href="compare.html">Compare</a>
+              <a href="about.html">About</a>
+              <a href="privacy.html">Privacy Policy</a>
+              <a href="terms.html">Terms & Conditions</a>
+              <a href="https://www.gonogo.co.uk" target="_blank">GoNoGo UK</a>
             </div>
             <div class="footer-attribution">
-              &copy; 2026 GoNoGo South Africa. All rights reserved.
+              &copy; 2026 GoNoGo Ratings and Reviews Ltd. All rights reserved.
             </div>
           </div>
         </div>
