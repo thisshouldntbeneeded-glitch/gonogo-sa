@@ -8,6 +8,7 @@ var GoNoGoAPI = (function () {
 
   var SUPABASE_URL = 'https://fnpxaneextqidbessnej.supabase.co';
   var SUPABASE_ANON_KEY = 'sb_publishable_132Gl37kwIXtdJc5VHtGCw_iXPxa6cW';
+  var SITE_REGION = 'za';
 
   // Reviews are on the original customer ratings project
   var REVIEWS_SUPABASE_URL = 'https://kkpbzttwljxvyjbvggqr.supabase.co';
@@ -55,7 +56,7 @@ var GoNoGoAPI = (function () {
   // Check if Supabase brands table exists (cached)
   function checkSupabaseBrands() {
     if (_supabaseBrandsAvailable !== null) return Promise.resolve(_supabaseBrandsAvailable);
-    return supabaseRequest('brands?select=slug&limit=1').then(function (rows) {
+    return supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=slug&limit=1').then(function (rows) {
       _supabaseBrandsAvailable = true;
       console.log('Supabase brands table: AVAILABLE');
       return true;
@@ -103,7 +104,7 @@ var GoNoGoAPI = (function () {
   var _categoryCache = null;
   function loadCategoryCache() {
     if (_categoryCache) return Promise.resolve(_categoryCache);
-    return supabaseRequest('categories?select=*&order=name.asc').then(function (rows) {
+    return supabaseRequest('categories?region=eq.' + SITE_REGION + '&select=*&order=name.asc').then(function (rows) {
       _categoryCache = {};
       rows.forEach(function (c) {
         _categoryCache[c.slug] = { name: c.name, icon: c.icon, scoring_categories: c.scoring_categories };
@@ -130,8 +131,8 @@ var GoNoGoAPI = (function () {
         if (hasSB) {
           // Get categories with brand counts from Supabase
           return Promise.all([
-            supabaseRequest('categories?select=*&order=name.asc'),
-            supabaseRequest('brands?select=slug,category_slug')
+            supabaseRequest('categories?region=eq.' + SITE_REGION + '&select=*&order=name.asc'),
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=slug,category_slug')
           ]).then(function (results) {
             var cats = results[0], brands = results[1];
             var counts = {};
@@ -161,7 +162,7 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           return Promise.all([
-            supabaseRequest('brands?select=*&order=gonogo_score.desc&limit=' + (count || 6)),
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=*&order=gonogo_score.desc&limit=' + (count || 6)),
             loadCategoryCache()
           ]).then(function (results) {
             var rows = results[0], cats = results[1];
@@ -180,7 +181,7 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           return Promise.all([
-            supabaseRequest('brands?select=*&order=gonogo_score.desc'),
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=*&order=gonogo_score.desc'),
             loadCategoryCache()
           ]).then(function (results) {
             var rows = results[0], cats = results[1];
@@ -199,7 +200,7 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           return Promise.all([
-            supabaseRequest('brands?category_slug=eq.' + encodeURIComponent(slug) + '&select=*&order=gonogo_score.desc'),
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&category_slug=eq.' + encodeURIComponent(slug) + '&select=*&order=gonogo_score.desc'),
             loadCategoryCache()
           ]).then(function (results) {
             var rows = results[0], cats = results[1];
@@ -218,7 +219,7 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           return Promise.all([
-            supabaseRequest('brands?slug=eq.' + encodeURIComponent(id) + '&select=*&limit=1'),
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(id) + '&select=*&limit=1'),
             loadCategoryCache()
           ]).then(function (results) {
             var rows = results[0], cats = results[1];
@@ -236,8 +237,8 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           return Promise.all([
-            supabaseRequest('brands?select=gonogo_score,verdict,category_slug'),
-            supabaseRequest('categories?select=slug')
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=gonogo_score,verdict,category_slug'),
+            supabaseRequest('categories?region=eq.' + SITE_REGION + '&select=slug')
           ]).then(function (results) {
             var brands = results[0], cats = results[1];
             var total = 0, scoreSum = 0, go = 0, caution = 0, nogo = 0;
@@ -439,6 +440,7 @@ var GoNoGoAPI = (function () {
       var record = {
         gonogo_score: overallScore,
         verdict: verdict,
+        region: SITE_REGION,
         framework_breakdown: frameworkBreakdown,
         last_updated: new Date().toISOString().split('T')[0]
       };
@@ -463,7 +465,7 @@ var GoNoGoAPI = (function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           // Try PATCH first (existing brand)
-          return supabaseRequest('brands?slug=eq.' + encodeURIComponent(slug), {
+          return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
             method: 'PATCH',
             body: record,
             prefer: 'return=representation'
@@ -490,7 +492,7 @@ var GoNoGoAPI = (function () {
     deleteBrand: function (slug) {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
-          return supabaseRequest('brands?slug=eq.' + encodeURIComponent(slug), { method: 'DELETE' })
+          return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), { method: 'DELETE' })
             .then(function () { return { ok: true }; });
         }
         throw new Error('Cannot delete brands without Supabase');
@@ -508,7 +510,7 @@ var GoNoGoAPI = (function () {
         if (rows && rows.length > 0) return { ok: true };
         return supabaseRequest('categories', {
           method: 'POST',
-          body: { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] }
+          body: { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [], region: SITE_REGION }
         }).then(function () { return { ok: true }; });
       });
     }
