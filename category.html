@@ -87,6 +87,12 @@
         document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
         document.title = catInfo.name + ' — GoNoGo South Africa';
 
+        // SEO meta
+        var catDesc = 'Compare ' + catInfo.brandCount + ' ' + catInfo.name.toLowerCase() + ' brands in South Africa. Independent ratings on a 100-point scoring framework.';
+        var metaTag = document.querySelector('meta[name="description"]');
+        if (!metaTag) { metaTag = document.createElement('meta'); metaTag.name = 'description'; document.head.appendChild(metaTag); }
+        metaTag.content = catDesc;
+
         var brands = await GoNoGoAPI.getBrandsByCategory(slug);
         var currentSort = 'score-desc';
 

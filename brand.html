@@ -68,6 +68,49 @@
       }
 
       document.title = brand.name + ' — GoNoGo South Africa';
+
+      // Dynamic SEO meta tags
+      var metaDesc = (brand.overview || brand.name + ' rated ' + brand.overallScore + '/100 (' + brand.verdict + ') in ' + brand.categoryName + '.');
+      var metaTag = document.querySelector('meta[name="description"]');
+      if (!metaTag) { metaTag = document.createElement('meta'); metaTag.name = 'description'; document.head.appendChild(metaTag); }
+      metaTag.content = metaDesc.substring(0, 160);
+
+      // Open Graph
+      function setOG(prop, val) {
+        var el = document.querySelector('meta[property="og:' + prop + '"]');
+        if (!el) { el = document.createElement('meta'); el.setAttribute('property', 'og:' + prop); document.head.appendChild(el); }
+        el.content = val;
+      }
+      setOG('title', brand.name + ' — GoNoGo South Africa');
+      setOG('description', metaDesc.substring(0, 160));
+      setOG('type', 'article');
+      setOG('url', window.location.href);
+
+      // JSON-LD structured data
+      var jsonLD = {
+        '@context': 'https://schema.org',
+        '@type': 'Review',
+        'itemReviewed': {
+          '@type': 'Brand',
+          'name': brand.name,
+          'url': brand.website || ''
+        },
+        'reviewRating': {
+          '@type': 'Rating',
+          'ratingValue': brand.overallScore,
+          'bestRating': 100,
+          'worstRating': 0
+        },
+        'author': { '@type': 'Organization', 'name': 'GoNoGo South Africa', 'url': 'https://www.gonogo.co.za' },
+        'creator': { '@type': 'SoftwareApplication', 'name': 'Perplexity Computer', 'url': 'https://www.perplexity.ai/computer' },
+        'reviewBody': brand.ratingSummary || metaDesc,
+        'publisher': { '@type': 'Organization', 'name': 'GoNoGo South Africa' }
+      };
+      var ldScript = document.createElement('script');
+      ldScript.type = 'application/ld+json';
+      ldScript.textContent = JSON.stringify(jsonLD);
+      document.head.appendChild(ldScript);
+
       var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
 
       // Category score cards
