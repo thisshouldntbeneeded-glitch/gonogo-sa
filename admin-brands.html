@@ -494,19 +494,43 @@
 
     function exportBrands() {
       var data = allBrandsData.map(function(b) {
-        return {
-          Name: b.name,
-          Industry: b.categoryName,
-          Score: b.overallScore,
+        var cs = b.categoryScores || {};
+        var ss = b.socialSentiment || {};
+        var row = {
+          BrandName: b.name,
+          CategoryName: b.categoryName,
+          CategorySlug: b.categorySlug,
+          CategoryIcon: b.categoryIcon || '',
+          WebsiteURL: b.website || '',
+          LogoURL: b.logo || '',
+          GoNoGoScore: b.overallScore,
           Verdict: b.verdict,
-          GooglePlay: b.appRatings.googlePlay,
-          iOS: b.appRatings.ios,
-          Website: b.website,
-          LastUpdated: b.lastUpdated
+          Overview: b.overview || '',
+          RatingSummary: b.ratingSummary || '',
+          GooglePlay_Rating: b.appRatings.googlePlay || '',
+          iOS_Rating: b.appRatings.ios || '',
+          KeyFeatures: (b.keyFeatures || []).join(', '),
+          KeyStrengths: (b.strengths || []).join(', '),
+          KeyConcerns: (b.concerns || []).join(', '),
+          Pricing: (b.pricing || []).map(function(p) { return p.cost || ''; }).join('; '),
+          SocialSentiment_Summary: ss.summary || '',
+          SocialSentiment_Positive: (ss.positive_themes || []).join(', '),
+          SocialSentiment_Concerns: (ss.common_concerns || []).join(', ')
         };
+        // Add score columns for each category
+        var cats = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
+        cats.forEach(function(cat) {
+          var key = cat.replace(/ /g, '').replace(/&/g, '');
+          var d = cs[cat] || {};
+          row[key + '_Score'] = d.score || '';
+          row[key + '_Max'] = d.max || '';
+          row[key + '_Description'] = d.description || '';
+        });
+        row.LastUpdated = b.lastUpdated || '';
+        return row;
       });
       Components.exportCSV(data, 'gonogo-sa-brands.csv');
-      Components.showToast('CSV exported');
+      Components.showToast('CSV exported — all fields included');
     }
 
     document.getElementById('brand-modal').addEventListener('click', function(e) {
@@ -661,6 +685,11 @@
         keyFeatures: findCol(headers, ['keyfeatures', 'key_features']),
         keyStrengths: findCol(headers, ['keystrengths', 'key_strengths']),
         keyConcerns: findCol(headers, ['keyconcerns', 'key_concerns']),
+        pricing: findCol(headers, ['pricing']),
+        sentimentSummary: findCol(headers, ['socialsentiment_summary', 'sentiment_summary']),
+        sentimentPositive: findCol(headers, ['socialsentiment_positive', 'sentiment_positive']),
+        sentimentConcerns: findCol(headers, ['socialsentiment_concerns', 'sentiment_concerns']),
+        categoryIcon: findCol(headers, ['categoryicon', 'category_icon', 'icon']),
       };
 
       // Process rows
@@ -680,11 +709,12 @@
           // Auto-create category if new
           if (!seenCategories[catSlug]) {
             seenCategories[catSlug] = true;
+            var catIcon = (colMap.categoryIcon !== -1 && cols[colMap.categoryIcon]) ? cols[colMap.categoryIcon].trim() : 'fa-tag';
             try {
               await GoNoGoAPI.saveCategory({
                 slug: catSlug,
                 name: catRaw,
-                icon: 'fa-tag',
+                icon: catIcon,
                 scoringCategories: [
                   { name: 'Compliance', max: 20 },
                   { name: 'Customer Satisfaction', max: 25 },
@@ -731,6 +761,13 @@
         if (colMap.keyFeatures !== -1 && cols[colMap.keyFeatures]) brandData.keyFeatures = cols[colMap.keyFeatures].split(',').map(function(s){return s.trim();}).filter(Boolean);
         if (colMap.keyStrengths !== -1 && cols[colMap.keyStrengths]) brandData.strengths = cols[colMap.keyStrengths].split(',').map(function(s){return s.trim();}).filter(Boolean);
         if (colMap.keyConcerns !== -1 && cols[colMap.keyConcerns]) brandData.concerns = cols[colMap.keyConcerns].split(',').map(function(s){return s.trim();}).filter(Boolean);
+        if (colMap.pricing !== -1 && cols[colMap.pricing]) brandData.pricing = [{ name: 'Pricing', cost: cols[colMap.pricing].trim(), features: '' }];
+        var hasSentiment = false;
+        var sentObj = {};
+        if (colMap.sentimentSummary !== -1 && cols[colMap.sentimentSummary]) { sentObj.summary = cols[colMap.sentimentSummary].trim(); hasSentiment = true; }
+        if (colMap.sentimentPositive !== -1 && cols[colMap.sentimentPositive]) { sentObj.positive_themes = cols[colMap.sentimentPositive].split(',').map(function(s){return s.trim();}).filter(Boolean); hasSentiment = true; }
+        if (colMap.sentimentConcerns !== -1 && cols[colMap.sentimentConcerns]) { sentObj.common_concerns = cols[colMap.sentimentConcerns].split(',').map(function(s){return s.trim();}).filter(Boolean); hasSentiment = true; }
+        if (hasSentiment) brandData.socialSentiment = sentObj;
 
         try {
           await GoNoGoAPI.saveBrand(brandData);
