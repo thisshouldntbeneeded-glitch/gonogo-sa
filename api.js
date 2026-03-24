@@ -292,15 +292,17 @@ var GoNoGoAPI = (function () {
     // REVIEWS — Supabase 'reviews' table
     // ==========================================
     submitReview: function (reviewData) {
+      var body = {
+        brand_name: reviewData.brandName || reviewData.brand_name || '',
+        category_slug: reviewData.categorySlug || reviewData.category_slug || reviewData.category || '',
+        reviewer_name: reviewData.reviewerName || reviewData.reviewer_name || '',
+        review_text: reviewData.reviewText || reviewData.review_text || '',
+        status: 'pending'
+      };
+      if (reviewData.verdict) body.verdict = reviewData.verdict;
       return reviewsRequest('reviews', {
         method: 'POST',
-        body: {
-          brand_name: reviewData.brandName || reviewData.brand_name || '',
-          category_slug: reviewData.categorySlug || reviewData.category_slug || reviewData.category || '',
-          reviewer_name: reviewData.reviewerName || reviewData.reviewer_name || '',
-          review_text: reviewData.reviewText || reviewData.review_text || '',
-          status: 'pending'
-        },
+        body: body,
         prefer: 'return=representation'
       }).then(function () {
         return { ok: true, status: 'pending', message: 'Review submitted — it will appear after approval.' };
@@ -314,6 +316,7 @@ var GoNoGoAPI = (function () {
             return {
               id: r.id, category: r.category_slug, brandname: r.brand_name,
               reviewername: r.reviewer_name, reviewtext: r.review_text,
+              verdict: r.verdict || '',
               date: r.created_at ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
               status: r.status
             };
@@ -332,6 +335,7 @@ var GoNoGoAPI = (function () {
               brandname: r.brand_name, brand_name: r.brand_name, BrandName: r.brand_name,
               reviewername: r.reviewer_name, ReviewerName: r.reviewer_name,
               reviewtext: r.review_text, ReviewText: r.review_text,
+              verdict: r.verdict || '',
               createdat: r.created_at ? new Date(r.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
               created_at: r.created_at, status: r.status, Status: r.status
             };

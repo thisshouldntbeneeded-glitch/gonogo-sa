@@ -280,18 +280,38 @@
 
           '<!-- Reviews Tab -->' +
           '<div class="tab-content" id="tab-reviews" style="display:none">' +
-            '<div id="review-list" style="margin-bottom:var(--space-6)"></div>' +
+            '<div id="review-summary" style="margin-bottom:var(--space-4)"></div>' +
+            '<div id="review-filters" style="display:none;margin-bottom:var(--space-4);display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center">' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn active" data-filter="all" onclick="filterReviews(\'all\')">All</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="GO" onclick="filterReviews(\'GO\')"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Go</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="NOGO" onclick="filterReviews(\'NOGO\')"><i class="fa-solid fa-circle-xmark" style="color:var(--red,#e74c3c)"></i> No Go</button>' +
+              '<span class="text-xs text-muted" id="review-filter-count" style="margin-left:auto"></span>' +
+            '</div>' +
+            '<div id="review-list" style="margin-bottom:var(--space-4)"></div>' +
+            '<div id="review-pagination" style="text-align:center;margin-bottom:var(--space-6)"></div>' +
             '<div class="card" style="max-width:600px">' +
-              '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Leave a Review</h4>' +
+              '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Rate ' + brand.name + '</h4>' +
+              '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">Would you recommend this brand? Cast your vote and tell us why.</p>' +
               '<div class="form-group">' +
                 '<label class="form-label">Your Name</label>' +
                 '<input type="text" id="review-name" placeholder="Enter your name">' +
               '</div>' +
               '<div class="form-group">' +
-                '<label class="form-label">Your Review</label>' +
-                '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="4"></textarea>' +
+                '<label class="form-label">Your Verdict</label>' +
+                '<div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-2)" id="verdict-buttons">' +
+                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-GO" onclick="selectVerdict(\'GO\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
+                    '<i class="fa-solid fa-circle-check"></i><br><strong>Go</strong><br><span class="text-xs">I recommend</span>' +
+                  '</button>' +
+                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-NOGO" onclick="selectVerdict(\'NOGO\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
+                    '<i class="fa-solid fa-circle-xmark"></i><br><strong>No Go</strong><br><span class="text-xs">I don\'t recommend</span>' +
+                  '</button>' +
+                '</div>' +
               '</div>' +
-              '<button class="btn btn-primary" onclick="submitReview()">' +
+              '<div class="form-group">' +
+                '<label class="form-label">Why? <span class="text-xs text-muted">(optional but helpful)</span></label>' +
+                '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="3"></textarea>' +
+              '</div>' +
+              '<button class="btn btn-primary" onclick="submitReview()" id="submit-review-btn" disabled style="opacity:0.5">' +
                 '<i class="fa-solid fa-paper-plane"></i> Submit Review' +
               '</button>' +
             '</div>' +
@@ -309,40 +329,129 @@
         document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
       };
 
-      // Load and render reviews from API
+      // Review state
+      var allReviews = [];
+      var reviewFilter = 'all';
+      var reviewPage = 1;
+      var reviewsPerPage = 10;
+      var selectedVerdict = null;
+
+      window.selectVerdict = function(v) {
+        selectedVerdict = v;
+        document.querySelectorAll('.verdict-btn').forEach(function(b) {
+          b.style.border = '2px solid var(--border-primary)';
+          b.style.background = 'transparent';
+          b.style.color = 'var(--text-secondary)';
+        });
+        var btn = document.getElementById('vbtn-' + v);
+        if (v === 'GO') {
+          btn.style.border = '2px solid var(--green)';
+          btn.style.background = 'var(--green-bg)';
+          btn.style.color = 'var(--green-text)';
+        } else {
+          btn.style.border = '2px solid var(--red, #e74c3c)';
+          btn.style.background = 'var(--red-bg, rgba(231,76,60,0.1))';
+          btn.style.color = 'var(--red-text, #e74c3c)';
+        }
+        document.getElementById('submit-review-btn').disabled = false;
+        document.getElementById('submit-review-btn').style.opacity = '1';
+      };
+
+      window.filterReviews = function(filter) {
+        reviewFilter = filter;
+        reviewPage = 1;
+        document.querySelectorAll('.review-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelector('[data-filter="' + filter + '"]').classList.add('active');
+        renderReviews();
+      };
+
+      window.loadMoreReviews = function() {
+        reviewPage++;
+        renderReviews();
+      };
+
       async function loadReviews() {
-        var reviews = await GoNoGoAPI.getReviews(brand.name, brand.categorySlug);
-        var list = document.getElementById('review-list');
-        if (!reviews || reviews.length === 0) {
-          list.innerHTML =
-            '<div style="text-align:center;padding:var(--space-10) 0;margin-bottom:var(--space-4)">' +
-              '<i class="fa-solid fa-comments" style="font-size:var(--text-3xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block"></i>' +
-              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">No Reviews Yet</h3>' +
-              '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to leave a review for ' + brand.name + '.</p>' +
-            '</div>';
+        allReviews = await GoNoGoAPI.getReviews(brand.name, brand.categorySlug);
+        renderReviewSummary();
+        renderReviews();
+      }
+
+      function renderReviewSummary() {
+        var el = document.getElementById('review-summary');
+        if (!allReviews || allReviews.length === 0) {
+          el.innerHTML = '';
+          document.getElementById('review-filters').style.display = 'none';
           return;
         }
-        list.innerHTML = '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-3)">' + reviews.length + ' User Review' + (reviews.length !== 1 ? 's' : '') + '</h4>' +
-          reviews.map(function(r) {
-            return Components.renderCommentCard({
-              author: r.reviewername || r.reviewer_name || 'Anonymous',
-              text: r.reviewtext || r.review_text || '',
-              date: r.date || r.created_at,
-              sentiment: 'positive'
-            }, brand.name);
-          }).join('');
+        var goCount = allReviews.filter(function(r) { return r.verdict === 'GO'; }).length;
+        var nogoCount = allReviews.filter(function(r) { return r.verdict === 'NOGO'; }).length;
+        var total = goCount + nogoCount;
+        var goPct = total > 0 ? Math.round((goCount / total) * 100) : 0;
+        var nogoPct = total > 0 ? 100 - goPct : 0;
+
+        el.innerHTML =
+          '<div style="display:flex;gap:var(--space-4);align-items:center;margin-bottom:var(--space-3)">' +
+            '<h4 style="font-size:var(--text-sm);font-weight:600;color:var(--text-secondary)">' + allReviews.length + ' User Review' + (allReviews.length !== 1 ? 's' : '') + '</h4>' +
+          '</div>' +
+          (total > 0 ? '<div style="display:flex;gap:var(--space-4);margin-bottom:var(--space-3)">' +
+            '<div style="flex:1;text-align:center;padding:var(--space-3);background:var(--green-bg);border-radius:var(--radius-md);border:1px solid var(--green-dim)">' +
+              '<div style="font-size:var(--text-xl);font-weight:800;color:var(--green-text)">' + goPct + '%</div>' +
+              '<div style="font-size:var(--text-xs);color:var(--green-text)"><i class="fa-solid fa-circle-check"></i> Go (' + goCount + ')</div>' +
+            '</div>' +
+            '<div style="flex:1;text-align:center;padding:var(--space-3);background:var(--red-bg,rgba(231,76,60,0.1));border-radius:var(--radius-md);border:1px solid var(--red-dim,rgba(231,76,60,0.2))">' +
+              '<div style="font-size:var(--text-xl);font-weight:800;color:var(--red-text,#e74c3c)">' + nogoPct + '%</div>' +
+              '<div style="font-size:var(--text-xs);color:var(--red-text,#e74c3c)"><i class="fa-solid fa-circle-xmark"></i> No Go (' + nogoCount + ')</div>' +
+            '</div>' +
+          '</div>' : '');
+
+        document.getElementById('review-filters').style.display = allReviews.length > 1 ? 'flex' : 'none';
+      }
+
+      function renderReviews() {
+        var list = document.getElementById('review-list');
+        if (!allReviews || allReviews.length === 0) {
+          list.innerHTML =
+            '<div style="text-align:center;padding:var(--space-10) 0">' +
+              '<i class="fa-solid fa-comments" style="font-size:var(--text-3xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block"></i>' +
+              '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">No Reviews Yet</h3>' +
+              '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to rate ' + brand.name + '.</p>' +
+            '</div>';
+          document.getElementById('review-pagination').innerHTML = '';
+          return;
+        }
+
+        var filtered = reviewFilter === 'all' ? allReviews : allReviews.filter(function(r) { return r.verdict === reviewFilter; });
+        document.getElementById('review-filter-count').textContent = filtered.length + ' review' + (filtered.length !== 1 ? 's' : '');
+
+        var visible = filtered.slice(0, reviewPage * reviewsPerPage);
+        var remaining = filtered.length - visible.length;
+
+        list.innerHTML = visible.map(function(r) {
+          var verdictHtml = '';
+          if (r.verdict === 'GO') verdictHtml = '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>';
+          else if (r.verdict === 'NOGO') verdictHtml = '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>';
+
+          return '<div class="comment-card">' +
+            '<div class="comment-header">' +
+              '<div style="display:flex;align-items:center;gap:var(--space-2)">' +
+                '<span class="comment-author">' + (r.reviewername || 'Anonymous') + '</span>' +
+                verdictHtml +
+              '</div>' +
+              '<span class="comment-date">' + (r.date || '') + '</span>' +
+            '</div>' +
+            (r.reviewtext ? '<div class="comment-text">' + r.reviewtext + '</div>' : '') +
+          '</div>';
+        }).join('');
+
+        document.getElementById('review-pagination').innerHTML = remaining > 0 ?
+          '<button class="btn btn-secondary btn-sm" onclick="loadMoreReviews()">Show more (' + remaining + ' remaining)</button>' : '';
       }
 
       window.submitReview = async function() {
         var name = document.getElementById('review-name').value.trim();
         var text = document.getElementById('review-text').value.trim();
-        if (!name || !text) {
-          Components.showToast('Please fill in both fields', 'error');
-          return;
-        }
-        // Check if backend is available
-        if (!GoNoGoAPI.isLive()) {
-          Components.showToast('Reviews require the live GoNoGo platform. This static version is read-only.', 'error');
+        if (!name || !selectedVerdict) {
+          Components.showToast('Please enter your name and select Go or No Go', 'error');
           return;
         }
         try {
@@ -350,11 +459,19 @@
             category: brand.categorySlug,
             brand_name: brand.name,
             reviewer_name: name,
-            scores: {},
-            review_text: text
+            review_text: text,
+            verdict: selectedVerdict
           });
           document.getElementById('review-name').value = '';
           document.getElementById('review-text').value = '';
+          selectedVerdict = null;
+          document.querySelectorAll('.verdict-btn').forEach(function(b) {
+            b.style.border = '2px solid var(--border-primary)';
+            b.style.background = 'transparent';
+            b.style.color = 'var(--text-secondary)';
+          });
+          document.getElementById('submit-review-btn').disabled = true;
+          document.getElementById('submit-review-btn').style.opacity = '0.5';
           Components.showToast('Review submitted — thank you!');
           await loadReviews();
         } catch (e) {
