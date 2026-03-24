@@ -142,8 +142,7 @@ const Components = {
               <a href="compare.html">Compare</a>
             </div>
             <div class="footer-attribution">
-              &copy; 2026 GoNoGo South Africa. All rights reserved.<br>
-              <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);font-size:var(--text-xs)">Created with Perplexity Computer</a>
+              &copy; 2026 GoNoGo South Africa. All rights reserved.
             </div>
           </div>
         </div>
