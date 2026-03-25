@@ -503,6 +503,7 @@ var GoNoGoAPI = (function () {
     // CATEGORY MANAGEMENT
     // ==========================================
     saveCategory: function (categoryData) {
+      _categoryCache = null; // bust cache
       return supabaseRequest('categories?slug=eq.' + encodeURIComponent(categoryData.slug), {
         method: 'PATCH',
         body: { name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] }
@@ -512,6 +513,34 @@ var GoNoGoAPI = (function () {
           method: 'POST',
           body: { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [], region: SITE_REGION }
         }).then(function () { return { ok: true }; });
+      });
+    },
+
+    // Update category name/icon (rename). Updates all brands that reference this category.
+    updateCategory: function (slug, newName, newIcon) {
+      _categoryCache = null; // bust cache
+      var body = {};
+      if (newName !== undefined) body.name = newName;
+      if (newIcon !== undefined) body.icon = newIcon;
+      return supabaseRequest('categories?slug=eq.' + encodeURIComponent(slug), {
+        method: 'PATCH',
+        body: body
+      }).then(function (rows) {
+        if (!rows || rows.length === 0) throw new Error('Category not found');
+        return { ok: true };
+      });
+    },
+
+    // Delete a category (only if no brands reference it)
+    deleteCategory: function (slug) {
+      _categoryCache = null; // bust cache
+      // First check if any brands use this category
+      return supabaseRequest('brands?category_slug=eq.' + encodeURIComponent(slug) + '&select=slug&limit=1').then(function (rows) {
+        if (rows && rows.length > 0) {
+          throw new Error('Cannot delete category — it still has brands assigned to it. Remove or reassign all brands first.');
+        }
+        return supabaseRequest('categories?slug=eq.' + encodeURIComponent(slug), { method: 'DELETE' })
+          .then(function () { return { ok: true }; });
       });
     }
   };
