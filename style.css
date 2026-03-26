@@ -718,6 +718,8 @@ input:focus, select:focus, textarea:focus {
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   transition: border-color var(--transition-fast);
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .comment-card:hover {
@@ -729,6 +731,8 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .comment-author {
@@ -992,7 +996,7 @@ textarea {
   padding: var(--space-24) 0 var(--space-16);
   text-align: center;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .hero::before {
