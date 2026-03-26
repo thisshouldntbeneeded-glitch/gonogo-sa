@@ -107,7 +107,7 @@ var GoNoGoAPI = (function () {
     return supabaseRequest('categories?select=*&order=name.asc').then(function (rows) {
       _categoryCache = {};
       rows.forEach(function (c) {
-        _categoryCache[c.slug] = { name: c.name, icon: c.icon, scoring_categories: c.scoring_categories };
+        _categoryCache[c.slug] = { name: c.name, icon: c.icon, scoring_categories: c.scoring_categories, category_type: c.category_type || 'brand' };
       });
       return _categoryCache;
     });
@@ -129,20 +129,24 @@ var GoNoGoAPI = (function () {
     getCategoriesWithBrands: function () {
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
-          // Get categories with brand counts from Supabase
+          // Get categories with brand + branch counts from Supabase
           return Promise.all([
             supabaseRequest('categories?select=*&order=name.asc'),
-            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=slug,category_slug')
+            supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=slug,category_slug'),
+            supabaseRequest('branches?select=branch_id,category_slug').catch(function () { return []; })
           ]).then(function (results) {
-            var cats = results[0], brands = results[1];
+            var cats = results[0], brands = results[1], branches = results[2];
             var counts = {};
             brands.forEach(function (b) { counts[b.category_slug] = (counts[b.category_slug] || 0) + 1; });
+            branches.forEach(function (b) { counts[b.category_slug] = (counts[b.category_slug] || 0) + 1; });
             return cats.map(function (c) {
+              var catType = c.category_type || 'brand';
               return {
                 id: c.slug, name: c.name, icon: c.icon,
                 brandCount: counts[c.slug] || 0,
                 hasBrands: (counts[c.slug] || 0) > 0,
-                scoringCategories: c.scoring_categories
+                scoringCategories: c.scoring_categories,
+                categoryType: catType
               };
             });
           });
@@ -689,6 +693,29 @@ var GoNoGoAPI = (function () {
         prefer: 'return=representation'
       }).then(function (rows) {
         return { ok: true, reply: rows && rows[0] ? rows[0] : null };
+      });
+    },
+
+    // ==========================================
+    // BRANCHES
+    // ==========================================
+    getBranchById: function (branchId) {
+      return supabaseRequest('branches?branch_id=eq.' + encodeURIComponent(branchId) + '&select=*&limit=1')
+        .then(function (rows) {
+          if (!rows || rows.length === 0) return null;
+          return rows[0];
+        });
+    },
+
+    getBranchesByCategory: function (categorySlug) {
+      return supabaseRequest('branches?category_slug=eq.' + encodeURIComponent(categorySlug) + '&select=*&order=total_score.desc')
+        .then(function (rows) { return rows || []; });
+    },
+
+    getCategoryType: function (categorySlug) {
+      return loadCategoryCache().then(function (cats) {
+        var c = cats[categorySlug];
+        return c ? (c.category_type || 'brand') : 'brand';
       });
     }
   };

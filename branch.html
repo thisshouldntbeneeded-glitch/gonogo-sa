@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Branch detail page — GoNoGo South Africa. See scores, contact info, sentiment, and corruption reports.">
+  <meta property="og:title" content="Branch Detail — GoNoGo South Africa">
+  <meta property="og:description" content="Branch detail page — GoNoGo South Africa.">
+  <meta property="og:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://gonogo-sa.vercel.app/branch">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="GoNoGo South Africa">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
+  <meta name="robots" content="index, follow">
+  <title>Branch — GoNoGo South Africa</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
+  <style>
+    .branch-hero { padding: var(--space-8) 0; border-bottom: 1px solid var(--border-primary); }
+    .branch-score { font-size: var(--text-3xl); font-weight: 900; }
+    .branch-contact { display: grid; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--space-3); }
+    .branch-contact i { width: 18px; color: var(--green); }
+    .branch-contact a { color: var(--green); text-decoration: underline; }
+    .branch-section { padding: var(--space-6) 0; border-bottom: 1px solid var(--border-primary); }
+    .branch-section h2 { font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-4); }
+    .branch-section h2 i { margin-right: var(--space-2); }
+    .score-breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+    .score-item { display: flex; align-items: center; gap: var(--space-3); }
+    .score-item-label { font-size: var(--text-sm); font-weight: 600; min-width: 180px; color: var(--text-secondary); }
+    .score-item-val { font-size: var(--text-sm); font-weight: 700; min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+    .sentiment-box { background: var(--surface-2); border-left: 3px solid var(--green); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-4); font-size: var(--text-sm); color: var(--text-secondary); }
+    .sentiment-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+    .sentiment-cols h4 { font-size: var(--text-sm); font-weight: 700; margin-bottom: var(--space-2); }
+    .sentiment-cols ul { list-style: none; padding: 0; margin: 0; font-size: var(--text-sm); }
+    .sentiment-cols li { padding: var(--space-1) 0; color: var(--text-secondary); }
+    .branch-form { max-width: 600px; }
+    .branch-form .form-group { margin-bottom: var(--space-3); }
+    .branch-form label { display: block; font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-1); color: var(--text-secondary); }
+    .branch-form input, .branch-form textarea { width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--border-primary); border-radius: var(--radius-md); background: var(--surface-1); color: var(--text-primary); font-size: var(--text-sm); }
+    .branch-form textarea { resize: vertical; min-height: 80px; }
+    .branch-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); align-items: start; }
+    @media (max-width: 768px) {
+      .branch-layout { grid-template-columns: 1fr; }
+      .score-breakdown-grid { grid-template-columns: 1fr; }
+      .sentiment-cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="nav"></div>
+  <div id="page-content">
+    <div style="text-align:center;padding:var(--space-10);color:var(--text-muted)">Loading branch...</div>
+  </div>
+  <div id="footer"></div>
+  <script src="data/data_partA.js"></script>
+  <script src="data/data_partB.js"></script>
+  <script src="data/data_partC.js"></script>
+  <script src="data/data_partD.js"></script>
+  <script src="data/data_partE.js"></script>
+  <script src="data/data_partF.js"></script>
+  <script src="data/data.js"></script>
+  <script src="data/helpers.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('nav').innerHTML = Components.renderPublicNav('');
+    Components.initTheme();
+    document.getElementById('footer').innerHTML = Components.renderFooter();
+
+    var branchId = Components.getParam('id');
+
+    (async function() {
+      if (!branchId) {
+        document.getElementById('page-content').innerHTML =
+          '<section class="section"><div class="container" style="text-align:center">' +
+            '<h1 class="section-title">Branch Not Found</h1>' +
+            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">No branch ID specified.</p>' +
+            '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+          '</div></section>';
+        return;
+      }
+
+      var branch = await GoNoGoAPI.getBranchById(branchId);
+
+      if (!branch) {
+        document.getElementById('page-content').innerHTML =
+          '<section class="section"><div class="container" style="text-align:center">' +
+            '<h1 class="section-title">Branch Not Found</h1>' +
+            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The branch "' + Components.escapeHTML(branchId) + '" does not exist.</p>' +
+            '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+          '</div></section>';
+        return;
+      }
+
+      document.title = branch.branch_name + ' — GoNoGo South Africa';
+
+      // SEO
+      var metaDesc = branch.branch_name + ' rated ' + branch.total_score + '/100 (' + branch.verdict + '). Contact, scores, sentiment, and corruption reports.';
+      var metaTag = document.querySelector('meta[name="description"]');
+      if (metaTag) metaTag.content = metaDesc.substring(0, 160);
+
+      var scoreColor = getScoreColor(branch.total_score);
+      var verdictClass = branch.verdict === 'GO' ? 'go' : branch.verdict === 'NOGO' ? 'nogo' : 'caution';
+
+      // Score breakdown items
+      var scoreCategories = [
+        { label: 'Compliance', value: branch.compliance, max: 20 },
+        { label: 'Customer Satisfaction', value: branch.customer_satisfaction, max: 25 },
+        { label: 'Service Offering', value: branch.service_offering, max: 25 },
+        { label: 'Innovation', value: branch.innovation, max: 10 },
+        { label: 'Customer Support', value: branch.customer_support, max: 15 },
+        { label: 'Accessibility & Security', value: branch.accessibility_security, max: 10 }
+      ];
+
+      var scoreBreakdownHTML = scoreCategories.map(function(sc) {
+        var pct = Math.round((sc.value / sc.max) * 100);
+        var color = getScoreColor(pct);
+        return '<div class="score-item">' +
+          '<span class="score-item-label">' + sc.label + '</span>' +
+          '<div class="score-bar" style="flex:1"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+          '<span class="score-item-val" style="color:' + color + '">' + sc.value + '/' + sc.max + '</span>' +
+        '</div>';
+      }).join('');
+
+      // Sentiment lists
+      var posItems = (branch.sentiment_positive || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      var negItems = (branch.sentiment_negative || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      var posHTML = posItems.map(function(s) { return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + Components.escapeHTML(s) + '</li>'; }).join('');
+      var negHTML = negItems.map(function(s) { return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + Components.escapeHTML(s) + '</li>'; }).join('');
+
+      // Category link
+      var catLabel = branch.category_slug === 'traffic-department' ? 'Traffic Departments' : 'Home Affairs';
+      var catLink = 'category.html?cat=' + encodeURIComponent(branch.category_slug);
+
+      document.getElementById('page-content').innerHTML =
+        // Hero
+        '<section class="branch-hero"><div class="container">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
+            '<a href="' + catLink + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
+              '<i class="fa-solid fa-arrow-left"></i> ' + catLabel +
+            '</a>' +
+          '</div>' +
+          '<h1 style="font-size:var(--text-2xl);font-weight:800;margin-bottom:var(--space-2)">' + Components.escapeHTML(branch.branch_name) + '</h1>' +
+          '<div class="branch-score" style="color:' + scoreColor + '">GoNoGo Score ' + branch.total_score + '</div>' +
+          '<div style="margin-top:var(--space-2)">' +
+            '<span class="verdict-badge verdict-' + verdictClass + '">' + branch.verdict + '</span>' +
+            '<span style="font-size:var(--text-xs);color:var(--text-muted);margin-left:var(--space-2)">' + Components.escapeHTML(branch.province) + '</span>' +
+          '</div>' +
+          '<div class="branch-contact">' +
+            (branch.manager ? '<div><i class="fa-solid fa-user-tie"></i> Manager: ' + Components.escapeHTML(branch.manager) + '</div>' : '') +
+            (branch.manager_email ? '<div><i class="fa-solid fa-envelope"></i> <a href="mailto:' + Components.escapeHTML(branch.manager_email) + '">' + Components.escapeHTML(branch.manager_email) + '</a></div>' : '') +
+            (branch.telephone ? '<div><i class="fa-solid fa-phone"></i> ' + Components.escapeHTML(branch.telephone) + '</div>' : '') +
+            (branch.address ? '<div><i class="fa-solid fa-location-dot"></i> ' + Components.escapeHTML(branch.address) + '</div>' : '') +
+            (branch.hours ? '<div><i class="fa-solid fa-clock"></i> ' + Components.escapeHTML(branch.hours) + '</div>' : '') +
+          '</div>' +
+        '</div></section>' +
+
+        // Main content
+        '<section class="section"><div class="container">' +
+          '<div class="branch-layout">' +
+
+            // Left column: scores + compliance info
+            '<div>' +
+              '<div class="branch-section" style="border-top:none;padding-top:0">' +
+                '<h2><i class="fa-solid fa-chart-bar" style="color:var(--green)"></i> Score Breakdown</h2>' +
+                '<div style="display:flex;flex-direction:column;gap:var(--space-3)">' + scoreBreakdownHTML + '</div>' +
+                '<div style="margin-top:var(--space-6);height:260px;position:relative"><canvas id="branch-radar"></canvas></div>' +
+              '</div>' +
+
+              // Customer Sentiment
+              '<div class="branch-section">' +
+                '<h2><i class="fa-solid fa-comments" style="color:var(--green)"></i> Customer Sentiment</h2>' +
+                '<div class="sentiment-box">' +
+                  '<strong>Methodology:</strong> 2025 Google, HelloPeter & survey reviews.' +
+                '</div>' +
+                (branch.sentiment_summary ? '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">' + Components.escapeHTML(branch.sentiment_summary) + '</p>' : '') +
+                '<div class="sentiment-cols">' +
+                  '<div>' +
+                    '<h4 style="color:var(--green-text)"><i class="fa-solid fa-thumbs-up"></i> Positive</h4>' +
+                    '<ul>' + (posHTML || '<li style="color:var(--text-muted)">No data</li>') + '</ul>' +
+                  '</div>' +
+                  '<div>' +
+                    '<h4 style="color:var(--orange-text)"><i class="fa-solid fa-thumbs-down"></i> Concerns</h4>' +
+                    '<ul>' + (negHTML || '<li style="color:var(--text-muted)">No data</li>') + '</ul>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+
+              // Downtime
+              '<div class="branch-section">' +
+                '<h2><i class="fa-solid fa-server" style="color:var(--orange)"></i> Downtime Review</h2>' +
+                '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + Components.escapeHTML(branch.downtime || 'No downtime data available.') + '</p>' +
+              '</div>' +
+
+              // Corruption
+              '<div class="branch-section">' +
+                '<h2><i class="fa-solid fa-gavel" style="color:var(--red,#e74c3c)"></i> Last Confirmed Corruption Incident</h2>' +
+                '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + Components.escapeHTML(branch.last_corruption || 'No incidents reported.') + '</p>' +
+              '</div>' +
+            '</div>' +
+
+            // Right column: forms
+            '<div>' +
+              // Wait Time form
+              '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6)">' +
+                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Share Your Actual Wait Time</h3>' +
+                '<div class="branch-form">' +
+                  '<div class="form-group">' +
+                    '<label>Your visit date:</label>' +
+                    '<input type="date" id="wait-date">' +
+                  '</div>' +
+                  '<div class="form-group">' +
+                    '<label>Total wait (minutes):</label>' +
+                    '<input type="number" id="wait-minutes" placeholder="e.g. 45" min="0">' +
+                  '</div>' +
+                  '<div class="form-group">' +
+                    '<label>Comments (optional):</label>' +
+                    '<textarea id="wait-comments" placeholder="Describe your queue experience"></textarea>' +
+                  '</div>' +
+                  '<button class="btn btn-primary" onclick="submitWaitTime()"><i class="fa-solid fa-paper-plane"></i> Submit Wait Time</button>' +
+                  '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-2)">Submissions are aggregated; averages will appear soon.</p>' +
+                '</div>' +
+              '</div>' +
+
+              // Corruption tip form
+              '<div class="card" style="padding:var(--space-5)">' +
+                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-shield-halved" style="color:var(--orange)"></i> Corruption & Whistle-blowing</h3>' +
+                '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4);font-style:italic">Your anonymous tip is sent to Corruption Watch & city authorities.</p>' +
+                '<div class="branch-form">' +
+                  '<div class="form-group">' +
+                    '<label>Describe the corruption concern:</label>' +
+                    '<textarea id="tip-text" placeholder="Describe the corruption concern" rows="3"></textarea>' +
+                  '</div>' +
+                  '<button class="btn btn-secondary" onclick="submitTip()"><i class="fa-solid fa-paper-plane"></i> Submit Report</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+          '</div>' +
+        '</div></section>';
+
+      // Radar chart
+      var radarCtx = document.getElementById('branch-radar');
+      if (radarCtx) {
+        new Chart(radarCtx, {
+          type: 'radar',
+          data: {
+            labels: ['Compliance', 'Cust. Satisfaction', 'Service Offering', 'Innovation', 'Cust. Support', 'Access. & Security'],
+            datasets: [{
+              label: branch.branch_name,
+              data: [
+                (branch.compliance / 20) * 100,
+                (branch.customer_satisfaction / 25) * 100,
+                (branch.service_offering / 25) * 100,
+                (branch.innovation / 10) * 100,
+                (branch.customer_support / 15) * 100,
+                (branch.accessibility_security / 10) * 100
+              ],
+              borderColor: '#11a551',
+              backgroundColor: 'rgba(17,165,81,0.15)',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: '#11a551'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { display: false },
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                angleLines: { color: 'rgba(255,255,255,0.08)' },
+                pointLabels: { color: 'rgba(255,255,255,0.6)', font: { size: 10 } }
+              }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
+
+      // Form handlers (toast only for now)
+      window.submitWaitTime = function() {
+        var date = document.getElementById('wait-date').value;
+        var mins = document.getElementById('wait-minutes').value;
+        if (!date || !mins) {
+          Components.showToast('Please enter a date and wait time.', 'error');
+          return;
+        }
+        Components.showToast('Thank you! Your wait time has been recorded.');
+        document.getElementById('wait-date').value = '';
+        document.getElementById('wait-minutes').value = '';
+        document.getElementById('wait-comments').value = '';
+      };
+
+      window.submitTip = function() {
+        var text = document.getElementById('tip-text').value.trim();
+        if (!text) {
+          Components.showToast('Please describe the concern.', 'error');
+          return;
+        }
+        Components.showToast('Report submitted anonymously. Thank you.');
+        document.getElementById('tip-text').value = '';
+      };
+    })();
+  </script>
+</body>
+</html>

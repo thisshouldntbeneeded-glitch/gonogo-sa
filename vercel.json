@@ -6,6 +6,7 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/category", "destination": "/category.html" },
+    { "source": "/branch", "destination": "/branch.html" },
     { "source": "/brand", "destination": "/brand.html" },
     { "source": "/compare", "destination": "/compare.html" },
     { "source": "/about", "destination": "/about.html" },
