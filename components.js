@@ -57,6 +57,8 @@ const Components = {
       // Admin link hidden from public nav — access via /admin.html directly
     ];
 
+    var themeIcon = document.documentElement.classList.contains('light-mode') ? 'fa-moon' : 'fa-sun';
+
     return `
       <header class="site-header">
         <div class="container">
@@ -72,6 +74,9 @@ const Components = {
               `).join('')}
             </ul>
           </nav>
+          <button class="theme-toggle" onclick="Components.toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+            <i class="fa-solid ${themeIcon} theme-toggle-icon"></i>
+          </button>
           <button class="hamburger" onclick="Components.toggleMobileNav()" aria-label="Menu">
             <i class="fa-solid fa-bars" id="hamburger-icon"></i>
           </button>
@@ -83,6 +88,10 @@ const Components = {
             <i class="fa-solid ${l.icon}"></i> ${l.label}
           </a>
         `).join('')}
+        <button class="theme-toggle" onclick="Components.toggleTheme()" aria-label="Toggle light/dark mode">
+          <i class="fa-solid ${themeIcon} theme-toggle-icon"></i>
+          <span class="theme-toggle-label">Toggle Theme</span>
+        </button>
       </div>
     `;
   },
@@ -131,6 +140,84 @@ const Components = {
     const icon = document.getElementById('hamburger-icon');
     const isOpen = nav.classList.toggle('open');
     icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  },
+
+  // ============================================================
+  // THEME (Light / Dark)
+  // ============================================================
+  initTheme() {
+    var saved = localStorage.getItem('gonogo_theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      document.documentElement.classList.add('light-mode');
+    } else if (!saved && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.body.classList.add('light-mode');
+      document.documentElement.classList.add('light-mode');
+    }
+    this.updateThemeIcon();
+  },
+
+  toggleTheme() {
+    var isLight = document.body.classList.toggle('light-mode');
+    document.documentElement.classList.toggle('light-mode');
+    localStorage.setItem('gonogo_theme', isLight ? 'light' : 'dark');
+    this.updateThemeIcon();
+    // Re-render any active Chart.js radar charts with correct colours
+    this._updateChartsForTheme();
+  },
+
+  updateThemeIcon() {
+    var isLight = document.body.classList.contains('light-mode');
+    var icons = document.querySelectorAll('.theme-toggle-icon');
+    icons.forEach(function(icon) {
+      icon.className = 'fa-solid ' + (isLight ? 'fa-moon' : 'fa-sun') + ' theme-toggle-icon';
+    });
+    var labels = document.querySelectorAll('.theme-toggle-label');
+    labels.forEach(function(label) {
+      label.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+    });
+  },
+
+  _getChartThemeColors() {
+    var isLight = document.body.classList.contains('light-mode');
+    return {
+      tickColor: isLight ? '#888888' : '#666',
+      labelColor: isLight ? '#555555' : '#a0a0a0',
+      gridColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+      tooltipBg: isLight ? '#ffffff' : '#1a1a1a',
+      tooltipTitle: isLight ? '#1a1a1a' : '#fff',
+      tooltipBody: isLight ? '#555555' : '#a0a0a0',
+      tooltipBorder: isLight ? '#e0e0e0' : '#2a2a2a',
+      legendColor: isLight ? '#555555' : '#a0a0a0'
+    };
+  },
+
+  _updateChartsForTheme() {
+    var colors = this._getChartThemeColors();
+    if (typeof Chart === 'undefined') return;
+    var instances = Object.values(Chart.instances || {});
+    instances.forEach(function(chart) {
+      if (!chart || chart.config.type !== 'radar') return;
+      var r = chart.options.scales.r;
+      if (r) {
+        r.ticks.color = colors.tickColor;
+        r.pointLabels.color = colors.labelColor;
+        r.grid.color = colors.gridColor;
+        r.angleLines.color = colors.gridColor;
+      }
+      var tooltip = chart.options.plugins.tooltip;
+      if (tooltip) {
+        tooltip.backgroundColor = colors.tooltipBg;
+        tooltip.titleColor = colors.tooltipTitle;
+        tooltip.bodyColor = colors.tooltipBody;
+        tooltip.borderColor = colors.tooltipBorder;
+      }
+      var legend = chart.options.plugins.legend;
+      if (legend && legend.labels) {
+        legend.labels.color = colors.legendColor;
+      }
+      chart.update();
+    });
   },
 
   toggleAdminSidebar() {
@@ -250,6 +337,7 @@ const Components = {
 
     const color = getScoreColor(brand.overallScore);
     const bgColor = color + '20';
+    const tc = this._getChartThemeColors();
 
     return new Chart(canvas, {
       type: 'radar',
@@ -279,29 +367,29 @@ const Components = {
             ticks: {
               stepSize: 25,
               display: options.showTicks !== false,
-              color: '#666',
+              color: tc.tickColor,
               backdropColor: 'transparent',
               font: { size: 9 }
             },
             pointLabels: {
-              color: '#a0a0a0',
+              color: tc.labelColor,
               font: {
                 family: 'Inter, sans-serif',
                 size: options.labelSize || 10,
                 weight: '500'
               }
             },
-            grid: { color: 'rgba(255,255,255,0.06)' },
-            angleLines: { color: 'rgba(255,255,255,0.06)' }
+            grid: { color: tc.gridColor },
+            angleLines: { color: tc.gridColor }
           }
         },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1a1a1a',
-            titleColor: '#fff',
-            bodyColor: '#a0a0a0',
-            borderColor: '#2a2a2a',
+            backgroundColor: tc.tooltipBg,
+            titleColor: tc.tooltipTitle,
+            bodyColor: tc.tooltipBody,
+            borderColor: tc.tooltipBorder,
             borderWidth: 1,
             cornerRadius: 8,
             padding: 10,
@@ -337,6 +425,7 @@ const Components = {
     const shortLabels = allLabels.map(l => l.length > 18 ? l.substring(0, 16) + '…' : l);
     const color1 = '#11a551';
     const color2 = '#ff9800';
+    const tc = this._getChartThemeColors();
 
     return new Chart(canvas, {
       type: 'radar',
@@ -372,19 +461,19 @@ const Components = {
           r: {
             min: 0,
             max: 100,
-            ticks: { stepSize: 25, display: true, color: '#666', backdropColor: 'transparent', font: { size: 9 } },
-            pointLabels: { color: '#a0a0a0', font: { family: 'Inter, sans-serif', size: 11, weight: '500' } },
-            grid: { color: 'rgba(255,255,255,0.06)' },
-            angleLines: { color: 'rgba(255,255,255,0.06)' }
+            ticks: { stepSize: 25, display: true, color: tc.tickColor, backdropColor: 'transparent', font: { size: 9 } },
+            pointLabels: { color: tc.labelColor, font: { family: 'Inter, sans-serif', size: 11, weight: '500' } },
+            grid: { color: tc.gridColor },
+            angleLines: { color: tc.gridColor }
           }
         },
         plugins: {
           legend: {
             display: true,
             position: 'bottom',
-            labels: { color: '#a0a0a0', font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle', padding: 20 }
+            labels: { color: tc.legendColor, font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle', padding: 20 }
           },
-          tooltip: { backgroundColor: '#1a1a1a', titleColor: '#fff', bodyColor: '#a0a0a0', borderColor: '#2a2a2a', borderWidth: 1, cornerRadius: 8, padding: 10 }
+          tooltip: { backgroundColor: tc.tooltipBg, titleColor: tc.tooltipTitle, bodyColor: tc.tooltipBody, borderColor: tc.tooltipBorder, borderWidth: 1, cornerRadius: 8, padding: 10 }
         },
         animation: { duration: 800, easing: 'easeOutQuart' }
       }

@@ -1987,3 +1987,160 @@ textarea {
   color: var(--green);
 }
 
+/* ============================================================
+   THEME TOGGLE BUTTON
+   ============================================================ */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+  border-color: var(--text-muted);
+}
+
+.mobile-nav .theme-toggle {
+  width: auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  gap: var(--space-3);
+  justify-content: flex-start;
+}
+
+/* ============================================================
+   LIGHT MODE OVERRIDES
+   ============================================================ */
+.light-mode {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f2f5;
+  --bg-elevated: #f5f5f5;
+  --border-primary: #e0e0e0;
+  --border-subtle: #eeeeee;
+
+  --green: #0d8c44;
+  --green-dim: rgba(13, 140, 68, 0.12);
+  --green-glow: rgba(13, 140, 68, 0.08);
+  --green-text: #0d8c44;
+  --green-bg: rgba(13, 140, 68, 0.08);
+
+  --orange: #e68a00;
+  --orange-dim: rgba(230, 138, 0, 0.12);
+  --orange-text: #cc7a00;
+  --orange-bg: rgba(230, 138, 0, 0.08);
+
+  --red: #d63031;
+  --red-dim: rgba(214, 48, 49, 0.12);
+  --red-text: #c0392b;
+  --red-bg: rgba(214, 48, 49, 0.08);
+
+  --blue: #2563eb;
+  --blue-dim: rgba(37, 99, 235, 0.12);
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --text-faint: #bbbbbb;
+
+  --surface-0: var(--bg-primary);
+  --surface-1: var(--bg-secondary);
+  --surface-2: var(--bg-card);
+  --surface-3: var(--bg-elevated);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 20px rgba(13, 140, 68, 0.06);
+  --shadow-glow-strong: 0 0 30px rgba(13, 140, 68, 0.1);
+}
+
+/* Header: override hardcoded dark background */
+.light-mode .site-header {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Hero: tone down radial glow on light */
+.light-mode .hero::before {
+  opacity: 0.25;
+}
+
+/* Logo image: invert for light backgrounds */
+.light-mode .logo img,
+.light-mode .hero img[alt="GoNoGo"] {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Table row hover: use light rgba */
+.light-mode .data-table tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Score circle track stroke: lighten on light mode */
+.light-mode .score-circle svg circle:first-child {
+  stroke: #e0e0e0;
+}
+
+/* Brand card / card borders: add subtle shadow for depth */
+.light-mode .brand-card,
+.light-mode .card,
+.light-mode .industry-card,
+.light-mode .industry-card-v2,
+.light-mode .category-card,
+.light-mode .rating-card,
+.light-mode .pricing-card,
+.light-mode .comment-card,
+.light-mode .kpi-card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* Search results dropdown: light */
+.light-mode #search-results {
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+}
+
+/* Mobile nav background */
+.light-mode .mobile-nav {
+  background: var(--bg-secondary);
+}
+
+/* Scrollbar thumb: lighter */
+.light-mode ::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+
+.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Brand selector dropdown */
+.light-mode .brand-selector-dropdown {
+  background: var(--bg-secondary);
+}
+
+/* Modal overlay */
+.light-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Selection colour */
+.light-mode ::selection {
+  background: var(--green);
+  color: #fff;
+}
+
