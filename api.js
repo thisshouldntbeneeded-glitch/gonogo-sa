@@ -398,7 +398,7 @@ var GoNoGoAPI = (function () {
     },
 
     adminGetUsers: function () {
-      return supabaseRequest('admin_users?select=id,email,display_name,role,created_at&order=created_at.asc')
+      return supabaseRequest('rpc/admin_list_users', { method: 'POST', body: {} })
         .then(function (rows) { return rows || []; })
         .catch(function () {
           var stored = GoNoGoStorage.get('adminUser');
@@ -409,15 +409,49 @@ var GoNoGoAPI = (function () {
 
     adminAddUser: function (email, password, displayName, role) {
       return this._hashPassword(password).then(function (hash) {
-        return supabaseRequest('admin_users', {
+        return supabaseRequest('rpc/admin_add_user', {
           method: 'POST',
-          body: { email: email.toLowerCase().trim(), password_hash: hash, display_name: displayName || '', role: role || 'admin' }
+          body: { p_email: email, p_hash: hash, p_display_name: displayName || '', p_role: role || 'admin' }
         });
       }).then(function (rows) { return { ok: true, user: rows && rows[0] ? rows[0] : null }; });
     },
 
     adminRemoveUser: function (userId) {
-      return supabaseRequest('admin_users?id=eq.' + encodeURIComponent(userId), { method: 'DELETE' })
+      return supabaseRequest('rpc/admin_remove_user', { method: 'POST', body: { p_user_id: userId } })
+        .then(function () { return { ok: true }; });
+    },
+
+    adminChangePassword: function (userId, oldPassword, newPassword) {
+      var self = this;
+      return Promise.all([this._hashPassword(oldPassword), this._hashPassword(newPassword)]).then(function (hashes) {
+        return supabaseRequest('rpc/admin_change_password', {
+          method: 'POST',
+          body: { p_user_id: userId, p_old_hash: hashes[0], p_new_hash: hashes[1] }
+        }).then(function (result) {
+          if (result === true) return { ok: true };
+          throw new Error('Current password is incorrect');
+        });
+      });
+    },
+
+    // Brand user management (admin)
+    getBrandUsers: function () {
+      return supabaseRequest('rpc/admin_list_brand_users', { method: 'POST', body: {} })
+        .then(function (rows) { return rows || []; })
+        .catch(function () { return []; });
+    },
+
+    addBrandUser: function (email, password, displayName, brandSlug, region) {
+      return this._hashPassword(password).then(function (hash) {
+        return supabaseRequest('rpc/admin_add_brand_user', {
+          method: 'POST',
+          body: { p_email: email, p_hash: hash, p_display_name: displayName || '', p_brand_slug: brandSlug, p_region: region || 'za' }
+        });
+      }).then(function (rows) { return { ok: true, user: rows && rows[0] ? rows[0] : null }; });
+    },
+
+    removeBrandUser: function (userId) {
+      return supabaseRequest('rpc/admin_remove_brand_user', { method: 'POST', body: { p_user_id: userId } })
         .then(function () { return { ok: true }; });
     },
 
