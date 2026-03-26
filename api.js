@@ -542,14 +542,18 @@ var GoNoGoAPI = (function () {
     // ==========================================
     saveCategory: function (categoryData) {
       _categoryCache = null; // bust cache
+      var patchBody = { name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] };
+      if (categoryData.category_type) patchBody.category_type = categoryData.category_type;
       return supabaseRequest('categories?slug=eq.' + encodeURIComponent(categoryData.slug), {
         method: 'PATCH',
-        body: { name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [] }
+        body: patchBody
       }).then(function (rows) {
         if (rows && rows.length > 0) return { ok: true };
+        var postBody = { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [], region: SITE_REGION };
+        if (categoryData.category_type) postBody.category_type = categoryData.category_type;
         return supabaseRequest('categories', {
           method: 'POST',
-          body: { slug: categoryData.slug, name: categoryData.name, icon: categoryData.icon, scoring_categories: categoryData.scoringCategories || [], region: SITE_REGION }
+          body: postBody
         }).then(function () { return { ok: true }; });
       });
     },
@@ -750,6 +754,83 @@ var GoNoGoAPI = (function () {
       return loadCategoryCache().then(function (cats) {
         var c = cats[categorySlug];
         return c ? (c.category_type || 'brand') : 'brand';
+      });
+    },
+
+    // ==========================================
+    // BRANCH WAIT TIMES & TIPS
+    // ==========================================
+    submitWaitTime: function (branchId, visitDate, waitMinutes, comment) {
+      return supabaseRequest('branch_wait_times', {
+        method: 'POST',
+        body: {
+          branch_id: branchId,
+          visit_date: visitDate,
+          wait_minutes: parseInt(waitMinutes, 10),
+          comment: comment || ''
+        },
+        prefer: 'return=representation'
+      }).then(function () {
+        return { ok: true, message: 'Wait time submitted.' };
+      });
+    },
+
+    getWaitTimes: function (branchId) {
+      return supabaseRequest('branch_wait_times?branch_id=eq.' + encodeURIComponent(branchId) + '&order=created_at.desc')
+        .then(function (rows) { return rows || []; })
+        .catch(function () { return []; });
+    },
+
+    submitTip: function (branchId, tipText) {
+      return supabaseRequest('branch_tips', {
+        method: 'POST',
+        body: {
+          branch_id: branchId,
+          tip_text: tipText
+        },
+        prefer: 'return=representation'
+      }).then(function () {
+        return { ok: true, message: 'Report submitted anonymously.' };
+      });
+    },
+
+    // ==========================================
+    // BRANCH SAVE (admin)
+    // ==========================================
+    saveBranch: function (branchData) {
+      var branchId = branchData.branch_id || branchData.branch_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      var score = parseInt(branchData.total_score, 10) || 0;
+      var verdict = score >= 75 ? 'GO' : score >= 50 ? 'GO WITH CAUTION' : 'NOGO';
+
+      var record = {
+        branch_id: branchId,
+        department_type: branchData.department_type || '',
+        category_slug: branchData.category_slug,
+        province: branchData.province || '',
+        branch_name: branchData.branch_name,
+        total_score: score,
+        verdict: verdict,
+        compliance: parseInt(branchData.compliance, 10) || 0,
+        customer_satisfaction: parseInt(branchData.customer_satisfaction, 10) || 0,
+        service_offering: parseInt(branchData.service_offering, 10) || 0,
+        innovation: parseInt(branchData.innovation, 10) || 0,
+        customer_support: parseInt(branchData.customer_support, 10) || 0,
+        accessibility_security: parseInt(branchData.accessibility_security, 10) || 0,
+        manager: branchData.manager || '',
+        manager_email: branchData.manager_email || '',
+        telephone: branchData.telephone || '',
+        address: branchData.address || '',
+        hours: branchData.hours || '',
+        services: branchData.services || '',
+        region: SITE_REGION
+      };
+
+      return supabaseRequest('branches', {
+        method: 'POST',
+        body: record,
+        prefer: 'resolution=merge-duplicates,return=representation'
+      }).then(function () {
+        return { ok: true, verdict: verdict, total_score: score };
       });
     }
   };

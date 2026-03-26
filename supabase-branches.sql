@@ -34,5 +34,32 @@ ALTER TABLE branches ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read branches_table" ON branches FOR SELECT USING (true);
 CREATE POLICY "Anon write branches_table" ON branches FOR ALL USING (true) WITH CHECK (true);
 
--- 2. Add category_type to categories table
+-- 2. Add services column to branches
+ALTER TABLE branches ADD COLUMN IF NOT EXISTS services TEXT DEFAULT '';
+
+-- 3. Add category_type to categories table
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS category_type TEXT DEFAULT 'brand';
+
+-- 4. Branch wait times table
+CREATE TABLE IF NOT EXISTS branch_wait_times (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  branch_id TEXT NOT NULL,
+  visit_date DATE,
+  wait_minutes INTEGER,
+  comment TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE branch_wait_times ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read branch_wait_times" ON branch_wait_times FOR SELECT USING (true);
+CREATE POLICY "Anon insert branch_wait_times" ON branch_wait_times FOR INSERT WITH CHECK (true);
+
+-- 5. Branch tips (corruption reports) table
+CREATE TABLE IF NOT EXISTS branch_tips (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  branch_id TEXT NOT NULL,
+  tip_text TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE branch_tips ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read branch_tips" ON branch_tips FOR SELECT USING (true);
+CREATE POLICY "Anon insert branch_tips" ON branch_tips FOR INSERT WITH CHECK (true);

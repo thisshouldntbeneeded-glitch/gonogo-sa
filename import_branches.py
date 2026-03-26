@@ -5,7 +5,7 @@ GoNoGo SA — Import branches from CSV into Supabase.
 Usage:
     python import_branches.py
 
-Reads gonogo_branches_grand.csv and inserts rows into the 'branches' table.
+Reads gonogo_branches_grand_with_services.csv and inserts rows into the 'branches' table.
 Also creates/updates the two branch categories (traffic-department, home-affairs).
 
 Requires: pip install requests
@@ -19,7 +19,7 @@ import requests
 
 SUPABASE_URL = "https://fnpxaneextqidbessnej.supabase.co"
 SUPABASE_ANON_KEY = "sb_publishable_132Gl37kwIXtdJc5VHtGCw_iXPxa6cW"
-CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "gonogo_branches_grand.csv")
+CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "gonogo_branches_grand_with_services.csv")
 REGION = "za"
 
 HEADERS = {
@@ -51,6 +51,21 @@ def supabase_upsert(table, rows):
         print(f"ERROR upserting into {table}: {resp.status_code} {resp.text}")
         sys.exit(1)
     return resp.json()
+
+
+def supabase_delete_all(table):
+    """Delete all rows from a Supabase table."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}?region=eq.{REGION}"
+    delete_headers = {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+        "Content-Type": "application/json",
+    }
+    resp = requests.delete(url, headers=delete_headers)
+    if resp.status_code not in (200, 204):
+        print(f"WARNING: Could not clear {table}: {resp.status_code} {resp.text}")
+    else:
+        print(f"Cleared existing rows from {table}")
 
 
 def create_categories():
@@ -90,10 +105,18 @@ def import_branches():
     csv_path = CSV_PATH
     if not os.path.exists(csv_path):
         # Try current directory
-        csv_path = "gonogo_branches_grand.csv"
+        csv_path = "gonogo_branches_grand_with_services.csv"
     if not os.path.exists(csv_path):
-        print(f"CSV not found at {CSV_PATH} or current directory")
-        sys.exit(1)
+        # Try old filename
+        old_path = os.path.join(os.path.dirname(__file__), "..", "gonogo_branches_grand.csv")
+        if os.path.exists(old_path):
+            csv_path = old_path
+        else:
+            print(f"CSV not found at {CSV_PATH} or current directory")
+            sys.exit(1)
+
+    # Clear existing branches before reimport
+    supabase_delete_all("branches")
 
     rows = []
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -106,7 +129,7 @@ def import_branches():
                 continue
 
             score = int(r["total_score"].strip())
-            rows.append({
+            row = {
                 "branch_id": r["branch_id"].strip(),
                 "department_type": dept,
                 "category_slug": cat_info["slug"],
@@ -131,14 +154,33 @@ def import_branches():
                 "sentiment_positive": r["sentiment_positive"].strip(),
                 "sentiment_negative": r["sentiment_negative"].strip(),
                 "region": REGION,
-            })
+            }
+
+            # Include services column if present
+            if "services" in r:
+                row["services"] = r["services"].strip()
+
+            rows.append(row)
 
     if not rows:
         print("No rows found in CSV")
         sys.exit(1)
 
-    result = supabase_upsert("branches", rows)
-    print(f"Branches upserted: {len(result)}")
+    # Try upsert with services column; fall back to without if column doesn't exist yet
+    url = f"{SUPABASE_URL}/rest/v1/branches"
+    resp = requests.post(url, headers=HEADERS, json=rows)
+    if resp.status_code in (200, 201):
+        result = resp.json()
+        print(f"Branches upserted: {len(result)}")
+    elif resp.status_code == 400 and "services" in resp.text:
+        print("WARNING: 'services' column not found in DB — importing without services")
+        for row in rows:
+            row.pop("services", None)
+        result = supabase_upsert("branches", rows)
+        print(f"Branches upserted (without services): {len(result)}")
+    else:
+        print(f"ERROR upserting into branches: {resp.status_code} {resp.text}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

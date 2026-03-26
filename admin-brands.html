@@ -314,6 +314,13 @@
           <label class="form-label">Icon Preview</label>
           <div style="font-size:24px;color:var(--green);padding:var(--space-2)" id="fc-icon-preview"><i class="fa-solid fa-tag"></i></div>
         </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:var(--space-2);cursor:pointer;font-size:var(--text-sm);color:var(--text-secondary)">
+            <input type="checkbox" id="fc-branch-type" style="width:18px;height:18px;accent-color:var(--green)">
+            This is a branch/location category
+          </label>
+          <p class="text-xs text-muted" style="margin-top:var(--space-1)">Branch categories use a fixed 100-point scoring framework (Compliance, Customer Satisfaction, Service Offering, Innovation, Customer Support, Accessibility & Security).</p>
+        </div>
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
           <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
           <button type="submit" class="btn btn-primary" id="save-cat-btn"><i class="fa-solid fa-check"></i> Save Category</button>
@@ -361,6 +368,70 @@
         <button class="btn btn-secondary btn-sm" id="confirm-cancel" onclick="closeConfirm()">Cancel</button>
         <button class="btn btn-sm" id="confirm-ok" style="background:var(--red-text);color:#fff;">Confirm</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Add Branch Modal -->
+  <div class="modal-overlay" id="branch-modal">
+    <div class="modal" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Branch</h2>
+        <button class="modal-close" onclick="closeBranchModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="branch-form" onsubmit="saveBranchForm(event)">
+        <input type="hidden" id="fb-category-slug" value="">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Branch Name</label>
+            <input type="text" id="fb-name" required placeholder="e.g. Bellville Home Affairs">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Province</label>
+            <input type="text" id="fb-province" required placeholder="e.g. Western Cape">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Manager</label>
+            <input type="text" id="fb-manager" placeholder="e.g. Mr. S. Swart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Manager Email</label>
+            <input type="email" id="fb-email" placeholder="e.g. sswart@gov.za">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Telephone</label>
+            <input type="text" id="fb-telephone" placeholder="e.g. 021 944 6200">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hours</label>
+            <input type="text" id="fb-hours" placeholder="e.g. Mon-Fri: 8:00-15:30">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input type="text" id="fb-address" placeholder="e.g. 177 Voortrekker Rd, Bellville 7530">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Services <span class="text-xs text-muted">(semicolon-separated)</span></label>
+          <textarea id="fb-services" rows="2" placeholder="e.g. Smart ID card (10 days); Passport (14 days); Marriage (same-day)"></textarea>
+        </div>
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-chart-simple"></i> Scores (out of 100 total)</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-2)">
+          <div class="form-group"><label class="form-label">Compliance /20</label><input type="number" id="fb-compliance" min="0" max="20" placeholder="0"></div>
+          <div class="form-group"><label class="form-label">Cust. Satisfaction /25</label><input type="number" id="fb-cust-sat" min="0" max="25" placeholder="0"></div>
+          <div class="form-group"><label class="form-label">Service Offering /25</label><input type="number" id="fb-service" min="0" max="25" placeholder="0"></div>
+          <div class="form-group"><label class="form-label">Innovation /10</label><input type="number" id="fb-innovation" min="0" max="10" placeholder="0"></div>
+          <div class="form-group"><label class="form-label">Cust. Support /15</label><input type="number" id="fb-support" min="0" max="15" placeholder="0"></div>
+          <div class="form-group"><label class="form-label">Access & Security /10</label><input type="number" id="fb-access" min="0" max="10" placeholder="0"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
+          <button type="button" class="btn btn-secondary" onclick="closeBranchModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-branch-btn"><i class="fa-solid fa-check"></i> Save Branch</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -894,6 +965,8 @@
       var icon = document.getElementById('fc-icon').value.trim() || 'fa-tag';
       var editingSlug = document.getElementById('fc-editing-slug').value;
 
+      var isBranchType = document.getElementById('fc-branch-type').checked;
+
       try {
         if (editingSlug) {
           // Update existing category
@@ -902,20 +975,32 @@
         } else {
           // Create new category
           var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-          await GoNoGoAPI.saveCategory({
+          var scoringCats = isBranchType
+            ? [
+                { name: 'Compliance', max: 20 },
+                { name: 'Customer Satisfaction', max: 25 },
+                { name: 'Service Offering', max: 25 },
+                { name: 'Innovation', max: 10 },
+                { name: 'Customer Support', max: 15 },
+                { name: 'Accessibility & Security', max: 10 }
+              ]
+            : [
+                { name: 'Compliance', max: 20 },
+                { name: 'Customer Satisfaction', max: 25 },
+                { name: 'Product Value', max: 35 },
+                { name: 'Innovation', max: 10 },
+                { name: 'Customer Support', max: 15 },
+                { name: 'Accessibility & Security', max: 10 }
+              ];
+          var catBody = {
             slug: slug,
             name: name,
             icon: icon,
-            scoringCategories: [
-              { name: 'Compliance', max: 20 },
-              { name: 'Customer Satisfaction', max: 25 },
-              { name: 'Product Value', max: 35 },
-              { name: 'Innovation', max: 10 },
-              { name: 'Customer Support', max: 15 },
-              { name: 'Accessibility & Security', max: 10 }
-            ]
-          });
-          Components.showToast('Category "' + name + '" created');
+            scoringCategories: scoringCats
+          };
+          if (isBranchType) catBody.category_type = 'branch';
+          await GoNoGoAPI.saveCategory(catBody);
+          Components.showToast('Category "' + name + '" created' + (isBranchType ? ' (branch type)' : ''));
         }
         closeCategoryModal();
 
@@ -958,10 +1043,15 @@
 
       container.innerHTML = allCategoriesData.map(function(cat) {
         var brandCount = cat.brandCount || 0;
+        var isBranch = cat.categoryType === 'branch';
+        var typeLabel = isBranch ? 'branch' : 'brand';
         return '<div class="cat-manage-row">' +
           '<span class="cat-manage-icon"><i class="fa-solid ' + (cat.icon || 'fa-tag') + '"></i></span>' +
-          '<span class="cat-manage-name">' + Components.escapeHTML(cat.name) + '</span>' +
-          '<span class="cat-manage-count">' + brandCount + ' brand' + (brandCount !== 1 ? 's' : '') + '</span>' +
+          '<span class="cat-manage-name">' + Components.escapeHTML(cat.name) +
+            (isBranch ? ' <span style="font-size:10px;color:var(--orange);background:var(--orange-bg,rgba(255,152,0,0.1));padding:1px 6px;border-radius:var(--radius-full);margin-left:var(--space-1)">branch</span>' : '') +
+          '</span>' +
+          '<span class="cat-manage-count">' + brandCount + ' ' + typeLabel + (brandCount !== 1 ? 's' : '') + '</span>' +
+          (isBranch ? '<button class="btn btn-ghost btn-sm" title="Add Branch" style="color:var(--green);" onclick="openBranchModal(\'' + cat.id + '\')"><i class="fa-solid fa-plus" style="font-size:12px;"></i></button>' : '') +
           '<button class="btn btn-ghost btn-sm" title="Edit" onclick="editCategory(\'' + cat.id + '\')">' +
             '<i class="fa-solid fa-pen" style="font-size:12px;"></i>' +
           '</button>' +
@@ -999,6 +1089,71 @@
           }
         }
       );
+    }
+
+    // ============================================================
+    // BRANCH MANAGEMENT
+    // ============================================================
+    function openBranchModal(categorySlug) {
+      document.getElementById('branch-form').reset();
+      document.getElementById('fb-category-slug').value = categorySlug;
+      // Determine department_type from slug
+      document.getElementById('branch-modal').classList.add('open');
+    }
+
+    function closeBranchModal() {
+      document.getElementById('branch-modal').classList.remove('open');
+    }
+
+    async function saveBranchForm(e) {
+      e.preventDefault();
+      var btn = document.getElementById('save-branch-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      var catSlug = document.getElementById('fb-category-slug').value;
+      var deptType = catSlug === 'traffic-department' ? 'traffic' : catSlug === 'home-affairs' ? 'home' : 'other';
+      var compliance = parseInt(document.getElementById('fb-compliance').value) || 0;
+      var custSat = parseInt(document.getElementById('fb-cust-sat').value) || 0;
+      var service = parseInt(document.getElementById('fb-service').value) || 0;
+      var innovation = parseInt(document.getElementById('fb-innovation').value) || 0;
+      var support = parseInt(document.getElementById('fb-support').value) || 0;
+      var access = parseInt(document.getElementById('fb-access').value) || 0;
+      var totalScore = compliance + custSat + service + innovation + support + access;
+
+      try {
+        await GoNoGoAPI.saveBranch({
+          branch_name: document.getElementById('fb-name').value.trim(),
+          department_type: deptType,
+          category_slug: catSlug,
+          province: document.getElementById('fb-province').value.trim(),
+          total_score: totalScore,
+          compliance: compliance,
+          customer_satisfaction: custSat,
+          service_offering: service,
+          innovation: innovation,
+          customer_support: support,
+          accessibility_security: access,
+          manager: document.getElementById('fb-manager').value.trim(),
+          manager_email: document.getElementById('fb-email').value.trim(),
+          telephone: document.getElementById('fb-telephone').value.trim(),
+          address: document.getElementById('fb-address').value.trim(),
+          hours: document.getElementById('fb-hours').value.trim(),
+          services: document.getElementById('fb-services').value.trim()
+        });
+        Components.showToast('Branch saved (' + totalScore + '/100)');
+        closeBranchModal();
+        // Refresh categories to update counts
+        allCategoriesData = await GoNoGoAPI.getCategories();
+        if (document.getElementById('manage-categories-modal').classList.contains('open')) {
+          renderManageCategoriesList();
+        }
+      } catch (err) {
+        Components.showToast('Error saving branch: ' + err.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Branch';
     }
 
     // ============================================================
