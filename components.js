@@ -835,11 +835,17 @@ const Components = {
     try {
       var user = await GoNoGoAPI.brandLogin(email, password);
       if (user) {
-        Components._brandUser = user;
-        GoNoGoStorage.set('brandUser', user);
-        GoNoGoStorage.set('brandLoginTime', Date.now());
-        document.getElementById('brand-login-overlay').remove();
-        if (typeof initBrandPage === 'function') initBrandPage();
+        if (user.role === 'admin' && user.brand_slug === '__admin__') {
+          // Admin user — show brand picker
+          Components._pendingAdminUser = user;
+          Components.showAdminBrandPicker();
+        } else {
+          Components._brandUser = user;
+          GoNoGoStorage.set('brandUser', user);
+          GoNoGoStorage.set('brandLoginTime', Date.now());
+          document.getElementById('brand-login-overlay').remove();
+          if (typeof initBrandPage === 'function') initBrandPage();
+        }
       } else {
         error.textContent = 'Incorrect credentials. Try again.';
         error.style.display = 'block';
@@ -853,6 +859,55 @@ const Components = {
 
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-lock"></i> Sign In';
+  },
+
+  async showAdminBrandPicker() {
+    var brands = await GoNoGoAPI.getAllBrandSlugs();
+    var overlay = document.getElementById('brand-login-overlay');
+    overlay.querySelector('.password-box').innerHTML = `
+      <div class="logo" style="justify-content:center">
+        <img src="${LOGO_URL}" alt="GoNoGo" style="height:32px;width:auto;">
+      </div>
+      <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">Admin Access</h3>
+      <p style="color:var(--text-secondary);font-size:var(--text-sm);margin-bottom:var(--space-5)">Select a brand to view their portal</p>
+      <div class="form-group">
+        <label class="form-label">Brand</label>
+        <input type="text" id="brand-picker-search" placeholder="Search brands..." oninput="Components.filterBrandPicker()" style="margin-bottom:var(--space-2);">
+        <div id="brand-picker-list" style="max-height:300px;overflow-y:auto;border:1px solid var(--border-primary);border-radius:var(--radius-md);">
+        </div>
+      </div>
+    `;
+    var listHtml = '';
+    brands.forEach(function(b) {
+      var verdictColor = b.verdict === 'GO' ? 'var(--green)' : b.verdict === 'NOGO' ? 'var(--red)' : 'var(--orange)';
+      listHtml += '<div class="brand-picker-item" data-slug="' + b.slug + '" data-name="' + Components.escapeHTML(b.name) + '" ' +
+        'onclick="Components.selectAdminBrand(\'' + b.slug + '\', \'' + Components.escapeHTML(b.name).replace(/'/g, "\\'") + '\')" ' +
+        'style="padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);font-size:var(--text-sm);transition:background 0.15s;"' +
+        ' onmouseover="this.style.background=\'var(--surface-2)\'" onmouseout="this.style.background=\'\'">'+
+        '<span style="font-weight:500;">' + Components.escapeHTML(b.name) + '</span>' +
+        '<span style="font-size:var(--text-xs);font-weight:700;color:' + verdictColor + ';">' + b.gonogo_score + '/100</span>' +
+      '</div>';
+    });
+    document.getElementById('brand-picker-list').innerHTML = listHtml;
+  },
+
+  filterBrandPicker() {
+    var search = (document.getElementById('brand-picker-search').value || '').toLowerCase();
+    var items = document.querySelectorAll('.brand-picker-item');
+    items.forEach(function(item) {
+      var name = (item.getAttribute('data-name') || '').toLowerCase();
+      item.style.display = name.indexOf(search) !== -1 ? '' : 'none';
+    });
+  },
+
+  selectAdminBrand(slug, name) {
+    var admin = Components._pendingAdminUser;
+    var user = { id: admin.id, email: admin.email, display_name: admin.display_name + ' (viewing ' + name + ')', role: 'admin', brand_slug: slug, region: admin.region };
+    Components._brandUser = user;
+    GoNoGoStorage.set('brandUser', user);
+    GoNoGoStorage.set('brandLoginTime', Date.now());
+    document.getElementById('brand-login-overlay').remove();
+    if (typeof initBrandPage === 'function') initBrandPage();
   },
 
   brandLogout() {

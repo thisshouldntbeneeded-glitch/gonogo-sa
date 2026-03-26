@@ -545,22 +545,63 @@ var GoNoGoAPI = (function () {
     },
 
     // ==========================================
-    // BRAND PORTAL AUTH — brand_login RPC
+    // BRAND PORTAL AUTH — tries brand_login first, then admin_login as fallback
     // ==========================================
     brandLogin: function (email, password) {
+      var self = this;
       return this._hashPassword(password).then(function (hash) {
+        // Try brand login first
         return supabaseRequest('rpc/brand_login', {
           method: 'POST',
           body: { p_email: email.toLowerCase().trim(), p_hash: hash }
         }).then(function (rows) {
           if (rows && rows.length > 0) return rows[0];
           if (rows && rows.id) return rows;
-          return null;
+          // No brand user found — try admin login as fallback
+          return supabaseRequest('rpc/admin_login', {
+            method: 'POST',
+            body: { p_email: email.toLowerCase().trim(), p_hash: hash }
+          }).then(function (adminRows) {
+            if (adminRows && adminRows.length > 0) {
+              var admin = adminRows[0];
+              return { id: admin.id, email: admin.email, display_name: admin.display_name, role: 'admin', brand_slug: '__admin__', region: SITE_REGION };
+            }
+            if (adminRows && adminRows.id) {
+              return { id: adminRows.id, email: adminRows.email, display_name: adminRows.display_name, role: 'admin', brand_slug: '__admin__', region: SITE_REGION };
+            }
+            return null;
+          }).catch(function () { return null; });
         }).catch(function (err) {
-          console.error('Brand login failed:', err);
-          return null;
+          // brand_login RPC might not exist yet — try admin
+          return supabaseRequest('rpc/admin_login', {
+            method: 'POST',
+            body: { p_email: email.toLowerCase().trim(), p_hash: hash }
+          }).then(function (adminRows) {
+            if (adminRows && adminRows.length > 0) {
+              var admin = adminRows[0];
+              return { id: admin.id, email: admin.email, display_name: admin.display_name, role: 'admin', brand_slug: '__admin__', region: SITE_REGION };
+            }
+            return null;
+          }).catch(function () { return null; });
         });
       });
+    },
+
+    // Get all brands (for admin brand picker)
+    getAllBrandSlugs: function () {
+      return supabaseRequest('brands?region=eq.' + SITE_REGION + '&select=slug,name,gonogo_score,verdict&order=name.asc')
+        .then(function (rows) { return rows || []; })
+        .catch(function () { return []; });
+    },
+
+    // Brand user management (admin only)
+    addBrandUser: function (email, password, displayName, brandSlug, region) {
+      return this._hashPassword(password).then(function (hash) {
+        return supabaseRequest('brand_users', {
+          method: 'POST',
+          body: { email: email.toLowerCase().trim(), password_hash: hash, display_name: displayName || '', brand_slug: brandSlug, region: region || SITE_REGION, role: 'brand_viewer' }
+        });
+      }).then(function (rows) { return { ok: true, user: rows && rows[0] ? rows[0] : null }; });
     },
 
     getBrandUser: function () {
