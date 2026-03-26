@@ -21,6 +21,7 @@
   <meta name="description" content="GoNoGo South Africa rates and compares brands across 13 industries using a transparent 100-point scoring framework.">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
 </head>
 <body>
   <div id="nav"></div>
@@ -158,6 +159,7 @@
 
   <script>
     document.getElementById('nav').innerHTML = Components.renderPublicNav('home');
+    Components.initTheme();
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
     // Category descriptions for richer cards

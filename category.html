@@ -20,6 +20,7 @@
   <title>Category — GoNoGo South Africa</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
 </head>
 <body>
   <div id="nav"></div>
@@ -42,11 +43,13 @@
   <script>
     var slug = Components.getParam('cat');
     document.getElementById('footer').innerHTML = Components.renderFooter();
+    Components.initTheme();
 
     (async function() {
       if (!slug) {
         // Show all categories grid
         document.getElementById('nav').innerHTML = Components.renderPublicNav('');
+        Components.updateThemeIcon();
         document.title = 'All Industries — GoNoGo South Africa';
         var categories = await GoNoGoAPI.getCategoriesWithBrands();
         document.getElementById('page-content').innerHTML =
@@ -75,6 +78,7 @@
 
         if (!catInfo) {
           document.getElementById('nav').innerHTML = Components.renderPublicNav('');
+          Components.updateThemeIcon();
           document.getElementById('page-content').innerHTML =
             '<section class="section"><div class="container" style="text-align:center">' +
               '<h1 class="section-title">Category Not Found</h1>' +
@@ -85,6 +89,7 @@
         }
 
         document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
+        Components.updateThemeIcon();
         document.title = catInfo.name + ' — GoNoGo South Africa';
 
         // SEO meta

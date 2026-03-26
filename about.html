@@ -7,6 +7,7 @@
 <meta name="description" content="GoNoGo is an independent brand rating platform using a transparent 100-point scoring framework to help consumers make informed decisions.">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
 </head>
 <body>
   <div id="nav"></div>
@@ -50,6 +51,7 @@
   <script src="components.js"></script>
   <script>
     document.getElementById('nav').innerHTML = Components.renderPublicNav('about');
+    Components.initTheme();
     document.getElementById('footer').innerHTML = Components.renderFooter();
   </script>
   <style>
