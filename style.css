@@ -2006,6 +2006,10 @@ textarea {
   flex-shrink: 0;
 }
 
+.nav-theme-toggle {
+  margin-left: var(--space-2);
+}
+
 .theme-toggle:hover {
   color: var(--text-primary);
   background: var(--surface-2);
@@ -2079,11 +2083,7 @@ textarea {
   opacity: 0.25;
 }
 
-/* Logo image: invert for light backgrounds */
-.light-mode .logo img,
-.light-mode .hero img[alt="GoNoGo"] {
-  filter: invert(1) hue-rotate(180deg);
-}
+/* Logo: use dedicated light-mode logo via JS — no CSS filter needed */
 
 /* Table row hover: use light rgba */
 .light-mode .data-table tr:hover td {
