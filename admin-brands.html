@@ -512,7 +512,24 @@
       'fa-newspaper', 'fa-bullhorn', 'fa-comments', 'fa-envelope', 'fa-phone',
       'fa-map-location-dot', 'fa-location-dot', 'fa-compass', 'fa-earth-africa', 'fa-flag'
     ];
+    // ============================================================
+    // CATEGORY COLOUR PICKER
+    // ============================================================
+    function highlightColorSwatch(color) {
+      var container = document.getElementById('fc-color-swatches');
+      if (!container) return;
+      container.querySelectorAll('.color-swatch').forEach(function(el) {
+        el.classList.toggle('active', el.dataset.color === color);
+      });
+    }
 
+    function pickColor(color) {
+      document.getElementById('fc-icon-color').value = color;
+      highlightColorSwatch(color);
+      // Also update icon preview colour
+      var preview = document.getElementById('fc-icon-preview');
+      if (preview) preview.style.color = color;
+    }
     // ============================================================
     // STATE
     // ============================================================
