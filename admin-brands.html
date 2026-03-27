@@ -1043,29 +1043,52 @@
             icon: icon,
             scoringCategories: scoringCats
           };
-          if (isBranchType) catBody.category_type = 'branch';
-          await GoNoGoAPI.saveCategory(catBody);
-          Components.showToast('Category "' + name + '" created' + (isBranchType ? ' (branch type)' : ''));
-        }
-        closeCategoryModal();
+         async function saveCategory(e) {
+      e.preventDefault();
+      var name = document.getElementById('fc-name').value.trim();
+      var icon = document.getElementById('fc-icon').value || 'fa-tag';
+      var desc = document.getElementById('fc-description').value.trim();
+      var color = document.getElementById('fc-icon-color').value || '#11a551';
+      var isBranch = document.getElementById('fc-branch-type').checked;
+      var editingSlug = document.getElementById('fc-editing-slug').value;
 
-        // Refresh
-        allCategoriesData = await GoNoGoAPI.getCategories();
-        allBrandsData = await GoNoGoAPI.getAllBrands();
-        populateIndustryDropdowns();
-        filterBrands();
-
-        // If manage categories modal is open, refresh it
-        if (document.getElementById('manage-categories-modal').classList.contains('open')) {
-          renderManageCategoriesList();
-        }
-      } catch (err) {
-        Components.showToast('Error: ' + err.message, 'error');
+      if (!name) {
+        Components.showToast('Please enter a category name', 'error');
+        return;
       }
 
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Category';
-    }
+      var payload = {
+        name: name,
+        icon: icon,
+        description: desc || null,
+        icon_color: color,
+        category_type: isBranch ? 'branch' : 'brand'
+      };
+
+      var btn = document.getElementById('save-cat-btn');
+      var originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        if (editingSlug) {
+          await GoNoGoAPI.updateCategory(editingSlug, payload);
+          Components.showToast('Category updated');
+        } else {
+          await GoNoGoAPI.addCategory(payload);
+          Components.showToast('Category added');
+        }
+        allCategoriesData = await GoNoGoAPI.getCategories();
+        populateIndustryDropdowns();
+        closeCategoryModal();
+      } catch (err) {
+        console.error(err);
+        Components.showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }     
 
     // ============================================================
     // MANAGE CATEGORIES MODAL
