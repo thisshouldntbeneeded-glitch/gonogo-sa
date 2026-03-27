@@ -123,30 +123,10 @@ var GoNoGoAPI = (function () {
       _categoryCache = null;
     },
 
-    // ==========================================
+      // ==========================================
     // CATEGORIES
     // ==========================================
     getCategoriesWithBrands: function () {
-          updateCategory: function (slug, data) {
-      // Build patch body from provided data only
-      var body = {};
-      if (typeof data.name !== 'undefined') body.name = data.name;
-      if (typeof data.icon !== 'undefined') body.icon = data.icon;
-      if (typeof data.description !== 'undefined') body.description = data.description;
-      if (typeof data.icon_color !== 'undefined') body.icon_color = data.icon_color;
-      if (typeof data.category_type !== 'undefined') body.category_type = data.category_type;
-      if (typeof data.scoring_categories !== 'undefined') body.scoring_categories = data.scoring_categories;
-
-      return supabaseRequest(
-        'categories?slug=eq.' + encodeURIComponent(slug),
-        {
-          method: 'PATCH',
-          body: body
-        }
-      ).then(function () {
-        return { ok: true };
-      });
-    },
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           // Get categories with brand + branch counts from Supabase
@@ -179,6 +159,28 @@ var GoNoGoAPI = (function () {
 
     getCategories: function () { return this.getCategoriesWithBrands(); },
 
+    // New payload-based updateCategory
+    updateCategory: function (slug, data) {
+      _categoryCache = null; // bust cache
+      var body = {};
+      if (typeof data.name !== 'undefined') body.name = data.name;
+      if (typeof data.icon !== 'undefined') body.icon = data.icon;
+      if (typeof data.description !== 'undefined') body.description = data.description;
+      if (typeof data.icon_color !== 'undefined') body.icon_color = data.icon_color;
+      if (typeof data.category_type !== 'undefined') body.category_type = data.category_type;
+      if (typeof data.scoring_categories !== 'undefined') body.scoring_categories = data.scoring_categories;
+
+      return supabaseRequest(
+        'categories?slug=eq.' + encodeURIComponent(slug),
+        {
+          method: 'PATCH',
+          body: body
+        }
+      ).then(function (rows) {
+        if (!rows || rows.length === 0) throw new Error('Category not found');
+        return { ok: true };
+      });
+    },
     // ==========================================
     // BRANDS
     // ==========================================
@@ -578,20 +580,7 @@ var GoNoGoAPI = (function () {
       });
     },
 
-    // Update category name/icon (rename). Updates all brands that reference this category.
-    updateCategory: function (slug, newName, newIcon) {
-      _categoryCache = null; // bust cache
-      var body = {};
-      if (newName !== undefined) body.name = newName;
-      if (newIcon !== undefined) body.icon = newIcon;
-      return supabaseRequest('categories?slug=eq.' + encodeURIComponent(slug), {
-        method: 'PATCH',
-        body: body
-      }).then(function (rows) {
-        if (!rows || rows.length === 0) throw new Error('Category not found');
-        return { ok: true };
-      });
-    },
+   
 
     // Delete a category (only if no brands reference it)
     deleteCategory: function (slug) {
