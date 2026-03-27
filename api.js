@@ -127,6 +127,26 @@ var GoNoGoAPI = (function () {
     // CATEGORIES
     // ==========================================
     getCategoriesWithBrands: function () {
+          updateCategory: function (slug, data) {
+      // Build patch body from provided data only
+      var body = {};
+      if (typeof data.name !== 'undefined') body.name = data.name;
+      if (typeof data.icon !== 'undefined') body.icon = data.icon;
+      if (typeof data.description !== 'undefined') body.description = data.description;
+      if (typeof data.icon_color !== 'undefined') body.icon_color = data.icon_color;
+      if (typeof data.category_type !== 'undefined') body.category_type = data.category_type;
+      if (typeof data.scoring_categories !== 'undefined') body.scoring_categories = data.scoring_categories;
+
+      return supabaseRequest(
+        'categories?slug=eq.' + encodeURIComponent(slug),
+        {
+          method: 'PATCH',
+          body: body
+        }
+      ).then(function () {
+        return { ok: true };
+      });
+    },
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
           // Get categories with brand + branch counts from Supabase
