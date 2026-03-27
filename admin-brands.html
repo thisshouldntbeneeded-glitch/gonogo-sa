@@ -89,6 +89,14 @@
     border: 1px solid var(--border-primary); border-radius: var(--radius-md);
   }
   .new-category-fields.visible { display: block; }
+     /* Color swatches */
+  .color-swatch {
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; border: 3px solid transparent;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.active { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,0.6); }
 </style>
 </head>
 <body>
@@ -320,6 +328,24 @@
             This is a branch/location category
           </label>
           <p class="text-xs text-muted" style="margin-top:var(--space-1)">Branch categories use a fixed 100-point scoring framework (Compliance, Customer Satisfaction, Service Offering, Innovation, Customer Support, Accessibility & Security).</p>
+        </div>
+                 <div class="form-group">
+          <label class="form-label">Description <span class="text-xs text-muted">(optional)</span></label>
+          <textarea id="fc-description" rows="2" placeholder="e.g. Banks, credit providers and financial services in South Africa"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon Colour</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;" id="fc-color-swatches">
+            <div class="color-swatch active" data-color="#11a551" style="background:#11a551;" onclick="pickColor('#11a551')"></div>
+            <div class="color-swatch" data-color="#0ea5e9" style="background:#0ea5e9;" onclick="pickColor('#0ea5e9')"></div>
+            <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b;" onclick="pickColor('#f59e0b')"></div>
+            <div class="color-swatch" data-color="#ef4444" style="background:#ef4444;" onclick="pickColor('#ef4444')"></div>
+            <div class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6;" onclick="pickColor('#8b5cf6')"></div>
+            <div class="color-swatch" data-color="#ec4899" style="background:#ec4899;" onclick="pickColor('#ec4899')"></div>
+            <div class="color-swatch" data-color="#14b8a6" style="background:#14b8a6;" onclick="pickColor('#14b8a6')"></div>
+            <div class="color-swatch" data-color="#f97316" style="background:#f97316;" onclick="pickColor('#f97316')"></div>
+          </div>
+          <input type="hidden" id="fc-icon-color" value="#11a551">
         </div>
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
           <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
