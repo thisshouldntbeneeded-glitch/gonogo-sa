@@ -964,58 +964,60 @@
     // ============================================================
     // CATEGORY MANAGEMENT
     // ============================================================
-    function openCategoryModal(editSlug) {
-      document.getElementById('category-form').reset();
-      document.getElementById('fc-editing-slug').value = '';
+        function openCategoryModal(editSlug) {
+      var titleEl = document.getElementById('cat-modal-title');
+      var nameEl = document.getElementById('fc-name');
+      var iconEl = document.getElementById('fc-icon');
+      var iconDisplay = document.getElementById('fc-icon-display');
+      var iconLabel = document.getElementById('fc-icon-label');
+      var iconPreview = document.getElementById('fc-icon-preview');
+      var descEl = document.getElementById('fc-description');
+      var colorEl = document.getElementById('fc-icon-color');
+      var branchEl = document.getElementById('fc-branch-type');
+      var editingSlugEl = document.getElementById('fc-editing-slug');
 
       if (editSlug) {
         // Edit mode
         var cat = allCategoriesData.find(function(c) { return c.id === editSlug; });
-        if (cat) {
-          document.getElementById('cat-modal-title').textContent = 'Edit Category';
-          document.getElementById('fc-name').value = cat.name;
-          document.getElementById('fc-editing-slug').value = editSlug;
-          var icon = cat.icon || 'fa-tag';
-          document.getElementById('fc-icon').value = icon;
-          document.getElementById('fc-icon-display').className = 'fa-solid ' + icon + ' selected-icon';
-          document.getElementById('fc-icon-label').textContent = icon;
-          document.getElementById('fc-icon-preview').innerHTML = '<i class="fa-solid ' + icon + '"></i>';
-          renderIconPickerGrid('fc-icon-picker', 'fc-icon', 'fc-icon-display', 'fc-icon-label', 'fc-icon-preview');
-        }
+        if (!cat) return;
+
+        titleEl.textContent = 'Edit Category';
+        nameEl.value = cat.name || '';
+        iconEl.value = cat.icon || 'fa-tag';
+        iconDisplay.className = 'fa-solid ' + (cat.icon || 'fa-tag') + ' selected-icon';
+        iconLabel.textContent = cat.icon || 'fa-tag';
+        iconPreview.innerHTML = '<i class="fa-solid ' + (cat.icon || 'fa-tag') + '"></i>';
+
+        descEl.value = (cat.description || '');
+        var color = cat.icon_color || '#11a551';
+        colorEl.value = color;
+        iconPreview.style.color = color;
+        highlightColorSwatch(color);
+
+        branchEl.checked = (cat.categoryType === 'branch');
+        editingSlugEl.value = editSlug;
+        document.getElementById('save-cat-btn').innerHTML = '<i class="fa-solid fa-check"></i> Save Changes';
       } else {
-        document.getElementById('cat-modal-title').textContent = 'Add Category';
-        document.getElementById('fc-icon').value = 'fa-tag';
-        document.getElementById('fc-icon-display').className = 'fa-solid fa-tag selected-icon';
-        document.getElementById('fc-icon-label').textContent = 'fa-tag';
-        document.getElementById('fc-icon-preview').innerHTML = '<i class="fa-solid fa-tag"></i>';
-        renderIconPickerGrid('fc-icon-picker', 'fc-icon', 'fc-icon-display', 'fc-icon-label', 'fc-icon-preview');
+        // Add mode
+        titleEl.textContent = 'Add Category';
+        nameEl.value = '';
+        iconEl.value = 'fa-tag';
+        iconDisplay.className = 'fa-solid fa-tag selected-icon';
+        iconLabel.textContent = 'fa-tag';
+        iconPreview.innerHTML = '<i class="fa-solid fa-tag"></i>';
+        iconPreview.style.color = '#11a551';
+
+        descEl.value = '';
+        colorEl.value = '#11a551';
+        highlightColorSwatch('#11a551');
+
+        branchEl.checked = false;
+        editingSlugEl.value = '';
+        document.getElementById('save-cat-btn').innerHTML = '<i class="fa-solid fa-check"></i> Save Category';
       }
 
       document.getElementById('category-modal').classList.add('open');
     }
-
-    function closeCategoryModal() {
-      document.getElementById('category-modal').classList.remove('open');
-    }
-
-    async function saveCategory(e) {
-      e.preventDefault();
-      var btn = document.getElementById('save-cat-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-
-      var name = document.getElementById('fc-name').value.trim();
-      var icon = document.getElementById('fc-icon').value.trim() || 'fa-tag';
-      var editingSlug = document.getElementById('fc-editing-slug').value;
-
-      var isBranchType = document.getElementById('fc-branch-type').checked;
-
-      try {
-        if (editingSlug) {
-          // Update existing category
-          await GoNoGoAPI.updateCategory(editingSlug, name, icon);
-          Components.showToast('Category "' + name + '" updated');
-        } else {
           // Create new category
           var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           var scoringCats = isBranchType
