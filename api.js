@@ -156,7 +156,33 @@ var GoNoGoAPI = (function () {
         throw new Error('No data source available');
       });
     },
+ getCategories: function () { return this.getCategoriesWithBrands(); },
 
+    updateCategory: function (slug, data) {
+      _categoryCache = null;
+      var body = {};
+      if (typeof data.name !== 'undefined') body.name = data.name;
+      if (typeof data.icon !== 'undefined') body.icon = data.icon;
+      if (typeof data.description !== 'undefined') body.description = data.description;
+      if (typeof data.icon_color !== 'undefined') body.icon_color = data.icon_color;
+      if (typeof data.category_type !== 'undefined') body.category_type = data.category_type;
+      // Optional: only include scoring_categories if you really need to change it
+      // and pass the same array-of-objects shape as in the table
+      if (typeof data.scoring_categories !== 'undefined') {
+        body.scoring_categories = data.scoring_categories;
+      }
+
+      return supabaseRequest(
+        'categories?slug=eq.' + encodeURIComponent(slug),
+        {
+          method: 'PATCH',
+          body: body
+        }
+      ).then(function (rows) {
+        if (!rows || rows.length === 0) throw new Error('Category not found');
+        return { ok: true };
+      });
+    },
     getCategories: function () { return this.getCategoriesWithBrands(); },
 
     // New payload-based updateCategory
