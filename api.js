@@ -829,14 +829,10 @@ var GoNoGoAPI = (function () {
       });
     },
 
-    // ==========================================
-    // BRANCH SAVE (admin)
-    // ==========================================
-           // ==========================================
+        // ==========================================
     // Scoring Engine API helpers
     // ==========================================
 
-    // Basic rubrics list for admin scoring engine
     getRubrics: function () {
       return supabaseRequest('rubrics?select=*&order=market.asc')
         .then(function (rows) {
@@ -849,7 +845,6 @@ var GoNoGoAPI = (function () {
         });
     },
 
-    // Versions of a given rubric (weights, definitions, research notes)
     getRubricVersions: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
       return supabaseRequest(
@@ -866,18 +861,14 @@ var GoNoGoAPI = (function () {
         });
     },
 
-    // All prompts attached to all versions of a rubric
     getRubricPromptsForRubric: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
-
-      // First fetch versions so we can map version ids to version strings
       return supabaseRequest(
         'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
       )
         .then(function (versions) {
           versions = versions || [];
           if (versions.length === 0) return [];
-
           var versionIds = versions.map(function (v) {
             return v.id;
           });
@@ -885,14 +876,11 @@ var GoNoGoAPI = (function () {
           versions.forEach(function (v) {
             versionMap[v.id] = v.version;
           });
-
-          // Now fetch prompts for those versions
           var orFilter = versionIds
             .map(function (id) {
               return 'rubric_version_id=eq.' + encodeURIComponent(id);
             })
             .join('&or=');
-
           return supabaseRequest(
             'rubric_prompts?' + orFilter + '&order=created_at.desc'
           ).then(function (prompts) {
@@ -909,17 +897,14 @@ var GoNoGoAPI = (function () {
         });
     },
 
-    // Decision rules (Go/NoGo bands etc) for all versions of a rubric
     getDecisionRulesForRubric: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
-
       return supabaseRequest(
         'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
       )
         .then(function (versions) {
           versions = versions || [];
           if (versions.length === 0) return [];
-
           var versionIds = versions.map(function (v) {
             return v.id;
           });
@@ -928,7 +913,6 @@ var GoNoGoAPI = (function () {
               return 'rubric_version_id=eq.' + encodeURIComponent(id);
             })
             .join('&or=');
-
           return supabaseRequest(
             'config_decision_rules?' + orFilter + '&order=created_at.desc'
           ).then(function (rules) {
@@ -939,7 +923,40 @@ var GoNoGoAPI = (function () {
           console.error('getDecisionRulesForRubric error', err);
           return [];
         });
+    },
+
+    // ==========================================
+    // Scoring Engine CREATE helpers
+    // ==========================================
+
+    createRubric: function (payload) {
+      return supabaseRequest('rubrics', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    createRubricVersion: function (payload) {
+      return supabaseRequest('rubric_versions', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    createRubricPrompt: function (payload) {
+      return supabaseRequest('rubric_prompts', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    createDecisionRule: function (payload) {
+      return supabaseRequest('config_decision_rules', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
     }
+
   };
 })();
 
