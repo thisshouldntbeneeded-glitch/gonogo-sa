@@ -875,9 +875,13 @@ var GoNoGoAPI = (function () {
     // Scoring Engine API helpers
     // ===========================
 
-    getRubrics: function () {
-      return supabaseRequest('rubrics?order=market.asc,industry.asc')
-        .then(function (rows) { return rows || []; })
+        getRubrics: function () {
+      // Simple REST call to rubrics table
+      return supabaseRequest('rubrics?select=*&order=market.asc,industry.asc')
+        .then(function (rows) {
+          console.log('getRubrics rows:', rows);
+          return rows || [];
+        })
         .catch(function (err) {
           console.error('getRubrics error', err);
           return [];
