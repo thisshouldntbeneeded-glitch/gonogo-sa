@@ -902,8 +902,18 @@
         }
       ],
       anchors: [
-        { category: 'Compliance & Consumer Protection', key: 'compliance_consumer_protection', definition: 'CPA compliance, returns policy, and POPIA adherence.', anchors: { go: 'Full CPA compliance, clear returns policy, POPIA certified.', caution: '    /* ── 16. Online Shopping & Marketplaces ── */
-    {
+  {
+    category: 'Compliance & Consumer Protection',
+    key: 'compliance_consumer_protection',
+    definition: 'CPA compliance, returns policy, and POPIA adherence.',
+    anchors: {
+      go: 'Full CPA compliance, clear returns policy, POPIA certified.',
+      caution: 'Generally compliant with minor policy or disclosure gaps.',
+      noGo: 'Non-compliance with CPA or serious POPIA issues.'
+    }
+  },
+  // next categories go here...
+]
       id: 'sa_online_shopping_marketplaces',
       name: 'South Africa — Online Shopping & Marketplaces',
       market: 'SA',
