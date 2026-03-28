@@ -969,13 +969,10 @@
         go: 'Strong payment security, buyer protection guarantees, robust fraud controls.',
         caution: 'Standard card security, basic buyer protection.',
         noGo: 'Security incidents, weak buyer protection, fraud complaints.'
-      }
-    }
-  ]
-},
           }
         }
-      ],
+      ]
+    },
       playbooks: [
         {
           category: 'Compliance & Consumer Protection',
