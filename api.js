@@ -868,6 +868,105 @@ var GoNoGoAPI = (function () {
         return { ok: true, verdict: verdict, total_score: score };
       });
     }
+  
+    // ===========================
+  // Scoring Engine API helpers
+  // ===========================
+
+  GoNoGoAPI.getRubrics = async function () {
+    try {
+      const { data, error } = await supabase
+        .from('rubrics')
+        .select('*')
+        .order('market', { ascending: true })
+        .order('industry', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('getRubrics error', err);
+      return [];
+    }
+  };
+
+  GoNoGoAPI.getRubricVersions = async function (rubricId) {
+    if (!rubricId) return [];
+    try {
+      const { data, error } = await supabase
+        .from('rubric_versions')
+        .select('*')
+        .eq('rubric_id', rubricId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('getRubricVersions error', err);
+      return [];
+    }
+  };
+
+  // For now: get all prompts for all versions of a rubric and join version info client-side
+  GoNoGoAPI.getRubricPromptsForRubric = async function (rubricId) {
+    if (!rubricId) return [];
+    try {
+      const { data: versions, error: vErr } = await supabase
+        .from('rubric_versions')
+        .select('id, version')
+        .eq('rubric_id', rubricId);
+
+      if (vErr) throw vErr;
+      if (!versions || versions.length === 0) return [];
+
+      const versionIds = versions.map(v => v.id);
+
+      const { data: prompts, error: pErr } = await supabase
+        .from('rubric_prompts')
+        .select('*')
+        .in('rubric_version_id', versionIds)
+        .order('created_at', { ascending: false });
+
+      if (pErr) throw pErr;
+
+      const versionMap = {};
+      versions.forEach(v => { versionMap[v.id] = v.version; });
+
+      return (prompts || []).map(p => ({
+        ...p,
+        rubric_version_version: versionMap[p.rubric_version_id] || null
+      }));
+    } catch (err) {
+      console.error('getRubricPromptsForRubric error', err);
+      return [];
+    }
+  };
+
+  GoNoGoAPI.getDecisionRulesForRubric = async function (rubricId) {
+    if (!rubricId) return [];
+    try {
+      const { data: versions, error: vErr } = await supabase
+        .from('rubric_versions')
+        .select('id')
+        .eq('rubric_id', rubricId);
+
+      if (vErr) throw vErr;
+      if (!versions || versions.length === 0) return [];
+
+      const versionIds = versions.map(v => v.id);
+
+      const { data: rules, error: rErr } = await supabase
+        .from('config_decision_rules')
+        .select('*')
+        .in('rubric_version_id', versionIds)
+        .order('created_at', { ascending: false });
+
+      if (rErr) throw rErr;
+      return rules || [];
+    } catch (err) {
+      console.error('getDecisionRulesForRubric error', err);
+      return [];
+    }
+  };
   };
 })();
 
