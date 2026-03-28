@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoNoGo SA — Scoring Engine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <div id="sidebar-container"></div>
+    <main class="admin-main" id="admin-content" style="display:none;">
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">Scoring Engine</h1>
+          <p class="text-sm text-secondary">Rubrics, methodology, prompts & audit trail</p>
+        </div>
+        <button id="btn-new-rubric" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-plus"></i> New Rubric
+        </button>
+      </div>
+
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-4);">Rubrics</h3>
+        <div id="rubrics-table-container">
+          <div class="text-sm text-muted">Loading rubrics...</div>
+        </div>
+      </div>
+
+      <div class="card" id="rubric-detail-card" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+          <div>
+            <h3 class="text-sm font-semibold" id="rubric-detail-title"></h3>
+            <p class="text-xs text-muted" id="rubric-detail-subtitle"></p>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-button tab-active" data-tab="versions">Versions</button>
+          <button class="tab-button" data-tab="prompts">Prompts</button>
+          <button class="tab-button" data-tab="rules">Decision Rules</button>
+        </div>
+
+        <div class="tab-content" data-tab-content="versions">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
+            <h4 class="text-sm font-semibold">Rubric Versions</h4>
+            <button id="btn-new-version" class="btn btn-secondary btn-xs">
+              <i class="fa-solid fa-plus"></i> New Version
+            </button>
+          </div>
+          <div id="versions-list"></div>
+        </div>
+
+        <div class="tab-content" data-tab-content="prompts" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
+            <h4 class="text-sm font-semibold">Prompts</h4>
+            <button id="btn-new-prompt" class="btn btn-secondary btn-xs">
+              <i class="fa-solid fa-plus"></i> New Prompt
+            </button>
+          </div>
+          <div id="prompts-list"></div>
+        </div>
+
+        <div class="tab-content" data-tab-content="rules" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
+            <h4 class="text-sm font-semibold">Decision Rules</h4>
+            <button id="btn-new-ruleset" class="btn btn-secondary btn-xs">
+              <i class="fa-solid fa-plus"></i> New Ruleset
+            </button>
+          </div>
+          <div id="rules-list"></div>
+        </div>
+      </div>
+
+      <div style="padding:var(--space-6) 0;text-align:center;">
+        <p class="text-xs text-muted">
+          &copy; 2026 GoNoGo South Africa
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script src="admin-scoring.js"></script>
+</body>
+</html>
