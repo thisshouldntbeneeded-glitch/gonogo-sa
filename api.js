@@ -934,13 +934,14 @@ var GoNoGoAPI = (function () {
       });
     },
 
-    // ===========================
+        // ==========================
     // Scoring Engine API helpers
-    // ===========================
+    // ==========================
 
-            getRubrics: function () {
-      // Simple REST call to rubrics table (single order to avoid syntax quirks)
-      return supabaseRequest('rubrics?select=*&order=market.asc')
+    // Basic rubrics list for admin scoring engine
+    getRubrics: function () {
+      // Simple REST call to rubrics table
+      return supabaseRequest('rubrics?select=*&order=market.asc,industry.asc')
         .then(function (rows) {
           console.log('getRubrics rows:', rows);
           return rows || [];
@@ -951,72 +952,96 @@ var GoNoGoAPI = (function () {
         });
     },
 
+    // Versions of a given rubric (weights, definitions, research notes)
     getRubricVersions: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
       return supabaseRequest(
-        'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId) + '&order=created_at.desc'
+        'rubric_versions?rubric_id=eq.' +
+          encodeURIComponent(rubricId) +
+          '&order=created_at.desc'
       )
-        .then(function (rows) { return rows || []; })
+        .then(function (rows) {
+          return rows || [];
+        })
         .catch(function (err) {
           console.error('getRubricVersions error', err);
           return [];
         });
     },
 
-    // For now: get all prompts for all versions of a rubric
+    // All prompts attached to all versions of a rubric
     getRubricPromptsForRubric: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
 
-      // First get versions for this rubric
+      // First fetch versions so we can map version ids to version strings
       return supabaseRequest(
         'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
-      ).then(function (versions) {
-        versions = versions || [];
-        if (versions.length === 0) return [];
+      )
+        .then(function (versions) {
+          versions = versions || [];
+          if (versions.length === 0) return [];
 
-        var versionIds = versions.map(function (v) { return v.id; });
-        var versionMap = {};
-        versions.forEach(function (v) { versionMap[v.id] = v.version; });
+          var versionIds = versions.map(function (v) {
+            return v.id;
+          });
+          var versionMap = {};
+          versions.forEach(function (v) {
+            versionMap[v.id] = v.version;
+          });
 
-        // Then get prompts for those versions
-        var filter = versionIds.map(function (id) {
-          return 'rubric_version_id=eq.' + encodeURIComponent(id);
-        }).join('&or=');
+          // Now fetch prompts for those versions
+          var orFilter = versionIds
+            .map(function (id) {
+              return 'rubric_version_id=eq.' + encodeURIComponent(id);
+            })
+            .join('&or=');
 
-        return supabaseRequest('rubric_prompts?' + filter + '&order=created_at.desc')
-          .then(function (prompts) {
+          return supabaseRequest(
+            'rubric_prompts?' + orFilter + '&order=created_at.desc'
+          ).then(function (prompts) {
             prompts = prompts || [];
             return prompts.map(function (p) {
               p.rubric_version_version = versionMap[p.rubric_version_id] || null;
               return p;
             });
           });
-      }).catch(function (err) {
-        console.error('getRubricPromptsForRubric error', err);
-        return [];
-      });
+        })
+        .catch(function (err) {
+          console.error('getRubricPromptsForRubric error', err);
+          return [];
+        });
     },
 
+    // Decision rules (Go/NoGo bands etc) for all versions of a rubric
     getDecisionRulesForRubric: function (rubricId) {
       if (!rubricId) return Promise.resolve([]);
 
       return supabaseRequest(
         'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
-      ).then(function (versions) {
-        versions = versions || [];
-        if (versions.length === 0) return [];
+      )
+        .then(function (versions) {
+          versions = versions || [];
+          if (versions.length === 0) return [];
 
-        var versionIds = versions.map(function (v) { return v.id; });
-        var filter = versionIds.map(function (id) {
-          return 'rubric_version_id=eq.' + encodeURIComponent(id);
-        }).join('&or=');
+          var versionIds = versions.map(function (v) {
+            return v.id;
+          });
+          var orFilter = versionIds
+            .map(function (id) {
+              return 'rubric_version_id=eq.' + encodeURIComponent(id);
+            })
+            .join('&or=');
 
-        return supabaseRequest('config_decision_rules?' + filter + '&order=created_at.desc')
-          .then(function (rules) { return rules || []; });
-      }).catch(function (err) {
-        console.error('getDecisionRulesForRubric error', err);
-        return [];
-      });
+          return supabaseRequest(
+            'config_decision_rules?' + orFilter + '&order=created_at.desc'
+          ).then(function (rules) {
+            return rules || [];
+          });
+        })
+        .catch(function (err) {
+          console.error('getDecisionRulesForRubric error', err);
+          return [];
+        });
     }
 
   };
