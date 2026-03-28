@@ -56,6 +56,7 @@ const Components = {
       { href: 'index.html', label: 'Home', icon: 'fa-house', id: 'home' },
       { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
       { href: 'about.html', label: 'About', icon: 'fa-circle-info', id: 'about' },
+      { href: 'business.html', label: 'For Business', icon: 'fa-briefcase', id: 'business' },
       // Admin link hidden from public nav — access via /admin.html directly
     ];
 
