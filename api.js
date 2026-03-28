@@ -44,10 +44,41 @@ var GoNoGoAPI = (function () {
   }
 
   // Main project (brands, categories, admin_users)
-    function supabaseRequest(path, options) {
+     function supabaseRequest(path, options) {
     options = options || {};
     var method = options.method || 'GET';
+
+    // Base headers with API key
     var headers = options.headers || {};
+    headers['apikey'] = SUPABASE_ANON_KEY;
+    headers['Authorization'] = 'Bearer ' + SUPABASE_ANON_KEY;
+    headers['Content-Type'] = 'application/json';
+
+    if (options.prefer) {
+      headers['Prefer'] = options.prefer;
+    }
+
+    var fetchOptions = {
+      method: method,
+      headers: headers,
+      credentials: 'omit'
+    };
+
+    if (options.body) {
+      fetchOptions.body = JSON.stringify(options.body);
+    }
+
+    return fetch(SUPABASE_URL + '/rest/v1/' + path, fetchOptions)
+      .then(function (res) {
+        if (!res.ok) {
+          return res.text().then(function (txt) {
+            console.error('supabaseRequest error', res.status, txt);
+            throw new Error('Supabase error ' + res.status);
+          });
+        }
+        return res.json();
+      });
+  }
 
     // Ensure we always send the API key and auth bearer like other calls do
     headers['apikey'] = SUPABASE_ANON_KEY;
