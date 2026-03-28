@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Business | GoNoGo South Africa</title>
+  <meta name="description" content="Display your GoNoGo score, access your business portal, and gather real-time customer feedback with QR codes." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface-2: #f2f4f3;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d9ddd9;
+      --primary: #0f766e;
+      --primary-dark: #0b5e57;
+      --success: #2f7d32;
+      --warning: #b45309;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(247, 246, 242, 0.88);
+      border-bottom: 1px solid rgba(31, 41, 55, 0.08);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2ca36b, #0f766e);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      font-size: 14px;
+      color: var(--muted);
+      transition: color .18s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--text);
+    }
+
+    .nav .button-link {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      padding: 40px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #ecf8f4;
+      color: #166534;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2.2rem, 4vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      max-width: 12ch;
+    }
+
+    .lead {
+      margin: 0 0 22px;
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 58ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .mini-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .mini-points div {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .mini-points strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .mini-points span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hero-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .panel-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .badge-preview {
+      background: #111111;
+      color: white;
+      border-radius: 16px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .score-chip {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .score-chip strong {
+      font-size: 30px;
+      line-height: 1;
+      color: #22c55e;
+      display: block;
+    }
+
+    .score-chip span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .badge-meta h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .badge-meta p {
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .code-box {
+      background: #fbfbfa;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #475569;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    section {
+      padding: 28px 0;
+    }
+
+    .section-head {
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+
+    .section-head h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.6rem, 2.7vw, 2.6rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+
+    .card li + li {
+      margin-top: 8px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .step-num {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #ecf8f4;
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .step h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .step p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .price-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .price-card.featured {
+      border-color: rgba(15,118,110,0.28);
+      box-shadow: 0 18px 40px rgba(15,118,110,0.10);
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #eef7f6;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .price-card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .price {
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+    }
+
+    .price small {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #faf8f4;
+      border: 1px solid #e7dfd4;
+      color: #7c5a21;
+      font-size: 14px;
+    }
+
+    .cta-band {
+      margin: 24px 0 60px;
+      background: linear-gradient(135deg, #0f766e, #166534);
+      color: #fff;
+      border-radius: 24px;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .cta-band h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+    }
+
+    .cta-band p {
+      margin: 0;
+      color: rgba(255,255,255,0.82);
+      max-width: 60ch;
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .cta-actions .btn-secondary {
+      border-color: rgba(255,255,255,0.24);
+      color: #fff;
+    }
+
+    footer {
+      padding: 0 0 42px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .split,
+      .cta-band,
+      .pricing,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        min-height: auto;
+        padding: 14px 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        gap: 12px;
+      }
+
+      .hero-copy,
+      .hero-card,
+      .card,
+      .price-card,
+      .cta-band {
+        padding: 20px;
+      }
+
+      .mini-points {
+        grid-template-columns: 1fr;
+      }
+
+      .badge-preview {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand" aria-label="GoNoGo home">
+        <div class="brand-mark">G</div>
+        <span>GoNoGo SA</span>
+      </a>
+
+      <nav class="nav" aria-label="Main navigation">
+        <a href="/about.html">About</a>
+        <a href="/business.html" class="active">For Business</a>
+        <a href="/compare.html">Compare</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/business-login.html" class="button-link">Business Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">For brands, venues and service providers</div>
+          <h1>Turn your GoNoGo score into proof.</h1>
+          <p class="lead">
+            Display your live GoNoGo badge on your website, access a private business portal,
+            and gather real-time customer feedback with QR codes across your branches, stores,
+            venues or service points.
+          </p>
+
+          <div class="hero-actions">
+            <a href="/contact.html" class="btn btn-primary">Request access</a>
+            <a href="#how-it-works" class="btn btn-secondary">See how it works</a>
+          </div>
+
+          <div class="mini-points">
+            <div>
+              <strong>Live score badge</strong>
+              <span>Embed your score on your site in minutes.</span>
+            </div>
+            <div>
+              <strong>Business portal</strong>
+              <span>See strengths, concerns and score breakdowns.</span>
+            </div>
+            <div>
+              <strong>QR feedback</strong>
+              <span>Capture comments where customers actually are.</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Badge preview">
+          <div>
+            <div class="panel-label">Live badge preview</div>
+          </div>
+
+          <div class="badge-preview">
+            <div class="score-chip">
+              <div>
+                <strong>86</strong>
+                <span>/100</span>
+              </div>
+            </div>
+            <div class="badge-meta">
+              <h3>Cape Town International Airport</h3>
+              <p>GO · Rated by GoNoGo</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Simple embed code</div>
+            <div class="code-box">
+              &lt;a href="https://gonogo-sa.vercel.app/brand.html?id=cape-town-international-airport"&gt;...&lt;/a&gt;
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>What brands get</h2>
+          <p>
+            GoNoGo gives businesses a simple way to display trust publicly and understand customer
+            experience privately — without building a whole research or feedback stack from scratch.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card">
+            <h3>GoNoGo score badge</h3>
+            <p>
+              Show your independent GoNoGo score on your homepage, landing pages or campaigns with a live badge that updates automatically.
+            </p>
+            <ul>
+              <li>Full, compact or score-only styles.</li>
+              <li>Simple copy-paste embed.</li>
+              <li>Links back to your GoNoGo profile.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Private business portal</h3>
+            <p>
+              Access your score, verdict, framework breakdown, strengths and concerns in one clear dashboard your marketing or CX team can use immediately.
+            </p>
+            <ul>
+              <li>View score breakdowns by category.</li>
+              <li>See strengths and key concerns clearly.</li>
+              <li>Use your data in reports and presentations.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>QR feedback collection</h3>
+            <p>
+              Put QR codes in stores, airports, hospitals, service desks or venues so customers can rate the experience while they’re still there.
+            </p>
+            <ul>
+              <li>Capture fresh comments on-site.</li>
+              <li>Spot patterns faster.</li>
+              <li>Turn feedback into practical action.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <div class="container split">
+        <div>
+          <div class="section-head">
+            <h2>How it works</h2>
+            <p>
+              Start simple with your score badge, then expand into portal access and live feedback
+              collection as your team needs more visibility.
+            </p>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div>
+                <h4>Claim your business profile</h4>
+                <p>We confirm your brand profile and switch on business access for your team.</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">2</div>
+              <div>
+                <h4>Add your badge</h4>
+                <p>Copy the embed code into your website and display your GoNoGo score publicly.</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">3</div>
+              <div>
+                <h4>Use the portal</h4>
+                <p>Track your score breakdown, understand concerns and share insights internally.</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">4</div>
+              <div>
+                <h4>Roll out QR feedback</h4>
+                <p>Place QR codes at customer touchpoints to gather comments at scale in the real world.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-head">
+            <h2>Ideal for high-footfall environments</h2>
+            <p>
+              Especially useful for brands and service providers where experience happens in real time
+              and small moments shape perception.
+            </p>
+          </div>
+
+          <div class="card">
+            <ul>
+              <li>Airports and transport hubs</li>
+              <li>Hospitals and clinics</li>
+              <li>Retail chains and supermarkets</li>
+              <li>Government service points</li>
+              <li>Hotels, venues and conference centres</li>
+              <li>Franchise networks and branch-based businesses</li>
+            </ul>
+
+            <div class="note">
+              GoNoGo does not sell scores. Businesses pay for access, display rights, dashboards and
+              feedback tools — not for a higher rating.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Simple plans</h2>
+          <p>
+            Start with visibility, then expand into insights and feedback collection as needed.
+          </p>
+        </div>
+
+        <div class="pricing">
+          <article class="price-card">
+            <div class="tag">Starter</div>
+            <h3>Badge</h3>
+            <div class="price">R2,500 <small>/ month</small></div>
+            <p>For brands that want to show their GoNoGo score on their website.</p>
+            <ul>
+              <li>One live GoNoGo badge</li>
+              <li>Embed code</li>
+              <li>Automatic score updates</li>
+            </ul>
+          </article>
+
+          <article class="price-card featured">
+            <div class="tag">Most useful</div>
+            <h3>Badge + Portal</h3>
+            <div class="price">R7,500 <small>/ month</small></div>
+            <p>For teams that want both a public trust signal and private score insight.</p>
+            <ul>
+              <li>Everything in Badge</li>
+              <li>Business portal access</li>
+              <li>Framework breakdowns</li>
+              <li>Strengths and concern summaries</li>
+            </ul>
+          </article>
+
+          <article class="price-card">
+            <div class="tag">Custom</div>
+            <h3>Feedback Layer</h3>
+            <div class="price">Custom <small>pilot pricing</small></div>
+            <p>For airports, venues, chains and service providers using QR-based feedback at scale.</p>
+            <ul>
+              <li>QR code setup</li>
+              <li>Feedback collection flows</li>
+              <li>Dashboard and reporting</li>
+              <li>Multi-location rollout support</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container cta-band">
+        <div>
+          <h2>Want to display your score or collect feedback with GoNoGo?</h2>
+          <p>
+            Start with a live badge, or speak to us about rolling out QR feedback across your stores,
+            branches, venues or customer service points.
+          </p>
+        </div>
+
+        <div class="cta-actions">
+          <a href="/contact.html" class="btn btn-primary">Speak to GoNoGo</a>
+          <a href="/business-login.html" class="btn btn-secondary">Business Login</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      GoNoGo South Africa — Independent brand ratings, business insight and real-world feedback tools.
+    </div>
+  </footer>
+</body>
+</html>
