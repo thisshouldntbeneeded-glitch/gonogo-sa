@@ -911,8 +911,7 @@
       caution: 'Generally compliant with minor policy or disclosure gaps.',
       noGo: 'Non-compliance with CPA or serious POPIA issues.'
     }
-    }
-  }
+      }
 ],
 {
   id: 'sa_online_shopping_marketplaces',
