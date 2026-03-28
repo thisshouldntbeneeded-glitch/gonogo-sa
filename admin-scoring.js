@@ -911,10 +911,11 @@
       caution: 'Generally compliant with minor policy or disclosure gaps.',
       noGo: 'Non-compliance with CPA or serious POPIA issues.'
     }
-  },
-  // next categories go here...
-]
-      id: 'sa_online_shopping_marketplaces',
+    }
+  }
+],
+{
+  id: 'sa_online_shopping_marketplaces',
       name: 'South Africa — Online Shopping & Marketplaces',
       market: 'SA',
       industry: 'Online Shopping & Marketplaces',
