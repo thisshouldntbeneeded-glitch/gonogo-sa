@@ -1,4 +1,3 @@
-@@ -1,848 +1,874 @@
 // GoNoGo SA — API Client (Supabase Edition v2)
 // Brands + Categories = Supabase tables (with static JS fallback)
 // Reviews = Supabase 'reviews' table
