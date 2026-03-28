@@ -108,7 +108,7 @@ const Components = {
       { href: 'admin-comments.html', label: 'Comments', icon: 'fa-comments', id: 'comments' },
       { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' },
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
-      { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' }
+      { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' },
       { id: 'scoring', href: 'admin-scoring.html', icon: 'fa-scale-balanced', label: 'Scoring Engine' }
     ];
 
