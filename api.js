@@ -832,39 +832,115 @@ var GoNoGoAPI = (function () {
     // ==========================================
     // BRANCH SAVE (admin)
     // ==========================================
-        saveBranch: function (branchData) {
-      var branchId = branchData.branch_id || branchData.branch_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      var score = parseInt(branchData.total_score, 10) || 0;
-      var verdict = score >= 75 ? 'GO' : score >= 50 ? 'GO WITH CAUTION' : 'NOGO';
+           // ==========================================
+    // Scoring Engine API helpers
+    // ==========================================
 
-      var record = {
-        branch_id: branchId,
-        department_type: branchData.department_type || '',
-        category_slug: branchData.category_slug,
-        province: branchData.province || '',
-        branch_name: branchData.branch_name,
-        total_score: score,
-        verdict: verdict,
-        compliance: parseInt(branchData.compliance, 10) || 0,
-        customer_satisfaction: parseInt(branchData.customer_satisfaction, 10) || 0,
-        service_offering: parseInt(branchData.service_offering, 10) || 0,
-        innovation: parseInt(branchData.innovation, 10) || 0,
-        customer_support: parseInt(branchData.customer_support, 10) || 0,
-        accessibility_security: parseInt(branchData.accessibility_security, 10) || 0,
-        manager: branchData.manager || '',
-        manager_email: branchData.manager_email || '',
-        telephone: branchData.telephone || '',
-        address: branchData.address || '',
-        hours: branchData.hours || '',
-        services: branchData.services || '',
-        region: SITE_REGION
-      };
-
-      return supabaseRequest('branches', {
-        method: 'POST',
-        body: record,
-        prefer: 'resolution=merge-duplicates,return=representation'
-      }).then(function () {
-        return { ok: true, verdict: verdict, total_score: score };
-      });
+    // Basic rubrics list for admin scoring engine
+    getRubrics: function () {
+      return supabaseRequest('rubrics?select=*&order=market.asc')
+        .then(function (rows) {
+          console.log('getRubrics rows:', rows);
+          return rows || [];
+        })
+        .catch(function (err) {
+          console.error('getRubrics error', err);
+          return [];
+        });
     },
+
+    // Versions of a given rubric (weights, definitions, research notes)
+    getRubricVersions: function (rubricId) {
+      if (!rubricId) return Promise.resolve([]);
+      return supabaseRequest(
+        'rubric_versions?rubric_id=eq.' +
+          encodeURIComponent(rubricId) +
+          '&order=created_at.desc'
+      )
+        .then(function (rows) {
+          return rows || [];
+        })
+        .catch(function (err) {
+          console.error('getRubricVersions error', err);
+          return [];
+        });
+    },
+
+    // All prompts attached to all versions of a rubric
+    getRubricPromptsForRubric: function (rubricId) {
+      if (!rubricId) return Promise.resolve([]);
+
+      // First fetch versions so we can map version ids to version strings
+      return supabaseRequest(
+        'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
+      )
+        .then(function (versions) {
+          versions = versions || [];
+          if (versions.length === 0) return [];
+
+          var versionIds = versions.map(function (v) {
+            return v.id;
+          });
+          var versionMap = {};
+          versions.forEach(function (v) {
+            versionMap[v.id] = v.version;
+          });
+
+          // Now fetch prompts for those versions
+          var orFilter = versionIds
+            .map(function (id) {
+              return 'rubric_version_id=eq.' + encodeURIComponent(id);
+            })
+            .join('&or=');
+
+          return supabaseRequest(
+            'rubric_prompts?' + orFilter + '&order=created_at.desc'
+          ).then(function (prompts) {
+            prompts = prompts || [];
+            return prompts.map(function (p) {
+              p.rubric_version_version = versionMap[p.rubric_version_id] || null;
+              return p;
+            });
+          });
+        })
+        .catch(function (err) {
+          console.error('getRubricPromptsForRubric error', err);
+          return [];
+        });
+    },
+
+    // Decision rules (Go/NoGo bands etc) for all versions of a rubric
+    getDecisionRulesForRubric: function (rubricId) {
+      if (!rubricId) return Promise.resolve([]);
+
+      return supabaseRequest(
+        'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
+      )
+        .then(function (versions) {
+          versions = versions || [];
+          if (versions.length === 0) return [];
+
+          var versionIds = versions.map(function (v) {
+            return v.id;
+          });
+          var orFilter = versionIds
+            .map(function (id) {
+              return 'rubric_version_id=eq.' + encodeURIComponent(id);
+            })
+            .join('&or=');
+
+          return supabaseRequest(
+            'config_decision_rules?' + orFilter + '&order=created_at.desc'
+          ).then(function (rules) {
+            return rules || [];
+          });
+        })
+        .catch(function (err) {
+          console.error('getDecisionRulesForRubric error', err);
+          return [];
+        });
+    }
+  };
+})();
+
+console.log('GoNoGoAPI loaded (Supabase v2 — auto-detects brands table)');
