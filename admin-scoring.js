@@ -883,121 +883,96 @@
       ]
     },
 
-    /* ── 16. Online Shopping & Marketplaces ── */
-    {
-      id: 'sa_online_shopping_marketplaces',
-      name: 'South Africa — Online Shopping & Marketplaces',
-      market: 'SA',
-      industry: 'Online Shopping & Marketplaces',
-      slug: 'online-retailers',
-      icon: 'fa-cart-shopping',
-      status: 'active',
-      description: 'Scoring rubric for SA e-commerce and online marketplace brands.',
-      owner: 'GoNoGo SA',
-      versions: [
-        {
-          version: '1.0', status: 'active', effectiveDate: '2026-03-01',
-          weights: { compliance_consumer_protection: 15, product_catalogue: 20, customer_experience: 20, value_pricing: 20, delivery_logistics: 15, security_trust: 10 },
-          changeSummary: 'Initial online shopping rubric.'
-        }
-      ],
-      anchors: [
-  {
-    category: 'Compliance & Consumer Protection',
-    key: 'compliance_consumer_protection',
-    definition: 'CPA compliance, returns policy, and POPIA adherence.',
-    anchors: {
-      go: 'Full CPA compliance, clear returns policy, POPIA certified.',
-      caution: 'Generally compliant with minor policy or disclosure gaps.',
-      noGo: 'Non-compliance with CPA or serious POPIA issues.'
-    }
-      }
-],
+   /* ── 16. Online Shopping & Marketplaces ── */
 {
   id: 'sa_online_shopping_marketplaces',
-      name: 'South Africa — Online Shopping & Marketplaces',
-      market: 'SA',
-      industry: 'Online Shopping & Marketplaces',
-      slug: 'online-retailers',
-      icon: 'fa-cart-shopping',
+  name: 'South Africa — Online Shopping & Marketplaces',
+  market: 'SA',
+  industry: 'Online Shopping & Marketplaces',
+  slug: 'online-retailers',
+  icon: 'fa-cart-shopping',
+  status: 'active',
+  description: 'Scoring rubric for SA e-commerce and online marketplace brands.',
+  owner: 'GoNoGo SA',
+  versions: [
+    {
+      version: '1.0',
       status: 'active',
-      description: 'Scoring rubric for SA e-commerce and online marketplace brands.',
-      owner: 'GoNoGo SA',
-      versions: [
-        {
-          version: '1.0',
-          status: 'active',
-          effectiveDate: '2026-03-01',
-          weights: {
-            compliance_consumer_protection: 15,
-            product_catalogue: 20,
-            customer_experience: 20,
-            value_pricing: 20,
-            delivery_logistics: 15,
-            security_trust: 10
-          },
-          changeSummary: 'Initial online shopping rubric.'
-        }
-      ],
-      anchors: [
-        {
-          category: 'Compliance & Consumer Protection',
-          key: 'compliance_consumer_protection',
-          definition: 'CPA compliance, returns policy, and POPIA adherence.',
-          anchors: {
-            go: 'Full CPA compliance, clear returns policy, POPIA certified.',
-            caution: 'Generally compliant with minor policy or disclosure gaps.',
-            noGo: 'Non‑compliance with CPA or serious POPIA issues.'
-          }
-        },
-        {
-          category: 'Product Catalogue',
-          key: 'product_catalogue',
-          definition: 'Range, availability, seller quality, and authenticity.',
-          anchors: {
-            go: 'Wide authentic range, strong local + international brands, good seller vetting.',
-            caution: 'Adequate catalogue with some availability gaps.',
-            noGo: 'Limited range, counterfeit risk, weak seller vetting.'
-          }
-        },
-        {
-          category: 'Customer Experience',
-          key: 'customer_experience',
-          definition: 'Site/app UX, search, and purchase flow.',
-          anchors: {
-            go: 'Fast, intuitive UX, powerful search/filters, seamless checkout.',
-            caution: 'Usable but with friction in search or checkout.',
-            noGo: 'Slow, confusing UX, frequent errors at checkout.'
-          }
-        },
-        {
-          category: 'Value & Pricing',
-          key: 'value_pricing',
-          definition: 'Price competitiveness, deals, and fee transparency.',
-          anchors: {
-            go: 'Competitive pricing, regular deals, transparent fees.',
-            caution: 'Average pricing, occasional deals, some fee opacity.',
-            noGo: 'Overpriced, misleading discounts, hidden fees.'
-          }
-        },
-        {
-          category: 'Delivery & Logistics',
-          key: 'delivery_logistics',
-          definition: 'Shipping speed, tracking, and delivery reliability.',
-          anchors: {
-            go: 'Fast, reliable delivery with accurate tracking and low loss/damage rates.',
-            caution: 'Standard delivery times with occasional issues.',
-            noGo: 'Frequent delays, lost parcels, unreliable tracking.'
-          }
-        },
-        {
-          category: 'Security & Trust',
-          key: 'security_trust',
-          definition: 'Payment security, buyer protection, and fraud prevention.',
-          anchors: {
-            go: 'Strong payment security, buyer protection guarantees, robust fraud controls.',
-            caution: 'Standard card security, basic buyer protection.',
-            noGo: 'Security incidents, weak buyer protection, fraud complaints.'
+      effectiveDate: '2026-03-01',
+      weights: {
+        compliance_consumer_protection: 15,
+        product_catalogue: 20,
+        customer_experience: 20,
+        value_pricing: 20,
+        delivery_logistics: 15,
+        security_trust: 10
+      },
+      changeSummary: 'Initial online shopping rubric.'
+    }
+  ],
+  anchors: [
+    {
+      category: 'Compliance & Consumer Protection',
+      key: 'compliance_consumer_protection',
+      definition: 'CPA compliance, returns policy, and POPIA adherence.',
+      anchors: {
+        go: 'Full CPA compliance, clear returns policy, POPIA certified.',
+        caution: 'Generally compliant with minor policy or disclosure gaps.',
+        noGo: 'Non-compliance with CPA or serious POPIA issues.'
+      }
+    },
+    {
+      category: 'Product Catalogue',
+      key: 'product_catalogue',
+      definition: 'Range, availability, seller quality, and authenticity.',
+      anchors: {
+        go: 'Wide authentic range, strong local + international brands, good seller vetting.',
+        caution: 'Adequate catalogue with some availability gaps.',
+        noGo: 'Limited range, counterfeit risk, weak seller vetting.'
+      }
+    },
+    {
+      category: 'Customer Experience',
+      key: 'customer_experience',
+      definition: 'Site/app UX, search, and purchase flow.',
+      anchors: {
+        go: 'Fast, intuitive UX, powerful search/filters, seamless checkout.',
+        caution: 'Usable but with friction in search or checkout.',
+        noGo: 'Slow, confusing UX, frequent errors at checkout.'
+      }
+    },
+    {
+      category: 'Value & Pricing',
+      key: 'value_pricing',
+      definition: 'Price competitiveness, deals, and fee transparency.',
+      anchors: {
+        go: 'Competitive pricing, regular deals, transparent fees.',
+        caution: 'Average pricing, occasional deals, some fee opacity.',
+        noGo: 'Overpriced, misleading discounts, hidden fees.'
+      }
+    },
+    {
+      category: 'Delivery & Logistics',
+      key: 'delivery_logistics',
+      definition: 'Shipping speed, tracking, and delivery reliability.',
+      anchors: {
+        go: 'Fast, reliable delivery with accurate tracking and low loss/damage rates.',
+        caution: 'Standard delivery times with occasional issues.',
+        noGo: 'Frequent delays, lost parcels, unreliable tracking.'
+      }
+    },
+    {
+      category: 'Security & Trust',
+      key: 'security_trust',
+      definition: 'Payment security, buyer protection, and fraud prevention.',
+      anchors: {
+        go: 'Strong payment security, buyer protection guarantees, robust fraud controls.',
+        caution: 'Standard card security, basic buyer protection.',
+        noGo: 'Security incidents, weak buyer protection, fraud complaints.'
+      }
+    }
+  ]
+},
           }
         }
       ],
