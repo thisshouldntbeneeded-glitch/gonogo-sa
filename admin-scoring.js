@@ -3,9 +3,8 @@
 document.getElementById('sidebar-container').innerHTML =
   Components.renderAdminSidebar('scoring');
 
-if (Components.checkAdminAuth()) {
-  initScoringPage();
-}
+// Rely on the existing admin session; no extra auth gate here
+initScoringPage();
 
 async function initScoringPage() {
   const main = document.getElementById('admin-content');
@@ -20,7 +19,7 @@ async function initScoringPage() {
   const subtitleEl = document.getElementById('rubric-detail-subtitle');
 
   try {
-    const rubrics = await GoNoGoAPI.getRubrics(); // we’ll implement this next
+    const rubrics = await GoNoGoAPI.getRubrics();
     if (!rubrics || rubrics.length === 0) {
       rubricsContainer.innerHTML = `
         <p class="text-sm text-muted">
@@ -59,7 +58,15 @@ async function initScoringPage() {
       row.addEventListener('click', async () => {
         const rubricId = row.getAttribute('data-rubric-id');
         const rubric = rubrics.find(r => r.id === rubricId);
-        await loadRubricDetail(rubric, detailCard, titleEl, subtitleEl, versionsList, promptsList, rulesList);
+        await loadRubricDetail(
+          rubric,
+          detailCard,
+          titleEl,
+          subtitleEl,
+          versionsList,
+          promptsList,
+          rulesList
+        );
       });
     });
 
@@ -73,7 +80,15 @@ async function initScoringPage() {
   }
 }
 
-async function loadRubricDetail(rubric, detailCard, titleEl, subtitleEl, versionsList, promptsList, rulesList) {
+async function loadRubricDetail(
+  rubric,
+  detailCard,
+  titleEl,
+  subtitleEl,
+  versionsList,
+  promptsList,
+  rulesList
+) {
   if (!rubric) return;
 
   titleEl.textContent = rubric.name;
@@ -89,7 +104,8 @@ async function loadRubricDetail(rubric, detailCard, titleEl, subtitleEl, version
       const tab = btn.getAttribute('data-tab');
       tabButtons.forEach(b => b.classList.toggle('tab-active', b === btn));
       tabContents.forEach(c => {
-        c.style.display = (c.getAttribute('data-tab-content') === tab) ? '' : 'none';
+        c.style.display =
+          c.getAttribute('data-tab-content') === tab ? '' : 'none';
       });
     };
   });
