@@ -7,552 +7,485 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    .scoring-shell {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4);
+    /* ── MODAL ── */
+    .modal-backdrop {
+      display:none; position:fixed; inset:0; z-index:900;
+      background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+      align-items:center; justify-content:center;
     }
+    .modal-backdrop.open { display:flex; }
+    .modal {
+      background:var(--color-surface,#1c1b19); border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px; width:min(520px,92vw); max-height:88vh; overflow-y:auto;
+      box-shadow:0 24px 64px rgba(0,0,0,0.5); padding:0;
+    }
+    .modal-header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:20px 24px 16px; border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .modal-header h2 { font-size:16px; font-weight:700; margin:0; color:var(--color-text,#fff); }
+    .modal-close {
+      width:32px; height:32px; border-radius:8px; display:flex;
+      align-items:center; justify-content:center; font-size:18px;
+      color:var(--color-text-muted,rgba(255,255,255,0.6));
+    }
+    .modal-close:hover { background:rgba(255,255,255,0.06); color:#fff; }
+    .modal-body { padding:20px 24px 24px; }
+    .form-group { margin-bottom:16px; }
+    .form-group label {
+      display:block; font-size:12px; font-weight:600; text-transform:uppercase;
+      letter-spacing:0.06em; color:var(--color-text-muted,rgba(255,255,255,0.58));
+      margin-bottom:6px;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width:100%; padding:10px 12px; border-radius:10px; font-size:14px;
+      border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04);
+      color:var(--color-text,#fff); outline:none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color:rgba(34,197,94,0.5); box-shadow:0 0 0 3px rgba(34,197,94,0.12);
+    }
+    .form-group textarea { min-height:80px; resize:vertical; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+    .form-actions .btn { min-width:100px; }
+    .inline-msg {
+      padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:14px; display:none;
+    }
+    .inline-msg.success { display:block; background:rgba(34,197,94,0.12); color:#86efac; }
+    .inline-msg.error { display:block; background:rgba(239,68,68,0.12); color:#fca5a5; }
 
+    /* ── LAYOUT ── */
+    .scoring-shell { display:flex; flex-direction:column; gap:16px; }
     .scoring-topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-4);
-      padding: var(--space-2) 0 var(--space-1);
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:16px; padding:8px 0 4px;
     }
-
-    .scoring-topbar-actions {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-    }
-
+    .scoring-topbar-actions { display:flex; gap:8px; flex-wrap:wrap; }
     .scoring-workspace {
-      display: grid;
-      grid-template-columns: 280px minmax(360px, 1.15fr) minmax(340px, 0.95fr);
-      gap: var(--space-4);
-      min-height: calc(100vh - 220px);
-      align-items: stretch;
+      display:grid;
+      grid-template-columns:280px minmax(420px,1.3fr) minmax(340px,0.85fr);
+      gap:16px; min-height:calc(100vh - 220px); align-items:stretch;
     }
-
     .scoring-panel {
-      background: var(--color-surface, #171717);
-      border: 1px solid var(--color-border, rgba(255,255,255,0.08));
-      border-radius: var(--radius-lg, 16px);
-      box-shadow: var(--shadow-sm, none);
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      background:var(--color-surface,#171717);
+      border:1px solid var(--color-border,rgba(255,255,255,0.08));
+      border-radius:16px; min-height:0; display:flex;
+      flex-direction:column; overflow:hidden;
     }
-
     .scoring-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: var(--space-3);
-      padding: var(--space-4);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display:flex; justify-content:space-between; align-items:flex-start;
+      gap:12px; padding:16px; border-bottom:1px solid rgba(255,255,255,0.06);
     }
-
-    .scoring-panel-title-wrap {
-      min-width: 0;
-    }
-
-    .scoring-panel-title {
-      margin: 0;
-      font-size: var(--text-base);
-      font-weight: 700;
-      color: var(--color-text, #fff);
-    }
-
+    .scoring-panel-title { margin:0; font-size:15px; font-weight:700; color:var(--color-text,#fff); }
     .scoring-panel-subtitle {
-      margin: var(--space-1) 0 0;
-      font-size: var(--text-xs);
-      color: var(--color-text-muted, rgba(255,255,255,0.65));
-      line-height: 1.45;
+      margin:4px 0 0; font-size:12px; color:var(--color-text-muted,rgba(255,255,255,0.65));
     }
+    .scoring-panel-body { padding:16px; overflow:auto; min-height:0; flex:1; }
 
-    .scoring-panel-body {
-      padding: var(--space-4);
-      overflow: auto;
-      min-height: 0;
-      flex: 1;
-    }
-
-    .scoring-rubric-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
+    /* ── LEFT: RUBRIC LIST ── */
+    .scoring-rubric-list { display:flex; flex-direction:column; gap:8px; }
     .rubric-card {
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 12px;
-      background: rgba(255,255,255,0.02);
-      cursor: pointer;
-      transition: 180ms ease;
+      border:1px solid rgba(255,255,255,0.08); border-radius:14px;
+      padding:12px; background:rgba(255,255,255,0.02); cursor:pointer; transition:180ms ease;
     }
+    .rubric-card:hover { border-color:rgba(34,197,94,0.45); background:rgba(34,197,94,0.05); transform:translateY(-1px); }
+    .rubric-card.active { border-color:rgba(34,197,94,0.7); background:rgba(34,197,94,0.1); }
+    .rubric-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .rubric-market { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#86efac; }
+    .rubric-status { font-size:11px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.06); color:var(--color-text-muted); }
+    .rubric-name { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--color-text,#fff); }
+    .rubric-meta, .rubric-slug { font-size:12px; color:var(--color-text-muted,rgba(255,255,255,0.62)); }
 
-    .rubric-card:hover {
-      border-color: rgba(34,197,94,0.45);
-      background: rgba(34,197,94,0.05);
-      transform: translateY(-1px);
-    }
-
-    .rubric-card.active {
-      border-color: rgba(34,197,94,0.7);
-      background: rgba(34,197,94,0.1);
-      box-shadow: inset 0 0 0 1px rgba(34,197,94,0.2);
-    }
-
-    .rubric-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-2);
-    }
-
-    .rubric-market {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #86efac;
-    }
-
-    .rubric-status {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      color: var(--color-text-muted, rgba(255,255,255,0.65));
-    }
-
-    .rubric-name {
-      margin: 0 0 4px;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--color-text, #fff);
-      line-height: 1.3;
-    }
-
-    .rubric-meta,
-    .rubric-slug {
-      font-size: 12px;
-      color: var(--color-text-muted, rgba(255,255,255,0.62));
-      line-height: 1.45;
-    }
-
-    .scoring-summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-    }
-
+    /* ── MIDDLE: SCORING METHODOLOGY ── */
+    .summary-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
     .summary-metric {
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 12px;
-      background: rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.06); border-radius:14px;
+      padding:12px; background:rgba(255,255,255,0.02);
+    }
+    .summary-label { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--color-text-muted); margin-bottom:6px; }
+    .summary-value { font-size:20px; font-weight:700; color:var(--color-text,#fff); font-variant-numeric:tabular-nums; }
+    .summary-note { margin-top:6px; font-size:12px; color:var(--color-text-muted); }
+
+    .methodology-section { margin-bottom:20px; }
+    .methodology-section-title {
+      margin:0 0 10px; font-size:12px; text-transform:uppercase;
+      letter-spacing:0.08em; color:var(--color-text-muted);
     }
 
-    .summary-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--color-text-muted, rgba(255,255,255,0.58));
-      margin-bottom: 6px;
+    .weight-table { width:100%; border-collapse:collapse; margin-bottom:4px; }
+    .weight-table th {
+      text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+      color:var(--color-text-muted); padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .weight-table td {
+      padding:8px 10px; font-size:13px; color:var(--color-text,#fff);
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .weight-bar-cell { width:40%; }
+    .weight-bar-bg {
+      height:8px; border-radius:999px; background:rgba(255,255,255,0.06); overflow:hidden;
+    }
+    .weight-bar-fill { height:100%; border-radius:999px; background:#22c55e; transition:width 400ms ease; }
+    .weight-total-row td { font-weight:700; border-top:2px solid rgba(34,197,94,0.3); color:#86efac; }
+    .weight-warning { font-size:12px; color:#fbbf24; margin-top:6px; }
+
+    .threshold-cards { display:flex; gap:10px; flex-wrap:wrap; }
+    .threshold-card {
+      flex:1; min-width:120px; border-radius:12px; padding:12px;
+      text-align:center; border:1px solid rgba(255,255,255,0.06);
+    }
+    .threshold-card.go { background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.25); }
+    .threshold-card.caution { background:rgba(251,191,36,0.08); border-color:rgba(251,191,36,0.25); }
+    .threshold-card.nogo { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.25); }
+    .threshold-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
+    .threshold-card.go .threshold-label { color:#86efac; }
+    .threshold-card.caution .threshold-label { color:#fde68a; }
+    .threshold-card.nogo .threshold-label { color:#fca5a5; }
+    .threshold-range { font-size:16px; font-weight:700; color:var(--color-text,#fff); }
+
+    .formula-block {
+      padding:14px; border-radius:12px; background:rgba(0,0,0,0.22);
+      font-size:13px; color:#d1fae5; line-height:1.6; white-space:pre-wrap; word-break:break-word;
     }
 
-    .summary-value {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--color-text, #fff);
-      line-height: 1.15;
+    .example-block {
+      border:1px solid rgba(34,197,94,0.15); border-radius:14px; padding:14px;
+      background:rgba(34,197,94,0.04);
     }
+    .example-title { font-size:13px; font-weight:700; color:#86efac; margin-bottom:10px; }
+    .example-row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; color:var(--color-text-muted); }
+    .example-row span:last-child { color:var(--color-text,#fff); font-weight:600; font-variant-numeric:tabular-nums; }
+    .example-divider { border-top:1px solid rgba(255,255,255,0.08); margin:6px 0; }
+    .example-verdict { display:flex; justify-content:space-between; font-size:14px; font-weight:700; padding:6px 0 0; }
 
-    .summary-note {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--color-text-muted, rgba(255,255,255,0.62));
-    }
-
-    .version-timeline {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-
+    /* ── VERSION TIMELINE ── */
+    .version-timeline { display:flex; flex-direction:column; gap:12px; }
     .version-card {
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 16px;
-      padding: 14px 14px 14px 18px;
-      background: rgba(255,255,255,0.02);
-      cursor: pointer;
-      transition: 180ms ease;
+      position:relative; border:1px solid rgba(255,255,255,0.07); border-radius:16px;
+      padding:14px 14px 14px 18px; background:rgba(255,255,255,0.02); cursor:pointer; transition:180ms ease;
     }
-
     .version-card::before {
-      content: "";
-      position: absolute;
-      top: 14px;
-      left: 0;
-      bottom: 14px;
-      width: 3px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
+      content:""; position:absolute; top:14px; left:0; bottom:14px;
+      width:3px; border-radius:999px; background:rgba(255,255,255,0.08);
     }
+    .version-card:hover { border-color:rgba(34,197,94,0.35); background:rgba(34,197,94,0.045); }
+    .version-card.active { border-color:rgba(34,197,94,0.7); background:rgba(34,197,94,0.09); }
+    .version-card.active::before { background:#22c55e; }
+    .version-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .version-badge { font-size:12px; font-weight:700; color:var(--color-text,#fff); }
+    .version-date { font-size:11px; color:var(--color-text-muted); }
+    .chip { display:inline-flex; align-items:center; border-radius:999px; padding:4px 8px; font-size:11px; font-weight:600; }
+    .chip-success { background:rgba(34,197,94,0.14); color:#86efac; }
+    .chip-muted { background:rgba(255,255,255,0.06); color:var(--color-text-muted); }
+    .version-status-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+    .version-summary { font-size:12px; color:var(--color-text-muted); line-height:1.5; }
 
-    .version-card:hover {
-      border-color: rgba(34,197,94,0.35);
-      background: rgba(34,197,94,0.045);
-    }
-
-    .version-card.active {
-      border-color: rgba(34,197,94,0.7);
-      background: rgba(34,197,94,0.09);
-    }
-
-    .version-card.active::before {
-      background: #22c55e;
-    }
-
-    .version-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: 8px;
-    }
-
-    .version-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--color-text, #fff);
-    }
-
-    .version-date {
-      font-size: 11px;
-      color: var(--color-text-muted, rgba(255,255,255,0.58));
-      white-space: nowrap;
-    }
-
-    .version-status-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    .chip-success {
-      background: rgba(34,197,94,0.14);
-      color: #86efac;
-    }
-
-    .chip-muted {
-      background: rgba(255,255,255,0.06);
-      color: var(--color-text-muted, rgba(255,255,255,0.65));
-    }
-
-    .version-summary {
-      font-size: 12px;
-      line-height: 1.5;
-      color: var(--color-text-muted, rgba(255,255,255,0.66));
-    }
-
-    .version-detail-card,
-    .prompt-card,
-    .rule-card,
-    .audit-card {
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      background: rgba(255,255,255,0.02);
-      padding: 14px;
-    }
-
-    .version-detail-card {
-      margin-bottom: var(--space-4);
-    }
-
-    .detail-section-title {
-      margin: 0 0 10px;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--color-text-muted, rgba(255,255,255,0.56));
-    }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-3);
-      margin-bottom: var(--space-3);
-    }
-
-    .detail-item-label {
-      font-size: 11px;
-      color: var(--color-text-muted, rgba(255,255,255,0.56));
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 5px;
-    }
-
-    .detail-item-value {
-      font-size: 13px;
-      color: var(--color-text, #fff);
-      line-height: 1.45;
-      word-break: break-word;
-    }
-
-    .json-block {
-      margin: 0;
-      padding: 12px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.22);
-      color: #d1fae5;
-      font-size: 12px;
-      line-height: 1.55;
-      overflow: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
+    /* ── RIGHT PANEL ── */
     .right-tabs {
-      display: flex;
-      gap: 8px;
-      padding: 0 var(--space-4) var(--space-3);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display:flex; gap:8px; padding:0 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
     }
-
     .right-tab {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      color: var(--color-text-muted, rgba(255,255,255,0.66));
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);
+      color:var(--color-text-muted); border-radius:999px; padding:7px 12px;
+      font-size:12px; font-weight:600; cursor:pointer;
     }
-
-    .right-tab.active {
-      background: rgba(34,197,94,0.12);
-      border-color: rgba(34,197,94,0.4);
-      color: #bbf7d0;
+    .right-tab.active { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.4); color:#bbf7d0; }
+    .right-pane { display:none; padding:16px; overflow:auto; flex:1; }
+    .right-pane.active { display:block; }
+    .stack-list { display:flex; flex-direction:column; gap:12px; }
+    .prompt-card, .rule-card, .audit-card {
+      border:1px solid rgba(255,255,255,0.06); border-radius:16px;
+      background:rgba(255,255,255,0.02); padding:14px;
     }
-
-    .right-pane {
-      display: none;
-      padding: var(--space-4);
-      overflow: auto;
-      flex: 1;
-    }
-
-    .right-pane.active {
-      display: block;
-    }
-
-    .stack-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
-
-    .prompt-title,
-    .rule-title,
-    .audit-title {
-      margin: 0 0 6px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--color-text, #fff);
-      line-height: 1.35;
-    }
-
-    .prompt-meta,
-    .rule-meta,
-    .audit-meta {
-      font-size: 12px;
-      color: var(--color-text-muted, rgba(255,255,255,0.62));
-      line-height: 1.5;
-    }
-
-    .prompt-snippet,
-    .rule-snippet {
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--color-text-muted, rgba(255,255,255,0.68));
-      line-height: 1.55;
-    }
+    .prompt-title, .rule-title, .audit-title { margin:0 0 6px; font-size:14px; font-weight:700; color:var(--color-text,#fff); }
+    .prompt-meta, .rule-meta, .audit-meta { font-size:12px; color:var(--color-text-muted); line-height:1.5; }
+    .prompt-snippet, .rule-snippet { margin-top:10px; font-size:12px; color:var(--color-text-muted); line-height:1.55; }
 
     .empty-state {
-      border: 1px dashed rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 22px;
-      font-size: 13px;
-      color: var(--color-text-muted, rgba(255,255,255,0.62));
-      line-height: 1.6;
-      text-align: center;
-      background: rgba(255,255,255,0.015);
+      border:1px dashed rgba(255,255,255,0.12); border-radius:16px; padding:22px;
+      font-size:13px; color:var(--color-text-muted); text-align:center;
+      background:rgba(255,255,255,0.015); line-height:1.6;
     }
 
-    @media (max-width: 1200px) {
-      .scoring-workspace {
-        grid-template-columns: 260px minmax(320px, 1fr);
-      }
-
-      .scoring-panel--right {
-        grid-column: 1 / -1;
-        min-height: 480px;
-      }
+    /* ── RESPONSIVE ── */
+    @media (max-width:1200px) {
+      .scoring-workspace { grid-template-columns:260px minmax(320px,1fr); }
+      .scoring-panel--right { grid-column:1/-1; min-height:480px; }
     }
-
-    @media (max-width: 860px) {
-      .scoring-workspace {
-        grid-template-columns: 1fr;
-      }
-
-      .scoring-panel {
-        min-height: 420px;
-      }
-
-      .scoring-summary-grid,
-      .detail-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .scoring-topbar {
-        flex-direction: column;
-      }
+    @media (max-width:860px) {
+      .scoring-workspace { grid-template-columns:1fr; }
+      .scoring-panel { min-height:420px; }
+      .summary-grid, .form-row { grid-template-columns:1fr; }
+      .scoring-topbar { flex-direction:column; }
+      .threshold-cards { flex-direction:column; }
     }
   </style>
 </head>
 <body>
   <div class="admin-layout">
     <div id="sidebar-container"></div>
-
     <main class="admin-main" id="admin-content" style="display:none;">
       <div class="scoring-shell">
+
         <div class="scoring-topbar">
           <div>
             <h1 class="admin-title">Scoring Engine</h1>
             <p class="text-sm text-secondary">Rubrics, methodology, prompts, versioning, tracking and audit trail</p>
           </div>
-
           <div class="scoring-topbar-actions">
-            <button id="btn-new-rubric" class="btn btn-primary btn-sm">
-              <i class="fa-solid fa-plus"></i> New Rubric
-            </button>
-            <button id="btn-new-version" class="btn btn-secondary btn-sm" disabled>
-              <i class="fa-solid fa-code-branch"></i> New Version
-            </button>
+            <button id="btn-new-rubric" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Rubric</button>
+            <button id="btn-new-version" class="btn btn-secondary btn-sm" disabled><i class="fa-solid fa-code-branch"></i> New Version</button>
           </div>
         </div>
 
         <div class="scoring-workspace">
+          <!-- LEFT: RUBRIC LIBRARY -->
           <section class="scoring-panel scoring-panel--left">
             <div class="scoring-panel-header">
-              <div class="scoring-panel-title-wrap">
+              <div>
                 <h2 class="scoring-panel-title">Rubric Library</h2>
-                <p class="scoring-panel-subtitle">Markets, industries, current status and version ownership.</p>
+                <p class="scoring-panel-subtitle">Markets, industries, status.</p>
               </div>
               <span id="rubric-count" class="chip chip-muted">0</span>
             </div>
-
             <div class="scoring-panel-body">
-              <div id="rubrics-list" class="scoring-rubric-list">
-                <div class="empty-state">Loading rubrics...</div>
-              </div>
+              <div id="rubrics-list" class="scoring-rubric-list"><div class="empty-state">Loading rubrics…</div></div>
             </div>
           </section>
 
+          <!-- MIDDLE: SCORING METHODOLOGY -->
           <section class="scoring-panel scoring-panel--middle">
             <div class="scoring-panel-header">
-              <div class="scoring-panel-title-wrap">
+              <div>
                 <h2 id="selected-rubric-title" class="scoring-panel-title">Select a rubric</h2>
-                <p id="selected-rubric-subtitle" class="scoring-panel-subtitle">Choose a rubric from the left to load versions, methodology and controls.</p>
+                <p id="selected-rubric-subtitle" class="scoring-panel-subtitle">Choose a rubric from the left to see how scoring works.</p>
               </div>
             </div>
-
             <div class="scoring-panel-body">
-              <div id="rubric-summary" class="scoring-summary-grid"></div>
-
-              <div id="version-detail" class="version-detail-card" style="display:none;"></div>
-
-              <div>
-                <h3 class="detail-section-title">Version Timeline</h3>
-                <div id="versions-list" class="version-timeline">
-                  <div class="empty-state">No rubric selected.</div>
-                </div>
+              <div id="rubric-summary" class="summary-grid"></div>
+              <div id="scoring-methodology"></div>
+              <div class="methodology-section">
+                <h3 class="methodology-section-title">Version Timeline</h3>
+                <div id="versions-list" class="version-timeline"><div class="empty-state">No rubric selected.</div></div>
               </div>
             </div>
           </section>
 
+          <!-- RIGHT: PROMPTS / RULES / AUDIT -->
           <section class="scoring-panel scoring-panel--right">
             <div class="scoring-panel-header">
-              <div class="scoring-panel-title-wrap">
+              <div>
                 <h2 class="scoring-panel-title">Prompts, Rules & Audit</h2>
-                <p class="scoring-panel-subtitle">Operational detail for the selected rubric and version.</p>
+                <p class="scoring-panel-subtitle">Operational detail for selected rubric.</p>
               </div>
-              <div style="display:flex; gap:8px;">
-                <button id="btn-new-prompt" class="btn btn-secondary btn-xs" disabled>
-                  <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt
-                </button>
-                <button id="btn-new-ruleset" class="btn btn-secondary btn-xs" disabled>
-                  <i class="fa-solid fa-scale-balanced"></i> Rule
-                </button>
+              <div style="display:flex;gap:8px;">
+                <button id="btn-new-prompt" class="btn btn-secondary btn-xs" disabled><i class="fa-solid fa-wand-magic-sparkles"></i> Prompt</button>
+                <button id="btn-new-ruleset" class="btn btn-secondary btn-xs" disabled><i class="fa-solid fa-scale-balanced"></i> Rule</button>
               </div>
             </div>
-
             <div class="right-tabs">
               <button class="right-tab active" data-pane="prompts">Prompts</button>
               <button class="right-tab" data-pane="rules">Rules</button>
               <button class="right-tab" data-pane="audit">Audit</button>
             </div>
-
-            <div id="pane-prompts" class="right-pane active">
-              <div id="prompts-list" class="stack-list">
-                <div class="empty-state">No rubric selected.</div>
-              </div>
-            </div>
-
-            <div id="pane-rules" class="right-pane">
-              <div id="rules-list" class="stack-list">
-                <div class="empty-state">No rubric selected.</div>
-              </div>
-            </div>
-
-            <div id="pane-audit" class="right-pane">
-              <div id="audit-list" class="stack-list">
-                <div class="empty-state">No rubric selected.</div>
-              </div>
-            </div>
+            <div id="pane-prompts" class="right-pane active"><div id="prompts-list" class="stack-list"><div class="empty-state">No rubric selected.</div></div></div>
+            <div id="pane-rules" class="right-pane"><div id="rules-list" class="stack-list"><div class="empty-state">No rubric selected.</div></div></div>
+            <div id="pane-audit" class="right-pane"><div id="audit-list" class="stack-list"><div class="empty-state">No rubric selected.</div></div></div>
           </section>
         </div>
 
-        <div style="padding:var(--space-4) 0;text-align:center;">
+        <div style="padding:16px 0;text-align:center;">
           <p class="text-xs text-muted">&copy; 2026 GoNoGo South Africa</p>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- NEW RUBRIC MODAL -->
+  <div class="modal-backdrop" id="modal-new-rubric">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Rubric</h2>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="rubric-form-msg" class="inline-msg"></div>
+        <form id="form-new-rubric">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rubric-name">Rubric Name</label>
+              <input type="text" id="rubric-name" placeholder="e.g. South Africa – Insurance" required>
+            </div>
+            <div class="form-group">
+              <label for="rubric-market">Market</label>
+              <input type="text" id="rubric-market" placeholder="e.g. SA" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rubric-industry">Industry</label>
+              <input type="text" id="rubric-industry" placeholder="e.g. Insurance">
+            </div>
+            <div class="form-group">
+              <label for="rubric-slug">Slug</label>
+              <input type="text" id="rubric-slug" placeholder="e.g. sa_insurance">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rubric-description">Description</label>
+            <textarea id="rubric-description" placeholder="Describe what this rubric measures and who it's for…"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Create Rubric</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW VERSION MODAL -->
+  <div class="modal-backdrop" id="modal-new-version">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Version</h2>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="version-form-msg" class="inline-msg"></div>
+        <form id="form-new-version">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="version-number">Version Number</label>
+              <input type="text" id="version-number" placeholder="e.g. 2.0" required>
+            </div>
+            <div class="form-group">
+              <label for="version-status">Status</label>
+              <select id="version-status">
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="version-effective">Effective From</label>
+            <input type="date" id="version-effective">
+          </div>
+          <div class="form-group">
+            <label for="version-summary">Change Summary</label>
+            <textarea id="version-summary" placeholder="What changed in this version…"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="version-weights">Weights JSON</label>
+            <textarea id="version-weights" placeholder='{"digital_presence":25,"customer_experience":20,"brand_reputation":20,"financial_health":15,"innovation":10,"social_impact":10}' style="min-height:100px;font-family:monospace;font-size:12px;"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Create Version</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW PROMPT MODAL -->
+  <div class="modal-backdrop" id="modal-new-prompt">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Prompt</h2>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="prompt-form-msg" class="inline-msg"></div>
+        <form id="form-new-prompt">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="prompt-title">Title</label>
+              <input type="text" id="prompt-title" placeholder="e.g. Brand Reputation Research" required>
+            </div>
+            <div class="form-group">
+              <label for="prompt-type">Type</label>
+              <select id="prompt-type">
+                <option value="research">Research</option>
+                <option value="scoring">Scoring</option>
+                <option value="analysis">Analysis</option>
+                <option value="validation">Validation</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="prompt-model">Model Hint</label>
+            <input type="text" id="prompt-model" placeholder="e.g. gpt-4o, claude-3.5-sonnet">
+          </div>
+          <div class="form-group">
+            <label for="prompt-body">Prompt Body</label>
+            <textarea id="prompt-body" placeholder="Enter the full prompt text…" style="min-height:120px;"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Prompt</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW RULE MODAL -->
+  <div class="modal-backdrop" id="modal-new-rule">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Decision Rule</h2>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="rule-form-msg" class="inline-msg"></div>
+        <form id="form-new-rule">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rule-name">Rule Name</label>
+              <input type="text" id="rule-name" placeholder="e.g. Go threshold" required>
+            </div>
+            <div class="form-group">
+              <label for="rule-scope">Scope</label>
+              <select id="rule-scope">
+                <option value="overall">Overall Score</option>
+                <option value="category">Category Level</option>
+                <option value="hard_fail">Hard Fail</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rule-min">Min Threshold</label>
+              <input type="number" id="rule-min" placeholder="e.g. 70" step="0.1">
+            </div>
+            <div class="form-group">
+              <label for="rule-max">Max Threshold</label>
+              <input type="number" id="rule-max" placeholder="e.g. 100" step="0.1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rule-verdict">Verdict</label>
+            <select id="rule-verdict">
+              <option value="go">Go</option>
+              <option value="caution">Caution</option>
+              <option value="no-go">No-Go</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="rule-description">Description / Logic</label>
+            <textarea id="rule-description" placeholder="Describe when this rule triggers and what it means…"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">Save Rule</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="components.js"></script>
