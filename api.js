@@ -1,3 +1,4 @@
+@@ -1,848 +1,874 @@
 // GoNoGo SA — API Client (Supabase Edition v2)
 // Brands + Categories = Supabase tables (with static JS fallback)
 // Reviews = Supabase 'reviews' table
@@ -44,71 +45,8 @@ var GoNoGoAPI = (function () {
   }
 
   // Main project (brands, categories, admin_users)
-     function supabaseRequest(path, options) {
-    options = options || {};
-    var method = options.method || 'GET';
-
-    // Base headers with API key
-    var headers = options.headers || {};
-    headers['apikey'] = SUPABASE_ANON_KEY;
-    headers['Authorization'] = 'Bearer ' + SUPABASE_ANON_KEY;
-    headers['Content-Type'] = 'application/json';
-
-    if (options.prefer) {
-      headers['Prefer'] = options.prefer;
-    }
-
-    var fetchOptions = {
-      method: method,
-      headers: headers,
-      credentials: 'omit'
-    };
-
-    if (options.body) {
-      fetchOptions.body = JSON.stringify(options.body);
-    }
-
-    return fetch(SUPABASE_URL + '/rest/v1/' + path, fetchOptions)
-      .then(function (res) {
-        if (!res.ok) {
-          return res.text().then(function (txt) {
-            console.error('supabaseRequest error', res.status, txt);
-            throw new Error('Supabase error ' + res.status);
-          });
-        }
-        return res.json();
-      });
-  }
-
-    // Ensure we always send the API key and auth bearer like other calls do
-    headers['apikey'] = SUPABASE_ANON_KEY;
-    headers['Authorization'] = 'Bearer ' + SUPABASE_ANON_KEY;
-    headers['Content-Type'] = 'application/json';
-
-    var fetchOptions = {
-      method: method,
-      headers: headers,
-      credentials: 'omit'
-    };
-
-    if (options.body) {
-      fetchOptions.body = JSON.stringify(options.body);
-    }
-
-    if (options.prefer) {
-      fetchOptions.headers['Prefer'] = options.prefer;
-    }
-
-    return fetch(SUPABASE_URL + '/rest/v1/' + path, fetchOptions)
-      .then(function (res) {
-        if (!res.ok) {
-          return res.text().then(function (txt) {
-            console.error('supabaseRequest error', res.status, txt);
-            throw new Error('Supabase error ' + res.status);
-          });
-        }
-        return res.json();
-      });
+  function supabaseRequest(path, options) {
+    return _sbFetch(SUPABASE_URL, SUPABASE_ANON_KEY, path, options);
   }
 
   // Reviews project
@@ -669,7 +607,7 @@ var GoNoGoAPI = (function () {
       });
     },
 
-   
+
 
     // Delete a category (only if no brands reference it)
     deleteCategory: function (slug) {
@@ -892,13 +830,11 @@ var GoNoGoAPI = (function () {
       });
     },
 
-        // ==========================================
+    // ==========================================
     // BRANCH SAVE (admin)
     // ==========================================
     saveBranch: function (branchData) {
-      var branchId = branchData.branch_id || branchData.branch_name.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+      var branchId = branchData.branch_id || branchData.branch_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       var score = parseInt(branchData.total_score, 10) || 0;
       var verdict = score >= 75 ? 'GO' : score >= 50 ? 'GO WITH CAUTION' : 'NOGO';
 
@@ -932,118 +868,7 @@ var GoNoGoAPI = (function () {
       }).then(function () {
         return { ok: true, verdict: verdict, total_score: score };
       });
-    },
-
-        // ==========================
-    // Scoring Engine API helpers
-    // ==========================
-
-    // Basic rubrics list for admin scoring engine
-    getRubrics: function () {
-      // Simple REST call to rubrics table
-      return supabaseRequest('rubrics?select=*&order=market.asc,industry.asc')
-        .then(function (rows) {
-          console.log('getRubrics rows:', rows);
-          return rows || [];
-        })
-        .catch(function (err) {
-          console.error('getRubrics error', err);
-          return [];
-        });
-    },
-
-    // Versions of a given rubric (weights, definitions, research notes)
-    getRubricVersions: function (rubricId) {
-      if (!rubricId) return Promise.resolve([]);
-      return supabaseRequest(
-        'rubric_versions?rubric_id=eq.' +
-          encodeURIComponent(rubricId) +
-          '&order=created_at.desc'
-      )
-        .then(function (rows) {
-          return rows || [];
-        })
-        .catch(function (err) {
-          console.error('getRubricVersions error', err);
-          return [];
-        });
-    },
-
-    // All prompts attached to all versions of a rubric
-    getRubricPromptsForRubric: function (rubricId) {
-      if (!rubricId) return Promise.resolve([]);
-
-      // First fetch versions so we can map version ids to version strings
-      return supabaseRequest(
-        'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
-      )
-        .then(function (versions) {
-          versions = versions || [];
-          if (versions.length === 0) return [];
-
-          var versionIds = versions.map(function (v) {
-            return v.id;
-          });
-          var versionMap = {};
-          versions.forEach(function (v) {
-            versionMap[v.id] = v.version;
-          });
-
-          // Now fetch prompts for those versions
-          var orFilter = versionIds
-            .map(function (id) {
-              return 'rubric_version_id=eq.' + encodeURIComponent(id);
-            })
-            .join('&or=');
-
-          return supabaseRequest(
-            'rubric_prompts?' + orFilter + '&order=created_at.desc'
-          ).then(function (prompts) {
-            prompts = prompts || [];
-            return prompts.map(function (p) {
-              p.rubric_version_version = versionMap[p.rubric_version_id] || null;
-              return p;
-            });
-          });
-        })
-        .catch(function (err) {
-          console.error('getRubricPromptsForRubric error', err);
-          return [];
-        });
-    },
-
-    // Decision rules (Go/NoGo bands etc) for all versions of a rubric
-    getDecisionRulesForRubric: function (rubricId) {
-      if (!rubricId) return Promise.resolve([]);
-
-      return supabaseRequest(
-        'rubric_versions?rubric_id=eq.' + encodeURIComponent(rubricId)
-      )
-        .then(function (versions) {
-          versions = versions || [];
-          if (versions.length === 0) return [];
-
-          var versionIds = versions.map(function (v) {
-            return v.id;
-          });
-          var orFilter = versionIds
-            .map(function (id) {
-              return 'rubric_version_id=eq.' + encodeURIComponent(id);
-            })
-            .join('&or=');
-
-          return supabaseRequest(
-            'config_decision_rules?' + orFilter + '&order=created_at.desc'
-          ).then(function (rules) {
-            return rules || [];
-          });
-        })
-        .catch(function (err) {
-          console.error('getDecisionRulesForRubric error', err);
-          return [];
-        });
     }
-
   };
 })();
 
