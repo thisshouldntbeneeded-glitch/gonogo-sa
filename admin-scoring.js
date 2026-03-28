@@ -902,4 +902,695 @@
         }
       ],
       anchors: [
-        { category: 'Compliance & Consumer Protection', key: 'compliance_consumer_protection', definition: 'CPA compliance, returns policy, and POPIA adherence.', anchors: { go: 'Full CPA compliance, clear returns policy, POPIA certified.', caution: '
+        { category: 'Compliance & Consumer Protection', key: 'compliance_consumer_protection', definition: 'CPA compliance, returns policy, and POPIA adherence.', anchors: { go: 'Full CPA compliance, clear returns policy, POPIA certified.', caution: '    /* ── 16. Online Shopping & Marketplaces ── */
+    {
+      id: 'sa_online_shopping_marketplaces',
+      name: 'South Africa — Online Shopping & Marketplaces',
+      market: 'SA',
+      industry: 'Online Shopping & Marketplaces',
+      slug: 'online-retailers',
+      icon: 'fa-cart-shopping',
+      status: 'active',
+      description: 'Scoring rubric for SA e-commerce and online marketplace brands.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            compliance_consumer_protection: 15,
+            product_catalogue: 20,
+            customer_experience: 20,
+            value_pricing: 20,
+            delivery_logistics: 15,
+            security_trust: 10
+          },
+          changeSummary: 'Initial online shopping rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Compliance & Consumer Protection',
+          key: 'compliance_consumer_protection',
+          definition: 'CPA compliance, returns policy, and POPIA adherence.',
+          anchors: {
+            go: 'Full CPA compliance, clear returns policy, POPIA certified.',
+            caution: 'Generally compliant with minor policy or disclosure gaps.',
+            noGo: 'Non‑compliance with CPA or serious POPIA issues.'
+          }
+        },
+        {
+          category: 'Product Catalogue',
+          key: 'product_catalogue',
+          definition: 'Range, availability, seller quality, and authenticity.',
+          anchors: {
+            go: 'Wide authentic range, strong local + international brands, good seller vetting.',
+            caution: 'Adequate catalogue with some availability gaps.',
+            noGo: 'Limited range, counterfeit risk, weak seller vetting.'
+          }
+        },
+        {
+          category: 'Customer Experience',
+          key: 'customer_experience',
+          definition: 'Site/app UX, search, and purchase flow.',
+          anchors: {
+            go: 'Fast, intuitive UX, powerful search/filters, seamless checkout.',
+            caution: 'Usable but with friction in search or checkout.',
+            noGo: 'Slow, confusing UX, frequent errors at checkout.'
+          }
+        },
+        {
+          category: 'Value & Pricing',
+          key: 'value_pricing',
+          definition: 'Price competitiveness, deals, and fee transparency.',
+          anchors: {
+            go: 'Competitive pricing, regular deals, transparent fees.',
+            caution: 'Average pricing, occasional deals, some fee opacity.',
+            noGo: 'Overpriced, misleading discounts, hidden fees.'
+          }
+        },
+        {
+          category: 'Delivery & Logistics',
+          key: 'delivery_logistics',
+          definition: 'Shipping speed, tracking, and delivery reliability.',
+          anchors: {
+            go: 'Fast, reliable delivery with accurate tracking and low loss/damage rates.',
+            caution: 'Standard delivery times with occasional issues.',
+            noGo: 'Frequent delays, lost parcels, unreliable tracking.'
+          }
+        },
+        {
+          category: 'Security & Trust',
+          key: 'security_trust',
+          definition: 'Payment security, buyer protection, and fraud prevention.',
+          anchors: {
+            go: 'Strong payment security, buyer protection guarantees, robust fraud controls.',
+            caution: 'Standard card security, basic buyer protection.',
+            noGo: 'Security incidents, weak buyer protection, fraud complaints.'
+          }
+        }
+      ],
+      playbooks: [
+        {
+          category: 'Compliance & Consumer Protection',
+          sources: ['CPA documentation', 'Returns and refunds policy pages', 'Privacy policy'],
+          rules: [
+            'Check CPA‑aligned returns and cooling‑off rights.',
+            'Confirm POPIA‑aligned data handling and disclosures.'
+          ]
+        },
+        {
+          category: 'Product Catalogue',
+          sources: ['On‑site catalogue review', 'Category and brand coverage analysis'],
+          rules: [
+            'Assess depth in key categories (electronics, fashion, FMCG).',
+            'Check for clear labelling and authenticity indicators.'
+          ]
+        },
+        {
+          category: 'Customer Experience',
+          sources: ['UX walkthroughs', 'App store reviews', 'On‑site search tests'],
+          rules: [
+            'Test full browse‑search‑checkout journey on mobile and desktop.',
+            'Record navigation or search friction points.'
+          ]
+        },
+        {
+          category: 'Value & Pricing',
+          sources: ['Price comparison tools', 'Basket‑level tests', 'Competitor benchmarks'],
+          rules: [
+            'Compare final basket price including shipping and fees.',
+            'Assess frequency and depth of promotions.'
+          ]
+        },
+        {
+          category: 'Delivery & Logistics',
+          sources: ['Delivery SLA pages', 'Customer reviews', 'Test orders'],
+          rules: [
+            'Place at least one test order to measure actual delivery time.',
+            'Track incidence of damaged/late parcels from reviews.'
+          ]
+        },
+        {
+          category: 'Security & Trust',
+          sources: ['Payment provider integrations', 'Security certifications', 'Fraud/chargeback reports'],
+          rules: [
+            'Verify HTTPS, 3‑D Secure and trusted payment partners.',
+            'Check buyer protection and dispute resolution mechanisms.'
+          ]
+        }
+      ],
+      prompts: [
+        {
+          id: 'p-ecom-1',
+          type: 'research',
+          title: 'E‑commerce Brand Research',
+          model: 'gpt-4o',
+          badge: 'research',
+          body:
+            'You are a South African e‑commerce analyst. Research {brand}, an online retailer/marketplace, across compliance & consumer protection, product catalogue, customer experience, value & pricing, delivery & logistics, and security & trust. Return structured JSON with category scores 0‑100 and evidence summaries.',
+          constraints: [
+            'Use SA consumer‑protection context (CPA, POPIA).',
+            'Score each category independently.',
+            'Include evidence URLs wherever possible.'
+          ]
+        },
+        {
+          id: 'p-ecom-2',
+          type: 'scoring',
+          title: 'E‑commerce Scoring Engine',
+          model: 'gpt-4o',
+          badge: 'scoring',
+          body:
+            'Given the research payload for {brand}, apply the SA Online Shopping rubric weights: Compliance & Consumer Protection 15, Product Catalogue 20, Customer Experience 20, Value & Pricing 20, Delivery & Logistics 15, Security & Trust 10. Compute a weighted GoNoGo score (0‑100) and return JSON with the final score, verdict (Go/Caution/No‑Go), and per‑category breakdowns.',
+          constraints: [
+            'Weights must sum to 100.',
+            'Apply any configured hard‑fail rules first.',
+            'Round all scores to 1 decimal place.'
+          ]
+        }
+      ],
+      rules: [
+        {
+          name: 'Go threshold',
+          scope: 'overall',
+          min: 70,
+          max: 100,
+          verdict: 'go',
+          description: 'Score ≥ 70 with no hard fails → Go.'
+        },
+        {
+          name: 'Caution band',
+          scope: 'overall',
+          min: 50,
+          max: 69.9,
+          verdict: 'caution',
+          description: 'Score 50–69.9 → Caution.'
+        },
+        {
+          name: 'No‑Go floor',
+          scope: 'overall',
+          min: 0,
+          max: 49.9,
+          verdict: 'no-go',
+          description: 'Score < 50 → No‑Go.'
+        },
+        {
+          name: 'Compliance hard fail',
+          scope: 'hard_fail',
+          min: null,
+          max: 30,
+          verdict: 'no-go',
+          description: 'Compliance & Consumer Protection < 30 → automatic No‑Go.'
+        }
+      ]
+    },
+
+    /* ── 17. Pharmacies ── */
+    {
+      id: 'sa_pharmacies',
+      name: 'South Africa — Pharmacies',
+      market: 'SA',
+      industry: 'Pharmacies',
+      slug: 'pharmacies-health',
+      icon: 'fa-prescription-bottle-medical',
+      status: 'active',
+      description: 'Scoring rubric for SA retail pharmacy brands.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            compliance_licensing: 20,
+            product_range: 20,
+            customer_experience: 20,
+            pricing_value: 15,
+            digital_services: 15,
+            accessibility: 10
+          },
+          changeSummary: 'Initial pharmacies rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Compliance & Licensing',
+          key: 'compliance_licensing',
+          definition: 'SAPC registration and schedule compliance.',
+          anchors: {
+            go: 'Fully SAPC registered, schedule‑compliant, no serious infractions.',
+            caution: 'Registered with minor inspection findings.',
+            noGo: 'Unregistered outlets or serious schedule breaches.'
+          }
+        },
+        {
+          category: 'Product Range',
+          key: 'product_range',
+          definition: 'Medication availability, generics, and health products.',
+          anchors: {
+            go: 'Broad Rx/OTC range, strong generics, wellness and chronic support.',
+            caution: 'Adequate core range with some gaps.',
+            noGo: 'Frequent stock‑outs, limited range.'
+          }
+        },
+        {
+          category: 'Customer Experience',
+          key: 'customer_experience',
+          definition: 'Service quality, pharmacist consultations, and wait times.',
+          anchors: {
+            go: 'Knowledgeable pharmacists, proactive counselling, short queues.',
+            caution: 'Standard service, moderate queues.',
+            noGo: 'Rushed, unhelpful service, long waits.'
+          }
+        },
+        {
+          category: 'Pricing & Value',
+          key: 'pricing_value',
+          definition: 'Medicine pricing, loyalty programmes, and SEP compliance.',
+          anchors: {
+            go: 'SEP compliant, competitive pricing, compelling loyalty value.',
+            caution: 'Compliant but only moderately competitive.',
+            noGo: 'Price or SEP non‑compliance, poor value.'
+          }
+        },
+        {
+          category: 'Digital Services',
+          key: 'digital_services',
+          definition: 'Online ordering, repeat prescriptions, and app features.',
+          anchors: {
+            go: 'Robust app/portal, repeat scripts, delivery options.',
+            caution: 'Basic online re‑order or app functions.',
+            noGo: 'No meaningful digital services.'
+          }
+        },
+        {
+          category: 'Accessibility',
+          key: 'accessibility',
+          definition: 'Store locations, operating hours, and delivery options.',
+          anchors: {
+            go: 'Dense branch network, long hours, broad delivery coverage.',
+            caution: 'Reasonable location and hours, limited delivery.',
+            noGo: 'Sparse network, restrictive hours, no delivery.'
+          }
+        }
+      ],
+      // playbooks / prompts / rules omitted here for brevity if you’re tight on size,
+      // but keep following the same pattern used above if you want full detail.
+    },
+
+    /* ── 18. Property Rental & Letting ── */
+    {
+      id: 'sa_property_rental_letting',
+      name: 'South Africa — Property Rental & Letting',
+      market: 'SA',
+      industry: 'Property Rental & Letting',
+      slug: 'property-letting',
+      icon: 'fa-house-chimney',
+      status: 'active',
+      description: 'Scoring rubric for SA residential rental agents and platforms.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            compliance_regulation: 20,
+            listing_quality: 20,
+            tenant_experience: 20,
+            landlord_service: 15,
+            digital_platform: 15,
+            value_fees: 10
+          },
+          changeSummary: 'Initial property rental rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Compliance & Regulation',
+          key: 'compliance_regulation',
+          definition: 'EAAB registration and Rental Housing Act compliance.',
+          anchors: {
+            go: 'Registered with EAAB, compliant leases and deposits, no serious findings.',
+            caution: 'Registered with minor compliance issues.',
+            noGo: 'Unregistered or serious compliance breaches.'
+          }
+        },
+        {
+          category: 'Listing Quality',
+          key: 'listing_quality',
+          definition: 'Property accuracy, photography, and listing detail.',
+          anchors: {
+            go: 'Accurate listings, high‑quality photos, full details.',
+            caution: 'Mostly accurate with some missing details.',
+            noGo: 'Misleading or sparse listings.'
+          }
+        },
+        {
+          category: 'Tenant Experience',
+          key: 'tenant_experience',
+          definition: 'Application process, maintenance response, and deposit handling.',
+          anchors: {
+            go: 'Smooth application, responsive maintenance, fair deposits.',
+            caution: 'Adequate processes with some friction.',
+            noGo: 'Difficult applications, slow maintenance, deposit disputes.'
+          }
+        },
+        {
+          category: 'Landlord Service',
+          key: 'landlord_service',
+          definition: 'Tenant vetting, rent collection, and property management.',
+          anchors: {
+            go: 'Thorough vetting, reliable collections, proactive management.',
+            caution: 'Standard management services.',
+            noGo: 'Poor vetting, collection problems, weak management.'
+          }
+        },
+        {
+          category: 'Digital Platform',
+          key: 'digital_platform',
+          definition: 'Online search, virtual tours, and application portal.',
+          anchors: {
+            go: 'Strong search, virtual tours, online applications.',
+            caution: 'Basic listing site with manual applications.',
+            noGo: 'Minimal digital tooling.'
+          }
+        },
+        {
+          category: 'Value & Fees',
+          key: 'value_fees',
+          definition: 'Commission rates, fee transparency, and service value.',
+          anchors: {
+            go: 'Competitive fees, fully transparent, strong value.',
+            caution: 'Standard fee levels, some opacity.',
+            noGo: 'High or opaque fees, poor value.'
+          }
+        }
+      ]
+    },
+
+    /* ── 19. Solar & Backup Power Installers ── */
+    {
+      id: 'sa_solar_backup_power_installers',
+      name: 'South Africa — Solar & Backup Power Installers',
+      market: 'SA',
+      industry: 'Solar & Backup Power Installers',
+      slug: 'solar-backup-installers',
+      icon: 'fa-solar-panel',
+      status: 'active',
+      description: 'Scoring rubric for SA solar and backup power installation brands.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            compliance_certification: 20,
+            product_quality: 25,
+            installation_service: 20,
+            customer_satisfaction: 15,
+            value_pricing: 10,
+            warranty_support: 10
+          },
+          changeSummary: 'Initial solar/installers rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Compliance & Certification',
+          key: 'compliance_certification',
+          definition: 'ECSA registration, COC compliance, and municipal approvals.',
+          anchors: {
+            go: 'ECSA registered, CoC compliant, municipal approvals in place.',
+            caution: 'Mostly compliant with minor gaps.',
+            noGo: 'Unregistered installers, invalid CoCs or approvals.'
+          }
+        },
+        {
+          category: 'Product Quality',
+          key: 'product_quality',
+          definition: 'Panel/inverter/battery brands, tier ratings, and system design.',
+          anchors: {
+            go: 'Tier‑1 components, reputable brands, solid design.',
+            caution: 'Mixed component quality.',
+            noGo: 'Low‑quality or grey‑import components.'
+          }
+        },
+        {
+          category: 'Installation & Service',
+          key: 'installation_service',
+          definition: 'Installation quality, timelines, and workmanship.',
+          anchors: {
+            go: 'Clean installations, on‑time delivery, neat cabling and finishing.',
+            caution: 'Generally acceptable with some issues.',
+            noGo: 'Unsafe or sloppy workmanship, major delays.'
+          }
+        },
+        {
+          category: 'Customer Satisfaction',
+          key: 'customer_satisfaction',
+          definition: 'Reviews, referral rates, and post‑install experience.',
+          anchors: {
+            go: 'Strong referrals, high ratings, proactive follow‑up.',
+            caution: 'Average ratings, mixed feedback.',
+            noGo: 'Frequent complaints, poor after‑sales.'
+          }
+        },
+        {
+          category: 'Value & Pricing',
+          key: 'value_pricing',
+          definition: 'Cost per kWh, financing options, and ROI transparency.',
+          anchors: {
+            go: 'Clear ROI cases, fair pricing, good finance options.',
+            caution: 'Average pricing, basic finance.',
+            noGo: 'Overpriced, opaque ROI, no finance options.'
+          }
+        },
+        {
+          category: 'Warranty & Support',
+          key: 'warranty_support',
+          definition: 'Warranty terms, monitoring, and after‑sales support.',
+          anchors: {
+            go: 'Solid warranties, remote monitoring, responsive support.',
+            caution: 'Standard warranties, reactive support.',
+            noGo: 'Weak warranties, poor support.'
+          }
+        }
+      ]
+    },
+
+    /* ── 20. Sports Betting ── */
+    {
+      id: 'sa_sports_betting',
+      name: 'South Africa — Sports Betting',
+      market: 'SA',
+      industry: 'Sports Betting',
+      slug: 'online-casinos-bookmakers',
+      icon: 'fa-dice',
+      status: 'active',
+      description: 'Scoring rubric for SA sports betting and iGaming brands.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            licensing_compliance: 20,
+            responsible_gambling: 15,
+            odds_value: 20,
+            platform_experience: 15,
+            customer_support: 15,
+            payout_security: 15
+          },
+          changeSummary: 'Initial sports betting rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Licensing & Compliance',
+          key: 'licensing_compliance',
+          definition: 'Regulatory licensing and responsible gambling compliance in SA.',
+          anchors: {
+            go: 'Fully licensed with SA gambling boards, clean record.',
+            caution: 'Licensed with minor issues or conditions.',
+            noGo: 'Unlicensed operations or major regulatory breaches.'
+          }
+        },
+        {
+          category: 'Responsible Gambling',
+          key: 'responsible_gambling',
+          definition: 'Self‑exclusion tools, deposit limits, and player protection measures.',
+          anchors: {
+            go: 'Robust RG tools, clear messaging, strong player protections.',
+            caution: 'Basic tools and messaging.',
+            noGo: 'Minimal RG controls, poor messaging.'
+          }
+        },
+        {
+          category: 'Odds & Value',
+          key: 'odds_value',
+          definition: 'Competitiveness of odds, promotions, and overall betting value.',
+          anchors: {
+            go: 'Consistently competitive odds, fair margins, good promos.',
+            caution: 'Generally average odds and value.',
+            noGo: 'Poor odds, misleading or predatory promotions.'
+          }
+        },
+        {
+          category: 'Platform Experience',
+          key: 'platform_experience',
+          definition: 'App quality, live betting features, and user interface.',
+          anchors: {
+            go: 'Stable, feature‑rich platform with strong UX.',
+            caution: 'Usable but occasionally buggy or limited.',
+            noGo: 'Unstable, confusing, or outdated platform.'
+          }
+        },
+        {
+          category: 'Customer Support',
+          key: 'customer_support',
+          definition: 'Support availability and resolution for betting queries.',
+          anchors: {
+            go: '24/7 support, fast issue resolution.',
+            caution: 'Limited hours, moderate resolution times.',
+            noGo: 'Hard to reach, poor resolution.'
+          }
+        },
+        {
+          category: 'Payout & Security',
+          key: 'payout_security',
+          definition: 'Withdrawal speed, payment options, and data security.',
+          anchors: {
+            go: 'Fast, reliable withdrawals, diverse secure payment methods.',
+            caution: 'Standard withdrawal times, basic security.',
+            noGo: 'Slow or blocked withdrawals, security incidents.'
+          }
+        }
+      ]
+    },
+
+    /* ── 21. Supermarkets ── */
+    {
+      id: 'sa_supermarkets',
+      name: 'South Africa — Supermarkets',
+      market: 'SA',
+      industry: 'Supermarkets',
+      slug: 'supermarkets',
+      icon: 'fa-basket-shopping',
+      status: 'active',
+      description: 'Scoring rubric for SA grocery and supermarket chains.',
+      owner: 'GoNoGo SA',
+      versions: [
+        {
+          version: '1.0',
+          status: 'active',
+          effectiveDate: '2026-03-01',
+          weights: {
+            compliance_food_safety: 15,
+            product_range: 20,
+            customer_experience: 20,
+            value_pricing: 20,
+            digital_loyalty: 15,
+            accessibility_reach: 10
+          },
+          changeSummary: 'Initial supermarkets rubric.'
+        }
+      ],
+      anchors: [
+        {
+          category: 'Compliance & Food Safety',
+          key: 'compliance_food_safety',
+          definition: 'Health inspections, food safety standards, and labelling compliance.',
+          anchors: {
+            go: 'Consistently clean inspections, strong food safety practices.',
+            caution: 'Generally compliant with occasional issues.',
+            noGo: 'Serious hygiene or food safety violations.'
+          }
+        },
+        {
+          category: 'Product Range',
+          key: 'product_range',
+          definition: 'Variety, fresh produce quality, local sourcing, and speciality items.',
+          anchors: {
+            go: 'Broad range with high‑quality fresh produce and local sourcing.',
+            caution: 'Adequate range with some gaps.',
+            noGo: 'Limited range, poor fresh quality.'
+          }
+        },
+        {
+          category: 'Customer Experience',
+          key: 'customer_experience',
+          definition: 'Store cleanliness, staff service, and checkout efficiency.',
+          anchors: {
+            go: 'Clean stores, helpful staff, fast checkouts.',
+            caution: 'Acceptable experience with some pain points.',
+            noGo: 'Dirty stores, poor service, long queues.'
+          }
+        },
+        {
+          category: 'Value & Pricing',
+          key: 'value_pricing',
+          definition: 'Price competitiveness, specials, and basket value.',
+          anchors: {
+            go: 'Competitive pricing and strong basket value.',
+            caution: 'Average pricing and savings.',
+            noGo: 'Expensive baskets, weak savings.'
+          }
+        },
+        {
+          category: 'Digital & Loyalty',
+          key: 'digital_loyalty',
+          definition: 'Loyalty programme, online shopping, and app features.',
+          anchors: {
+            go: 'Compelling loyalty scheme, robust app and online shopping.',
+            caution: 'Basic loyalty and/or digital offering.',
+            noGo: 'Minimal loyalty benefits, weak digital.'
+          }
+        },
+        {
+          category: 'Accessibility & Reach',
+          key: 'accessibility_reach',
+          definition: 'Store locations, trading hours, and delivery coverage.',
+          anchors: {
+            go: 'Dense footprint, long trading hours, broad delivery coverage.',
+            caution: 'Reasonable physical access, limited delivery.',
+            noGo: 'Sparse footprint, restrictive hours, no delivery.'
+          }
+        }
+      ]
+    }
+
+  ]; // end RUBRICS array
+
+  /* ──────────────────────────────────────────────
+     RENDERING + STATE
+     ────────────────────────────────────────────── */
+
+  const state = {
+    rubrics: RUBRICS,
+    selectedRubricId: null,
+    selectedVersionIndex: 0
+  };
+
+  // Helper functions, event wiring, and DOM rendering should remain
+  // as in your existing admin-scoring.js; you only need to swap out
+  // the RUBRICS seed definition with this expanded version.
+
+  // Example minimal hooks (if you already have these, keep your versions):
+
+  function findRubric(id) {
+    return state.rubrics.find(r => r.id === id);
+  }
+
+  // ... your existing code that:
+  // - Renders the left-hand rubric list from state.rubrics
+  // - When a rubric is clicked, updates state.selectedRubricId
+  // - Renders Scoring Framework / Playbooks / Decisions / Versions
+  //   for the selected rubric using anchors, versions, prompts, rules
+
+  window.GoNoGoScoring = { state, findRubric };
+})();
