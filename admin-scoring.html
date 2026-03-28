@@ -6,77 +6,551 @@
   <title>GoNoGo SA — Scoring Engine</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .scoring-shell {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .scoring-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-2) 0 var(--space-1);
+    }
+
+    .scoring-topbar-actions {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .scoring-workspace {
+      display: grid;
+      grid-template-columns: 280px minmax(360px, 1.15fr) minmax(340px, 0.95fr);
+      gap: var(--space-4);
+      min-height: calc(100vh - 220px);
+      align-items: stretch;
+    }
+
+    .scoring-panel {
+      background: var(--color-surface, #171717);
+      border: 1px solid var(--color-border, rgba(255,255,255,0.08));
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: var(--shadow-sm, none);
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .scoring-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .scoring-panel-title-wrap {
+      min-width: 0;
+    }
+
+    .scoring-panel-title {
+      margin: 0;
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--color-text, #fff);
+    }
+
+    .scoring-panel-subtitle {
+      margin: var(--space-1) 0 0;
+      font-size: var(--text-xs);
+      color: var(--color-text-muted, rgba(255,255,255,0.65));
+      line-height: 1.45;
+    }
+
+    .scoring-panel-body {
+      padding: var(--space-4);
+      overflow: auto;
+      min-height: 0;
+      flex: 1;
+    }
+
+    .scoring-rubric-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .rubric-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: 180ms ease;
+    }
+
+    .rubric-card:hover {
+      border-color: rgba(34,197,94,0.45);
+      background: rgba(34,197,94,0.05);
+      transform: translateY(-1px);
+    }
+
+    .rubric-card.active {
+      border-color: rgba(34,197,94,0.7);
+      background: rgba(34,197,94,0.1);
+      box-shadow: inset 0 0 0 1px rgba(34,197,94,0.2);
+    }
+
+    .rubric-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .rubric-market {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #86efac;
+    }
+
+    .rubric-status {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--color-text-muted, rgba(255,255,255,0.65));
+    }
+
+    .rubric-name {
+      margin: 0 0 4px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text, #fff);
+      line-height: 1.3;
+    }
+
+    .rubric-meta,
+    .rubric-slug {
+      font-size: 12px;
+      color: var(--color-text-muted, rgba(255,255,255,0.62));
+      line-height: 1.45;
+    }
+
+    .scoring-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .summary-metric {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .summary-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted, rgba(255,255,255,0.58));
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text, #fff);
+      line-height: 1.15;
+    }
+
+    .summary-note {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--color-text-muted, rgba(255,255,255,0.62));
+    }
+
+    .version-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .version-card {
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 14px 14px 14px 18px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: 180ms ease;
+    }
+
+    .version-card::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 0;
+      bottom: 14px;
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .version-card:hover {
+      border-color: rgba(34,197,94,0.35);
+      background: rgba(34,197,94,0.045);
+    }
+
+    .version-card.active {
+      border-color: rgba(34,197,94,0.7);
+      background: rgba(34,197,94,0.09);
+    }
+
+    .version-card.active::before {
+      background: #22c55e;
+    }
+
+    .version-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: 8px;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-text, #fff);
+    }
+
+    .version-date {
+      font-size: 11px;
+      color: var(--color-text-muted, rgba(255,255,255,0.58));
+      white-space: nowrap;
+    }
+
+    .version-status-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .chip-success {
+      background: rgba(34,197,94,0.14);
+      color: #86efac;
+    }
+
+    .chip-muted {
+      background: rgba(255,255,255,0.06);
+      color: var(--color-text-muted, rgba(255,255,255,0.65));
+    }
+
+    .version-summary {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--color-text-muted, rgba(255,255,255,0.66));
+    }
+
+    .version-detail-card,
+    .prompt-card,
+    .rule-card,
+    .audit-card {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      padding: 14px;
+    }
+
+    .version-detail-card {
+      margin-bottom: var(--space-4);
+    }
+
+    .detail-section-title {
+      margin: 0 0 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted, rgba(255,255,255,0.56));
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .detail-item-label {
+      font-size: 11px;
+      color: var(--color-text-muted, rgba(255,255,255,0.56));
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 5px;
+    }
+
+    .detail-item-value {
+      font-size: 13px;
+      color: var(--color-text, #fff);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .json-block {
+      margin: 0;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.22);
+      color: #d1fae5;
+      font-size: 12px;
+      line-height: 1.55;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .right-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 var(--space-4) var(--space-3);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .right-tab {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--color-text-muted, rgba(255,255,255,0.66));
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .right-tab.active {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.4);
+      color: #bbf7d0;
+    }
+
+    .right-pane {
+      display: none;
+      padding: var(--space-4);
+      overflow: auto;
+      flex: 1;
+    }
+
+    .right-pane.active {
+      display: block;
+    }
+
+    .stack-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .prompt-title,
+    .rule-title,
+    .audit-title {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text, #fff);
+      line-height: 1.35;
+    }
+
+    .prompt-meta,
+    .rule-meta,
+    .audit-meta {
+      font-size: 12px;
+      color: var(--color-text-muted, rgba(255,255,255,0.62));
+      line-height: 1.5;
+    }
+
+    .prompt-snippet,
+    .rule-snippet {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--color-text-muted, rgba(255,255,255,0.68));
+      line-height: 1.55;
+    }
+
+    .empty-state {
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 22px;
+      font-size: 13px;
+      color: var(--color-text-muted, rgba(255,255,255,0.62));
+      line-height: 1.6;
+      text-align: center;
+      background: rgba(255,255,255,0.015);
+    }
+
+    @media (max-width: 1200px) {
+      .scoring-workspace {
+        grid-template-columns: 260px minmax(320px, 1fr);
+      }
+
+      .scoring-panel--right {
+        grid-column: 1 / -1;
+        min-height: 480px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .scoring-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .scoring-panel {
+        min-height: 420px;
+      }
+
+      .scoring-summary-grid,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scoring-topbar {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="admin-layout">
     <div id="sidebar-container"></div>
+
     <main class="admin-main" id="admin-content" style="display:none;">
-      <div class="admin-header">
-        <div>
-          <h1 class="admin-title">Scoring Engine</h1>
-          <p class="text-sm text-secondary">Rubrics, methodology, prompts & audit trail</p>
-        </div>
-        <button id="btn-new-rubric" class="btn btn-primary btn-sm">
-          <i class="fa-solid fa-plus"></i> New Rubric
-        </button>
-      </div>
-
-      <div class="card" style="margin-bottom:var(--space-6);">
-        <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-4);">Rubrics</h3>
-        <div id="rubrics-table-container">
-          <div class="text-sm text-muted">Loading rubrics...</div>
-        </div>
-      </div>
-
-      <div class="card" id="rubric-detail-card" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4);">
+      <div class="scoring-shell">
+        <div class="scoring-topbar">
           <div>
-            <h3 class="text-sm font-semibold" id="rubric-detail-title"></h3>
-            <p class="text-xs text-muted" id="rubric-detail-subtitle"></p>
+            <h1 class="admin-title">Scoring Engine</h1>
+            <p class="text-sm text-secondary">Rubrics, methodology, prompts, versioning, tracking and audit trail</p>
           </div>
-        </div>
 
-        <div class="tabs">
-          <button class="tab-button tab-active" data-tab="versions">Versions</button>
-          <button class="tab-button" data-tab="prompts">Prompts</button>
-          <button class="tab-button" data-tab="rules">Decision Rules</button>
-        </div>
-
-        <div class="tab-content" data-tab-content="versions">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
-            <h4 class="text-sm font-semibold">Rubric Versions</h4>
-            <button id="btn-new-version" class="btn btn-secondary btn-xs">
-              <i class="fa-solid fa-plus"></i> New Version
+          <div class="scoring-topbar-actions">
+            <button id="btn-new-rubric" class="btn btn-primary btn-sm">
+              <i class="fa-solid fa-plus"></i> New Rubric
+            </button>
+            <button id="btn-new-version" class="btn btn-secondary btn-sm" disabled>
+              <i class="fa-solid fa-code-branch"></i> New Version
             </button>
           </div>
-          <div id="versions-list"></div>
         </div>
 
-        <div class="tab-content" data-tab-content="prompts" style="display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
-            <h4 class="text-sm font-semibold">Prompts</h4>
-            <button id="btn-new-prompt" class="btn btn-secondary btn-xs">
-              <i class="fa-solid fa-plus"></i> New Prompt
-            </button>
-          </div>
-          <div id="prompts-list"></div>
+        <div class="scoring-workspace">
+          <section class="scoring-panel scoring-panel--left">
+            <div class="scoring-panel-header">
+              <div class="scoring-panel-title-wrap">
+                <h2 class="scoring-panel-title">Rubric Library</h2>
+                <p class="scoring-panel-subtitle">Markets, industries, current status and version ownership.</p>
+              </div>
+              <span id="rubric-count" class="chip chip-muted">0</span>
+            </div>
+
+            <div class="scoring-panel-body">
+              <div id="rubrics-list" class="scoring-rubric-list">
+                <div class="empty-state">Loading rubrics...</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="scoring-panel scoring-panel--middle">
+            <div class="scoring-panel-header">
+              <div class="scoring-panel-title-wrap">
+                <h2 id="selected-rubric-title" class="scoring-panel-title">Select a rubric</h2>
+                <p id="selected-rubric-subtitle" class="scoring-panel-subtitle">Choose a rubric from the left to load versions, methodology and controls.</p>
+              </div>
+            </div>
+
+            <div class="scoring-panel-body">
+              <div id="rubric-summary" class="scoring-summary-grid"></div>
+
+              <div id="version-detail" class="version-detail-card" style="display:none;"></div>
+
+              <div>
+                <h3 class="detail-section-title">Version Timeline</h3>
+                <div id="versions-list" class="version-timeline">
+                  <div class="empty-state">No rubric selected.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="scoring-panel scoring-panel--right">
+            <div class="scoring-panel-header">
+              <div class="scoring-panel-title-wrap">
+                <h2 class="scoring-panel-title">Prompts, Rules & Audit</h2>
+                <p class="scoring-panel-subtitle">Operational detail for the selected rubric and version.</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button id="btn-new-prompt" class="btn btn-secondary btn-xs" disabled>
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt
+                </button>
+                <button id="btn-new-ruleset" class="btn btn-secondary btn-xs" disabled>
+                  <i class="fa-solid fa-scale-balanced"></i> Rule
+                </button>
+              </div>
+            </div>
+
+            <div class="right-tabs">
+              <button class="right-tab active" data-pane="prompts">Prompts</button>
+              <button class="right-tab" data-pane="rules">Rules</button>
+              <button class="right-tab" data-pane="audit">Audit</button>
+            </div>
+
+            <div id="pane-prompts" class="right-pane active">
+              <div id="prompts-list" class="stack-list">
+                <div class="empty-state">No rubric selected.</div>
+              </div>
+            </div>
+
+            <div id="pane-rules" class="right-pane">
+              <div id="rules-list" class="stack-list">
+                <div class="empty-state">No rubric selected.</div>
+              </div>
+            </div>
+
+            <div id="pane-audit" class="right-pane">
+              <div id="audit-list" class="stack-list">
+                <div class="empty-state">No rubric selected.</div>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div class="tab-content" data-tab-content="rules" style="display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:var(--space-4) 0;">
-            <h4 class="text-sm font-semibold">Decision Rules</h4>
-            <button id="btn-new-ruleset" class="btn btn-secondary btn-xs">
-              <i class="fa-solid fa-plus"></i> New Ruleset
-            </button>
-          </div>
-          <div id="rules-list"></div>
+        <div style="padding:var(--space-4) 0;text-align:center;">
+          <p class="text-xs text-muted">&copy; 2026 GoNoGo South Africa</p>
         </div>
-      </div>
-
-      <div style="padding:var(--space-6) 0;text-align:center;">
-        <p class="text-xs text-muted">
-          &copy; 2026 GoNoGo South Africa
-        </p>
       </div>
     </main>
   </div>
