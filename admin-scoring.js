@@ -883,7 +883,7 @@
       ]
     },
 
-   /* ── 16. Online Shopping & Marketplaces ── */
+/* ── 16. Online Shopping & Marketplaces ── */
 {
   id: 'sa_online_shopping_marketplaces',
   name: 'South Africa — Online Shopping & Marketplaces',
@@ -969,11 +969,11 @@
         go: 'Strong payment security, buyer protection guarantees, robust fraud controls.',
         caution: 'Standard card security, basic buyer protection.',
         noGo: 'Security incidents, weak buyer protection, fraud complaints.'
-          }
-        }
-      ]
-    },
-      playbooks: [
+      }
+    }
+  ],
+  playbooks: [
+     
         {
           category: 'Compliance & Consumer Protection',
           sources: ['CPA documentation', 'Returns and refunds policy pages', 'Privacy policy'],
