@@ -12,6 +12,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GoNoGo SA — Brand Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2311a551'/><text x='16' y='22' text-anchor='middle' font-size='18' font-weight='800' fill='white'>G</text></svg>">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -863,20 +864,21 @@
     }
 
     function renderHeader(brand) {
-  var logoHtml = '';
-  if (brand.logo) {
-    var img = document.createElement('img');
-    img.src = brand.logo;
-    img.alt = brand.name;
-    img.style.cssText = 'width:48px;height:48px;border-radius:var(--radius-md);object-fit:contain;background:var(--surface-3);';
-    img.onerror = function() { this.style.display = 'none'; };
-    document.getElementById('brand-logo-area').appendChild(img);
-  }
-  document.getElementById('brand-welcome').textContent = 'Welcome, ' + brand.name;
-  document.getElementById('brand-subtitle').textContent = brand.categoryName + ' — Last updated ' + (brand.lastUpdated || '');
-  document.getElementById('score-circle-area').innerHTML = Components.renderScoreCircle(brand.overallScore, 'lg');
-  document.getElementById('verdict-badge-area').innerHTML = Components.renderVerdictBadge(brand.verdict);
-}
+      var logoArea = document.getElementById('brand-logo-area');
+      logoArea.innerHTML = '';
+      if (brand.logo) {
+        var img = document.createElement('img');
+        img.src = brand.logo;
+        img.alt = brand.name;
+        img.style.cssText = 'width:48px;height:48px;border-radius:var(--radius-md);object-fit:contain;background:var(--surface-3);';
+        img.onerror = function() { this.style.display = 'none'; };
+        logoArea.appendChild(img);
+      }
+      document.getElementById('brand-welcome').textContent = 'Welcome, ' + brand.name;
+      document.getElementById('brand-subtitle').textContent = brand.categoryName + ' — Last updated ' + (brand.lastUpdated || '');
+      document.getElementById('score-circle-area').innerHTML = Components.renderScoreCircle(brand.overallScore, 'lg');
+      document.getElementById('verdict-badge-area').innerHTML = Components.renderVerdictBadge(brand.verdict);
+    }
 
     function renderTopSummary(brand, raw, reviews, peers, brandSlug) {
       var rank = 1;
@@ -1557,7 +1559,6 @@
 
     function getCategoryAction(category, theme) {
       var name = String(category || '').toLowerCase();
-
       if (name.indexOf('support') !== -1) {
         return 'Reduce response times, make support channels easier to find, and close the loop on complaints faster.';
       }
@@ -1647,6 +1648,12 @@
         score: parseFloat(parts[0]) || 0,
         max: parseFloat(parts[1]) || 0
       };
+    }
+
+    function getScoreColor(pct) {
+      if (pct >= 80) return '#11a551';
+      if (pct >= 60) return '#ff9800';
+      return '#e74c3c';
     }
 
     function getFrameworkTotal(fb) {
