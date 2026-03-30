@@ -187,16 +187,13 @@ const Components = {
     banner.className = 'cookie-banner';
     banner.id = 'cookie-banner';
     banner.innerHTML =
-      '<p>We use cookies to analyse site usage and improve your experience. ' +
-      'This includes Google Analytics for anonymous usage statistics. ' +
-      'By clicking \"Accept\", you consent to the use of cookies in accordance with ' +
-      '<a href="privacy.html">our Privacy Policy</a> and the Protection of Personal Information Act (POPIA).</p>' +
-      '<div class="cookie-banner-buttons">' +
-        '<button class="cookie-btn-reject" onclick="Components.cookieReject()">Reject</button>' +
-        '<button class="cookie-btn-accept" onclick="Components.cookieAccept()">Accept</button>' +
-      '</div>';
-    document.body.appendChild(banner);
-  },
+      '<p>We use essential cookies to keep this site working and optional analytics cookies to understand how it is used and improve our content. ' +
+'Google Analytics will only run if you click "Accept". By choosing an option you are making an informed choice under the Protection of Personal Information Act (POPIA). ' +
+'For details, please see our <a href="privacy.html">Privacy Policy</a> and <a href="cookies.html">Cookie Policy</a>.</p>' +
+'<div class="cookie-banner-buttons">' +
+  '<button class="cookie-btn-reject" onclick="Components.cookieReject()">Reject</button>' +
+  '<button class="cookie-btn-accept" onclick="Components.cookieAccept()">Accept</button>' +
+'</div>';
 
   cookieAccept() {
     localStorage.setItem('gonogo_cookie_consent', 'accepted');
