@@ -23,7 +23,6 @@ const Components = {
   // LOGO HELPER
   // ============================================================
   getBrandInitials(name) {
-    // Strip parenthesised text and non-alpha chars, then take first letters
     const clean = name.replace(/\s*\([^)]*\)/g, '').trim();
     const words = clean.split(/\s+/).filter(w => /^[A-Za-z]/.test(w));
     if (words.length === 0) return name.substring(0, 2).toUpperCase();
@@ -36,7 +35,12 @@ const Components = {
     const color = colors[hash % colors.length];
     const initials = this.getBrandInitials(name);
     const fontSize = size * 0.38;
-    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${size*0.16}" fill="${color}"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="${fontSize}">${initials}</text></svg>`)}`;
+    return `data:image/svg+xml,${encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+        <rect width="${size}" height="${size}" rx="${size * 0.16}" fill="${color}"/>
+        <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Inter,system-ui,sans-serif" font-weight="700" font-size="${fontSize}">${initials}</text>
+      </svg>`
+    )}`;
   },
 
   renderLogo(brand, className = 'brand-logo') {
@@ -56,8 +60,7 @@ const Components = {
       { href: 'index.html', label: 'Home', icon: 'fa-house', id: 'home' },
       { href: 'compare.html', label: 'Compare', icon: 'fa-code-compare', id: 'compare' },
       { href: 'about.html', label: 'About', icon: 'fa-circle-info', id: 'about' },
-      { href: 'business.html', label: 'For Business', icon: 'fa-briefcase', id: 'business' },
-      // Admin link hidden from public nav — access via /admin.html directly
+      { href: 'business.html', label: 'For Business', icon: 'fa-briefcase', id: 'business' }
     ];
 
     var themeIcon = document.documentElement.classList.contains('light-mode') ? 'fa-moon' : 'fa-sun';
@@ -109,7 +112,7 @@ const Components = {
       { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' },
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
       { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' },
-      { id: 'scoring', href: 'admin-scoring.html', icon: 'fa-scale-balanced', label: 'Scoring Engine' }
+      { href: 'admin-scoring.html', label: 'Scoring Engine', icon: 'fa-scale-balanced', id: 'scoring' }
     ];
 
     return `
@@ -161,7 +164,6 @@ const Components = {
       document.documentElement.classList.add('light-mode');
     }
     this.updateThemeIcon();
-    // Show cookie banner if no consent recorded
     this.initCookieConsent();
   },
 
@@ -177,34 +179,24 @@ const Components = {
       return;
     }
     if (consent === 'rejected') return;
-    // No decision yet — show banner
     this.showCookieBanner();
   },
 
   showCookieBanner() {
     if (document.getElementById('cookie-banner')) return;
+
     var banner = document.createElement('div');
     banner.className = 'cookie-banner';
     banner.id = 'cookie-banner';
     banner.innerHTML =
-      '<p>We use cookies to analyse site usage and improve your experience. ' +
-      'This includes Google Analytics for anonymous usage statistics. ' +
-      'By clicking \"Accept\", you consent to the use of cookies in accordance with ' +
-      '<a href="privacy.html">our Privacy Policy</a> and the Protection of Personal Information Act (POPIA).</p>' +
+      '<p>We use essential cookies to keep this site working and optional analytics cookies to understand how it is used and improve our content. Google Analytics will only run if you click "Accept". By choosing an option you are making an informed choice under the Protection of Personal Information Act (POPIA). For details, please see our <a href="privacy.html">Privacy Policy</a> and <a href="cookies.html">Cookie Policy</a>.</p>' +
       '<div class="cookie-banner-buttons">' +
         '<button class="cookie-btn-reject" onclick="Components.cookieReject()">Reject</button>' +
         '<button class="cookie-btn-accept" onclick="Components.cookieAccept()">Accept</button>' +
       '</div>';
+
     document.body.appendChild(banner);
   },
-      '<p>We use cookies to analyse site usage and improve your experience. ' +
-'This includes Google Analytics for anonymous usage statistics. ' +
-'By clicking \\"Accept\\", you consent to the use of cookies in accordance with ' +
-'<a href="privacy.html">our Privacy Policy</a> and the Protection of Personal Information Act (POPIA).</p>' +
-'<div class="cookie-banner-buttons">' +
-'<button class="cookie-btn-reject" onclick="Components.cookieReject()">Reject</button>' +
-'<button class="cookie-btn-accept" onclick="Components.cookieAccept()">Accept</button>' +
-'</div>';
 
   cookieAccept() {
     localStorage.setItem('gonogo_cookie_consent', 'accepted');
@@ -222,12 +214,12 @@ const Components = {
   loadGA() {
     if (window._gaLoaded) return;
     window._gaLoaded = true;
-    // Load gtag.js
+
     var script = document.createElement('script');
     script.async = true;
     script.src = 'https://www.googletagmanager.com/gtag/js?id=' + this._GA_ID;
     document.head.appendChild(script);
-    // Init dataLayer
+
     window.dataLayer = window.dataLayer || [];
     function gtag() { window.dataLayer.push(arguments); }
     window.gtag = gtag;
@@ -240,7 +232,6 @@ const Components = {
     document.documentElement.classList.toggle('light-mode');
     localStorage.setItem('gonogo_theme', isLight ? 'light' : 'dark');
     this.updateThemeIcon();
-    // Re-render any active Chart.js radar charts with correct colours
     this._updateChartsForTheme();
   },
 
@@ -254,7 +245,6 @@ const Components = {
     labels.forEach(function(label) {
       label.textContent = isLight ? 'Dark Mode' : 'Light Mode';
     });
-    // Swap hero logo for theme
     var heroLogos = document.querySelectorAll('.hero-logo');
     heroLogos.forEach(function(img) {
       img.src = isLight ? HERO_LOGO_LIGHT : HERO_LOGO_DARK;
@@ -321,7 +311,7 @@ const Components = {
               <a href="about.html">About</a>
               <a href="privacy.html">Privacy Policy</a>
               <a href="terms.html">Terms & Conditions</a>
-              <a href="https://www.gonogo.co.uk" target="_blank">GoNoGo UK</a>
+              <a href="https://www.gonogo.co.uk" target="_blank" rel="noopener noreferrer">GoNoGo UK</a>
             </div>
             <div class="footer-attribution">
               &copy; 2026 GoNoGo Ratings and Reviews Ltd. All rights reserved.
@@ -348,11 +338,14 @@ const Components = {
   renderVerdictBadge(verdict) {
     let cls, icon;
     if (verdict === 'GO') {
-      cls = 'badge-go'; icon = 'fa-circle-check';
+      cls = 'badge-go';
+      icon = 'fa-circle-check';
     } else if (verdict === 'NOGO') {
-      cls = 'badge-nogo'; icon = 'fa-circle-xmark';
+      cls = 'badge-nogo';
+      icon = 'fa-circle-xmark';
     } else {
-      cls = 'badge-caution'; icon = 'fa-triangle-exclamation';
+      cls = 'badge-caution';
+      icon = 'fa-triangle-exclamation';
     }
     return `<span class="badge ${cls}">
       <i class="fa-solid ${icon}"></i>
@@ -412,7 +405,6 @@ const Components = {
       return Math.round((cs.score / cs.max) * 100);
     });
 
-    // Shorten labels for radar
     const shortLabels = labels.map(l => {
       if (l.length > 18) return l.substring(0, 16) + '…';
       return l;
@@ -494,7 +486,6 @@ const Components = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return null;
 
-    // Use union of scoring categories
     const allLabels = Object.keys(brand1.categoryScores);
     const data1 = allLabels.map(key => {
       const cs = brand1.categoryScores[key];
@@ -544,8 +535,17 @@ const Components = {
           r: {
             min: 0,
             max: 100,
-            ticks: { stepSize: 25, display: true, color: tc.tickColor, backdropColor: 'transparent', font: { size: 9 } },
-            pointLabels: { color: tc.labelColor, font: { family: 'Inter, sans-serif', size: 11, weight: '500' } },
+            ticks: {
+              stepSize: 25,
+              display: true,
+              color: tc.tickColor,
+              backdropColor: 'transparent',
+              font: { size: 9 }
+            },
+            pointLabels: {
+              color: tc.labelColor,
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' }
+            },
             grid: { color: tc.gridColor },
             angleLines: { color: tc.gridColor }
           }
@@ -554,9 +554,23 @@ const Components = {
           legend: {
             display: true,
             position: 'bottom',
-            labels: { color: tc.legendColor, font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle', padding: 20 }
+            labels: {
+              color: tc.legendColor,
+              font: { family: 'Inter', size: 12 },
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 20
+            }
           },
-          tooltip: { backgroundColor: tc.tooltipBg, titleColor: tc.tooltipTitle, bodyColor: tc.tooltipBody, borderColor: tc.tooltipBorder, borderWidth: 1, cornerRadius: 8, padding: 10 }
+          tooltip: {
+            backgroundColor: tc.tooltipBg,
+            titleColor: tc.tooltipTitle,
+            bodyColor: tc.tooltipBody,
+            borderColor: tc.tooltipBorder,
+            borderWidth: 1,
+            cornerRadius: 8,
+            padding: 10
+          }
         },
         animation: { duration: 800, easing: 'easeOutQuart' }
       }
@@ -680,13 +694,11 @@ const Components = {
     try {
       var stored = GoNoGoStorage.get('adminUser');
       if (stored) {
-        // Check session expiry (24 hours)
         var loginTime = GoNoGoStorage.get('adminLoginTime');
         if (loginTime) {
           var elapsed = Date.now() - loginTime;
           var twentyFourHours = 24 * 60 * 60 * 1000;
           if (elapsed > twentyFourHours) {
-            // Session expired — force re-login
             this._adminUser = null;
             GoNoGoStorage.remove('adminUser');
             GoNoGoStorage.remove('adminLoginTime');
@@ -695,7 +707,7 @@ const Components = {
         }
         this._adminUser = stored;
       }
-    } catch(e) {}
+    } catch (e) {}
     return this._adminUser;
   },
 
@@ -768,7 +780,7 @@ const Components = {
         passInput.value = '';
         passInput.focus();
       }
-    } catch(e) {
+    } catch (e) {
       error.textContent = 'Login error: ' + e.message;
       error.style.display = 'block';
     }
@@ -827,6 +839,7 @@ const Components = {
   // BRAND PORTAL AUTH
   // ============================================================
   _brandUser: null,
+  _pendingAdminUser: null,
 
   getBrandUser() {
     if (this._brandUser) return this._brandUser;
@@ -910,7 +923,6 @@ const Components = {
       var user = await GoNoGoAPI.brandLogin(email, password);
       if (user) {
         if (user.role === 'admin' && user.brand_slug === '__admin__') {
-          // Admin user — show brand picker
           Components._pendingAdminUser = user;
           Components.showAdminBrandPicker();
         } else {
@@ -947,17 +959,17 @@ const Components = {
       <div class="form-group">
         <label class="form-label">Brand</label>
         <input type="text" id="brand-picker-search" placeholder="Search brands..." oninput="Components.filterBrandPicker()" style="margin-bottom:var(--space-2);">
-        <div id="brand-picker-list" style="max-height:300px;overflow-y:auto;border:1px solid var(--border-primary);border-radius:var(--radius-md);">
-        </div>
+        <div id="brand-picker-list" style="max-height:300px;overflow-y:auto;border:1px solid var(--border-primary);border-radius:var(--radius-md);"></div>
       </div>
     `;
+
     var listHtml = '';
     brands.forEach(function(b) {
       var verdictColor = b.verdict === 'GO' ? 'var(--green)' : b.verdict === 'NOGO' ? 'var(--red)' : 'var(--orange)';
       listHtml += '<div class="brand-picker-item" data-slug="' + b.slug + '" data-name="' + Components.escapeHTML(b.name) + '" ' +
         'onclick="Components.selectAdminBrand(\'' + b.slug + '\', \'' + Components.escapeHTML(b.name).replace(/'/g, "\\'") + '\')" ' +
         'style="padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);font-size:var(--text-sm);transition:background 0.15s;"' +
-        ' onmouseover="this.style.background=\'var(--surface-2)\'" onmouseout="this.style.background=\'\'">'+
+        ' onmouseover="this.style.background=\'var(--surface-2)\'" onmouseout="this.style.background=\'\'">' +
         '<span style="font-weight:500;">' + Components.escapeHTML(b.name) + '</span>' +
         '<span style="font-size:var(--text-xs);font-weight:700;color:' + verdictColor + ';">' + b.gonogo_score + '/100</span>' +
       '</div>';
@@ -976,7 +988,14 @@ const Components = {
 
   selectAdminBrand(slug, name) {
     var admin = Components._pendingAdminUser;
-    var user = { id: admin.id, email: admin.email, display_name: admin.display_name + ' (viewing ' + name + ')', role: 'admin', brand_slug: slug, region: admin.region };
+    var user = {
+      id: admin.id,
+      email: admin.email,
+      display_name: admin.display_name + ' (viewing ' + name + ')',
+      role: 'admin',
+      brand_slug: slug,
+      region: admin.region
+    };
     Components._brandUser = user;
     GoNoGoStorage.set('brandUser', user);
     GoNoGoStorage.set('brandLoginTime', Date.now());
