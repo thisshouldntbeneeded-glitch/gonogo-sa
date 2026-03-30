@@ -82,8 +82,7 @@
 
       document.title = brand.name + ' — GoNoGo South Africa';
 
-      // Dynamic SEO meta tags
-      var metaDesc = (brand.overview || (brand.name + ' rated ' + brand.overallScore + '/100 (' + brand.verdict + ') in ' + brand.categoryName + '.'));
+      var metaDesc = (brand.overview || brand.name + ' rated ' + brand.overallScore + '/100 (' + brand.verdict + ') in ' + brand.categoryName + '.');
       var metaTag = document.querySelector('meta[name="description"]');
       if (!metaTag) {
         metaTag = document.createElement('meta');
@@ -92,7 +91,6 @@
       }
       metaTag.content = metaDesc.substring(0, 160);
 
-      // Open Graph
       function setOG(prop, val) {
         var el = document.querySelector('meta[property="og:' + prop + '"]');
         if (!el) {
@@ -102,12 +100,12 @@
         }
         el.content = val;
       }
+
       setOG('title', brand.name + ' — GoNoGo South Africa');
       setOG('description', metaDesc.substring(0, 160));
       setOG('type', 'article');
       setOG('url', window.location.href);
 
-      // JSON-LD structured data
       var jsonLD = {
         '@context': 'https://schema.org',
         '@type': 'Review',
@@ -122,10 +120,18 @@
           'bestRating': 100,
           'worstRating': 0
         },
-        'author': { '@type': 'Organization', 'name': 'GoNoGo South Africa', 'url': 'https://www.gonogo.co.za' },
+        'author': {
+          '@type': 'Organization',
+          'name': 'GoNoGo South Africa',
+          'url': 'https://www.gonogo.co.za'
+        },
         'reviewBody': brand.ratingSummary || metaDesc,
-        'publisher': { '@type': 'Organization', 'name': 'GoNoGo South Africa' }
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'GoNoGo South Africa'
+        }
       };
+
       var ldScript = document.createElement('script');
       ldScript.type = 'application/ld+json';
       ldScript.textContent = JSON.stringify(jsonLD);
@@ -133,7 +139,6 @@
 
       var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
 
-      // Category score cards
       var categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
         var name = entry[0], data = entry[1];
         var pct = Math.round((data.score / data.max) * 100);
@@ -148,31 +153,32 @@
         '</div>';
       }).join('');
 
-      // Strengths & Concerns
       var strengthsHTML = brand.strengths.map(function(s) {
         return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + s + '</li>';
       }).join('');
+
       var concernsHTML = brand.concerns.map(function(c) {
         return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + c + '</li>';
       }).join('');
 
-      // Pricing
-      var pricingHTML = brand.pricing.length > 0 ? brand.pricing.map(function(p) {
-        var features = typeof p.features === 'string' && p.features
-          ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
-          : (Array.isArray(p.features) ? p.features : []);
-        return '<div class="pricing-card">' +
-          '<div class="pricing-card-name">' + p.name + '</div>' +
-          '<div class="pricing-card-price">' + p.cost + '</div>' +
-          (features.length > 0 ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>' : '') +
-        '</div>';
-      }).join('') : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
+      var pricingHTML = brand.pricing.length > 0
+        ? brand.pricing.map(function(p) {
+            var features = typeof p.features === 'string' && p.features
+              ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
+              : (Array.isArray(p.features) ? p.features : []);
+            return '<div class="pricing-card">' +
+              '<div class="pricing-card-name">' + p.name + '</div>' +
+              '<div class="pricing-card-price">' + p.cost + '</div>' +
+              (features.length > 0
+                ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>'
+                : '') +
+            '</div>';
+          }).join('')
+        : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
 
-      // App ratings
       var gpStars = renderStars(brand.appRatings.googlePlayScore);
       var iosStars = renderStars(brand.appRatings.iosScore);
 
-      // Social sentiment
       var sentiment = brand.socialSentiment || {};
       var posThemes = (sentiment.positive_themes || []).map(function(t) {
         return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + t + '</li>';
@@ -182,7 +188,6 @@
       }).join('');
 
       document.getElementById('page-content').innerHTML =
-        '<!-- Brand Hero -->' +
         '<section class="brand-hero"><div class="container">' +
           '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
             '<a href="category.html?cat=' + brand.categorySlug + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
@@ -211,16 +216,14 @@
           '</div>' +
         '</div></section>' +
 
-        '<!-- Tabs -->' +
         '<section class="section-sm"><div class="container">' +
           '<div class="tabs" id="tabs">' +
-            '<button class="tab active" data-tab="overview" onclick="switchTab(\\'overview\\')">Overview</button>' +
-            '<button class="tab" data-tab="pricing" onclick="switchTab(\\'pricing\\')">Pricing</button>' +
-            '<button class="tab" data-tab="ratings" onclick="switchTab(\\'ratings\\')">Ratings</button>' +
-            '<button class="tab" data-tab="reviews" onclick="switchTab(\\'reviews\\')">Reviews</button>' +
+            '<button class="tab active" data-tab="overview" onclick="switchTab(\'overview\')">Overview</button>' +
+            '<button class="tab" data-tab="pricing" onclick="switchTab(\'pricing\')">Pricing</button>' +
+            '<button class="tab" data-tab="ratings" onclick="switchTab(\'ratings\')">Ratings</button>' +
+            '<button class="tab" data-tab="reviews" onclick="switchTab(\'reviews\')">Reviews</button>' +
           '</div>' +
 
-          '<!-- Overview Tab -->' +
           '<div class="tab-content" id="tab-overview">' +
             (brand.overview || brand.ratingSummary
               ? '<div class="card" style="margin-bottom:var(--space-6);padding:var(--space-5)">' +
@@ -263,13 +266,11 @@
             '</div>' +
           '</div>' +
 
-          '<!-- Pricing Tab -->' +
           '<div class="tab-content" id="tab-pricing" style="display:none">' +
             '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Pricing Plans</h3>' +
             '<div class="pricing-grid">' + pricingHTML + '</div>' +
           '</div>' +
 
-          '<!-- Ratings Tab -->' +
           '<div class="tab-content" id="tab-ratings" style="display:none">' +
             '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">App Ratings</h3>' +
             '<div class="ratings-grid" style="margin-bottom:var(--space-8)">' +
@@ -298,13 +299,12 @@
             '</div>' +
           '</div>' +
 
-          '<!-- Reviews Tab -->' +
           '<div class="tab-content" id="tab-reviews" style="display:none">' +
             '<div id="review-summary" style="margin-bottom:var(--space-4)"></div>' +
             '<div id="review-filters" style="display:none;margin-bottom:var(--space-4);display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center">' +
-              '<button class="btn btn-sm btn-ghost review-filter-btn active" data-filter="all" onclick="filterReviews(\\'all\\')">All</button>' +
-              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="GO" onclick="filterReviews(\\'GO\\')"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Go</button>' +
-              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="NOGO" onclick="filterReviews(\\'NOGO\\')"><i class="fa-solid fa-circle-xmark" style="color:var(--red,#e74c3c)"></i> No Go</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn active" data-filter="all" onclick="filterReviews(\'all\')">All</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="GO" onclick="filterReviews(\'GO\')"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Go</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="NOGO" onclick="filterReviews(\'NOGO\')"><i class="fa-solid fa-circle-xmark" style="color:var(--red,#e74c3c)"></i> No Go</button>' +
               '<span class="text-xs text-muted" id="review-filter-count" style="margin-left:auto"></span>' +
             '</div>' +
             '<div id="review-list" style="margin-bottom:var(--space-4)"></div>' +
@@ -319,11 +319,11 @@
               '<div class="form-group">' +
                 '<label class="form-label">Your Verdict</label>' +
                 '<div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-2)" id="verdict-buttons">' +
-                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-GO" onclick="selectVerdict(\\'GO\\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
+                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-GO" onclick="selectVerdict(\'GO\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
                     '<i class="fa-solid fa-circle-check"></i><br><strong>Go</strong><br><span class="text-xs">I recommend</span>' +
                   '</button>' +
-                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-NOGO" onclick="selectVerdict(\\'NOGO\\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
-                    '<i class="fa-solid fa-circle-xmark"></i><br><strong>No Go</strong><br><span class="text-xs">I don\\'t recommend</span>' +
+                  '<button type="button" class="btn btn-sm verdict-btn" id="vbtn-NOGO" onclick="selectVerdict(\'NOGO\')" style="flex:1;border:2px solid var(--border-primary);background:transparent;color:var(--text-secondary);padding:var(--space-3)">' +
+                    '<i class="fa-solid fa-circle-xmark"></i><br><strong>No Go</strong><br><span class="text-xs">I don\'t recommend</span>' +
                   '</button>' +
                 '</div>' +
               '</div>' +
@@ -331,7 +331,6 @@
                 '<label class="form-label">Why? <span class="text-xs text-muted">(optional but helpful)</span></label>' +
                 '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="3"></textarea>' +
               '</div>' +
-              <!-- LEGAL DISCLAIMER FOR COMMENTS -->
               '<p class="text-sm text-muted" style="margin-bottom:var(--space-3);line-height:1.6;">' +
                 'By submitting a review, you confirm that your name and comment may be published publicly on this website. ' +
                 'Please do not include sensitive, confidential, defamatory, or third-party personal information. ' +
@@ -344,10 +343,8 @@
           '</div>' +
         '</div></section>';
 
-      // Init radar chart
       Components.createRadarChart('brand-radar', brand, { showTicks: true, labelSize: 11, pointRadius: 4 });
 
-      // Tab switching
       window.switchTab = function(tab) {
         document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
         document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
@@ -355,7 +352,6 @@
         document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
       };
 
-      // Review state
       var allReviews = [];
       var reviewFilter = 'all';
       var reviewPage = 1;
@@ -454,11 +450,8 @@
 
         list.innerHTML = visible.map(function(r) {
           var verdictHtml = '';
-          if (r.verdict === 'GO') {
-            verdictHtml = '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>';
-          } else if (r.verdict === 'NOGO') {
-            verdictHtml = '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>';
-          }
+          if (r.verdict === 'GO') verdictHtml = '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>';
+          else if (r.verdict === 'NOGO') verdictHtml = '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>';
 
           return '<div class="comment-card">' +
             '<div class="comment-header">' +
