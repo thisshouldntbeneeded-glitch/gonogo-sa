@@ -344,27 +344,33 @@
   }
 
   async function addBrandUser(e) {
-    e.preventDefault();
-    var btn = document.getElementById('bu-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
-    try {
-      var email = document.getElementById('bu-email').value;
-      var pw = document.getElementById('bu-password').value;
-      var name = document.getElementById('bu-name').value;
-      var brandSlug = document.getElementById('bu-brand').value;
-      if (!brandSlug) { Components.showToast('Please select a brand', 'error'); return; }
-      await GoNoGoAPI.addBrandUser(email, pw, name, brandSlug, 'za');
-      Components.showToast('Brand user created: ' + email);
-      document.getElementById('brand-user-form').reset();
-      document.getElementById('brand-user-form').style.display = 'none';
-      loadBrandUsers();
-    } catch(err) {
-      Components.showToast('Error: ' + err.message, 'error');
+  e.preventDefault();
+  var btn = document.getElementById('bu-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+
+  try {
+    var email = document.getElementById('bu-email').value.trim();
+    var pw = document.getElementById('bu-password').value;
+    var name = document.getElementById('bu-name').value.trim();
+    var brandSlug = document.getElementById('bu-brand').value;
+
+    if (!brandSlug) {
+      throw new Error('Please select a brand');
     }
+
+    await GoNoGoAPI.addBrandUser(email, pw, name, brandSlug, 'za');
+    Components.showToast('Brand user created: ' + email);
+    document.getElementById('brand-user-form').reset();
+    document.getElementById('brand-user-form').style.display = 'none';
+    await loadBrandUsers();
+  } catch (err) {
+    Components.showToast('Error: ' + (err.message || 'Failed to create brand user'), 'error');
+  } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
   }
+}
 
   async function removeBrandUser(userId, email) {
     if (!confirm('Remove brand portal access for ' + email + '?')) return;
