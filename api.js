@@ -490,13 +490,21 @@ var GoNoGoAPI = (function () {
     },
 
     addBrandUser: function (email, password, displayName, brandSlug, region) {
-      return this._hashPassword(password).then(function (hash) {
-        return supabaseRequest('rpc/admin_add_brand_user', {
-          method: 'POST',
-          body: { p_email: email, p_hash: hash, p_display_name: displayName || '', p_brand_slug: brandSlug, p_region: region || 'za' }
-        });
-      }).then(function (rows) { return { ok: true, user: rows && rows[0] ? rows[0] : null }; });
-    },
+  return this._hashPassword(password).then(function (hash) {
+    return supabaseRequest('rpc/admin_add_brand_user', {
+      method: 'POST',
+      body: {
+        p_email: email.toLowerCase().trim(),
+        p_hash: hash,
+        p_display_name: displayName || '',
+        p_brand_slug: brandSlug,
+        p_region: region || SITE_REGION
+      }
+    });
+  }).then(function (rows) {
+    return { ok: true, user: rows && rows[0] ? rows[0] : null };
+  });
+},
 
     removeBrandUser: function (userId) {
       return supabaseRequest('rpc/admin_remove_brand_user', { method: 'POST', body: { p_user_id: userId } })
