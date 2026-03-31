@@ -38,8 +38,8 @@
         </p>
 
         <div class="business-actions">
-          <a href="#business-form" class="btn btn-primary">Book a business demo</a>
-          <a href="#pricing" class="btn btn-secondary">View pricing</a>
+          <a href="mailto:mike@gonogo.co.za?subject=GoNoGo%20Business%20Enquiry" class="btn btn-primary">Contact us</a>
+          <a href="#pricing" class="btn btn-secondary">See pricing</a>
         </div>
 
         <div class="value-points">
@@ -416,7 +416,7 @@
             <li>QR feedback for a single site or simple operation</li>
             <li>Monthly support</li>
           </ul>
-          <a href="#business-form" class="btn btn-primary full-width-btn">Book a demo</a>
+          <a href="mailto:mike@gonogo.co.za?subject=GoNoGo%20Business%20Enquiry" class="btn btn-primary full-width-btn">Contact us</a>
         </article>
 
         <article class="price-card">
@@ -432,69 +432,8 @@
             <li>Multi-user team access</li>
             <li>Rollout support and onboarding</li>
           </ul>
-          <a href="#business-form" class="btn btn-secondary full-width-btn">Discuss Multi-Venue</a>
+          <a href="mailto:mike@gonogo.co.za?subject=GoNoGo%20Business%20Enquiry" class="btn btn-secondary full-width-btn">Contact us</a>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="business-form" style="padding-top:0">
-    <div class="container form-panel-wrap">
-      <div class="cta-panel business-form-panel">
-        <div>
-          <h2 class="business-subtitle" style="margin-top:0">Book a GoNoGo business demo</h2>
-          <p class="cta-copy">Tell us a little about your business and we will show you how GoNoGo could work on your website, across your service locations, or within your customer experience workflow.</p>
-        </div>
-
-        <form class="business-form-grid" id="business-demo-form">
-          <div class="form-field">
-            <label for="business-name">Business name</label>
-            <input id="business-name" name="Business name" type="text" required>
-          </div>
-          <div class="form-field">
-            <label for="contact-name">Contact name</label>
-            <input id="contact-name" name="Contact name" type="text" required>
-          </div>
-          <div class="form-field">
-            <label for="work-email">Work email</label>
-            <input id="work-email" name="Work email" type="email" required>
-          </div>
-          <div class="form-field">
-            <label for="phone-number">Phone number</label>
-            <input id="phone-number" name="Phone number" type="tel">
-          </div>
-          <div class="form-field form-field-full">
-            <label for="website-url">Website</label>
-            <input id="website-url" name="Website" type="url" placeholder="https://">
-          </div>
-          <div class="form-field">
-            <label for="locations">Number of locations</label>
-            <select id="locations" name="Number of locations">
-              <option value="1">1</option>
-              <option value="2-5">2–5</option>
-              <option value="6-20">6–20</option>
-              <option value="21+">21+</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="interest">Interested in</label>
-            <select id="interest" name="Interested in">
-              <option value="Public score badge">Public score badge</option>
-              <option value="Business portal">Business portal</option>
-              <option value="QR feedback">QR feedback</option>
-              <option value="Multi-location rollout">Multi-location rollout</option>
-            </select>
-          </div>
-          <div class="form-field form-field-full">
-            <label for="message">Anything useful to know?</label>
-            <textarea id="message" name="Message" rows="4" placeholder="Tell us a little about your business or what you want to use GoNoGo for."></textarea>
-          </div>
-          <div class="form-actions-row form-field-full">
-            <button type="submit" class="btn btn-primary">Request demo</button>
-            <p class="form-help-text">This opens a pre-filled email so you can review it before sending.</p>
-          </div>
-          <p class="form-status" id="form-status" aria-live="polite"></p>
-        </form>
       </div>
     </div>
   </section>
@@ -507,53 +446,6 @@
     document.getElementById('nav').innerHTML = Components.renderPublicNav('business');
     Components.initTheme();
     document.getElementById('footer').innerHTML = Components.renderFooter();
-
-    (function () {
-      var form = document.getElementById('business-demo-form');
-      var status = document.getElementById('form-status');
-      if (!form) return;
-
-      function value(id) {
-        var el = document.getElementById(id);
-        return el ? el.value.trim() : '';
-      }
-
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        var businessName = value('business-name');
-        var contactName = value('contact-name');
-        var workEmail = value('work-email');
-        var phoneNumber = value('phone-number') || 'Not provided';
-        var website = value('website-url') || 'Not provided';
-        var locations = value('locations') || 'Not provided';
-        var interest = value('interest') || 'Not provided';
-        var message = value('message') || 'No additional notes';
-
-        if (!businessName || !contactName || !workEmail) {
-          status.textContent = 'Please complete business name, contact name, and work email.';
-          status.classList.add('is-error');
-          return;
-        }
-
-        status.textContent = '';
-        status.classList.remove('is-error');
-
-        var subject = 'GoNoGo Business Demo Request';
-        var body = [
-          'Business name: ' + businessName,
-          'Contact name: ' + contactName,
-          'Work email: ' + workEmail,
-          'Interested in: ' + interest,
-          '',
-          'Anything useful to know?',
-          message
-        ].join('\n');
-
-        var mailto = 'mailto:mike@gonogo.co.za?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-        window.location.href = mailto;
-      });
-    })();
   </script>
 <style>
     .business-hero {
@@ -1068,7 +960,7 @@
         align-items: flex-start;
       }
     }
-  
+
     .acquisition-strip-three {
       grid-template-columns: repeat(3, 1fr);
     }
@@ -1255,68 +1147,6 @@
       font-size: var(--text-sm);
       line-height: 1.7;
     }
-    .form-panel-wrap {
-      max-width: 980px;
-    }
-    .business-form-panel {
-      padding: var(--space-6);
-      display: grid;
-      gap: var(--space-5);
-    }
-    .business-form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-4);
-    }
-    .form-field {
-      display: grid;
-      gap: 8px;
-    }
-    .form-field-full {
-      grid-column: 1 / -1;
-    }
-    .form-field label {
-      font-size: var(--text-xs);
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      padding: 12px 14px;
-      font: inherit;
-    }
-    .form-field textarea {
-      resize: vertical;
-      min-height: 110px;
-    }
-    .form-actions-row {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      justify-content: flex-start;
-    }
-    .form-help-text {
-      margin: 0;
-      color: var(--text-secondary);
-      font-size: var(--text-xs);
-      line-height: 1.6;
-    }
-    .form-status {
-      margin: 0;
-      color: #b42318;
-      font-size: var(--text-xs);
-      font-weight: 600;
-    }
-    .form-status:empty {
-      display: none;
-    }
     @media (max-width: 1100px) {
       .acquisition-strip-three,
       .acquisition-strip-two,
@@ -1337,7 +1167,6 @@
     }
     @media (max-width: 720px) {
       .example-brand-grid,
-      .business-form-grid,
       .mockup-kpis {
         grid-template-columns: 1fr;
       }
