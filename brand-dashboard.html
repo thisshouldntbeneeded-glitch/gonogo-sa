@@ -1542,24 +1542,64 @@
     }
 
     function copyApiEndpoint() {
-      var url = document.getElementById('api-endpoint').textContent;
-      navigator.clipboard.writeText(url).then(function() {
-        Components.showToast('API endpoint copied to clipboard');
-      });
-    }
-<script>
-    function setupReviewQr(brandSlug) {
-      var reviewUrl = window.location.origin + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
-      window.reviewPageUrl = reviewUrl;
+  var url = document.getElementById('api-endpoint').textContent;
+  navigator.clipboard.writeText(url).then(function() {
+    Components.showToast('API endpoint copied to clipboard');
+  });
+}
 
-      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
+function setupReviewQr(brandSlug) {
+  var reviewUrl = window.location.origin + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
+  window.reviewPageUrl = reviewUrl;
 
-      var reviewUrlEl = document.getElementById('review-url');
-      var qrImageEl = document.getElementById('review-qr-image');
+  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
 
-      if (reviewUrlEl) reviewUrlEl.textContent = reviewUrl;
-      if (qrImageEl) qrImageEl.src = qrUrl;
-    }
+  var reviewUrlEl = document.getElementById('review-url');
+  var qrImageEl = document.getElementById('review-qr-image');
+
+  if (reviewUrlEl) {
+    reviewUrlEl.textContent = reviewUrl;
+  }
+
+  if (qrImageEl) {
+    qrImageEl.src = qrUrl;
+  }
+}
+
+function openReviewPage() {
+  if (!window.reviewPageUrl) return;
+  window.open(window.reviewPageUrl, '_blank', 'noopener,noreferrer');
+}
+
+function copyReviewUrl() {
+  if (!window.reviewPageUrl) return;
+  navigator.clipboard.writeText(window.reviewPageUrl).then(function() {
+    Components.showToast('Review page link copied to clipboard');
+  });
+}
+
+function downloadQrCode() {
+  var img = document.getElementById('review-qr-image');
+  if (!img || !img.src) return;
+
+  fetch(img.src)
+    .then(function(response) {
+      return response.blob();
+    })
+    .then(function(blob) {
+      var a = document.createElement('a');
+      var objectUrl = URL.createObjectURL(blob);
+
+      a.href = objectUrl;
+      a.download = (window.brandSlug || 'brand') + '-review-qr.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(objectUrl);
+      Components.showToast('QR code downloaded');
+    });
+}
 
     function openReviewPage() {
       if (!window.reviewPageUrl) return;
