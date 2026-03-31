@@ -21,28 +21,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-  .portal-grid {
-    display: grid;
-    gap: var(--space-6);
-  }
+  .portal-grid { display: grid; gap: var(--space-6); }
+  .portal-grid-2 { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--space-6); }
+  .portal-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
 
-  .portal-grid-2 {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: var(--space-6);
-  }
-
-  .portal-grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
-  }
-
-  .insight-card {
-    position: relative;
-    overflow: hidden;
-  }
-
+  .insight-card { position: relative; overflow: hidden; }
   .insight-card::after {
     content: '';
     position: absolute;
@@ -50,7 +33,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(17, 165, 81, 0.10) 0%, rgba(17, 165, 81, 0) 70%);
+    background: radial-gradient(circle, rgba(17,165,81,0.10) 0%, rgba(17,165,81,0) 70%);
     pointer-events: none;
   }
 
@@ -62,9 +45,7 @@
     margin-bottom: var(--space-4);
   }
 
-  .section-header-copy p {
-    max-width: none;
-  }
+  .section-header-copy p { max-width: none; }
 
   .priority-list,
   .theme-list,
@@ -106,20 +87,17 @@
     font-size: 13px;
   }
 
-  .priority-icon.critical { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
-  .priority-icon.warning { background: rgba(255, 152, 0, 0.12); color: #ff9800; }
-  .priority-icon.good { background: rgba(17, 165, 81, 0.12); color: #11a551; }
-  .theme-icon { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
-  .reply-icon { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
-  .micro-icon { background: rgba(17, 165, 81, 0.10); color: var(--green); }
+  .priority-icon.critical { background: rgba(231,76,60,0.12); color: #e74c3c; }
+  .priority-icon.warning { background: rgba(255,152,0,0.12); color: #ff9800; }
+  .priority-icon.good { background: rgba(17,165,81,0.12); color: #11a551; }
+  .theme-icon { background: rgba(59,130,246,0.12); color: #3b82f6; }
+  .reply-icon { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+  .micro-icon { background: rgba(17,165,81,0.10); color: var(--green); }
 
   .priority-meta,
   .theme-meta,
   .reply-meta,
-  .micro-meta {
-    min-width: 0;
-    flex: 1;
-  }
+  .micro-meta { min-width: 0; flex: 1; }
 
   .priority-title,
   .theme-title,
@@ -182,7 +160,7 @@
     padding: var(--space-5);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-primary);
-    background: linear-gradient(135deg, rgba(17, 165, 81, 0.10), rgba(59, 130, 246, 0.07));
+    background: linear-gradient(135deg, rgba(17,165,81,0.10), rgba(59,130,246,0.07));
   }
 
   .goal-banner h3 {
@@ -191,10 +169,7 @@
     color: var(--text-primary);
   }
 
-  .goal-banner p {
-    margin: 0;
-    max-width: none;
-  }
+  .goal-banner p { margin: 0; max-width: none; }
 
   .goal-score-chip {
     display: inline-flex;
@@ -208,7 +183,7 @@
     font-weight: 800;
     color: #fff;
     background: linear-gradient(135deg, #11a551, #0d8742);
-    box-shadow: 0 8px 24px rgba(17, 165, 81, 0.18);
+    box-shadow: 0 8px 24px rgba(17,165,81,0.18);
     font-variant-numeric: tabular-nums;
   }
 
@@ -244,7 +219,7 @@
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(17, 165, 81, 0.12);
+    background: rgba(17,165,81,0.12);
     color: #11a551;
   }
 
@@ -313,9 +288,7 @@
     background: var(--surface-2);
   }
 
-  .coach-box + .coach-box {
-    margin-top: var(--space-4);
-  }
+  .coach-box + .coach-box { margin-top: var(--space-4); }
 
   .coach-label {
     font-size: 11px;
@@ -333,9 +306,7 @@
     max-width: none;
   }
 
-  .coach-copy strong {
-    color: var(--text-primary);
-  }
+  .coach-copy strong { color: var(--text-primary); }
 
   .opportunity-bar-wrap {
     display: flex;
@@ -395,10 +366,7 @@
     justify-content: center;
   }
 
-  .embed-tips {
-    display: grid;
-    gap: var(--space-3);
-  }
+  .embed-tips { display: grid; gap: var(--space-3); }
 
   .embed-tip {
     border: 1px solid var(--border-primary);
@@ -440,51 +408,27 @@
     border-radius: 999px;
   }
 
-  .heat-badge.high {
-    background: rgba(231, 76, 60, 0.12);
-    color: #e74c3c;
-  }
-
-  .heat-badge.medium {
-    background: rgba(255, 152, 0, 0.12);
-    color: #ff9800;
-  }
-
-  .heat-badge.low {
-    background: rgba(17, 165, 81, 0.12);
-    color: #11a551;
-  }
+  .heat-badge.high { background: rgba(231,76,60,0.12); color: #e74c3c; }
+  .heat-badge.medium { background: rgba(255,152,0,0.12); color: #ff9800; }
+  .heat-badge.low { background: rgba(17,165,81,0.12); color: #11a551; }
 
   @media (max-width: 1200px) {
     .portal-grid-2,
     .themes-grid,
     .embed-grid,
-    .sentiment-summary {
-      grid-template-columns: 1fr;
-    }
+    .sentiment-summary { grid-template-columns: 1fr; }
 
     .scenario-grid,
-    .metric-strip {
-      grid-template-columns: 1fr 1fr;
-    }
+    .metric-strip { grid-template-columns: 1fr 1fr; }
   }
 
   @media (max-width: 900px) {
     .portal-grid-3,
     .scenario-grid,
-    .metric-strip {
-      grid-template-columns: 1fr;
-    }
+    .metric-strip { grid-template-columns: 1fr; }
 
-    .opportunity-row {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .goal-banner {
-      flex-direction: column;
-      align-items: flex-start;
-    }
+    .opportunity-row { grid-template-columns: 1fr; gap: 8px; }
+    .goal-banner { flex-direction: column; align-items: flex-start; }
   }
 
   @media (max-width: 1024px) {
@@ -851,6 +795,7 @@
 
     var currentBadgeStyle = 'full';
     var reviewReplyTemplates = [];
+    var LIVE_PUBLIC_BASE_URL = 'https://www.gonogo.co.za';
 
     function getChartThemeColors() {
       if (typeof Components.getChartThemeColors === 'function') {
@@ -1441,7 +1386,7 @@
       window.brandName = brandName;
       window.brandScore = brandScore;
       window.brandVerdict = brandVerdict;
-      window.siteUrl = window.location.origin;
+      window.siteUrl = LIVE_PUBLIC_BASE_URL;
       setBadgeStyle('full');
 
       var apiUrl = 'https://fnpxaneextqidbessnej.supabase.co/rest/v1/brands?slug=eq.' + encodeURIComponent(brandSlug) + '&select=name,gonogo_score,verdict,framework_breakdown,key_strengths,key_concerns,last_updated';
@@ -1471,7 +1416,7 @@
       var score = window.brandScore || 0;
       var verdict = window.brandVerdict || 'NOGO';
       var slug = window.brandSlug || '';
-      var siteUrl = window.siteUrl || '';
+      var siteUrl = window.siteUrl || LIVE_PUBLIC_BASE_URL;
       var verdictColor = verdict === 'GO' ? '#11a551' : verdict === 'NOGO' ? '#e74c3c' : '#ff9800';
       var brandUrl = siteUrl + '/brand.html?id=' + encodeURIComponent(slug);
 
@@ -1517,24 +1462,17 @@
     }
 
     function setupReviewQr(brandSlug) {
-  var publicBaseUrl = 'https://www.gonogo.co.za';
-  var reviewUrl = publicBaseUrl + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
+      var reviewUrl = LIVE_PUBLIC_BASE_URL + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
+      window.reviewPageUrl = reviewUrl;
 
-  window.reviewPageUrl = reviewUrl;
+      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
 
-  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
+      var reviewUrlEl = document.getElementById('review-url');
+      var qrImageEl = document.getElementById('review-qr-image');
 
-  var reviewUrlEl = document.getElementById('review-url');
-  var qrImageEl = document.getElementById('review-qr-image');
-
-  if (reviewUrlEl) {
-    reviewUrlEl.textContent = reviewUrl;
-  }
-
-  if (qrImageEl) {
-    qrImageEl.src = qrUrl;
-  }
-}
+      if (reviewUrlEl) {
+        reviewUrlEl.textContent = reviewUrl;
+      }
 
       if (qrImageEl) {
         qrImageEl.src = qrUrl;
