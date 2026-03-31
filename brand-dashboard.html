@@ -932,6 +932,7 @@
       renderReviewThemes(reviewAnalysis, frameworkAnalysis);
       renderReplyCoach(brand, reviewAnalysis, frameworkAnalysis);
       setupEmbed(brandSlug, brand.name || 'Brand', brand.overallScore || 0, brand.verdict || 'NOGO');
+       setupReviewQr(brandSlug);
     }
 
     function renderHeader(brand) {
