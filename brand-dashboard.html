@@ -1517,17 +1517,24 @@
     }
 
     function setupReviewQr(brandSlug) {
-      var reviewUrl = window.location.origin + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
-      window.reviewPageUrl = reviewUrl;
+  var publicBaseUrl = 'https://www.gonogo.co.za';
+  var reviewUrl = publicBaseUrl + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
 
-      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
+  window.reviewPageUrl = reviewUrl;
 
-      var reviewUrlEl = document.getElementById('review-url');
-      var qrImageEl = document.getElementById('review-qr-image');
+  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
 
-      if (reviewUrlEl) {
-        reviewUrlEl.textContent = reviewUrl;
-      }
+  var reviewUrlEl = document.getElementById('review-url');
+  var qrImageEl = document.getElementById('review-qr-image');
+
+  if (reviewUrlEl) {
+    reviewUrlEl.textContent = reviewUrl;
+  }
+
+  if (qrImageEl) {
+    qrImageEl.src = qrUrl;
+  }
+}
 
       if (qrImageEl) {
         qrImageEl.src = qrUrl;
