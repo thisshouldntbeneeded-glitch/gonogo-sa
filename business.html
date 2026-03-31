@@ -446,7 +446,7 @@
           <p class="cta-copy">Tell us a little about your business and we will show you how GoNoGo could work on your website, across your service locations, or within your customer experience workflow.</p>
         </div>
 
-        <form class="business-form-grid" action="mailto:mike@gonogo.co.za" method="post" enctype="text/plain">
+        <form class="business-form-grid" id="business-demo-form">
           <div class="form-field">
             <label for="business-name">Business name</label>
             <input id="business-name" name="Business name" type="text" required>
@@ -491,7 +491,9 @@
           </div>
           <div class="form-actions-row form-field-full">
             <button type="submit" class="btn btn-primary">Request demo</button>
+            <p class="form-help-text">This opens a pre-filled email so you can review it before sending.</p>
           </div>
+          <p class="form-status" id="form-status" aria-live="polite"></p>
         </form>
       </div>
     </div>
@@ -505,6 +507,56 @@
     document.getElementById('nav').innerHTML = Components.renderPublicNav('business');
     Components.initTheme();
     document.getElementById('footer').innerHTML = Components.renderFooter();
+
+    (function () {
+      var form = document.getElementById('business-demo-form');
+      var status = document.getElementById('form-status');
+      if (!form) return;
+
+      function value(id) {
+        var el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        var businessName = value('business-name');
+        var contactName = value('contact-name');
+        var workEmail = value('work-email');
+        var phoneNumber = value('phone-number') || 'Not provided';
+        var website = value('website-url') || 'Not provided';
+        var locations = value('locations') || 'Not provided';
+        var interest = value('interest') || 'Not provided';
+        var message = value('message') || 'No additional notes';
+
+        if (!businessName || !contactName || !workEmail) {
+          status.textContent = 'Please complete business name, contact name, and work email.';
+          status.classList.add('is-error');
+          return;
+        }
+
+        status.textContent = '';
+        status.classList.remove('is-error');
+
+        var subject = 'GoNoGo Business Demo Request';
+        var body = [
+          'Business name: ' + businessName,
+          'Contact name: ' + contactName,
+          'Work email: ' + workEmail,
+          'Phone number: ' + phoneNumber,
+          'Website: ' + website,
+          'Number of locations: ' + locations,
+          'Interested in: ' + interest,
+          '',
+          'Anything useful to know?',
+          message
+        ].join('\n');
+
+        var mailto = 'mailto:mike@gonogo.co.za?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        window.location.href = mailto;
+      });
+    })();
   </script>
 <style>
     .business-hero {
@@ -1248,7 +1300,25 @@
     }
     .form-actions-row {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-3);
       justify-content: flex-start;
+    }
+    .form-help-text {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: var(--text-xs);
+      line-height: 1.6;
+    }
+    .form-status {
+      margin: 0;
+      color: #b42318;
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+    .form-status:empty {
+      display: none;
     }
     @media (max-width: 1100px) {
       .acquisition-strip-three,
