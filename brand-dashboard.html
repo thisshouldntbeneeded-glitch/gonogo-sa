@@ -5,19 +5,22 @@
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
  / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
-/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+ / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+ \____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
                     /_/
 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoNoGo SA â€” Brand Dashboard</title>
+<title>GoNoGo SA — Brand Dashboard</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
   .portal-grid {
     display: grid;
     gap: var(--space-6);
@@ -179,8 +182,7 @@
     padding: var(--space-5);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-primary);
-    background:
-      linear-gradient(135deg, rgba(17,165,81,0.10), rgba(59,130,246,0.07));
+    background: linear-gradient(135deg, rgba(17,165,81,0.10), rgba(59,130,246,0.07));
   }
 
   .goal-banner h3 {
@@ -302,24 +304,6 @@
     grid-template-columns: 220px 1fr;
     gap: var(--space-5);
     align-items: center;
-  }
-
-  .mini-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .mini-table th,
-  .mini-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border-subtle);
-    text-align: left;
-    font-size: var(--text-xs);
-  }
-
-  .mini-table th {
-    color: var(--text-muted);
-    font-weight: 700;
   }
 
   .coach-box {
@@ -512,13 +496,10 @@
   }
 
   @media (max-width: 768px) {
-    .admin-main > div:nth-child(2) {
-      grid-template-columns: 1fr !important;
-    }
-    .admin-main > div:nth-child(3) {
-      grid-template-columns: 1fr !important;
-    }
-    .admin-main > div:nth-child(4) {
+    .admin-main > div:nth-child(2),
+    .admin-main > div:nth-child(3),
+    .admin-main > div:nth-child(4),
+    .admin-main > div:nth-child(5) {
       grid-template-columns: 1fr !important;
     }
   }
@@ -534,7 +515,7 @@
           <div id="brand-logo-area"></div>
           <div>
             <h1 class="admin-title" id="brand-welcome">Dashboard</h1>
-            <p class="text-sm text-secondary" id="brand-subtitle">Your GoNoGo brand overview</p>
+            <p class="text-sm text-secondary" id="brand-subtitle">Your GoNoGo South Africa brand overview</p>
           </div>
         </div>
         <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
@@ -641,7 +622,7 @@
               Position in Your Category
             </h3>
             <div style="height:300px;"><canvas id="peer-position-chart"></canvas></div>
-            <p class="text-xs text-muted" id="peer-position-note" style="margin-top:var(--space-3);">How your score compares with other brands in your category.</p>
+            <p class="text-xs text-muted" id="peer-position-note" style="margin-top:var(--space-3);">How your score compares with other South African brands in your category.</p>
           </div>
         </div>
       </div>
@@ -720,7 +701,7 @@
               <i class="fa-solid fa-code" style="color:var(--green);margin-right:var(--space-2);"></i>
               Display Your GoNoGo Score on Your Website
             </h3>
-            <p class="text-sm text-secondary">Publish your live score badge and reinforce trust wherever customers compare brands.</p>
+            <p class="text-sm text-secondary">Publish your live score badge and reinforce trust wherever South African customers compare brands.</p>
           </div>
         </div>
 
@@ -812,6 +793,39 @@
     var currentBadgeStyle = 'full';
     var reviewReplyTemplates = [];
 
+    function getChartThemeColors() {
+      if (typeof Components.getChartThemeColors === 'function') {
+        return Components.getChartThemeColors();
+      }
+      if (typeof Components._getChartThemeColors === 'function') {
+        return Components._getChartThemeColors();
+      }
+      return {
+        gridColor: 'rgba(148, 163, 184, 0.16)',
+        tickColor: '#94a3b8',
+        legendColor: '#94a3b8',
+        tooltipBg: '#111827',
+        tooltipTitle: '#ffffff',
+        tooltipBody: '#e5e7eb',
+        tooltipBorder: 'rgba(255,255,255,0.08)'
+      };
+    }
+
+    function safeText(value, fallback) {
+      return value === null || value === undefined || value === '' ? fallback : value;
+    }
+
+    function getRawCategorySlug(raw) {
+      return raw.category_slug || raw.categoryslug || raw.category || '';
+    }
+
+    function destroyExistingChart(canvasId) {
+      var canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      var chart = Chart.getChart(canvas);
+      if (chart) chart.destroy();
+    }
+
     async function initBrandPage() {
       var user = Components.getBrandUser();
       if (!user) return;
@@ -819,7 +833,7 @@
       document.getElementById('brand-content').style.display = '';
       document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('dashboard');
 
-      var brandSlug = user.brand_slug;
+      var brandSlug = user.brand_slug || user.brandslug || '';
       var data = await GoNoGoAPI.getBrandData(brandSlug);
 
       if (!data) {
@@ -832,12 +846,13 @@
         return;
       }
 
-      var brand = data.normalized;
-      var raw = data.raw;
+      var brand = data.normalized || {};
+      var raw = data.raw || {};
+      var categorySlug = getRawCategorySlug(raw);
 
       var results = await Promise.all([
         GoNoGoAPI.getBrandReviews(brand.name),
-        GoNoGoAPI.getBrandsInCategory(raw.category_slug)
+        categorySlug ? GoNoGoAPI.getBrandsInCategory(categorySlug) : Promise.resolve([])
       ]);
 
       var reviews = Array.isArray(results[0]) ? results[0] : [];
@@ -850,42 +865,41 @@
       renderStrengths(brand);
       renderConcerns(brand);
 
-      var frameworkAnalysis = analyseFramework(raw.framework_breakdown || [], brand.overallScore);
+      var frameworkAnalysis = analyseFramework(raw.framework_breakdown || raw.frameworkbreakdown || [], brand.overallScore || 0);
       var reviewAnalysis = analyseReviews(reviews);
-      var peerAnalysis = analysePeers(peers, brandSlug, brand.overallScore);
 
       renderGoalBanner(brand, frameworkAnalysis, reviewAnalysis);
       renderImprovementPlan(brand, frameworkAnalysis, reviewAnalysis);
       renderScoreLiftScenarios(brand, frameworkAnalysis);
       renderOpportunityBars(frameworkAnalysis);
-      renderPeerPositionChart(peers, brandSlug, brand.name);
+      renderPeerPositionChart(peers, brandSlug, brand.name || 'Your brand');
       renderSentiment(reviewAnalysis);
       renderReviewThemes(reviewAnalysis, frameworkAnalysis);
       renderReplyCoach(brand, reviewAnalysis, frameworkAnalysis);
-      setupEmbed(brandSlug, brand.name, brand.overallScore, brand.verdict);
+      setupEmbed(brandSlug, brand.name || 'Brand', brand.overallScore || 0, brand.verdict || 'NOGO');
     }
 
     function renderHeader(brand) {
-      var logoArea = document.getElementById('brand-logo-area');
-      logoArea.innerHTML = '';
-      if (brand.logo) {
-        var img = document.createElement('img');
-        img.src = brand.logo;
-        img.alt = brand.name;
-        img.style.cssText = 'width:48px;height:48px;border-radius:var(--radius-md);object-fit:contain;background:var(--surface-3);';
-        img.onerror = function() { this.style.display = 'none'; };
-        logoArea.appendChild(img);
-      }
-      document.getElementById('brand-welcome').textContent = 'Welcome, ' + brand.name;
-      document.getElementById('brand-subtitle').textContent = brand.categoryName + ' â€” Last updated ' + (brand.lastUpdated || '');
-      document.getElementById('score-circle-area').innerHTML = Components.renderScoreCircle(brand.overallScore, 'lg');
-      document.getElementById('verdict-badge-area').innerHTML = Components.renderVerdictBadge(brand.verdict);
+      var logoHtml = brand.logo
+        ? '<img src="' + brand.logo + '" alt="' + Components.escapeHTML(brand.name || 'Brand') + '" style="width:48px;height:48px;border-radius:var(--radius-md);object-fit:contain;background:var(--surface-3);" onerror="this.style.display=\'none\'">'
+        : '';
+
+      document.getElementById('brand-logo-area').innerHTML = logoHtml;
+      document.getElementById('brand-welcome').textContent = 'Welcome, ' + safeText(brand.name, 'Brand');
+      document.getElementById('brand-subtitle').textContent =
+        safeText(brand.categoryName, 'Category unavailable') + ' — Last updated ' + Components.formatDate(safeText(brand.lastUpdated, new Date().toISOString()));
+      document.getElementById('score-circle-area').innerHTML = Components.renderScoreCircle(brand.overallScore || 0, 'lg');
+      document.getElementById('verdict-badge-area').innerHTML = Components.renderVerdictBadge(safeText(brand.verdict, 'NOGO'));
     }
 
     function renderTopSummary(brand, raw, reviews, peers, brandSlug) {
+      var sortedPeers = (peers || []).slice().sort(function(a, b) {
+        return (parseInt(b.gonogo_score || b.gonogoscore, 10) || 0) - (parseInt(a.gonogo_score || a.gonogoscore, 10) || 0);
+      });
+
       var rank = 1;
-      for (var i = 0; i < peers.length; i++) {
-        if (peers[i].slug === brandSlug) {
+      for (var i = 0; i < sortedPeers.length; i++) {
+        if (sortedPeers[i].slug === brandSlug) {
           rank = i + 1;
           break;
         }
@@ -894,16 +908,19 @@
       var goReviews = reviews.filter(function(r) {
         return normalizeVerdict(r.verdict) === 'GO';
       });
+
       var negativeReviews = reviews.filter(function(r) {
         var v = normalizeVerdict(r.verdict);
         return v === 'NOGO' || v === 'GO WITH CAUTION';
       });
 
       var avgSentiment = reviews.length > 0 ? Math.round((goReviews.length / reviews.length) * 100) : 0;
-      var totalPossible = getFrameworkTotal(raw.framework_breakdown || []);
-      var currentPoints = getFrameworkEarned(raw.framework_breakdown || []);
+      var breakdown = raw.framework_breakdown || raw.frameworkbreakdown || [];
+      var totalPossible = getFrameworkTotal(breakdown);
+      var currentPoints = getFrameworkEarned(breakdown);
       var headroom = Math.max(0, totalPossible - currentPoints);
-      var toNextBand = brand.overallScore >= 80 ? 0 : (brand.overallScore >= 60 ? 80 - brand.overallScore : 60 - brand.overallScore);
+      var overallScore = brand.overallScore || 0;
+      var toNextBand = overallScore >= 80 ? 0 : (overallScore >= 60 ? 80 - overallScore : 60 - overallScore);
 
       document.getElementById('kpi-grid').innerHTML =
         '<div class="kpi-card">' +
@@ -920,8 +937,8 @@
         '</div>' +
         '<div class="kpi-card">' +
           '<div class="kpi-label">Industry Rank</div>' +
-          '<div class="kpi-value">#' + rank + '<span class="text-sm text-muted"> / ' + peers.length + '</span></div>' +
-          '<div class="kpi-delta text-muted">' + Components.escapeHTML(brand.categoryName) + '</div>' +
+          '<div class="kpi-value">#' + rank + '<span class="text-sm text-muted"> / ' + (sortedPeers.length || 0) + '</span></div>' +
+          '<div class="kpi-delta text-muted">' + Components.escapeHTML(safeText(brand.categoryName, 'Unknown category')) + '</div>' +
         '</div>';
 
       document.getElementById('metric-strip').innerHTML =
@@ -955,7 +972,8 @@
       if (!topGap) {
         copy = 'Complete more framework data to unlock personalised score-improvement guidance.';
       } else {
-        var nextTarget = brand.overallScore >= 80 ? Math.min(100, brand.overallScore + 5) : (brand.overallScore >= 60 ? 80 : 60);
+        var overallScore = brand.overallScore || 0;
+        var nextTarget = overallScore >= 80 ? Math.min(100, overallScore + 5) : (overallScore >= 60 ? 80 : 60);
         var issuePhrase = reviewAnalysis.topNegativeTheme ? ' and reducing "' + reviewAnalysis.topNegativeTheme.label + '" complaints' : '';
         copy = 'Your fastest improvement path is to strengthen ' + topGap.category + issuePhrase + '. That is the clearest route toward a score of ' + nextTarget + '.';
         chip = '+' + Math.min(12, Math.max(3, Math.round(topGap.missing * 0.6)));
@@ -967,6 +985,7 @@
 
     function renderRadar(brand) {
       if (brand.categoryScores && Object.keys(brand.categoryScores).length > 0) {
+        destroyExistingChart('radar-chart');
         Components.createRadarChart('radar-chart', brand, { labelSize: 11, showTicks: true });
       } else {
         document.getElementById('radar-chart').parentElement.innerHTML =
@@ -975,7 +994,7 @@
     }
 
     function renderFrameworkTable(raw) {
-      var fb = raw.framework_breakdown || [];
+      var fb = raw.framework_breakdown || raw.frameworkbreakdown || [];
       if (!fb.length) {
         document.getElementById('framework-table').innerHTML =
           '<div class="empty-soft">No framework breakdown available.</div>';
@@ -995,9 +1014,9 @@
         var color = getScoreColor(pct);
 
         tableHtml += '<tr>' +
-          '<td style="font-weight:600;font-size:var(--text-sm);">' + Components.escapeHTML(item.category) + '</td>' +
+          '<td style="font-weight:600;font-size:var(--text-sm);">' + Components.escapeHTML(safeText(item.category, 'Category')) + '</td>' +
           '<td style="text-align:center;">' +
-            '<span style="display:inline-block;padding:2px 10px;border-radius:var(--radius-sm);background:' + color + '15;color:' + color + ';font-weight:700;font-size:var(--text-sm);">' + Components.escapeHTML(item.score) + '</span>' +
+            '<span style="display:inline-block;padding:2px 10px;border-radius:var(--radius-sm);background:' + color + '15;color:' + color + ';font-weight:700;font-size:var(--text-sm);">' + Components.escapeHTML(safeText(item.score, '0/0')) + '</span>' +
           '</td>' +
           '<td style="text-align:center;font-size:var(--text-xs);font-weight:700;color:' + color + ';">' + pct + '%</td>' +
           '<td style="font-size:var(--text-xs);color:var(--text-secondary);max-width:320px;">' + Components.escapeHTML(item.description || 'This category contributes directly to your GoNoGo outcome.') + '</td>' +
@@ -1076,7 +1095,7 @@
             '<div class="scenario-delta">+' + s.delta + '</div>' +
           '</div>' +
           '<div class="scenario-score-line">' +
-            '<strong>' + brand.overallScore + '</strong>' +
+            '<strong>' + (brand.overallScore || 0) + '</strong>' +
             '<span class="scenario-arrow"><i class="fa-solid fa-arrow-right"></i></span>' +
             '<strong>' + s.projected + '</strong>' +
           '</div>' +
@@ -1100,9 +1119,10 @@
         html += '<div class="opportunity-row">' +
           '<div class="opportunity-label">' + Components.escapeHTML(item.category) + '</div>' +
           '<div class="opportunity-track"><div class="opportunity-fill" style="width:' + gainPct + '%;"></div></div>' +
-          '<div class="opportunity-value">+' + item.missing + ' pts</div>' +
+          '<div class="opportunity-value">' + item.missing + ' pts</div>' +
         '</div>';
       });
+
       container.innerHTML = html;
     }
 
@@ -1113,15 +1133,13 @@
         return;
       }
 
-      var tc = Components._getChartThemeColors();
+      destroyExistingChart('peer-position-chart');
+
+      var tc = getChartThemeColors();
       var labels = peers.map(function(p) { return p.name; });
-      var scores = peers.map(function(p) { return parseInt(p.gonogo_score, 10) || 0; });
-      var colors = peers.map(function(p) {
-        return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.45)';
-      });
-      var borders = peers.map(function(p) {
-        return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.7)';
-      });
+      var scores = peers.map(function(p) { return parseInt(p.gonogo_score || p.gonogoscore, 10) || 0; });
+      var colors = peers.map(function(p) { return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.45)'; });
+      var borders = peers.map(function(p) { return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.7)'; });
 
       new Chart(canvas, {
         type: 'bar',
@@ -1176,21 +1194,41 @@
         }
       });
 
-      document.getElementById('peer-position-note').textContent = brandName + ' is highlighted in green so you can see where you sit in your category.';
+      document.getElementById('peer-position-note').textContent =
+        brandName + ' is highlighted in green so you can see where you sit in your category.';
     }
 
     function renderSentiment(reviewAnalysis) {
       var canvas = document.getElementById('sentiment-chart');
-      var tc = Components._getChartThemeColors();
+      if (!canvas) return;
 
+      destroyExistingChart('sentiment-chart');
+
+      var tc = getChartThemeColors();
       var labels = [];
       var data = [];
       var colors = [];
 
-      if (reviewAnalysis.go > 0) { labels.push('Go'); data.push(reviewAnalysis.go); colors.push('#11a551'); }
-      if (reviewAnalysis.caution > 0) { labels.push('Caution'); data.push(reviewAnalysis.caution); colors.push('#ff9800'); }
-      if (reviewAnalysis.nogo > 0) { labels.push('NoGo'); data.push(reviewAnalysis.nogo); colors.push('#e74c3c'); }
-      if (reviewAnalysis.noVerdict > 0) { labels.push('No Verdict'); data.push(reviewAnalysis.noVerdict); colors.push('#666666'); }
+      if (reviewAnalysis.go > 0) {
+        labels.push('Go');
+        data.push(reviewAnalysis.go);
+        colors.push('#11a551');
+      }
+      if (reviewAnalysis.caution > 0) {
+        labels.push('Caution');
+        data.push(reviewAnalysis.caution);
+        colors.push('#ff9800');
+      }
+      if (reviewAnalysis.nogo > 0) {
+        labels.push('NoGo');
+        data.push(reviewAnalysis.nogo);
+        colors.push('#e74c3c');
+      }
+      if (reviewAnalysis.noVerdict > 0) {
+        labels.push('No Verdict');
+        data.push(reviewAnalysis.noVerdict);
+        colors.push('#666666');
+      }
 
       if (reviewAnalysis.total === 0) {
         labels = ['No Reviews'];
@@ -1244,16 +1282,16 @@
         }
       });
 
-      var summary = 'You have ' + reviewAnalysis.total + ' review' + (reviewAnalysis.total === 1 ? '' : 's') + '. ';
+      var summary = 'You have ' + reviewAnalysis.total + ' review' + (reviewAnalysis.total === 1 ? '' : 's') + '.';
       if (reviewAnalysis.total === 0) {
-        summary += 'As reviews arrive, this section will show recurring themes and what they imply for your score.';
+        summary = 'As reviews arrive, this section will show recurring themes and what they imply for your score.';
       } else if (reviewAnalysis.nogo > reviewAnalysis.go) {
-        summary += 'Negative verdicts currently outweigh positive ones, which suggests unresolved customer issues are still visible.';
-      } else if (reviewAnalysis.go >= reviewAnalysis.nogo) {
-        summary += 'Positive signals are stronger than negative ones, but recurring complaints still show where trust can improve.';
+        summary = 'Negative verdicts currently outweigh positive ones, which suggests unresolved customer issues are still visible.';
+      } else if (reviewAnalysis.go > reviewAnalysis.nogo) {
+        summary = 'Positive signals are stronger than negative ones, but recurring complaints still show where trust can improve.';
       }
       if (reviewAnalysis.topNegativeTheme) {
-        summary += ' The most repeated concern is "' + reviewAnalysis.topNegativeTheme.label + '".';
+        summary += ' The most repeated concern is ' + reviewAnalysis.topNegativeTheme.label + '.';
       }
 
       document.getElementById('review-intel-summary').innerHTML =
@@ -1267,6 +1305,7 @@
         pills.push('<span class="theme-pill"><i class="fa-solid fa-triangle-exclamation" style="color:#ff9800;"></i> ' + Components.escapeHTML(reviewAnalysis.topNegativeTheme.label) + '</span>');
       }
       pills.push('<span class="theme-pill"><i class="fa-solid fa-hashtag"></i> ' + reviewAnalysis.total + ' reviews analysed</span>');
+
       document.getElementById('theme-pill-row').innerHTML = pills.join('');
     }
 
@@ -1279,7 +1318,8 @@
       }
 
       var combined = [];
-      (reviewAnalysis.negativeThemes || []).slice(0, 3).forEach(function(theme) {
+
+      reviewAnalysis.negativeThemes.slice(0, 3).forEach(function(theme) {
         combined.push({
           icon: 'fa-triangle-exclamation',
           title: theme.label + ' is dragging trust',
@@ -1287,7 +1327,7 @@
         });
       });
 
-      (reviewAnalysis.positiveThemes || []).slice(0, 2).forEach(function(theme) {
+      reviewAnalysis.positiveThemes.slice(0, 2).forEach(function(theme) {
         combined.push({
           icon: 'fa-circle-check',
           title: theme.label + ' is a trust asset',
@@ -1335,13 +1375,11 @@
       actionList.innerHTML = actions.map(function(text) {
         return '<li class="micro-item">' +
           '<span class="micro-icon"><i class="fa-solid fa-check"></i></span>' +
-          '<div class="micro-meta">' +
-            '<div class="micro-desc">' + Components.escapeHTML(text) + '</div>' +
-          '</div>' +
+          '<div class="micro-meta"><div class="micro-desc">' + Components.escapeHTML(text) + '</div></div>' +
         '</li>';
       }).join('');
 
-      reviewReplyTemplates = buildReplyTemplates(brand.name, topNegativeTheme);
+      reviewReplyTemplates = buildReplyTemplates(brand.name || 'your brand', topNegativeTheme);
       templateList.innerHTML = reviewReplyTemplates.map(function(item) {
         return '<div class="reply-item">' +
           '<span class="reply-icon"><i class="fa-solid fa-pen"></i></span>' +
@@ -1354,19 +1392,25 @@
     }
 
     function setupEmbed(brandSlug, brandName, brandScore, brandVerdict) {
-      window._brandSlug = brandSlug;
-      window._brandName = brandName;
-      window._brandScore = brandScore;
-      window._brandVerdict = brandVerdict;
-      window._siteUrl = window.location.origin;
+      window.brandSlug = brandSlug;
+      window.brandName = brandName;
+      window.brandScore = brandScore;
+      window.brandVerdict = brandVerdict;
+      window.siteUrl = window.location.origin;
+
       setBadgeStyle('full');
 
-      var apiUrl = 'https://fnpxaneextqidbessnej.supabase.co/rest/v1/brands?slug=eq.' + encodeURIComponent(brandSlug) + '&select=name,gonogo_score,verdict,framework_breakdown,key_strengths,key_concerns,last_updated';
+      var apiUrl =
+        'https://fnpxaneextqidbessnej.supabase.co/rest/v1/brands?slug=eq.' +
+        encodeURIComponent(brandSlug) +
+        '&select=name,gonogo_score,verdict,framework_breakdown,key_strengths,key_concerns,last_updated';
+
       document.getElementById('api-endpoint').textContent = apiUrl;
     }
 
     function setBadgeStyle(style) {
       currentBadgeStyle = style;
+
       ['full', 'compact', 'score'].forEach(function(s) {
         var btn = document.getElementById('badge-style-' + s);
         if (!btn) return;
@@ -1380,38 +1424,53 @@
           btn.style.border = '1px solid var(--border-primary)';
         }
       });
+
       updateBadgePreview();
     }
 
     function updateBadgePreview() {
-      var name = window._brandName || 'Brand';
-      var score = window._brandScore || 0;
-      var verdict = window._brandVerdict || 'NOGO';
-      var slug = window._brandSlug || '';
-      var siteUrl = window._siteUrl || '';
-      var verdictColor = verdict === 'GO' ? '#11a551' : verdict === 'NOGO' ? '#e74c3c' : '#ff9800';
+      var name = window.brandName || 'Brand';
+      var score = window.brandScore || 0;
+      var verdict = window.brandVerdict || 'NOGO';
+      var slug = window.brandSlug || '';
+      var siteUrl = window.siteUrl || window.location.origin;
+      var verdictColor = verdict === 'GO' ? '#11a551' : (verdict === 'NOGO' ? '#e74c3c' : '#ff9800');
       var brandUrl = siteUrl + '/brand.html?id=' + encodeURIComponent(slug);
 
       var badgeHtml = '';
       var embedCode = '';
 
       if (currentBadgeStyle === 'full') {
-        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;padding:12px 20px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-          '<div style="text-align:center;"><div style="font-size:28px;font-weight:800;color:' + verdictColor + ';">' + score + '</div><div style="font-size:10px;color:#666;">/100</div></div>' +
-          '<div style="width:1px;height:40px;background:#2a2a2a;"></div>' +
-          '<div><div style="font-size:13px;font-weight:600;color:#fff;">' + escapeInline(name) + '</div>' +
-          '<div style="font-size:11px;font-weight:700;color:' + verdictColor + ';">' + verdict.replace(/_/g, ' ') + '</div>' +
-          '<div style="font-size:9px;color:#666;margin-top:2px;">Rated by GoNoGo</div></div></a>';
+        badgeHtml =
+          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;padding:12px 20px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+            '<div style="text-align:center;">' +
+              '<div style="font-size:28px;font-weight:800;color:' + verdictColor + ';">' + score + '</div>' +
+              '<div style="font-size:10px;color:#666;">/100</div>' +
+            '</div>' +
+            '<div style="width:1px;height:40px;background:#2a2a2a;"></div>' +
+            '<div>' +
+              '<div style="font-size:13px;font-weight:600;color:#fff;">' + escapeInline(name) + '</div>' +
+              '<div style="font-size:11px;font-weight:700;color:' + verdictColor + ';">' + escapeInline(verdict.replace(/_/g, ' ')) + '</div>' +
+              '<div style="font-size:9px;color:#666;margin-top:2px;">Rated by GoNoGo</div>' +
+            '</div>' +
+          '</a>';
         embedCode = badgeHtml;
       } else if (currentBadgeStyle === 'compact') {
-        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#0a0a0a;border-radius:8px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-          '<span style="font-size:18px;font-weight:800;color:' + verdictColor + ';">' + score + '</span>' +
-          '<span style="font-size:11px;color:#fff;font-weight:600;">' + verdict.replace(/_/g, ' ') + '</span>' +
-          '<span style="font-size:9px;color:#666;">GoNoGo</span></a>';
+        badgeHtml =
+          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#0a0a0a;border-radius:8px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+            '<span style="font-size:18px;font-weight:800;color:' + verdictColor + ';">' + score + '</span>' +
+            '<span style="font-size:11px;color:#fff;font-weight:600;">' + escapeInline(verdict.replace(/_/g, ' ')) + '</span>' +
+            '<span style="font-size:9px;color:#666;">GoNoGo</span>' +
+          '</a>';
         embedCode = badgeHtml;
       } else {
-        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-          '<div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:' + verdictColor + ';">' + score + '</div><div style="font-size:8px;color:#666;">/100</div></div></a>';
+        badgeHtml =
+          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+            '<div style="text-align:center;">' +
+              '<div style="font-size:22px;font-weight:800;color:' + verdictColor + ';">' + score + '</div>' +
+              '<div style="font-size:8px;color:#666;">/100</div>' +
+            '</div>' +
+          '</a>';
         embedCode = badgeHtml;
       }
 
@@ -1434,7 +1493,7 @@
     }
 
     function analyseFramework(frameworkBreakdown, overallScore) {
-      var items = (frameworkBreakdown || []).map(function(item) {
+      var items = frameworkBreakdown.map(function(item) {
         var parsed = parseScore(item.score);
         var pct = parsed.max > 0 ? Math.round((parsed.score / parsed.max) * 100) : 0;
         return {
@@ -1458,28 +1517,7 @@
         lowest: sortedByPct.slice(0, 4),
         sorted: sortedByMissing,
         highest: items.slice().sort(function(a, b) { return b.pct - a.pct; }).slice(0, 3),
-        score: overallScore
-      };
-    }
-
-    function analysePeers(peers, brandSlug, brandScore) {
-      var ordered = (peers || []).slice().sort(function(a, b) {
-        return (parseInt(b.gonogo_score, 10) || 0) - (parseInt(a.gonogo_score, 10) || 0);
-      });
-
-      var rank = 1;
-      for (var i = 0; i < ordered.length; i++) {
-        if (ordered[i].slug === brandSlug) {
-          rank = i + 1;
-          break;
-        }
-      }
-
-      var top = ordered[0] ? (parseInt(ordered[0].gonogo_score, 10) || 0) : brandScore;
-      return {
-        rank: rank,
-        total: ordered.length,
-        gapToTop: Math.max(0, top - brandScore)
+        score: overallScore || 0
       };
     }
 
@@ -1500,11 +1538,8 @@
         var themesFound = extractThemes(text);
 
         themesFound.forEach(function(theme) {
-          if (verdict === 'GO') {
-            positiveThemes[theme] = (positiveThemes[theme] || 0) + 1;
-          } else {
-            negativeThemes[theme] = (negativeThemes[theme] || 0) + 1;
-          }
+          if (verdict === 'GO') positiveThemes[theme] = (positiveThemes[theme] || 0) + 1;
+          else negativeThemes[theme] = (negativeThemes[theme] || 0) + 1;
         });
       });
 
@@ -1525,11 +1560,14 @@
     }
 
     function buildScenarios(brand, frameworkAnalysis) {
-      var current = brand.overallScore;
+      var current = brand.overallScore || 0;
       var items = frameworkAnalysis.sorted.slice(0, 3);
 
       return items.map(function(item, idx) {
-        var categoryLift = item.max > 0 ? Math.min(item.max, item.score + Math.max(1, Math.ceil(item.missing * (idx === 0 ? 0.75 : idx === 1 ? 0.55 : 0.35)))) : item.score;
+        var categoryLift = item.max > 0
+          ? Math.min(item.max, item.score + Math.max(1, Math.ceil(item.missing * (idx === 0 ? 0.75 : idx === 1 ? 0.55 : 0.35))))
+          : item.score;
+
         var gainedRaw = Math.max(0, categoryLift - item.score);
         var projected = Math.min(100, current + Math.max(2, Math.round((gainedRaw / Math.max(1, item.max)) * 8)));
         var delta = projected - current;
@@ -1550,7 +1588,7 @@
     }
 
     function buildPriorityDescription(item, reviewAnalysis) {
-      var theme = reviewAnalysis.topNegativeTheme ? reviewAnalysis.topNegativeTheme.label : '';
+      var theme = reviewAnalysis.topNegativeTheme ? reviewAnalysis.topNegativeTheme.label : null;
       var prefix = item.pct < 40
         ? 'This is a critical weakness.'
         : (item.pct < 70 ? 'This is one of your most important improvement areas.' : 'This is a refinement opportunity.');
@@ -1561,6 +1599,7 @@
 
     function getCategoryAction(category, theme) {
       var name = String(category || '').toLowerCase();
+
       if (name.indexOf('support') !== -1) {
         return 'Reduce response times, make support channels easier to find, and close the loop on complaints faster.';
       }
@@ -1604,6 +1643,7 @@
 
     function extractThemes(text) {
       if (!text) return [];
+
       var lexicon = [
         { label: 'support', terms: ['support', 'help', 'service', 'agent', 'staff', 'call centre', 'call center', 'response', 'reply', 'answered'] },
         { label: 'pricing', terms: ['price', 'pricing', 'expensive', 'cost', 'fee', 'fees', 'value', 'overpriced', 'cheap'] },
@@ -1660,13 +1700,13 @@
 
     function getFrameworkTotal(fb) {
       return (fb || []).reduce(function(sum, item) {
-        return sum + (parseScore(item.score).max || 0);
+        return sum + parseScore(item.score).max;
       }, 0);
     }
 
     function getFrameworkEarned(fb) {
       return (fb || []).reduce(function(sum, item) {
-        return sum + (parseScore(item.score).score || 0);
+        return sum + parseScore(item.score).score;
       }, 0);
     }
 
@@ -1683,7 +1723,7 @@
 
     function dedupe(arr) {
       var out = [];
-      arr.forEach(function(item) {
+      (arr || []).forEach(function(item) {
         if (out.indexOf(item) === -1) out.push(item);
       });
       return out;
