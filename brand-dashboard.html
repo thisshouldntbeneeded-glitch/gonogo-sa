@@ -50,7 +50,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(17,165,81,0.10) 0%, rgba(17,165,81,0) 70%);
+    background: radial-gradient(circle, rgba(17, 165, 81, 0.10) 0%, rgba(17, 165, 81, 0) 70%);
     pointer-events: none;
   }
 
@@ -106,12 +106,12 @@
     font-size: 13px;
   }
 
-  .priority-icon.critical { background: rgba(231,76,60,0.12); color: #e74c3c; }
-  .priority-icon.warning { background: rgba(255,152,0,0.12); color: #ff9800; }
-  .priority-icon.good { background: rgba(17,165,81,0.12); color: #11a551; }
-  .theme-icon { background: rgba(59,130,246,0.12); color: #3b82f6; }
-  .reply-icon { background: rgba(139,92,246,0.12); color: #8b5cf6; }
-  .micro-icon { background: rgba(17,165,81,0.10); color: var(--green); }
+  .priority-icon.critical { background: rgba(231, 76, 60, 0.12); color: #e74c3c; }
+  .priority-icon.warning { background: rgba(255, 152, 0, 0.12); color: #ff9800; }
+  .priority-icon.good { background: rgba(17, 165, 81, 0.12); color: #11a551; }
+  .theme-icon { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .reply-icon { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+  .micro-icon { background: rgba(17, 165, 81, 0.10); color: var(--green); }
 
   .priority-meta,
   .theme-meta,
@@ -182,7 +182,7 @@
     padding: var(--space-5);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-primary);
-    background: linear-gradient(135deg, rgba(17,165,81,0.10), rgba(59,130,246,0.07));
+    background: linear-gradient(135deg, rgba(17, 165, 81, 0.10), rgba(59, 130, 246, 0.07));
   }
 
   .goal-banner h3 {
@@ -208,7 +208,7 @@
     font-weight: 800;
     color: #fff;
     background: linear-gradient(135deg, #11a551, #0d8742);
-    box-shadow: 0 8px 24px rgba(17,165,81,0.18);
+    box-shadow: 0 8px 24px rgba(17, 165, 81, 0.18);
     font-variant-numeric: tabular-nums;
   }
 
@@ -244,7 +244,7 @@
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(17,165,81,0.12);
+    background: rgba(17, 165, 81, 0.12);
     color: #11a551;
   }
 
@@ -441,17 +441,17 @@
   }
 
   .heat-badge.high {
-    background: rgba(231,76,60,0.12);
+    background: rgba(231, 76, 60, 0.12);
     color: #e74c3c;
   }
 
   .heat-badge.medium {
-    background: rgba(255,152,0,0.12);
+    background: rgba(255, 152, 0, 0.12);
     color: #ff9800;
   }
 
   .heat-badge.low {
-    background: rgba(17,165,81,0.12);
+    background: rgba(17, 165, 81, 0.12);
     color: #11a551;
   }
 
@@ -527,6 +527,9 @@
           </a>
           <a href="#api-embed-section" class="btn btn-primary btn-sm">
             <i class="fa-solid fa-code"></i> Embed Score
+          </a>
+          <a href="#qr-review-section" class="btn btn-sm" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);">
+            <i class="fa-solid fa-qrcode"></i> Review QR
           </a>
         </div>
       </div>
@@ -704,61 +707,6 @@
             <p class="text-sm text-secondary">Publish your live score badge and reinforce trust wherever South African customers compare brands.</p>
           </div>
         </div>
-               <div class="card" style="margin-bottom:var(--space-8);" id="qr-review-section">
-        <div class="section-header-row">
-          <div class="section-header-copy">
-            <h3 class="text-sm font-semibold" style="margin-bottom:6px;">
-              <i class="fa-solid fa-qrcode" style="color:var(--green);margin-right:var(--space-2);"></i>
-              Review QR Code
-            </h3>
-            <p class="text-sm text-secondary">Send customers straight to your public GoNoGo review page with a scannable QR code.</p>
-          </div>
-          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
-            <button class="btn btn-sm" onclick="openReviewPage()" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Review Page
-            </button>
-            <button class="btn btn-sm" onclick="copyReviewUrl()" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);">
-              <i class="fa-solid fa-link"></i> Copy Link
-            </button>
-            <button class="btn btn-primary btn-sm" onclick="downloadQrCode()">
-              <i class="fa-solid fa-download"></i> Download QR
-            </button>
-          </div>
-        </div>
-
-        <div class="embed-grid">
-          <div>
-            <div class="embed-preview-shell" style="min-height:260px;flex-direction:column;gap:var(--space-4);">
-              <img id="review-qr-image" alt="QR code for your GoNoGo review page" style="width:220px;height:220px;border-radius:var(--radius-md);background:#fff;padding:10px;border:1px solid var(--border-primary);object-fit:contain;">
-              <div class="text-xs text-muted" style="text-align:center;">Scan to open your brand review page</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="embed-tips" style="margin-bottom:var(--space-4);">
-              <div class="embed-tip">
-                <div class="embed-tip-title">Best use cases</div>
-                <div class="embed-tip-copy">Reception desks, tills, delivery inserts, invoices, packaging, event stands, airport activations, and customer follow-up messages.</div>
-              </div>
-              <div class="embed-tip">
-                <div class="embed-tip-title">Where it sends people</div>
-                <div class="embed-tip-copy">The QR opens your live public brand page and jumps directly to the review section so customers can leave feedback faster.</div>
-              </div>
-              <div class="embed-tip">
-                <div class="embed-tip-title">Operational tip</div>
-                <div class="embed-tip-copy">Use the QR only after checking the public review destination is correct for this exact brand slug.</div>
-              </div>
-            </div>
-
-            <div>
-              <label class="form-label">Review URL</label>
-              <div style="position:relative;">
-                <pre id="review-url" style="background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4);font-size:var(--text-xs);overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--text-secondary);margin:0;"></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
         <div class="embed-grid">
           <div>
@@ -814,6 +762,62 @@
                 </button>
               </div>
               <p class="text-xs text-muted" style="margin-top:var(--space-2);">Use this endpoint to power custom widgets or internal reporting dashboards.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:var(--space-8);" id="qr-review-section">
+        <div class="section-header-row">
+          <div class="section-header-copy">
+            <h3 class="text-sm font-semibold" style="margin-bottom:6px;">
+              <i class="fa-solid fa-qrcode" style="color:var(--green);margin-right:var(--space-2);"></i>
+              Review QR Code
+            </h3>
+            <p class="text-sm text-secondary">Send customers straight to your public GoNoGo review page with a scannable QR code.</p>
+          </div>
+          <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="openReviewPage()" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Review Page
+            </button>
+            <button class="btn btn-sm" onclick="copyReviewUrl()" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);">
+              <i class="fa-solid fa-link"></i> Copy Link
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="downloadQrCode()">
+              <i class="fa-solid fa-download"></i> Download QR
+            </button>
+          </div>
+        </div>
+
+        <div class="embed-grid">
+          <div>
+            <div class="embed-preview-shell" style="min-height:260px;flex-direction:column;gap:var(--space-4);">
+              <img id="review-qr-image" alt="QR code for your GoNoGo review page" style="width:220px;height:220px;border-radius:var(--radius-md);background:#fff;padding:10px;border:1px solid var(--border-primary);object-fit:contain;">
+              <div class="text-xs text-muted" style="text-align:center;">Scan to open your brand review page</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="embed-tips" style="margin-bottom:var(--space-4);">
+              <div class="embed-tip">
+                <div class="embed-tip-title">Best use cases</div>
+                <div class="embed-tip-copy">Reception desks, tills, delivery inserts, invoices, packaging, event stands, airport activations, and customer follow-up messages.</div>
+              </div>
+              <div class="embed-tip">
+                <div class="embed-tip-title">Where it sends people</div>
+                <div class="embed-tip-copy">The QR opens your live public brand page and jumps directly to the review section so customers can leave feedback faster.</div>
+              </div>
+              <div class="embed-tip">
+                <div class="embed-tip-title">Operational tip</div>
+                <div class="embed-tip-copy">Use the QR only after checking the public review destination is correct for this exact brand slug.</div>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label">Review URL</label>
+              <div style="position:relative;">
+                <pre id="review-url" style="background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4);font-size:var(--text-xs);overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--text-secondary);margin:0;"></pre>
+              </div>
             </div>
           </div>
         </div>
@@ -932,7 +936,7 @@
       renderReviewThemes(reviewAnalysis, frameworkAnalysis);
       renderReplyCoach(brand, reviewAnalysis, frameworkAnalysis);
       setupEmbed(brandSlug, brand.name || 'Brand', brand.overallScore || 0, brand.verdict || 'NOGO');
-       setupReviewQr(brandSlug);
+      setupReviewQr(brandSlug);
     }
 
     function renderHeader(brand) {
@@ -1175,10 +1179,9 @@
         html += '<div class="opportunity-row">' +
           '<div class="opportunity-label">' + Components.escapeHTML(item.category) + '</div>' +
           '<div class="opportunity-track"><div class="opportunity-fill" style="width:' + gainPct + '%;"></div></div>' +
-          '<div class="opportunity-value">' + item.missing + ' pts</div>' +
+          '<div class="opportunity-value">+' + item.missing + ' pts</div>' +
         '</div>';
       });
-
       container.innerHTML = html;
     }
 
@@ -1194,8 +1197,12 @@
       var tc = getChartThemeColors();
       var labels = peers.map(function(p) { return p.name; });
       var scores = peers.map(function(p) { return parseInt(p.gonogo_score || p.gonogoscore, 10) || 0; });
-      var colors = peers.map(function(p) { return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.45)'; });
-      var borders = peers.map(function(p) { return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.7)'; });
+      var colors = peers.map(function(p) {
+        return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.45)';
+      });
+      var borders = peers.map(function(p) {
+        return p.slug === brandSlug ? '#11a551' : 'rgba(59,130,246,0.7)';
+      });
 
       new Chart(canvas, {
         type: 'bar',
@@ -1250,41 +1257,23 @@
         }
       });
 
-      document.getElementById('peer-position-note').textContent =
-        brandName + ' is highlighted in green so you can see where you sit in your category.';
+      document.getElementById('peer-position-note').textContent = brandName + ' is highlighted in green so you can see where you sit in your category.';
     }
 
     function renderSentiment(reviewAnalysis) {
       var canvas = document.getElementById('sentiment-chart');
-      if (!canvas) return;
+      var tc = getChartThemeColors();
 
       destroyExistingChart('sentiment-chart');
 
-      var tc = getChartThemeColors();
       var labels = [];
       var data = [];
       var colors = [];
 
-      if (reviewAnalysis.go > 0) {
-        labels.push('Go');
-        data.push(reviewAnalysis.go);
-        colors.push('#11a551');
-      }
-      if (reviewAnalysis.caution > 0) {
-        labels.push('Caution');
-        data.push(reviewAnalysis.caution);
-        colors.push('#ff9800');
-      }
-      if (reviewAnalysis.nogo > 0) {
-        labels.push('NoGo');
-        data.push(reviewAnalysis.nogo);
-        colors.push('#e74c3c');
-      }
-      if (reviewAnalysis.noVerdict > 0) {
-        labels.push('No Verdict');
-        data.push(reviewAnalysis.noVerdict);
-        colors.push('#666666');
-      }
+      if (reviewAnalysis.go > 0) { labels.push('Go'); data.push(reviewAnalysis.go); colors.push('#11a551'); }
+      if (reviewAnalysis.caution > 0) { labels.push('Caution'); data.push(reviewAnalysis.caution); colors.push('#ff9800'); }
+      if (reviewAnalysis.nogo > 0) { labels.push('NoGo'); data.push(reviewAnalysis.nogo); colors.push('#e74c3c'); }
+      if (reviewAnalysis.noVerdict > 0) { labels.push('No Verdict'); data.push(reviewAnalysis.noVerdict); colors.push('#666666'); }
 
       if (reviewAnalysis.total === 0) {
         labels = ['No Reviews'];
@@ -1338,16 +1327,16 @@
         }
       });
 
-      var summary = 'You have ' + reviewAnalysis.total + ' review' + (reviewAnalysis.total === 1 ? '' : 's') + '.';
+      var summary = 'You have ' + reviewAnalysis.total + ' review' + (reviewAnalysis.total === 1 ? '' : 's') + '. ';
       if (reviewAnalysis.total === 0) {
-        summary = 'As reviews arrive, this section will show recurring themes and what they imply for your score.';
+        summary += 'As reviews arrive, this section will show recurring themes and what they imply for your score.';
       } else if (reviewAnalysis.nogo > reviewAnalysis.go) {
-        summary = 'Negative verdicts currently outweigh positive ones, which suggests unresolved customer issues are still visible.';
-      } else if (reviewAnalysis.go > reviewAnalysis.nogo) {
-        summary = 'Positive signals are stronger than negative ones, but recurring complaints still show where trust can improve.';
+        summary += 'Negative verdicts currently outweigh positive ones, which suggests unresolved customer issues are still visible.';
+      } else if (reviewAnalysis.go >= reviewAnalysis.nogo) {
+        summary += 'Positive signals are stronger than negative ones, but recurring complaints still show where trust can improve.';
       }
       if (reviewAnalysis.topNegativeTheme) {
-        summary += ' The most repeated concern is ' + reviewAnalysis.topNegativeTheme.label + '.';
+        summary += ' The most repeated concern is "' + reviewAnalysis.topNegativeTheme.label + '".';
       }
 
       document.getElementById('review-intel-summary').innerHTML =
@@ -1361,7 +1350,6 @@
         pills.push('<span class="theme-pill"><i class="fa-solid fa-triangle-exclamation" style="color:#ff9800;"></i> ' + Components.escapeHTML(reviewAnalysis.topNegativeTheme.label) + '</span>');
       }
       pills.push('<span class="theme-pill"><i class="fa-solid fa-hashtag"></i> ' + reviewAnalysis.total + ' reviews analysed</span>');
-
       document.getElementById('theme-pill-row').innerHTML = pills.join('');
     }
 
@@ -1374,8 +1362,7 @@
       }
 
       var combined = [];
-
-      reviewAnalysis.negativeThemes.slice(0, 3).forEach(function(theme) {
+      (reviewAnalysis.negativeThemes || []).slice(0, 3).forEach(function(theme) {
         combined.push({
           icon: 'fa-triangle-exclamation',
           title: theme.label + ' is dragging trust',
@@ -1383,7 +1370,7 @@
         });
       });
 
-      reviewAnalysis.positiveThemes.slice(0, 2).forEach(function(theme) {
+      (reviewAnalysis.positiveThemes || []).slice(0, 2).forEach(function(theme) {
         combined.push({
           icon: 'fa-circle-check',
           title: theme.label + ' is a trust asset',
@@ -1431,11 +1418,13 @@
       actionList.innerHTML = actions.map(function(text) {
         return '<li class="micro-item">' +
           '<span class="micro-icon"><i class="fa-solid fa-check"></i></span>' +
-          '<div class="micro-meta"><div class="micro-desc">' + Components.escapeHTML(text) + '</div></div>' +
+          '<div class="micro-meta">' +
+            '<div class="micro-desc">' + Components.escapeHTML(text) + '</div>' +
+          '</div>' +
         '</li>';
       }).join('');
 
-      reviewReplyTemplates = buildReplyTemplates(brand.name || 'your brand', topNegativeTheme);
+      reviewReplyTemplates = buildReplyTemplates(brand.name || 'Your brand', topNegativeTheme);
       templateList.innerHTML = reviewReplyTemplates.map(function(item) {
         return '<div class="reply-item">' +
           '<span class="reply-icon"><i class="fa-solid fa-pen"></i></span>' +
@@ -1453,20 +1442,14 @@
       window.brandScore = brandScore;
       window.brandVerdict = brandVerdict;
       window.siteUrl = window.location.origin;
-
       setBadgeStyle('full');
 
-      var apiUrl =
-        'https://fnpxaneextqidbessnej.supabase.co/rest/v1/brands?slug=eq.' +
-        encodeURIComponent(brandSlug) +
-        '&select=name,gonogo_score,verdict,framework_breakdown,key_strengths,key_concerns,last_updated';
-
+      var apiUrl = 'https://fnpxaneextqidbessnej.supabase.co/rest/v1/brands?slug=eq.' + encodeURIComponent(brandSlug) + '&select=name,gonogo_score,verdict,framework_breakdown,key_strengths,key_concerns,last_updated';
       document.getElementById('api-endpoint').textContent = apiUrl;
     }
 
     function setBadgeStyle(style) {
       currentBadgeStyle = style;
-
       ['full', 'compact', 'score'].forEach(function(s) {
         var btn = document.getElementById('badge-style-' + s);
         if (!btn) return;
@@ -1480,7 +1463,6 @@
           btn.style.border = '1px solid var(--border-primary)';
         }
       });
-
       updateBadgePreview();
     }
 
@@ -1489,44 +1471,30 @@
       var score = window.brandScore || 0;
       var verdict = window.brandVerdict || 'NOGO';
       var slug = window.brandSlug || '';
-      var siteUrl = window.siteUrl || window.location.origin;
-      var verdictColor = verdict === 'GO' ? '#11a551' : (verdict === 'NOGO' ? '#e74c3c' : '#ff9800');
+      var siteUrl = window.siteUrl || '';
+      var verdictColor = verdict === 'GO' ? '#11a551' : verdict === 'NOGO' ? '#e74c3c' : '#ff9800';
       var brandUrl = siteUrl + '/brand.html?id=' + encodeURIComponent(slug);
 
       var badgeHtml = '';
       var embedCode = '';
 
       if (currentBadgeStyle === 'full') {
-        badgeHtml =
-          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;padding:12px 20px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-            '<div style="text-align:center;">' +
-              '<div style="font-size:28px;font-weight:800;color:' + verdictColor + ';">' + score + '</div>' +
-              '<div style="font-size:10px;color:#666;">/100</div>' +
-            '</div>' +
-            '<div style="width:1px;height:40px;background:#2a2a2a;"></div>' +
-            '<div>' +
-              '<div style="font-size:13px;font-weight:600;color:#fff;">' + escapeInline(name) + '</div>' +
-              '<div style="font-size:11px;font-weight:700;color:' + verdictColor + ';">' + escapeInline(verdict.replace(/_/g, ' ')) + '</div>' +
-              '<div style="font-size:9px;color:#666;margin-top:2px;">Rated by GoNoGo</div>' +
-            '</div>' +
-          '</a>';
+        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:12px;padding:12px 20px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+          '<div style="text-align:center;"><div style="font-size:28px;font-weight:800;color:' + verdictColor + ';">' + score + '</div><div style="font-size:10px;color:#666;">/100</div></div>' +
+          '<div style="width:1px;height:40px;background:#2a2a2a;"></div>' +
+          '<div><div style="font-size:13px;font-weight:600;color:#fff;">' + escapeInline(name) + '</div>' +
+          '<div style="font-size:11px;font-weight:700;color:' + verdictColor + ';">' + verdict.replace(/_/g, ' ') + '</div>' +
+          '<div style="font-size:9px;color:#666;margin-top:2px;">Rated by GoNoGo</div></div></a>';
         embedCode = badgeHtml;
       } else if (currentBadgeStyle === 'compact') {
-        badgeHtml =
-          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#0a0a0a;border-radius:8px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-            '<span style="font-size:18px;font-weight:800;color:' + verdictColor + ';">' + score + '</span>' +
-            '<span style="font-size:11px;color:#fff;font-weight:600;">' + escapeInline(verdict.replace(/_/g, ' ')) + '</span>' +
-            '<span style="font-size:9px;color:#666;">GoNoGo</span>' +
-          '</a>';
+        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#0a0a0a;border-radius:8px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+          '<span style="font-size:18px;font-weight:800;color:' + verdictColor + ';">' + score + '</span>' +
+          '<span style="font-size:11px;color:#fff;font-weight:600;">' + verdict.replace(/_/g, ' ') + '</span>' +
+          '<span style="font-size:9px;color:#666;">GoNoGo</span></a>';
         embedCode = badgeHtml;
       } else {
-        badgeHtml =
-          '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
-            '<div style="text-align:center;">' +
-              '<div style="font-size:22px;font-weight:800;color:' + verdictColor + ';">' + score + '</div>' +
-              '<div style="font-size:8px;color:#666;">/100</div>' +
-            '</div>' +
-          '</a>';
+        badgeHtml = '<a href="' + brandUrl + '" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#0a0a0a;border-radius:12px;border:1px solid #2a2a2a;font-family:Inter,system-ui,sans-serif;">' +
+          '<div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:' + verdictColor + ';">' + score + '</div><div style="font-size:8px;color:#666;">/100</div></div></a>';
         embedCode = badgeHtml;
       }
 
@@ -1542,64 +1510,29 @@
     }
 
     function copyApiEndpoint() {
-  var url = document.getElementById('api-endpoint').textContent;
-  navigator.clipboard.writeText(url).then(function() {
-    Components.showToast('API endpoint copied to clipboard');
-  });
-}
+      var url = document.getElementById('api-endpoint').textContent;
+      navigator.clipboard.writeText(url).then(function() {
+        Components.showToast('API endpoint copied to clipboard');
+      });
+    }
 
-function setupReviewQr(brandSlug) {
-  var reviewUrl = window.location.origin + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
-  window.reviewPageUrl = reviewUrl;
+    function setupReviewQr(brandSlug) {
+      var reviewUrl = window.location.origin + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
+      window.reviewPageUrl = reviewUrl;
 
-  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
+      var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
 
-  var reviewUrlEl = document.getElementById('review-url');
-  var qrImageEl = document.getElementById('review-qr-image');
+      var reviewUrlEl = document.getElementById('review-url');
+      var qrImageEl = document.getElementById('review-qr-image');
 
-  if (reviewUrlEl) {
-    reviewUrlEl.textContent = reviewUrl;
-  }
+      if (reviewUrlEl) {
+        reviewUrlEl.textContent = reviewUrl;
+      }
 
-  if (qrImageEl) {
-    qrImageEl.src = qrUrl;
-  }
-}
-
-function openReviewPage() {
-  if (!window.reviewPageUrl) return;
-  window.open(window.reviewPageUrl, '_blank', 'noopener,noreferrer');
-}
-
-function copyReviewUrl() {
-  if (!window.reviewPageUrl) return;
-  navigator.clipboard.writeText(window.reviewPageUrl).then(function() {
-    Components.showToast('Review page link copied to clipboard');
-  });
-}
-
-function downloadQrCode() {
-  var img = document.getElementById('review-qr-image');
-  if (!img || !img.src) return;
-
-  fetch(img.src)
-    .then(function(response) {
-      return response.blob();
-    })
-    .then(function(blob) {
-      var a = document.createElement('a');
-      var objectUrl = URL.createObjectURL(blob);
-
-      a.href = objectUrl;
-      a.download = (window.brandSlug || 'brand') + '-review-qr.png';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      URL.revokeObjectURL(objectUrl);
-      Components.showToast('QR code downloaded');
-    });
-}
+      if (qrImageEl) {
+        qrImageEl.src = qrUrl;
+      }
+    }
 
     function openReviewPage() {
       if (!window.reviewPageUrl) return;
@@ -1618,22 +1551,26 @@ function downloadQrCode() {
       if (!img || !img.src) return;
 
       fetch(img.src)
-        .then(function(response) { return response.blob(); })
+        .then(function(response) {
+          return response.blob();
+        })
         .then(function(blob) {
           var a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
+          var objectUrl = URL.createObjectURL(blob);
+
+          a.href = objectUrl;
           a.download = (window.brandSlug || 'brand') + '-review-qr.png';
           document.body.appendChild(a);
           a.click();
           a.remove();
-          URL.revokeObjectURL(a.href);
+
+          URL.revokeObjectURL(objectUrl);
           Components.showToast('QR code downloaded');
         });
     }
-</script>
-     
+
     function analyseFramework(frameworkBreakdown, overallScore) {
-      var items = frameworkBreakdown.map(function(item) {
+      var items = (frameworkBreakdown || []).map(function(item) {
         var parsed = parseScore(item.score);
         var pct = parsed.max > 0 ? Math.round((parsed.score / parsed.max) * 100) : 0;
         return {
@@ -1657,7 +1594,7 @@ function downloadQrCode() {
         lowest: sortedByPct.slice(0, 4),
         sorted: sortedByMissing,
         highest: items.slice().sort(function(a, b) { return b.pct - a.pct; }).slice(0, 3),
-        score: overallScore || 0
+        score: overallScore
       };
     }
 
@@ -1678,8 +1615,11 @@ function downloadQrCode() {
         var themesFound = extractThemes(text);
 
         themesFound.forEach(function(theme) {
-          if (verdict === 'GO') positiveThemes[theme] = (positiveThemes[theme] || 0) + 1;
-          else negativeThemes[theme] = (negativeThemes[theme] || 0) + 1;
+          if (verdict === 'GO') {
+            positiveThemes[theme] = (positiveThemes[theme] || 0) + 1;
+          } else {
+            negativeThemes[theme] = (negativeThemes[theme] || 0) + 1;
+          }
         });
       });
 
@@ -1704,10 +1644,7 @@ function downloadQrCode() {
       var items = frameworkAnalysis.sorted.slice(0, 3);
 
       return items.map(function(item, idx) {
-        var categoryLift = item.max > 0
-          ? Math.min(item.max, item.score + Math.max(1, Math.ceil(item.missing * (idx === 0 ? 0.75 : idx === 1 ? 0.55 : 0.35))))
-          : item.score;
-
+        var categoryLift = item.max > 0 ? Math.min(item.max, item.score + Math.max(1, Math.ceil(item.missing * (idx === 0 ? 0.75 : idx === 1 ? 0.55 : 0.35)))) : item.score;
         var gainedRaw = Math.max(0, categoryLift - item.score);
         var projected = Math.min(100, current + Math.max(2, Math.round((gainedRaw / Math.max(1, item.max)) * 8)));
         var delta = projected - current;
@@ -1728,7 +1665,7 @@ function downloadQrCode() {
     }
 
     function buildPriorityDescription(item, reviewAnalysis) {
-      var theme = reviewAnalysis.topNegativeTheme ? reviewAnalysis.topNegativeTheme.label : null;
+      var theme = reviewAnalysis.topNegativeTheme ? reviewAnalysis.topNegativeTheme.label : '';
       var prefix = item.pct < 40
         ? 'This is a critical weakness.'
         : (item.pct < 70 ? 'This is one of your most important improvement areas.' : 'This is a refinement opportunity.');
@@ -1739,7 +1676,6 @@ function downloadQrCode() {
 
     function getCategoryAction(category, theme) {
       var name = String(category || '').toLowerCase();
-
       if (name.indexOf('support') !== -1) {
         return 'Reduce response times, make support channels easier to find, and close the loop on complaints faster.';
       }
@@ -1783,7 +1719,6 @@ function downloadQrCode() {
 
     function extractThemes(text) {
       if (!text) return [];
-
       var lexicon = [
         { label: 'support', terms: ['support', 'help', 'service', 'agent', 'staff', 'call centre', 'call center', 'response', 'reply', 'answered'] },
         { label: 'pricing', terms: ['price', 'pricing', 'expensive', 'cost', 'fee', 'fees', 'value', 'overpriced', 'cheap'] },
@@ -1840,13 +1775,13 @@ function downloadQrCode() {
 
     function getFrameworkTotal(fb) {
       return (fb || []).reduce(function(sum, item) {
-        return sum + parseScore(item.score).max;
+        return sum + (parseScore(item.score).max || 0);
       }, 0);
     }
 
     function getFrameworkEarned(fb) {
       return (fb || []).reduce(function(sum, item) {
-        return sum + parseScore(item.score).score;
+        return sum + (parseScore(item.score).score || 0);
       }, 0);
     }
 
@@ -1863,7 +1798,7 @@ function downloadQrCode() {
 
     function dedupe(arr) {
       var out = [];
-      (arr || []).forEach(function(item) {
+      arr.forEach(function(item) {
         if (out.indexOf(item) === -1) out.push(item);
       });
       return out;
