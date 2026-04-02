@@ -1,48 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-ZA">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Detailed brand rating and review on GoNoGo UK. See the full 100-point scoring breakdown, customer reviews, and verdict.">
-  <meta name="keywords" content="brand rating, brand review, GoNoGo score, UK brands">
-  <link rel="canonical" href="https://gonogo-uk.vercel.app/brand">
-  <meta property="og:title" content="Brand Rating — GoNoGo UK">
-  <meta property="og:description" content="Detailed brand rating and review on GoNoGo UK. See the full 100-point scoring breakdown, customer reviews, and verdict.">
-  <meta property="og:image" content="https://gonogo-uk.vercel.app/logos/og-share.jpg">
+  <meta name="description" content="Branch detail page — GoNoGo South Africa. See scores, contact info, sentiment, and corruption reports.">
+  <meta property="og:title" content="Branch Detail — GoNoGo South Africa">
+  <meta property="og:description" content="Branch detail page — GoNoGo South Africa.">
+  <meta property="og:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://gonogo-uk.vercel.app/brand">
+  <meta property="og:url" content="https://gonogo-sa.vercel.app/branch">
   <meta property="og:type" content="article">
-  <meta property="og:site_name" content="GoNoGo United Kingdom">
+  <meta property="og:site_name" content="GoNoGo South Africa">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Brand Rating — GoNoGo UK">
-  <meta name="twitter:description" content="Detailed brand rating and review on GoNoGo UK. See the full 100-point scoring breakdown, customer reviews, and verdict.">
-  <meta name="twitter:image" content="https://gonogo-uk.vercel.app/logos/og-share.jpg">
+  <meta name="twitter:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
   <meta name="robots" content="index, follow">
-  <title>Brand Rating — GoNoGo United Kingdom</title>
-  <link rel="icon" href="favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="manifest" href="site.webmanifest">
-  <script>
-    (function(){
-      var t = localStorage.getItem('gonogo_theme');
-      if (t === 'light' || (!t && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-        document.documentElement.classList.add('light-mode');
-      }
-    })();
-  </script>
+  <title>Branch — GoNoGo South Africa</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
 </head>
 <body>
   <div id="nav"></div>
   <div id="page-content">
-    <div style="text-align:center;padding:var(--space-10);color:var(--text-muted)">Loading brand...</div>
+    <div style="text-align:center;padding:var(--space-10);color:var(--text-muted)">Loading branch...</div>
   </div>
   <div id="footer"></div>
-
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -54,98 +45,83 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="components.js"></script>
   <script src="api.js"></script>
-
   <script>
     document.getElementById('nav').innerHTML = Components.renderPublicNav('');
+    Components.initTheme();
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
-    var brandId = Components.getParam('id');
+    var branchId = Components.getParam('id');
 
     (async function() {
-      if (!brandId) {
+      if (!branchId) {
         document.getElementById('page-content').innerHTML =
           '<section class="section"><div class="container" style="text-align:center">' +
-            '<h1 class="section-title">Brand Not Found</h1>' +
-            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
+            '<h1 class="section-title">Branch Not Found</h1>' +
+            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">No branch ID specified.</p>' +
             '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
           '</div></section>';
         return;
       }
 
-      var brand = await GoNoGoAPI.getBrandById(brandId);
+      var branch = await GoNoGoAPI.getBranchById(branchId);
 
-      if (!brand) {
+      if (!branch) {
         document.getElementById('page-content').innerHTML =
           '<section class="section"><div class="container" style="text-align:center">' +
-            '<h1 class="section-title">Brand Not Found</h1>' +
-            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The brand you are looking for does not exist.</p>' +
+            '<h1 class="section-title">Branch Not Found</h1>' +
+            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The branch "' + Components.escapeHTML(branchId) + '" does not exist.</p>' +
             '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
           '</div></section>';
         return;
       }
 
-      document.title = brand.name + ' — GoNoGo United Kingdom';
+      document.title = branch.branch_name + ' — GoNoGo South Africa';
 
-      // Dynamic SEO meta tags
-      var metaDesc = (brand.overview || (brand.name + ' rated ' + brand.overallScore + '/100 (' + brand.verdict + ') in ' + brand.categoryName + '.'));
+      // SEO
+      var metaDesc = branch.branch_name + ' rated ' + branch.total_score + '/100 (' + branch.verdict + '). Contact, scores, sentiment, and corruption reports.';
       var metaTag = document.querySelector('meta[name="description"]');
-      if (!metaTag) {
-        metaTag = document.createElement('meta');
-        metaTag.name = 'description';
-        document.head.appendChild(metaTag);
-      }
-      metaTag.content = metaDesc.substring(0, 160);
+      if (metaTag) metaTag.content = metaDesc.substring(0, 160);
 
-      // Open Graph
       function setOG(prop, val) {
         var el = document.querySelector('meta[property="og:' + prop + '"]');
-        if (!el) {
-          el = document.createElement('meta');
-          el.setAttribute('property', 'og:' + prop);
-          document.head.appendChild(el);
-        }
+        if (!el) { el = document.createElement('meta'); el.setAttribute('property', 'og:' + prop); document.head.appendChild(el); }
         el.content = val;
       }
-      setOG('title', brand.name + ' — GoNoGo United Kingdom');
+      setOG('title', branch.branch_name + ' — GoNoGo South Africa');
       setOG('description', metaDesc.substring(0, 160));
-      setOG('type', 'article');
       setOG('url', window.location.href);
 
-      // JSON-LD structured data
+      // JSON-LD
       var jsonLD = {
         '@context': 'https://schema.org',
         '@type': 'Review',
-        'itemReviewed': {
-          '@type': 'Brand',
-          'name': brand.name,
-          'url': brand.website || ''
-        },
-        'reviewRating': {
-          '@type': 'Rating',
-          'ratingValue': brand.overallScore,
-          'bestRating': 100,
-          'worstRating': 0
-        },
-        'author': {
-          '@type': 'Organization',
-          'name': 'GoNoGo United Kingdom',
-          'url': 'https://www.gonogo.co.uk'
-        },
-        'reviewBody': brand.ratingSummary || metaDesc,
-        'publisher': {
-          '@type': 'Organization',
-          'name': 'GoNoGo United Kingdom'
-        }
+        'itemReviewed': { '@type': 'GovernmentOffice', 'name': branch.branch_name, 'address': branch.address || '' },
+        'reviewRating': { '@type': 'Rating', 'ratingValue': branch.total_score, 'bestRating': 100, 'worstRating': 0 },
+        'author': { '@type': 'Organization', 'name': 'GoNoGo South Africa', 'url': 'https://www.gonogo.co.za' },
+        'publisher': { '@type': 'Organization', 'name': 'GoNoGo South Africa' }
       };
       var ldScript = document.createElement('script');
       ldScript.type = 'application/ld+json';
       ldScript.textContent = JSON.stringify(jsonLD);
       document.head.appendChild(ldScript);
 
-      var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-lg');
+      // Prepare branch data in format Components.createRadarChart expects
+      var branchScores = {
+        'Compliance': { score: branch.compliance, max: 20, description: '' },
+        'Customer Satisfaction': { score: branch.customer_satisfaction, max: 25, description: '' },
+        'Service Offering': { score: branch.service_offering, max: 25, description: '' },
+        'Innovation': { score: branch.innovation, max: 10, description: '' },
+        'Customer Support': { score: branch.customer_support, max: 15, description: '' },
+        'Accessibility & Security': { score: branch.accessibility_security, max: 10, description: '' }
+      };
 
-      // Category score cards
-      var categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
+      var brandLike = {
+        categoryScores: branchScores,
+        name: branch.branch_name
+      };
+
+      // Category score cards (same style as brand.html)
+      var categoryCardsHTML = Object.entries(branchScores).map(function(entry) {
         var name = entry[0], data = entry[1];
         var pct = Math.round((data.score / data.max) * 100);
         var color = getScoreColor(pct);
@@ -155,172 +131,165 @@
             '<span class="category-card-score" style="color:' + color + '">' + data.score + '/' + data.max + '</span>' +
           '</div>' +
           Components.renderScoreBar(data.score, data.max) +
-          '<p class="category-card-desc">' + data.description + '</p>' +
         '</div>';
       }).join('');
 
-      // Strengths & Concerns
-      var strengthsHTML = brand.strengths.map(function(s) {
-        return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + s + '</li>';
+      // Strengths & Concerns (from sentiment_positive / sentiment_negative)
+      var posItems = (branch.sentiment_positive || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      var negItems = (branch.sentiment_negative || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      var strengthsHTML = posItems.map(function(s) {
+        return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + Components.escapeHTML(s) + '</li>';
       }).join('');
-      var concernsHTML = brand.concerns.map(function(c) {
-        return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + c + '</li>';
+      var concernsHTML = negItems.map(function(s) {
+        return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + Components.escapeHTML(s) + '</li>';
       }).join('');
 
-      // Pricing
-      var pricingHTML = brand.pricing.length > 0
-        ? brand.pricing.map(function(p) {
-            var features = typeof p.features === 'string' && p.features
-              ? p.features.split(',').map(function(f) { return f.trim(); }).filter(Boolean)
-              : (Array.isArray(p.features) ? p.features : []);
-            return '<div class="pricing-card">' +
-              '<div class="pricing-card-name">' + p.name + '</div>' +
-              '<div class="pricing-card-price">' + p.cost + '</div>' +
-              (features.length > 0
-                ? '<ul class="pricing-card-features">' + features.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul>'
-                : '') +
-            '</div>';
-          }).join('')
-        : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No pricing information available.</p>';
+      // Services table
+      var servicesRaw = (branch.services || '').split(';').map(function(s) { return s.trim(); }).filter(Boolean);
+      var servicesHTML = servicesRaw.length > 0
+        ? '<table style="width:100%;border-collapse:collapse;font-size:var(--text-sm)">' +
+            '<thead><tr><th style="text-align:left;padding:var(--space-2) var(--space-3);border-bottom:2px solid var(--border-primary);color:var(--text-secondary);font-weight:600">Service</th></tr></thead>' +
+            '<tbody>' + servicesRaw.map(function(s) {
+              return '<tr><td style="padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border-primary);color:var(--text-secondary)">' + Components.escapeHTML(s) + '</td></tr>';
+            }).join('') + '</tbody></table>'
+        : '<p style="color:var(--text-muted);font-size:var(--text-sm)">No service data available.</p>';
 
-      // App ratings
-      var gpStars = renderStars(brand.appRatings.googlePlayScore);
-      var iosStars = renderStars(brand.appRatings.iosScore);
+      // Category link
+      var catLabel = branch.category_slug === 'traffic-department' ? 'Traffic Departments' : 'Home Affairs';
+      var catIcon = branch.category_slug === 'traffic-department' ? 'fa-car' : 'fa-building-columns';
+      var catLink = 'category.html?cat=' + encodeURIComponent(branch.category_slug);
 
-      // Social sentiment
-      var sentiment = brand.socialSentiment || {};
-      var posThemes = (sentiment.positive_themes || []).map(function(t) {
-        return '<li><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> ' + t + '</li>';
-      }).join('');
-      var negThemes = (sentiment.common_concerns || []).map(function(t) {
-        return '<li><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> ' + t + '</li>';
-      }).join('');
+      // Contact info card
+      var contactRows = '';
+      if (branch.manager) contactRows += '<div style="display:flex;align-items:center;gap:var(--space-2)"><i class="fa-solid fa-user-tie" style="width:18px;color:var(--green)"></i><span>Manager: ' + Components.escapeHTML(branch.manager) + '</span></div>';
+      if (branch.manager_email) contactRows += '<div style="display:flex;align-items:center;gap:var(--space-2)"><i class="fa-solid fa-envelope" style="width:18px;color:var(--green)"></i><a href="mailto:' + Components.escapeHTML(branch.manager_email) + '" style="color:var(--green);text-decoration:underline">' + Components.escapeHTML(branch.manager_email) + '</a></div>';
+      if (branch.telephone) contactRows += '<div style="display:flex;align-items:center;gap:var(--space-2)"><i class="fa-solid fa-phone" style="width:18px;color:var(--green)"></i><a href="tel:' + Components.escapeHTML(branch.telephone.replace(/[^0-9+]/g, '').substring(0, 15)) + '" style="color:var(--green);text-decoration:underline">' + Components.escapeHTML(branch.telephone) + '</a></div>';
+      if (branch.address) contactRows += '<div style="display:flex;align-items:center;gap:var(--space-2)"><i class="fa-solid fa-location-dot" style="width:18px;color:var(--green)"></i><a href="https://www.google.com/maps/search/' + encodeURIComponent(branch.address) + '" target="_blank" rel="noopener noreferrer" style="color:var(--green);text-decoration:underline">' + Components.escapeHTML(branch.address) + '</a></div>';
+      if (branch.hours) contactRows += '<div style="display:flex;align-items:center;gap:var(--space-2)"><i class="fa-solid fa-clock" style="width:18px;color:var(--green)"></i><span>' + Components.escapeHTML(branch.hours) + '</span></div>';
 
       document.getElementById('page-content').innerHTML =
+        // Hero — matches brand.html layout
         '<section class="brand-hero"><div class="container">' +
           '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
-            '<a href="category.html?cat=' + brand.categorySlug + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
-              '<i class="fa-solid fa-arrow-left"></i> ' + brand.categoryName +
+            '<a href="' + catLink + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
+              '<i class="fa-solid fa-arrow-left"></i> ' + catLabel +
             '</a>' +
           '</div>' +
           '<div class="brand-hero-inner">' +
-            '<div class="brand-hero-score">' + Components.renderScoreCircle(brand.overallScore, 'lg') + '</div>' +
+            '<div class="brand-hero-score">' + Components.renderScoreCircle(branch.total_score, 'lg') + '</div>' +
             '<div class="brand-hero-info">' +
               '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">' +
-                logoHTML +
-                '<h1 class="brand-hero-name">' + brand.name + '</h1>' +
+                '<div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green)"><i class="fa-solid ' + catIcon + '"></i></div>' +
+                '<h1 class="brand-hero-name">' + Components.escapeHTML(branch.branch_name) + '</h1>' +
               '</div>' +
               '<div class="brand-hero-badges">' +
-                Components.renderVerdictBadge(brand.verdict) +
-                Components.renderScoreBadge(brand.overallScore) +
+                Components.renderVerdictBadge(branch.verdict) +
+                Components.renderScoreBadge(branch.total_score) +
                 '<span class="badge" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary)">' +
-                  '<i class="fa-solid ' + brand.categoryIcon + '"></i> ' + brand.categoryName +
+                  '<i class="fa-solid ' + catIcon + '"></i> ' + catLabel +
                 '</span>' +
-              '</div>' +
-              '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap">' +
-                '<a href="compare.html?brands=' + brand.id + '" class="btn btn-secondary btn-sm"><i class="fa-solid fa-code-compare"></i> Compare</a>' +
-                (brand.website ? '<a href="' + brand.website + '" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>' : '') +
+                '<span class="badge" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary)">' +
+                  '<i class="fa-solid fa-map-location-dot"></i> ' + Components.escapeHTML(branch.province) +
+                '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
         '</div></section>' +
 
+        // Tabs — matches brand.html
         '<section class="section-sm"><div class="container">' +
           '<div class="tabs" id="tabs">' +
             '<button class="tab active" data-tab="overview" onclick="switchTab(\'overview\')">Overview</button>' +
-            '<button class="tab" data-tab="pricing" onclick="switchTab(\'pricing\')">Pricing</button>' +
-            '<button class="tab" data-tab="ratings" onclick="switchTab(\'ratings\')">Ratings</button>' +
+            '<button class="tab" data-tab="details" onclick="switchTab(\'details\')">Details</button>' +
             '<button class="tab" data-tab="reviews" onclick="switchTab(\'reviews\')">Reviews</button>' +
+            '<button class="tab" data-tab="report" onclick="switchTab(\'report\')">Report</button>' +
           '</div>' +
 
+          // === Overview Tab ===
           '<div class="tab-content" id="tab-overview">' +
-            (brand.overview || brand.ratingSummary
+            (branch.sentiment_summary
               ? '<div class="card" style="margin-bottom:var(--space-6);padding:var(--space-5)">' +
-                  (brand.overview
-                    ? '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-3)">Brand Overview</h3>' +
-                      '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + brand.overview + '</p>'
-                    : '') +
-                  (brand.ratingSummary
-                    ? '<h3 style="font-size:var(--text-lg);font-weight:700;margin:var(--space-4) 0 var(--space-3)"><i class="fa-solid fa-clipboard-check" style="color:var(--green)"></i> Rating Summary</h3>' +
-                      '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + brand.ratingSummary + '</p>'
-                    : '') +
+                  '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-3)">Branch Overview</h3>' +
+                  '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + Components.escapeHTML(branch.sentiment_summary) + '</p>' +
                 '</div>'
               : '') +
+
+            // Score Breakdown + Radar Chart (same 2-col layout as brand.html)
             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-8)">' +
               '<div>' +
                 '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Score Breakdown</h3>' +
-                '<div style="height:280px;position:relative"><canvas id="brand-radar"></canvas></div>' +
+                '<div style="height:280px;position:relative"><canvas id="branch-radar"></canvas></div>' +
               '</div>' +
               '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Key Features</h3>' +
+                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Branch Info</h3>' +
                 '<div style="display:flex;flex-wrap:wrap;gap:var(--space-2)">' +
-                  brand.keyFeatures.map(function(f) {
-                    return '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)">' + f + '</span>';
-                  }).join('') +
+                  '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)">' + Components.escapeHTML(branch.province) + '</span>' +
+                  '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)">' + catLabel + '</span>' +
+                  (branch.hours ? '<span style="background:var(--surface-3);border:1px solid var(--border-primary);border-radius:var(--radius-full);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);color:var(--text-secondary)"><i class="fa-solid fa-clock"></i> ' + Components.escapeHTML(branch.hours) + '</span>' : '') +
                 '</div>' +
-                '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)">Last updated: ' + Components.formatDate(brand.lastUpdated) + '</p>' +
               '</div>' +
             '</div>' +
+
+            // Category Scores
             '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Category Scores</h3>' +
             '<div class="category-grid" style="margin-bottom:var(--space-8)">' + categoryCardsHTML + '</div>' +
+
+            // Strengths & Concerns (same layout as brand.html)
             '<div class="sc-grid">' +
               '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Strengths</h3>' +
-                '<ul class="sc-list">' + strengthsHTML + '</ul>' +
+                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Key Strengths</h3>' +
+                '<ul class="sc-list">' + (strengthsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
               '</div>' +
               '<div>' +
-                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> Concerns</h3>' +
-                '<ul class="sc-list">' + concernsHTML + '</ul>' +
+                '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-triangle-exclamation" style="color:var(--orange)"></i> Key Concerns</h3>' +
+                '<ul class="sc-list">' + (concernsHTML || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
               '</div>' +
             '</div>' +
           '</div>' +
 
-          '<div class="tab-content" id="tab-pricing" style="display:none">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Pricing Plans</h3>' +
-            '<div class="pricing-grid">' + pricingHTML + '</div>' +
-          '</div>' +
-
-          '<div class="tab-content" id="tab-ratings" style="display:none">' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">App Ratings</h3>' +
-            '<div class="ratings-grid" style="margin-bottom:var(--space-8)">' +
-              '<div class="rating-card">' +
-                '<div class="rating-card-platform"><i class="fa-brands fa-google-play"></i> Google Play</div>' +
-                '<div class="rating-card-score">' + brand.appRatings.googlePlay + '</div>' +
-                '<div class="star-rating">' + gpStars + '</div>' +
-              '</div>' +
-              '<div class="rating-card">' +
-                '<div class="rating-card-platform"><i class="fa-brands fa-apple"></i> iOS App Store</div>' +
-                '<div class="rating-card-score">' + brand.appRatings.ios + '</div>' +
-                '<div class="star-rating">' + iosStars + '</div>' +
+          // === Details Tab ===
+          '<div class="tab-content" id="tab-details" style="display:none">' +
+            // Contact Info Card
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-address-card" style="color:var(--green)"></i> Contact Information</h3>' +
+            '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6)">' +
+              '<div style="display:grid;gap:var(--space-3);font-size:var(--text-sm);color:var(--text-secondary)">' +
+                contactRows +
               '</div>' +
             '</div>' +
-            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Social Sentiment</h3>' +
-            (sentiment.summary ? '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">' + sentiment.summary + '</p>' : '') +
-            '<div class="sc-grid">' +
-              '<div>' +
-                '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--green-text)"><i class="fa-solid fa-thumbs-up"></i> Positive Themes</h4>' +
-                '<ul class="sc-list">' + (posThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
-              '</div>' +
-              '<div>' +
-                '<h4 style="font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-3);color:var(--orange-text)"><i class="fa-solid fa-thumbs-down"></i> Common Concerns</h4>' +
-                '<ul class="sc-list">' + (negThemes || '<li style="color:var(--text-muted)">No data available</li>') + '</ul>' +
-              '</div>' +
+
+            // Services
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-list-check" style="color:var(--green)"></i> Services Offered</h3>' +
+            '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6)">' +
+              servicesHTML +
+            '</div>' +
+
+            // Downtime
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-server" style="color:var(--orange)"></i> Downtime Review</h3>' +
+            '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6)">' +
+              '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + Components.escapeHTML(branch.downtime || 'No downtime data available.') + '</p>' +
+            '</div>' +
+
+            // Last Corruption
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-gavel" style="color:var(--red,#e74c3c)"></i> Last Confirmed Corruption Incident</h3>' +
+            '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6)">' +
+              '<p style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.7">' + Components.escapeHTML(branch.last_corruption || 'No incidents reported.') + '</p>' +
             '</div>' +
           '</div>' +
 
+          // === Reviews Tab ===
           '<div class="tab-content" id="tab-reviews" style="display:none">' +
             '<div id="review-summary" style="margin-bottom:var(--space-4)"></div>' +
             '<div id="review-filters" style="display:none;margin-bottom:var(--space-4);display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center">' +
               '<button class="btn btn-sm btn-ghost review-filter-btn active" data-filter="all" onclick="filterReviews(\'all\')">All</button>' +
               '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="GO" onclick="filterReviews(\'GO\')"><i class="fa-solid fa-circle-check" style="color:var(--green)"></i> Go</button>' +
-              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="NOGO" onclick="filterReviews(\'NOGO\')"><i class="fa-solid fa-circle-xmark" style="color:var(--red,#e74c3c)\"></i> No Go</button>' +
+              '<button class="btn btn-sm btn-ghost review-filter-btn" data-filter="NOGO" onclick="filterReviews(\'NOGO\')"><i class="fa-solid fa-circle-xmark" style="color:var(--red,#e74c3c)"></i> No Go</button>' +
               '<span class="text-xs text-muted" id="review-filter-count" style="margin-left:auto"></span>' +
             '</div>' +
             '<div id="review-list" style="margin-bottom:var(--space-4)"></div>' +
             '<div id="review-pagination" style="text-align:center;margin-bottom:var(--space-6)"></div>' +
             '<div class="card" style="max-width:600px">' +
-              '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Rate ' + brand.name + '</h4>' +
-              '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">Would you recommend this brand? Cast your vote and tell us why.</p>' +
+              '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Rate ' + Components.escapeHTML(branch.branch_name) + '</h4>' +
+              '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">Would you recommend this branch? Cast your vote and tell us why.</p>' +
               '<div class="form-group">' +
                 '<label class="form-label">Your Name</label>' +
                 '<input type="text" id="review-name" placeholder="Enter your name">' +
@@ -338,24 +307,54 @@
               '</div>' +
               '<div class="form-group">' +
                 '<label class="form-label">Why? <span class="text-xs text-muted">(optional but helpful)</span></label>' +
-                '<textarea id="review-text" placeholder="Share your experience with ' + brand.name + '..." rows="3"></textarea>' +
+                '<textarea id="review-text" placeholder="Share your experience with ' + Components.escapeHTML(branch.branch_name) + '..." rows="3"></textarea>' +
               '</div>' +
-              '<p class="text-sm text-muted" style="margin-bottom:var(--space-3);line-height:1.6;">' +
-                'By submitting a review, you confirm that your name and comment may be published publicly on this website. ' +
-                'Please do not include sensitive, confidential, defamatory, or third-party personal information. ' +
-                'Reviews may be moderated, refused, or removed in line with our <a href="terms.html" style="color:var(--green)">Terms &amp; Conditions</a> and <a href="privacy.html" style="color:var(--green)">Privacy Policy</a>.' +
-              '</p>' +
               '<button class="btn btn-primary" onclick="submitReview()" id="submit-review-btn" disabled style="opacity:0.5">' +
                 '<i class="fa-solid fa-paper-plane"></i> Submit Review' +
               '</button>' +
             '</div>' +
           '</div>' +
+
+          // === Report Tab (Wait Time + Corruption) ===
+          '<div class="tab-content" id="tab-report" style="display:none">' +
+            // Wait Time form
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-stopwatch" style="color:var(--green)"></i> Report Wait Time</h3>' +
+            '<div class="card" style="padding:var(--space-5);margin-bottom:var(--space-6);max-width:600px">' +
+              '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">Help others plan their visit by sharing how long you waited.</p>' +
+              '<div class="form-group">' +
+                '<label class="form-label">Your visit date</label>' +
+                '<input type="date" id="wait-date">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label">Total wait (minutes)</label>' +
+                '<input type="number" id="wait-minutes" placeholder="e.g. 45" min="0">' +
+              '</div>' +
+              '<div class="form-group">' +
+                '<label class="form-label">Comments <span class="text-xs text-muted">(optional)</span></label>' +
+                '<textarea id="wait-comments" placeholder="Describe your queue experience" rows="3"></textarea>' +
+              '</div>' +
+              '<button class="btn btn-primary" onclick="submitWaitTime()"><i class="fa-solid fa-paper-plane"></i> Submit Wait Time</button>' +
+              '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-2)">Submissions are aggregated; averages will appear soon.</p>' +
+            '</div>' +
+
+            // Corruption tip form
+            '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-shield-halved" style="color:var(--orange)"></i> Corruption & Whistle-blowing</h3>' +
+            '<div class="card" style="padding:var(--space-5);max-width:600px">' +
+              '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4);font-style:italic">Your anonymous tip is sent to Corruption Watch & city authorities.</p>' +
+              '<div class="form-group">' +
+                '<label class="form-label">Describe the corruption concern</label>' +
+                '<textarea id="tip-text" placeholder="Describe the corruption concern" rows="3"></textarea>' +
+              '</div>' +
+              '<button class="btn btn-secondary" onclick="submitTip()"><i class="fa-solid fa-paper-plane"></i> Submit Report</button>' +
+            '</div>' +
+          '</div>' +
+
         '</div></section>';
 
-      // Init radar chart
-      Components.createRadarChart('brand-radar', brand, { showTicks: true, labelSize: 11, pointRadius: 4 });
+      // Init radar chart (using Components.createRadarChart like brand.html)
+      Components.createRadarChart('branch-radar', brandLike, { showTicks: true, labelSize: 11, pointRadius: 4 });
 
-      // Tab switching
+      // Tab switching (same as brand.html)
       window.switchTab = function(tab) {
         document.querySelectorAll('.tab-content').forEach(function(el) { el.style.display = 'none'; });
         document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('active'); });
@@ -363,7 +362,7 @@
         document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
       };
 
-      // Review state
+      // Review state (same as brand.html)
       var allReviews = [];
       var reviewFilter = 'all';
       var reviewPage = 1;
@@ -404,19 +403,11 @@
         renderReviews();
       };
 
-      // UPDATED: load reviews + replies
       async function loadReviews() {
-  allReviews = await GoNoGoAPI.getBrandReviews(brand.name);
-  var replies = await GoNoGoAPI.getReviewReplies(brand.id);
-  allReviews.forEach(function(r) {
-    var matching = replies.find(function(rep) {
-      return rep.review_id === r.id;
-    });
-    r.brandReply = matching || null;
-  });
-  renderReviewSummary();
-  renderReviews();
-}
+        allReviews = await GoNoGoAPI.getReviews(branch.branch_name, branch.category_slug);
+        renderReviewSummary();
+        renderReviews();
+      }
 
       function renderReviewSummary() {
         var el = document.getElementById('review-summary');
@@ -456,7 +447,7 @@
             '<div style="text-align:center;padding:var(--space-10) 0">' +
               '<i class="fa-solid fa-comments" style="font-size:var(--text-3xl);color:var(--text-faint);margin-bottom:var(--space-4);display:block"></i>' +
               '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">No Reviews Yet</h3>' +
-              '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to rate ' + brand.name + '.</p>' +
+              '<p style="font-size:var(--text-sm);color:var(--text-secondary)">Be the first to rate ' + Components.escapeHTML(branch.branch_name) + '.</p>' +
             '</div>';
           document.getElementById('review-pagination').innerHTML = '';
           return;
@@ -470,11 +461,8 @@
 
         list.innerHTML = visible.map(function(r) {
           var verdictHtml = '';
-          if (r.verdict === 'GO') {
-            verdictHtml = '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>';
-          } else if (r.verdict === 'NOGO') {
-            verdictHtml = '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>';
-          }
+          if (r.verdict === 'GO') verdictHtml = '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>';
+          else if (r.verdict === 'NOGO') verdictHtml = '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>';
 
           return '<div class="comment-card">' +
             '<div class="comment-header">' +
@@ -485,30 +473,11 @@
               '<span class="comment-date">' + (r.date || '') + '</span>' +
             '</div>' +
             (r.reviewtext ? '<div class="comment-text">' + r.reviewtext + '</div>' : '') +
-            (r.brandReply ? (
-              '<div class="brand-reply" ' +
-                   'style="margin-top:var(--space-3);padding:var(--space-3);background:var(--surface-3);border-left:3px solid var(--green);border-radius:var(--radius-sm)">' +
-                '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-1)">' +
-                  '<span style="font-size:var(--text-xs);font-weight:700;color:var(--green-text)">' +
-                    '<i class="fa-solid fa-building"></i> Brand response' +
-                  '</span>' +
-                  (r.brandReply.created_at
-                    ? '<span style="margin-left:auto;font-size:var(--text-xs);color:var(--text-muted)">' +
-                        new Date(r.brandReply.created_at).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" }) +
-                      '</span>'
-                    : '') +
-                '</div>' +
-                '<div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6;">' +
-                  r.brandReply.reply_text +
-                '</div>' +
-              '</div>'
-            ) : '') +
           '</div>';
         }).join('');
 
-        document.getElementById('review-pagination').innerHTML = remaining > 0
-          ? '<button class="btn btn-secondary btn-sm" onclick="loadMoreReviews()">Show more (' + remaining + ' remaining)</button>'
-          : '';
+        document.getElementById('review-pagination').innerHTML = remaining > 0 ?
+          '<button class="btn btn-secondary btn-sm" onclick="loadMoreReviews()">Show more (' + remaining + ' remaining)</button>' : '';
       }
 
       window.submitReview = async function() {
@@ -520,8 +489,8 @@
         }
         try {
           await GoNoGoAPI.submitReview({
-            category: brand.categorySlug,
-            brand_name: brand.name,
+            category: branch.category_slug,
+            brand_name: branch.branch_name,
             reviewer_name: name,
             review_text: text,
             verdict: selectedVerdict
@@ -539,36 +508,54 @@
           Components.showToast('Review submitted — thank you!');
           await loadReviews();
         } catch (e) {
-          var msg = e.message || 'Error submitting review. Please try again.';
-          if (msg.indexOf('live platform') !== -1 || msg.indexOf('require') !== -1) {
-            Components.showToast(msg, 'error');
-          } else {
-            Components.showToast('Error submitting review. Please try again.', 'error');
-          }
+          Components.showToast('Error submitting review. Please try again.', 'error');
           console.error('Review submission error:', e);
+        }
+      };
+
+      // Wait time submission — writes to Supabase
+      window.submitWaitTime = async function() {
+        var date = document.getElementById('wait-date').value;
+        var mins = document.getElementById('wait-minutes').value;
+        if (!date || !mins) {
+          Components.showToast('Please enter a date and wait time.', 'error');
+          return;
+        }
+        try {
+          await GoNoGoAPI.submitWaitTime(branch.branch_id, date, mins, document.getElementById('wait-comments').value.trim());
+          Components.showToast('Thank you! Your wait time has been recorded.');
+          document.getElementById('wait-date').value = '';
+          document.getElementById('wait-minutes').value = '';
+          document.getElementById('wait-comments').value = '';
+        } catch (e) {
+          Components.showToast('Error submitting wait time. Please try again.', 'error');
+          console.error('Wait time submission error:', e);
+        }
+      };
+
+      // Tip submission — writes to Supabase
+      window.submitTip = async function() {
+        var text = document.getElementById('tip-text').value.trim();
+        if (!text) {
+          Components.showToast('Please describe the concern.', 'error');
+          return;
+        }
+        try {
+          await GoNoGoAPI.submitTip(branch.branch_id, text);
+          Components.showToast('Report submitted anonymously. Thank you.');
+          document.getElementById('tip-text').value = '';
+        } catch (e) {
+          Components.showToast('Error submitting report. Please try again.', 'error');
+          console.error('Tip submission error:', e);
         }
       };
 
       await loadReviews();
     })();
-
-    function renderStars(score) {
-      var val = parseFloat(score) || 0;
-      var full = Math.floor(val);
-      var half = val - full >= 0.3;
-      var html = '';
-      for (var i = 1; i <= 5; i++) {
-        if (i <= full) html += '<i class="fa-solid fa-star active"></i>';
-        else if (i === full + 1 && half) html += '<i class="fa-solid fa-star-half-stroke active"></i>';
-        else html += '<i class="fa-regular fa-star"></i>';
-      }
-      return html;
-    }
   </script>
-
   <style>
     @media (max-width: 768px) {
-      #tab-overview > div:first-child {
+      #tab-overview > div:nth-child(2) {
         grid-template-columns: 1fr !important;
       }
     }
