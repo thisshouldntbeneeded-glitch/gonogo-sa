@@ -406,17 +406,17 @@
 
       // UPDATED: load reviews + replies
       async function loadReviews() {
-        allReviews = await GoNoGoAPI.getReviews(brand.name, brand.categorySlug);
-        var replies = await GoNoGoAPI.getReviewReplies(brand.id);
-        allReviews.forEach(function(r) {
-          var matching = replies.find(function(rep) {
-            return rep.review_id === r.id;
-          });
-          r.brandReply = matching || null;
-        });
-        renderReviewSummary();
-        renderReviews();
-      }
+  allReviews = await GoNoGoAPI.getBrandReviews(brand.name);
+  var replies = await GoNoGoAPI.getReviewReplies(brand.id);
+  allReviews.forEach(function(r) {
+    var matching = replies.find(function(rep) {
+      return rep.review_id === r.id;
+    });
+    r.brandReply = matching || null;
+  });
+  renderReviewSummary();
+  renderReviews();
+}
 
       function renderReviewSummary() {
         var el = document.getElementById('review-summary');
