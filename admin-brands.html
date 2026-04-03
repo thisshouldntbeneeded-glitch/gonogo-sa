@@ -1018,31 +1018,7 @@
 
       document.getElementById('category-modal').classList.add('open');
     }
-          // Create new category
-          var slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-          var scoringCats = isBranchType
-            ? [
-                { name: 'Compliance', max: 20 },
-                { name: 'Customer Satisfaction', max: 25 },
-                { name: 'Service Offering', max: 25 },
-                { name: 'Innovation', max: 10 },
-                { name: 'Customer Support', max: 15 },
-                { name: 'Accessibility & Security', max: 10 }
-              ]
-            : [
-                { name: 'Compliance', max: 20 },
-                { name: 'Customer Satisfaction', max: 25 },
-                { name: 'Product Value', max: 35 },
-                { name: 'Innovation', max: 10 },
-                { name: 'Customer Support', max: 15 },
-                { name: 'Accessibility & Security', max: 10 }
-              ];
-          var catBody = {
-            slug: slug,
-            name: name,
-            icon: icon,
-            scoringCategories: scoringCats
-          };
+         
          async function saveCategory(e) {
       e.preventDefault();
       var name = document.getElementById('fc-name').value.trim();
