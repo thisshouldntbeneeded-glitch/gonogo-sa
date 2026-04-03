@@ -562,9 +562,9 @@
       fIndustry.innerHTML = '';
 
       allCategoriesData.forEach(function(cat) {
-        industryFilter.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
-        fIndustry.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
-      });
+  industryFilter.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
+  fIndustry.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
+});
 
       // Add "Create New Category" option at the end
       fIndustry.innerHTML += '<option value="__new__" style="font-weight:bold;color:#11a551;">➕ Create New Category</option>';
