@@ -281,6 +281,36 @@
           </div>
         </div>
 
+        <h4 class="text-sm font-semibold" style="margin:var(--space-5) 0 var(--space-3);color:var(--green);"><i class="fa-solid fa-user-shield"></i> Admin Review</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Region</label>
+            <input type="text" id="f-region" placeholder="e.g. South Africa">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reviewed By</label>
+            <input type="text" id="f-reviewed-by" placeholder="e.g. admin">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Reviewed At</label>
+            <input type="datetime-local" id="f-reviewed-at">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Created At</label>
+            <input type="datetime-local" id="f-created-at">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Internal Score Justification</label>
+          <textarea id="f-internal-score-justification" rows="4" placeholder="Internal-only rationale for the score and verdict"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Scoring Breakdown JSON <span class="text-xs text-muted">(optional override)</span></label>
+          <textarea id="f-scoring-breakdown" rows="5" placeholder='Auto-generated from score fields if left blank'></textarea>
+        </div>
+
         <div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-4);">
           <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
           <button type="submit" class="btn btn-primary" id="save-btn"><i class="fa-solid fa-check"></i> Save Brand</button>
@@ -592,6 +622,48 @@
       return null;
     }
 
+
+    function toDatetimeLocalValue(value) {
+      if (!value) return '';
+      try {
+        var d = new Date(value);
+        if (isNaN(d.getTime())) return '';
+        var pad = function(n) { return String(n).padStart(2, '0'); };
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function fromDatetimeLocalValue(value) {
+      if (!value) return null;
+      try {
+        return new Date(value).toISOString();
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function buildScoringBreakdown(scores) {
+      var items = [];
+      Object.keys(scores || {}).forEach(function(name) {
+        var item = scores[name] || {};
+        items.push({
+          category: name,
+          score: typeof item.score === 'number' ? item.score : parseFloat(item.score) || 0,
+          max: typeof item.max === 'number' ? item.max : parseFloat(item.max) || 0,
+          description: item.description || ''
+        });
+      });
+      return items;
+    }
+
+    function parseScoringBreakdown(value) {
+      if (!value) return null;
+      if (typeof value === 'object') return value;
+      try { return JSON.parse(value); } catch (e) { return null; }
+    }
+
     async function initAdminPage() {
       document.getElementById('admin-content').style.display = '';
       await refreshDashboardData();
@@ -822,6 +894,12 @@
       document.getElementById('brand-form').reset();
       document.getElementById('new-cat-fields').classList.remove('visible');
       document.getElementById('f-industry').value = allCategoriesData.length > 0 ? getCategorySlug(allCategoriesData[0]) : '';
+      document.getElementById('f-region').value = 'South Africa';
+      document.getElementById('f-reviewed-by').value = 'admin';
+      document.getElementById('f-reviewed-at').value = toDatetimeLocalValue(new Date().toISOString());
+      document.getElementById('f-created-at').value = '';
+      document.getElementById('f-internal-score-justification').value = '';
+      document.getElementById('f-scoring-breakdown').value = '';
       document.getElementById('brand-modal').classList.add('open');
     }
 
@@ -1499,6 +1577,13 @@
     document.getElementById('branch-modal').addEventListener('click', function(e) {
       if (e.target === this) closeBranchModal();
     });
+
+
+    // Added admin metadata support for newer Supabase schema.
+    // If your existing importCSV/exportBrands implementations exist below in the original file,
+    // they should be updated to include: Region, ReviewedBy, ReviewedAt, CreatedAt,
+    // InternalScoreJustification, and ScoringBreakdown JSON.
+
   </script>
 </body>
 </html>
