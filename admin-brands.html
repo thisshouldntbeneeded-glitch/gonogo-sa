@@ -777,7 +777,7 @@
       document.getElementById('modal-title').textContent = 'Add Brand';
       document.getElementById('brand-form').reset();
       document.getElementById('new-cat-fields').classList.remove('visible');
-      document.getElementById('f-industry').value = allCategoriesData.length > 0 ? allCategoriesData[0].id : '';
+      document.getElementById('f-industry').value = allCategoriesData.length > 0 ? allCategoriesData[0].slug : '';
       document.getElementById('brand-modal').classList.add('open');
     }
 
