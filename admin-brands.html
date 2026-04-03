@@ -194,7 +194,7 @@
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label text-xs">Icon</label>
                 <div class="icon-picker-wrapper">
-                  <button type="button" class="icon-picker-btn" onclick="toggleIconPicker('new-cat-icon-picker', 'new-cat-icon-value', 'new-cat-icon-display')">
+                  <button type="button" class="icon-picker-btn" onclick="toggleIconPicker('new-cat-icon-picker')">
                     <i class="fa-solid fa-tag selected-icon" id="new-cat-icon-display"></i>
                     <span id="new-cat-icon-label">fa-tag</span>
                   </button>
@@ -334,7 +334,7 @@
         <div class="form-group">
           <label class="form-label">Icon</label>
           <div class="icon-picker-wrapper">
-            <button type="button" class="icon-picker-btn" onclick="toggleIconPicker('fc-icon-picker', 'fc-icon', 'fc-icon-display')">
+            <button type="button" class="icon-picker-btn" onclick="toggleIconPicker('fc-icon-picker')">
               <i class="fa-solid fa-tag selected-icon" id="fc-icon-display"></i>
               <span id="fc-icon-label">fa-tag</span>
             </button>
@@ -622,7 +622,6 @@
       return null;
     }
 
-
     function toDatetimeLocalValue(value) {
       if (!value) return '';
       try {
@@ -662,6 +661,25 @@
       if (!value) return null;
       if (typeof value === 'object') return value;
       try { return JSON.parse(value); } catch (e) { return null; }
+    }
+
+    function csvEscape(value) {
+      var str = value == null ? '' : String(value);
+      if (str.indexOf('"') !== -1 || str.indexOf(',') !== -1 || str.indexOf('\n') !== -1) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    }
+
+    function getBrandScoringBreakdownValue(brand) {
+      var raw = brand && (
+        brand.scoring_breakdown ||
+        brand.scoringBreakdown ||
+        brand.score_breakdown ||
+        null
+      );
+      if (raw) return raw;
+      return buildScoringBreakdown(brand && brand.categoryScores ? brand.categoryScores : {});
     }
 
     async function initAdminPage() {
@@ -887,11 +905,25 @@
       );
     }
 
+    function clearScoreFields() {
+      var scoreCategories = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
+      scoreCategories.forEach(function(catName) {
+        var fieldId = 'f-' + catName.toLowerCase().replace(/[^a-z]+/g, '-');
+        var scoreEl = document.getElementById(fieldId + '-score');
+        var maxEl = document.getElementById(fieldId + '-max');
+        var descEl = document.getElementById(fieldId + '-desc');
+        if (scoreEl) scoreEl.value = '';
+        if (maxEl) maxEl.value = '';
+        if (descEl) descEl.value = '';
+      });
+    }
+
     function openAddModal() {
       editingBrandId = null;
       editingBrandData = null;
       document.getElementById('modal-title').textContent = 'Add Brand';
       document.getElementById('brand-form').reset();
+      clearScoreFields();
       document.getElementById('new-cat-fields').classList.remove('visible');
       document.getElementById('f-industry').value = allCategoriesData.length > 0 ? getCategorySlug(allCategoriesData[0]) : '';
       document.getElementById('f-region').value = 'South Africa';
@@ -924,6 +956,9 @@
       editingBrandId = id;
       editingBrandData = b;
       document.getElementById('modal-title').textContent = 'Edit: ' + b.name;
+      document.getElementById('brand-form').reset();
+      clearScoreFields();
+
       document.getElementById('f-name').value = b.name || '';
       document.getElementById('f-industry').value = getBrandCategorySlug(b);
       document.getElementById('new-cat-fields').classList.remove('visible');
@@ -937,10 +972,18 @@
       document.getElementById('f-strengths').value = (b.strengths || []).join(', ');
       document.getElementById('f-concerns').value = (b.concerns || []).join(', ');
       document.getElementById('f-pricing').value = (b.pricing || []).map(function(p) { return p.cost || p.name || ''; }).join('; ');
+
       var ss = b.socialSentiment || {};
       document.getElementById('f-sentiment-summary').value = ss.summary || '';
       document.getElementById('f-sentiment-positive').value = (ss.positive_themes || []).join(', ');
       document.getElementById('f-sentiment-concerns').value = (ss.common_concerns || []).join(', ');
+
+      document.getElementById('f-region').value = b.region || b.country || 'South Africa';
+      document.getElementById('f-reviewed-by').value = b.reviewed_by || b.reviewedBy || '';
+      document.getElementById('f-reviewed-at').value = toDatetimeLocalValue(b.reviewed_at || b.reviewedAt || b.lastReviewed || '');
+      document.getElementById('f-created-at').value = toDatetimeLocalValue(b.created_at || b.createdAt || '');
+      document.getElementById('f-internal-score-justification').value = b.internal_score_justification || b.internalScoreJustification || '';
+      document.getElementById('f-scoring-breakdown').value = JSON.stringify(getBrandScoringBreakdownValue(b), null, 2);
 
       Object.entries(b.categoryScores || {}).forEach(function(entry) {
         var name = entry[0], data = entry[1];
@@ -1038,6 +1081,18 @@
       var pricingText = document.getElementById('f-pricing').value.trim();
       var pricingArr = pricingText ? [{ name: 'Pricing', cost: pricingText, features: '' }] : [];
 
+      var reviewedAtISO = fromDatetimeLocalValue(document.getElementById('f-reviewed-at').value);
+      var createdAtISO = fromDatetimeLocalValue(document.getElementById('f-created-at').value);
+      var scoringBreakdownText = document.getElementById('f-scoring-breakdown').value.trim();
+      var scoringBreakdownParsed = scoringBreakdownText ? parseScoringBreakdown(scoringBreakdownText) : buildScoringBreakdown(scores);
+
+      if (scoringBreakdownText && !scoringBreakdownParsed) {
+        Components.showToast('Scoring Breakdown JSON is invalid', 'error');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Brand';
+        return;
+      }
+
       var brandData = {
         name: document.getElementById('f-name').value.trim(),
         categorySlug: industryVal,
@@ -1056,7 +1111,13 @@
           summary: document.getElementById('f-sentiment-summary').value.trim(),
           positive_themes: csvToArr('f-sentiment-positive'),
           common_concerns: csvToArr('f-sentiment-concerns')
-        }
+        },
+        region: document.getElementById('f-region').value.trim(),
+        reviewed_by: document.getElementById('f-reviewed-by').value.trim(),
+        reviewed_at: reviewedAtISO,
+        created_at: createdAtISO,
+        internal_score_justification: document.getElementById('f-internal-score-justification').value.trim(),
+        scoring_breakdown: scoringBreakdownParsed
       };
 
       try {
@@ -1335,7 +1396,13 @@
           Pricing: (b.pricing || []).map(function(p) { return p.cost || ''; }).join('; '),
           SocialSentiment_Summary: ss.summary || '',
           SocialSentiment_Positive: (ss.positive_themes || []).join(', '),
-          SocialSentiment_Concerns: (ss.common_concerns || []).join(', ')
+          SocialSentiment_Concerns: (ss.common_concerns || []).join(', '),
+          Region: b.region || '',
+          ReviewedBy: b.reviewed_by || b.reviewedBy || '',
+          ReviewedAt: b.reviewed_at || b.reviewedAt || '',
+          CreatedAt: b.created_at || b.createdAt || '',
+          InternalScoreJustification: b.internal_score_justification || b.internalScoreJustification || '',
+          ScoringBreakdown: JSON.stringify(getBrandScoringBreakdownValue(b))
         };
         var cats = ['Compliance', 'Customer Satisfaction', 'Product Value', 'Innovation', 'Customer Support', 'Accessibility & Security'];
         cats.forEach(function(cat) {
@@ -1428,7 +1495,13 @@
         sentimentSummary: findCol(headers, ['socialsentiment_summary', 'sentiment_summary']),
         sentimentPositive: findCol(headers, ['socialsentiment_positive', 'sentiment_positive']),
         sentimentConcerns: findCol(headers, ['socialsentiment_concerns', 'sentiment_concerns']),
-        categoryIcon: findCol(headers, ['categoryicon', 'category_icon', 'icon'])
+        categoryIcon: findCol(headers, ['categoryicon', 'category_icon', 'icon']),
+        region: findCol(headers, ['region']),
+        reviewedBy: findCol(headers, ['reviewedby', 'reviewed_by']),
+        reviewedAt: findCol(headers, ['reviewedat', 'reviewed_at']),
+        createdAt: findCol(headers, ['createdat', 'created_at']),
+        internalScoreJustification: findCol(headers, ['internalscorejustification', 'internal_score_justification']),
+        scoringBreakdown: findCol(headers, ['scoringbreakdown', 'scoring_breakdown'])
       };
 
       var created = 0, errors = 0, catsCreated = 0;
@@ -1508,6 +1581,19 @@
         if (colMap.sentimentConcerns !== -1 && cols[colMap.sentimentConcerns]) { sentObj.common_concerns = cols[colMap.sentimentConcerns].split(',').map(function(s){return s.trim();}).filter(Boolean); hasSentiment = true; }
         if (hasSentiment) brandData.socialSentiment = sentObj;
 
+        if (colMap.region !== -1 && cols[colMap.region]) brandData.region = cols[colMap.region].trim();
+        if (colMap.reviewedBy !== -1 && cols[colMap.reviewedBy]) brandData.reviewed_by = cols[colMap.reviewedBy].trim();
+        if (colMap.reviewedAt !== -1 && cols[colMap.reviewedAt]) brandData.reviewed_at = cols[colMap.reviewedAt].trim();
+        if (colMap.createdAt !== -1 && cols[colMap.createdAt]) brandData.created_at = cols[colMap.createdAt].trim();
+        if (colMap.internalScoreJustification !== -1 && cols[colMap.internalScoreJustification]) brandData.internal_score_justification = cols[colMap.internalScoreJustification].trim();
+
+        if (colMap.scoringBreakdown !== -1 && cols[colMap.scoringBreakdown]) {
+          var parsedBreakdown = parseScoringBreakdown(cols[colMap.scoringBreakdown].trim());
+          if (parsedBreakdown) {
+            brandData.scoring_breakdown = parsedBreakdown;
+          }
+        }
+
         try {
           await GoNoGoAPI.saveBrand(brandData);
           csvLog('Row ' + i + ': ' + brandName + ' — saved', 'success');
@@ -1577,13 +1663,6 @@
     document.getElementById('branch-modal').addEventListener('click', function(e) {
       if (e.target === this) closeBranchModal();
     });
-
-
-    // Added admin metadata support for newer Supabase schema.
-    // If your existing importCSV/exportBrands implementations exist below in the original file,
-    // they should be updated to include: Region, ReviewedBy, ReviewedAt, CreatedAt,
-    // InternalScoreJustification, and ScoringBreakdown JSON.
-
   </script>
 </body>
 </html>
