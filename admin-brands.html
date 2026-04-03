@@ -562,9 +562,6 @@
       fIndustry.innerHTML = '';
 
       allCategoriesData.forEach(function(cat) {
-        industryFilter.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
-        fIndustry.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
-      });
   industryFilter.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
   fIndustry.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
 });
