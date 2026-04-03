@@ -562,6 +562,9 @@
       fIndustry.innerHTML = '';
 
       allCategoriesData.forEach(function(cat) {
+        industryFilter.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
+        fIndustry.innerHTML += '<option value="' + cat.id + '">' + Components.escapeHTML(cat.name) + '</option>';
+      });
   industryFilter.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
   fIndustry.innerHTML += '<option value="' + cat.slug + '">' + Components.escapeHTML(cat.name) + '</option>';
 });
@@ -777,7 +780,7 @@
       document.getElementById('modal-title').textContent = 'Add Brand';
       document.getElementById('brand-form').reset();
       document.getElementById('new-cat-fields').classList.remove('visible');
-      document.getElementById('f-industry').value = allCategoriesData.length > 0 ? allCategoriesData[0].slug : '';
+      document.getElementById('f-industry').value = allCategoriesData.length > 0 ? allCategoriesData[0].id : '';
       document.getElementById('brand-modal').classList.add('open');
     }
 
@@ -1018,7 +1021,7 @@
 
       document.getElementById('category-modal').classList.add('open');
     }
-         
+
          async function saveCategory(e) {
       e.preventDefault();
       var name = document.getElementById('fc-name').value.trim();
