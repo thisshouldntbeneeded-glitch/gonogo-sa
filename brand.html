@@ -113,29 +113,35 @@
 
       var jsonLD = {
         '@context': 'https://schema.org',
-        '@type': 'Review',
-        'itemReviewed': {
-          '@type': 'Brand',
-          'name': brand.name,
-          'url': brand.website || ''
+        '@type': 'Organization',
+        'name': brand.name,
+        'url': brand.website || window.location.href,
+        'aggregateRating': {
+          '@type': 'AggregateRating',
+          'ratingValue': (brand.overallScore / 20).toFixed(1),
+          'bestRating': 5,
+          'worstRating': 1,
+          'ratingCount': 1,
+          'reviewCount': 1
         },
-        'reviewRating': {
-          '@type': 'Rating',
-          'ratingValue': brand.overallScore,
-          'bestRating': 100,
-          'worstRating': 0
-        },
-        'author': {
-          '@type': 'Organization',
-          'name': 'GoNoGo South Africa',
-          'url': 'https://www.gonogo.co.za'
-        },
-        'reviewBody': brand.ratingSummary || metaDesc,
-        'publisher': {
-          '@type': 'Organization',
-          'name': 'GoNoGo South Africa'
+        'review': {
+          '@type': 'Review',
+          'author': {
+            '@type': 'Organization',
+            'name': 'GoNoGo Ratings and Reviews',
+            'url': 'https://www.gonogo.co.za'
+          },
+          'reviewRating': {
+            '@type': 'Rating',
+            'ratingValue': (brand.overallScore / 20).toFixed(1),
+            'bestRating': 5,
+            'worstRating': 1
+          },
+          'reviewBody': brand.ratingSummary || metaDesc
         }
       };
+      if (brand.logo) jsonLD.logo = brand.logo;
+      if (brand.overview) jsonLD.description = brand.overview;
 
       var ldScript = document.createElement('script');
       ldScript.type = 'application/ld+json';
@@ -415,6 +421,13 @@
 
         renderReviewSummary();
         renderReviews();
+
+        if (allReviews.length > 0) {
+          var count = allReviews.length;
+          jsonLD.aggregateRating.ratingCount = count;
+          jsonLD.aggregateRating.reviewCount = count;
+          ldScript.textContent = JSON.stringify(jsonLD);
+        }
       }
 
       function renderReviewSummary() {
