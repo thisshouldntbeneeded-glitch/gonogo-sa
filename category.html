@@ -13,37 +13,49 @@
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
-<meta name="keywords" content="industry comparison, brand rankings, South Africa brands, category ratings">
-<link rel="canonical" href="https://gonogo-sa.vercel.app/category">
-<meta property="og:title" content="Industry Brands — GoNoGo South Africa">
-<meta property="og:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
-<meta property="og:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://gonogo-sa.vercel.app/category">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="GoNoGo South Africa">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Industry Brands — GoNoGo South Africa">
-<meta name="twitter:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
-<meta name="twitter:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
-<meta name="robots" content="index, follow">
+  <meta name="description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
+  <meta name="keywords" content="industry comparison, brand rankings, South Africa brands, category ratings">
+  <link rel="canonical" href="https://gonogo-sa.vercel.app/category">
+  <meta property="og:title" content="Industry Brands — GoNoGo South Africa">
+  <meta property="og:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
+  <meta property="og:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://gonogo-sa.vercel.app/category">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GoNoGo South Africa">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Industry Brands — GoNoGo South Africa">
+  <meta name="twitter:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
+  <meta name="twitter:image" content="https://gonogo-sa.vercel.app/logos/og-share.jpg">
+  <meta name="robots" content="index, follow">
   <title>Industry Brands — GoNoGo South Africa</title>
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('gonogo_theme');
+        if (t === 'light' || (!t && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+          document.documentElement.classList.add('light-mode');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
+<body>
   <div id="nav"></div>
   <div id="page-content">
     <div style="text-align:center;padding:var(--space-10);color:var(--text-muted)">Loading...</div>
   </div>
   <div id="footer"></div>
+
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -61,13 +73,48 @@
     document.getElementById('footer').innerHTML = Components.renderFooter();
     Components.initTheme();
 
+    var CATEGORY_FRAMEWORK_OVERRIDES = {
+      'property-letting': [
+        { name: 'Compliance', max: 15 },
+        { name: 'Customer Satisfaction', max: 25 },
+        { name: 'Product Value', max: 30 },
+        { name: 'Innovation', max: 10 },
+        { name: 'Customer Support', max: 10 },
+        { name: 'Accessibility & Security', max: 10 }
+      ]
+    };
+
+    function getCategoryFramework(catInfo) {
+      if (!catInfo) return [];
+
+      if (CATEGORY_FRAMEWORK_OVERRIDES[catInfo.id]) {
+        return CATEGORY_FRAMEWORK_OVERRIDES[catInfo.id];
+      }
+
+      return Array.isArray(catInfo.scoringCategories) ? catInfo.scoringCategories : [];
+    }
+
+    function renderFrameworkHTML(scoringCategories) {
+      return (scoringCategories || []).map(function(sc) {
+        var pct = Math.round((Number(sc.max || 0) / 100) * 100);
+        return '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0">' +
+          '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
+          '<div class="score-bar" style="flex:1">' +
+            '<div class="score-bar-fill" style="width:' + pct + '%;background:var(--green)"></div>' +
+          '</div>' +
+          '<span style="font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:right;color:var(--text-primary)">' + sc.max + '</span>' +
+        '</div>';
+      }).join('');
+    }
+
     (async function() {
       if (!slug) {
-        // Show all categories grid
         document.getElementById('nav').innerHTML = Components.renderPublicNav('');
         Components.updateThemeIcon();
         document.title = 'All Industries — GoNoGo South Africa';
+
         var categories = await GoNoGoAPI.getCategoriesWithBrands();
+
         document.getElementById('page-content').innerHTML =
           '<section class="section"><div class="container">' +
             '<div class="section-header">' +
@@ -86,208 +133,200 @@
               }).join('') +
             '</div>' +
           '</div></section>';
-      } else {
-        // Load category data
-        var allCats = await GoNoGoAPI.getCategories();
-        var catInfo = null;
-        for (var i = 0; i < allCats.length; i++) {
-          if (allCats[i].id === slug) { catInfo = allCats[i]; break; }
-        }
 
-        if (!catInfo) {
-          document.getElementById('nav').innerHTML = Components.renderPublicNav('');
-          Components.updateThemeIcon();
-          document.getElementById('page-content').innerHTML =
-            '<section class="section"><div class="container" style="text-align:center">' +
-              '<h1 class="section-title">Category Not Found</h1>' +
-              '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The category "' + slug + '" does not exist.</p>' +
-              '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
-            '</div></section>';
-          return;
-        }
+        return;
+      }
 
-        document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
+      var allCats = await GoNoGoAPI.getCategories();
+      var catInfo = null;
+
+      for (var i = 0; i < allCats.length; i++) {
+        if (allCats[i].id === slug) {
+          catInfo = allCats[i];
+          break;
+        }
+      }
+
+      if (!catInfo) {
+        document.getElementById('nav').innerHTML = Components.renderPublicNav('');
         Components.updateThemeIcon();
-        document.title = catInfo.name + ' — GoNoGo South Africa';
+        document.getElementById('page-content').innerHTML =
+          '<section class="section"><div class="container" style="text-align:center">' +
+            '<h1 class="section-title">Category Not Found</h1>' +
+            '<p class="section-subtitle" style="margin-bottom:var(--space-6)">The category "' + slug + '" does not exist.</p>' +
+            '<a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+          '</div></section>';
+        return;
+      }
 
-        var isBranchCategory = catInfo.categoryType === 'branch';
-        var itemLabel = isBranchCategory ? 'branch' : 'brand';
+      document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
+      Components.updateThemeIcon();
+      document.title = catInfo.name + ' — GoNoGo South Africa';
 
-        // SEO meta
-        var catDesc = 'Compare ' + catInfo.brandCount + ' ' + catInfo.name.toLowerCase() + ' ' + itemLabel + (catInfo.brandCount !== 1 ? (isBranchCategory ? 'es' : 's') : '') + ' in South Africa. Independent ratings on a 100-point scoring framework.';
-        var metaTag = document.querySelector('meta[name="description"]');
-        if (!metaTag) { metaTag = document.createElement('meta'); metaTag.name = 'description'; document.head.appendChild(metaTag); }
-        metaTag.content = catDesc;
+      var isBranchCategory = catInfo.categoryType === 'branch';
+      var itemLabel = isBranchCategory ? 'branch' : 'brand';
 
-        if (isBranchCategory) {
-          // ===== BRANCH CATEGORY =====
-          var branches = await GoNoGoAPI.getBranchesByCategory(slug);
-          var currentSort = 'score-desc';
+      var catDesc = 'Compare ' + catInfo.brandCount + ' ' + catInfo.name.toLowerCase() + ' ' + itemLabel + (catInfo.brandCount !== 1 ? (isBranchCategory ? 'es' : 's') : '') + ' in South Africa. Independent ratings on a 100-point scoring framework.';
+      var metaTag = document.querySelector('meta[name="description"]');
+      if (!metaTag) {
+        metaTag = document.createElement('meta');
+        metaTag.name = 'description';
+        document.head.appendChild(metaTag);
+      }
+      metaTag.content = catDesc;
 
-          window.sortBrands = function(key) {
-            currentSort = key;
-            if (key === 'score-desc') branches.sort(function(a, b) { return b.total_score - a.total_score; });
-            else if (key === 'score-asc') branches.sort(function(a, b) { return a.total_score - b.total_score; });
-            else if (key === 'name-asc') branches.sort(function(a, b) { return a.branch_name.localeCompare(b.branch_name); });
-            else if (key === 'name-desc') branches.sort(function(a, b) { return b.branch_name.localeCompare(a.branch_name); });
-            renderBranches();
-          };
+      if (isBranchCategory) {
+        var branches = await GoNoGoAPI.getBranchesByCategory(slug);
+        var currentSort = 'score-desc';
 
-          function renderBranchCard(b, i) {
-            var stagger = i < 6 ? ' stagger-' + (i + 1) : '';
-            var scoreColor = getScoreColor(b.total_score);
-            var verdictClass = b.verdict === 'GO' ? 'go' : b.verdict === 'NOGO' ? 'nogo' : 'caution';
-            return '<a href="branch.html?id=' + b.branch_id + '" class="brand-card animate-in' + stagger + '" style="text-decoration:none">' +
-              '<div class="brand-card-top">' +
-                '<div style="width:48px;height:48px;border-radius:var(--radius-lg);background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:var(--text-lg);flex-shrink:0">' +
-                  '<i class="fa-solid fa-building-columns" style="color:var(--green)"></i>' +
-                '</div>' +
-                '<div class="brand-card-info">' +
-                  '<div class="brand-card-name">' + b.branch_name + '</div>' +
-                  '<div class="brand-card-meta">' +
-                    '<span class="verdict-badge verdict-' + verdictClass + '">' + b.verdict + '</span>' +
-                    '<span class="score-badge" style="color:' + scoreColor + '">' + b.total_score + '/100</span>' +
-                  '</div>' +
-                '</div>' +
-              '</div>' +
-              '<div class="brand-card-stats" style="font-size:var(--text-xs);color:var(--text-secondary)">' +
-                '<span><i class="fa-solid fa-map-marker-alt"></i> ' + b.province + '</span>' +
-                '<span><i class="fa-solid fa-user-tie"></i> ' + (b.manager || 'N/A') + '</span>' +
-              '</div>' +
-            '</a>';
-          }
-
-          function renderBranches() {
-            var grid = document.getElementById('brand-grid');
-            grid.innerHTML = branches.map(function(b, i) { return renderBranchCard(b, i); }).join('');
-            document.querySelectorAll('.sort-btn').forEach(function(btn) {
-              btn.classList.toggle('active', btn.dataset.sort === currentSort);
-            });
-          }
-
-          // Branch scoring framework
-          var branchFramework = [
-            { name: 'Compliance', max: 15 },
-            { name: 'Customer Satisfaction', max: 25 },
-            { name: 'Service Offering', max: 30 },
-            { name: 'Innovation', max: 10 },
-            { name: 'Customer Support', max: 10 },
-            { name: 'Accessibility & Security', max: 10 }
-          ];
-          var frameworkHTML = branchFramework.map(function(sc) {
-            var pct = Math.round((sc.max / 100) * 100);
-            return '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0">' +
-              '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
-              '<div class="score-bar" style="flex:1"><div class="score-bar-fill" style="width:' + pct + '%;background:var(--green)"></div></div>' +
-              '<span style="font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:right;color:var(--text-primary)">' + sc.max + '</span>' +
-            '</div>';
-          }).join('');
-
-          document.getElementById('page-content').innerHTML =
-            '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
-              '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2)">' +
-                '<a href="index.html" style="color:var(--text-muted);font-size:var(--text-sm)"><i class="fa-solid fa-arrow-left"></i> Home</a>' +
-              '</div>' +
-              '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
-                '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
-                  '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
-                '</div>' +
-                '<div>' +
-                  '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +
-                  '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + branches.length + ' branch' + (branches.length !== 1 ? 'es' : '') + ' reviewed</p>' +
-                '</div>' +
-              '</div>' +
-            '</div></section>' +
-            '<section class="section-sm" style="background:var(--surface-1);border-bottom:1px solid var(--border-primary)"><div class="container">' +
-              '<h2 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Scoring Framework</h2>' +
-              '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">Each ' + catInfo.name.toLowerCase() + ' branch is scored out of 100 across these weighted categories:</p>' +
-              '<div style="max-width:600px">' + frameworkHTML + '</div>' +
-            '</div></section>' +
-            '<section class="section"><div class="container">' +
-              '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6)">' +
-                '<h2 style="font-size:var(--text-lg);font-weight:700">All Branches</h2>' +
-                '<div class="filter-pills">' +
-                  '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score ↓</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score ↑</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A–Z</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z–A</button>' +
-                '</div>' +
-              '</div>' +
-              '<div class="brand-grid" id="brand-grid"></div>' +
-            '</div></section>';
-
+        window.sortBrands = function(key) {
+          currentSort = key;
+          if (key === 'score-desc') branches.sort(function(a, b) { return b.total_score - a.total_score; });
+          else if (key === 'score-asc') branches.sort(function(a, b) { return a.total_score - b.total_score; });
+          else if (key === 'name-asc') branches.sort(function(a, b) { return a.branch_name.localeCompare(b.branch_name); });
+          else if (key === 'name-desc') branches.sort(function(a, b) { return b.branch_name.localeCompare(a.branch_name); });
           renderBranches();
+        };
 
-        } else {
-          // ===== REGULAR BRAND CATEGORY =====
-          var brands = await GoNoGoAPI.getBrandsByCategory(slug);
-          var currentSort = 'score-desc';
+        function renderBranchCard(b, i) {
+          var stagger = i < 6 ? ' stagger-' + (i + 1) : '';
+          var scoreColor = getScoreColor(b.total_score);
+          var verdictClass = b.verdict === 'GO' ? 'go' : b.verdict === 'NOGO' ? 'nogo' : 'caution';
 
-          window.sortBrands = function(key) {
-            currentSort = key;
-            if (key === 'score-desc') brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
-            else if (key === 'score-asc') brands.sort(function(a, b) { return a.overallScore - b.overallScore; });
-            else if (key === 'name-asc') brands.sort(function(a, b) { return a.name.localeCompare(b.name); });
-            else if (key === 'name-desc') brands.sort(function(a, b) { return b.name.localeCompare(a.name); });
-            renderBrands();
-          };
-
-          function renderBrands() {
-            var grid = document.getElementById('brand-grid');
-            grid.innerHTML = brands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
-            brands.forEach(function(brand) {
-              Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
-            });
-            document.querySelectorAll('.sort-btn').forEach(function(btn) {
-              btn.classList.toggle('active', btn.dataset.sort === currentSort);
-            });
-          }
-
-          // Build scoring framework display
-          var frameworkHTML = (catInfo.scoringCategories || []).map(function(sc) {
-            var pct = Math.round((sc.max / 100) * 100);
-            return '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0">' +
-              '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
-              '<div class="score-bar" style="flex:1"><div class="score-bar-fill" style="width:' + pct + '%;background:var(--green)"></div></div>' +
-              '<span style="font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:right;color:var(--text-primary)">' + sc.max + '</span>' +
-            '</div>';
-          }).join('');
-
-          document.getElementById('page-content').innerHTML =
-            '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
-              '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2)">' +
-                '<a href="index.html" style="color:var(--text-muted);font-size:var(--text-sm)"><i class="fa-solid fa-arrow-left"></i> Home</a>' +
+          return '<a href="branch.html?id=' + b.branch_id + '" class="brand-card animate-in' + stagger + '" style="text-decoration:none">' +
+            '<div class="brand-card-top">' +
+              '<div style="width:48px;height:48px;border-radius:var(--radius-lg);background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:var(--text-lg);flex-shrink:0">' +
+                '<i class="fa-solid fa-building-columns" style="color:var(--green)"></i>' +
               '</div>' +
-              '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
-                '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
-                  '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
-                '</div>' +
-                '<div>' +
-                  '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +
-                  '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + brands.length + ' brand' + (brands.length !== 1 ? 's' : '') + ' reviewed</p>' +
+              '<div class="brand-card-info">' +
+                '<div class="brand-card-name">' + b.branch_name + '</div>' +
+                '<div class="brand-card-meta">' +
+                  '<span class="verdict-badge verdict-' + verdictClass + '">' + b.verdict + '</span>' +
+                  '<span class="score-badge" style="color:' + scoreColor + '">' + b.total_score + '/100</span>' +
                 '</div>' +
               '</div>' +
-            '</div></section>' +
-            '<section class="section-sm" style="background:var(--surface-1);border-bottom:1px solid var(--border-primary)"><div class="container">' +
-              '<h2 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Scoring Framework</h2>' +
-              '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">Each ' + catInfo.name.toLowerCase() + ' brand is scored out of 100 across these weighted categories:</p>' +
-              '<div style="max-width:600px">' + frameworkHTML + '</div>' +
-            '</div></section>' +
-            '<section class="section"><div class="container">' +
-              '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6)">' +
-                '<h2 style="font-size:var(--text-lg);font-weight:700">All Brands</h2>' +
-                '<div class="filter-pills">' +
-                  '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score ↓</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score ↑</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A–Z</button>' +
-                  '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z–A</button>' +
-                '</div>' +
-              '</div>' +
-              '<div class="brand-grid" id="brand-grid"></div>' +
-            '</div></section>';
-
-          renderBrands();
+            '</div>' +
+            '<div class="brand-card-stats" style="font-size:var(--text-xs);color:var(--text-secondary)">' +
+              '<span><i class="fa-solid fa-map-marker-alt"></i> ' + b.province + '</span>' +
+              '<span><i class="fa-solid fa-user-tie"></i> ' + (b.manager || 'N/A') + '</span>' +
+            '</div>' +
+          '</a>';
         }
+
+        function renderBranches() {
+          var grid = document.getElementById('brand-grid');
+          grid.innerHTML = branches.map(function(b, i) { return renderBranchCard(b, i); }).join('');
+          document.querySelectorAll('.sort-btn').forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.sort === currentSort);
+          });
+        }
+
+        var branchFramework = [
+          { name: 'Compliance', max: 15 },
+          { name: 'Customer Satisfaction', max: 25 },
+          { name: 'Service Offering', max: 30 },
+          { name: 'Innovation', max: 10 },
+          { name: 'Customer Support', max: 10 },
+          { name: 'Accessibility & Security', max: 10 }
+        ];
+
+        var frameworkHTML = renderFrameworkHTML(branchFramework);
+
+        document.getElementById('page-content').innerHTML =
+          '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2)">' +
+              '<a href="index.html" style="color:var(--text-muted);font-size:var(--text-sm)"><i class="fa-solid fa-arrow-left"></i> Home</a>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
+              '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
+                '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
+              '</div>' +
+              '<div>' +
+                '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +
+                '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + branches.length + ' branch' + (branches.length !== 1 ? 'es' : '') + ' reviewed</p>' +
+              '</div>' +
+            '</div>' +
+          '</div></section>' +
+          '<section class="section-sm" style="background:var(--surface-1);border-bottom:1px solid var(--border-primary)"><div class="container">' +
+            '<h2 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Scoring Framework</h2>' +
+            '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">Each ' + catInfo.name.toLowerCase() + ' branch is scored out of 100 across these weighted categories:</p>' +
+            '<div style="max-width:600px">' + frameworkHTML + '</div>' +
+          '</div></section>' +
+          '<section class="section"><div class="container">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6)">' +
+              '<h2 style="font-size:var(--text-lg);font-weight:700">All Branches</h2>' +
+              '<div class="filter-pills">' +
+                '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score ↓</button>' +
+                '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score ↑</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A–Z</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z–A</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="brand-grid" id="brand-grid"></div>' +
+          '</div></section>';
+
+        renderBranches();
+      } else {
+        var brands = await GoNoGoAPI.getBrandsByCategory(slug);
+        var currentSort = 'score-desc';
+
+        window.sortBrands = function(key) {
+          currentSort = key;
+          if (key === 'score-desc') brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
+          else if (key === 'score-asc') brands.sort(function(a, b) { return a.overallScore - b.overallScore; });
+          else if (key === 'name-asc') brands.sort(function(a, b) { return a.name.localeCompare(b.name); });
+          else if (key === 'name-desc') brands.sort(function(a, b) { return b.name.localeCompare(a.name); });
+          renderBrands();
+        };
+
+        function renderBrands() {
+          var grid = document.getElementById('brand-grid');
+          grid.innerHTML = brands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
+          brands.forEach(function(brand) {
+            Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
+          });
+          document.querySelectorAll('.sort-btn').forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.sort === currentSort);
+          });
+        }
+
+        var scoringCategories = getCategoryFramework(catInfo);
+        var frameworkHTML = renderFrameworkHTML(scoringCategories);
+
+        document.getElementById('page-content').innerHTML =
+          '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-2)">' +
+              '<a href="index.html" style="color:var(--text-muted);font-size:var(--text-sm)"><i class="fa-solid fa-arrow-left"></i> Home</a>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
+              '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
+                '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
+              '</div>' +
+              '<div>' +
+                '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +
+                '<p style="font-size:var(--text-sm);color:var(--text-secondary)">' + brands.length + ' brand' + (brands.length !== 1 ? 's' : '') + ' reviewed</p>' +
+              '</div>' +
+            '</div>' +
+          '</div></section>' +
+          '<section class="section-sm" style="background:var(--surface-1);border-bottom:1px solid var(--border-primary)"><div class="container">' +
+            '<h2 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Scoring Framework</h2>' +
+            '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-4)">Each ' + catInfo.name.toLowerCase() + ' brand is scored out of 100 across these weighted categories:</p>' +
+            '<div style="max-width:600px">' + frameworkHTML + '</div>' +
+          '</div></section>' +
+          '<section class="section"><div class="container">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6)">' +
+              '<h2 style="font-size:var(--text-lg);font-weight:700">All Brands</h2>' +
+              '<div class="filter-pills">' +
+                '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score ↓</button>' +
+                '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score ↑</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A–Z</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z–A</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="brand-grid" id="brand-grid"></div>' +
+          '</div></section>';
+
+        renderBrands();
       }
     })();
   </script>
