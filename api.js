@@ -74,6 +74,8 @@ var GoNoGoAPI = (function () {
         _categoryCache[c.slug] = {
           name: c.name,
           icon: c.icon,
+          icon_color: c.icon_color || null,
+          description: c.description || '',
           scoring_categories: c.scoring_categories,
           category_type: c.category_type || 'brand'
         };
@@ -121,7 +123,13 @@ var GoNoGoAPI = (function () {
       socialSentiment: row.social_sentiment || {},
       overview: row.overview || '',
       ratingSummary: row.rating_summary || '',
-      lastUpdated: row.last_updated || '2026-03-01'
+      lastUpdated: row.last_updated || '2026-03-01',
+      region: row.region || '',
+      reviewed_by: row.reviewed_by || '',
+      reviewed_at: row.reviewed_at || '',
+      created_at: row.created_at || '',
+      internal_score_justification: row.internal_score_justification || '',
+      scoring_breakdown: row.scoring_breakdown || null
     };
   }
 
@@ -164,12 +172,16 @@ var GoNoGoAPI = (function () {
             return cats.map(function (c) {
               return {
                 id: c.slug,
+                slug: c.slug,
                 name: c.name,
                 icon: c.icon,
+                icon_color: c.icon_color || null,
+                description: c.description || '',
                 brandCount: counts[c.slug] || 0,
                 hasBrands: (counts[c.slug] || 0) > 0,
                 scoringCategories: c.scoring_categories,
-                categoryType: c.category_type || 'brand'
+                categoryType: c.category_type || 'brand',
+                category_type: c.category_type || 'brand'
               };
             });
           });
@@ -846,6 +858,11 @@ var GoNoGoAPI = (function () {
       if ('socialSentiment' in brandData) record.social_sentiment = brandData.socialSentiment || {};
       if ('overview' in brandData) record.overview = brandData.overview || '';
       if ('ratingSummary' in brandData) record.rating_summary = brandData.ratingSummary || '';
+      if (brandData.reviewed_by) record.reviewed_by = brandData.reviewed_by;
+      if (brandData.reviewed_at) record.reviewed_at = brandData.reviewed_at;
+      if (brandData.created_at) record.created_at = brandData.created_at;
+      if (brandData.internal_score_justification) record.internal_score_justification = brandData.internal_score_justification;
+      if (brandData.scoring_breakdown) record.scoring_breakdown = brandData.scoring_breakdown;
 
       return checkSupabaseBrands().then(function (hasSB) {
         if (hasSB) {
@@ -901,6 +918,8 @@ var GoNoGoAPI = (function () {
       };
 
       if (categoryData.category_type) patchBody.category_type = categoryData.category_type;
+      if (categoryData.description !== undefined) patchBody.description = categoryData.description;
+      if (categoryData.icon_color !== undefined) patchBody.icon_color = categoryData.icon_color;
 
       return supabaseRequest('categories?slug=eq.' + encodeURIComponent(categoryData.slug), {
         method: 'PATCH',
@@ -917,6 +936,8 @@ var GoNoGoAPI = (function () {
         };
 
         if (categoryData.category_type) postBody.category_type = categoryData.category_type;
+        if (categoryData.description) postBody.description = categoryData.description;
+        if (categoryData.icon_color) postBody.icon_color = categoryData.icon_color;
 
         return supabaseRequest('categories', {
           method: 'POST',
@@ -924,6 +945,36 @@ var GoNoGoAPI = (function () {
         }).then(function () {
           return { ok: true };
         });
+      });
+    },
+
+    addCategory: function (categoryData) {
+      _categoryCache = null;
+      var slug = categoryData.slug || categoryData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      var postBody = {
+        slug: slug,
+        name: categoryData.name,
+        icon: categoryData.icon || 'fa-tag',
+        scoring_categories: categoryData.scoringCategories || categoryData.scoring_categories || [
+          { name: 'Compliance', max: 20 },
+          { name: 'Customer Satisfaction', max: 25 },
+          { name: 'Product Value', max: 35 },
+          { name: 'Innovation', max: 10 },
+          { name: 'Customer Support', max: 15 },
+          { name: 'Accessibility & Security', max: 10 }
+        ],
+        region: SITE_REGION
+      };
+
+      if (categoryData.description) postBody.description = categoryData.description;
+      if (categoryData.icon_color) postBody.icon_color = categoryData.icon_color;
+      if (categoryData.category_type) postBody.category_type = categoryData.category_type;
+
+      return supabaseRequest('categories', {
+        method: 'POST',
+        body: postBody
+      }).then(function () {
+        return { ok: true };
       });
     },
 
@@ -958,6 +1009,39 @@ var GoNoGoAPI = (function () {
         .then(function (rows) {
           return rows || [];
         });
+    },
+
+    saveBranch: function (branchData) {
+      var slug = (branchData.branch_name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      var record = {
+        branch_name: branchData.branch_name,
+        department_type: branchData.department_type,
+        category_slug: branchData.category_slug,
+        province: branchData.province || '',
+        total_score: branchData.total_score || 0,
+        compliance: branchData.compliance || 0,
+        customer_satisfaction: branchData.customer_satisfaction || 0,
+        service_offering: branchData.service_offering || 0,
+        innovation: branchData.innovation || 0,
+        customer_support: branchData.customer_support || 0,
+        accessibility_security: branchData.accessibility_security || 0,
+        region: SITE_REGION
+      };
+
+      if (branchData.manager) record.manager = branchData.manager;
+      if (branchData.manager_email) record.manager_email = branchData.manager_email;
+      if (branchData.telephone) record.telephone = branchData.telephone;
+      if (branchData.address) record.address = branchData.address;
+      if (branchData.hours) record.hours = branchData.hours;
+      if (branchData.services) record.services = branchData.services;
+
+      return supabaseRequest('branches', {
+        method: 'POST',
+        body: record,
+        prefer: 'return=representation'
+      }).then(function (rows) {
+        return { ok: true, branch: rows && rows[0] ? rows[0] : null };
+      });
     },
 
     getCategoryType: function (categorySlug) {
