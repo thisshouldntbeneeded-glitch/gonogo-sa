@@ -156,7 +156,6 @@ function getScoreColor(score) {
 
 function getScoreLabel(score) {
   if (score >= 80) return 'Excellent';
-  if (score >= 70) return 'Good';
   if (score >= 60) return 'Fair';
   return 'Poor';
 }
