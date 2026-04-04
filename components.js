@@ -44,7 +44,7 @@ const Components = {
   },
 
   renderLogo(brand, className = 'brand-logo') {
-    const size = className.includes('hero') ? 88 : className.includes('xl') ? 96 : className.includes('lg') ? 48 : 32;
+    const size = className.includes('hero') ? 120 : className.includes('xl') ? 96 : className.includes('lg') ? 48 : 32;
     const fallback = this.getLogoFallback(brand.name, size);
     if (brand.logo) {
       return `<img src="${brand.logo}" alt="${brand.name}" class="${className}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">`;
