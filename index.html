@@ -52,6 +52,7 @@
   <div id="nav"></div>
 
   <main>
+    <!-- HERO -->
     <section class="hero">
       <div class="container">
         <div class="animate-in">
@@ -85,6 +86,7 @@
             </a>
           </div>
 
+          <!-- SEARCH CARD -->
           <div class="container-narrow" style="position:relative;">
             <div class="card" style="padding:var(--space-4); box-shadow: var(--shadow-md);">
               <div style="font-size:var(--text-xs);font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--space-3);">
@@ -111,9 +113,10 @@
       </div>
     </section>
 
+    <!-- QUICK LINKS -->
     <section class="section section-sm" style="padding-top:0;">
       <div class="container">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);" class="homepage-quick-links-grid">
+        <div class="homepage-quick-links-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);">
           <a href="#categories" class="card card-hover" style="text-decoration:none;color:var(--text-primary);padding:var(--space-4);">
             <div style="display:flex;align-items:center;gap:var(--space-3);">
               <i class="fa-solid fa-layer-group text-green" style="font-size:var(--text-lg);"></i>
@@ -154,6 +157,7 @@
       </div>
     </section>
 
+    <!-- CATEGORIES -->
     <section class="section" id="categories">
       <div class="container">
         <div class="section-header" style="max-width:760px;">
@@ -179,10 +183,11 @@
       </div>
     </section>
 
+    <!-- VALUE / WHY GONOGO -->
     <section class="section section-sm" style="padding-top:0;">
       <div class="container">
         <div class="card" style="padding:var(--space-6);">
-          <div style="display:grid;grid-template-columns:1.25fr 0.75fr;gap:var(--space-6);align-items:center;" class="homepage-value-grid">
+          <div class="homepage-value-grid" style="display:grid;grid-template-columns:1.25fr 0.75fr;gap:var(--space-6);align-items:center;">
             <div>
               <div style="margin-bottom:var(--space-3);">
                 <span class="badge badge-go" style="padding:6px 12px;">
@@ -196,7 +201,7 @@
               <p class="section-subtitle" style="font-size:var(--text-base);max-width:60ch;margin-bottom:var(--space-5);">
                 GoNoGo turns scattered brand signals into something more useful: a clearer view of trust, value, customer experience, and overall brand quality.
               </p>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);" class="homepage-value-points">
+              <div class="homepage-value-points" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);">
                 <div>
                   <div class="text-green" style="font-weight:800;font-size:var(--text-base);margin-bottom:4px;">Transparent</div>
                   <div class="text-sm text-secondary">Structured scoring and easier comparisons.</div>
@@ -236,6 +241,7 @@
       </div>
     </section>
 
+    <!-- TOP BRANDS -->
     <section class="section" id="top-brands-section">
       <div class="container">
         <div class="section-header" style="max-width:760px;">
@@ -261,10 +267,11 @@
       </div>
     </section>
 
+    <!-- COMPARE CTA -->
     <section class="section section-sm">
       <div class="container">
         <div class="card" style="padding:var(--space-8);">
-          <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:var(--space-6);align-items:center;" class="homepage-compare-grid">
+          <div class="homepage-compare-grid" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:var(--space-6);align-items:center;">
             <div>
               <div style="margin-bottom:var(--space-3);">
                 <span class="badge badge-go" style="padding:6px 12px;">
@@ -290,10 +297,11 @@
       </div>
     </section>
 
+    <!-- BUSINESS CTA -->
     <section class="section section-sm">
       <div class="container">
         <div class="card" style="padding:var(--space-8);">
-          <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:var(--space-6);align-items:center;" class="homepage-business-grid">
+          <div class="homepage-business-grid" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:var(--space-6);align-items:center;">
             <div>
               <div style="margin-bottom:var(--space-3);">
                 <span class="badge badge-go" style="padding:6px 12px;">
@@ -322,6 +330,7 @@
 
   <div id="footer"></div>
 
+  <!-- DATA & COMPONENTS -->
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -461,6 +470,7 @@
     })();
   </script>
 
+  <!-- HOMEPAGE INLINE RESPONSIVE TWEAKS -->
   <style>
     @media (max-width: 900px) {
       .homepage-quick-links-grid,
