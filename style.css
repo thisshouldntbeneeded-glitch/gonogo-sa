@@ -706,7 +706,7 @@ input:focus, select:focus, textarea:focus {
   padding: 4px;
 }
 
-.brand-logo-hero {
+img.brand-logo-hero {
   width: 120px;
   height: 120px;
   border-radius: var(--radius-lg);
@@ -1628,7 +1628,7 @@ textarea {
     flex-direction: column;
     gap: var(--space-2);
   }
-  .brand-hero-logo .brand-logo-hero {
+  .brand-hero-logo img.brand-logo-hero {
     width: 80px;
     height: 80px;
   }
