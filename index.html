@@ -455,22 +455,6 @@
       'car-rentals': 'Vehicle rental and mobility providers.'
     };
 
-    var categoryColors = {
-      'banking': '#11a551',
-      'mobile-networks': '#3b82f6',
-      'hr-software': '#8b5cf6',
-      'accounting-software': '#06b6d4',
-      'property-letting': '#ec4899',
-      'online-retailers': '#f59e0b',
-      'medical-aid': '#ef4444',
-      'insurance': '#14b8a6',
-      'home-cleaning': '#f97316',
-      'car-dealers': '#6366f1',
-      'food-delivery': '#e74c3c',
-      'armed-response': '#64748b',
-      'car-rentals': '#0ea5e9'
-    };
-
     (async function () {
       try {
         var categories = await GoNoGoAPI.getCategoriesWithBrands();
@@ -479,7 +463,7 @@
         var industryGrid = document.getElementById('industry-grid');
         industryGrid.innerHTML = categories.map(function (cat) {
           var desc = categoryDescriptions[cat.id] || (cat.brandCount + ' brands reviewed');
-          var color = categoryColors[cat.id] || '#11a551';
+          var color = cat.icon_color || '#11a551';
           return ''
             + '<a href="category.html?cat=' + cat.id + '" class="industry-card-v2">'
             +   '<div class="ic-icon" style="color:' + color + '"><i class="fa-solid ' + cat.icon + '"></i></div>'
