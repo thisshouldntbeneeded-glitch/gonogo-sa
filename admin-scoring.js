@@ -223,7 +223,9 @@ var state = {
 
 // ── INIT ──
 document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('scoring');
-initScoringPage();
+if (Components.checkAdminAuth()) {
+  initScoringPage();
+}
 
 function initScoringPage() {
   wireTabs();
