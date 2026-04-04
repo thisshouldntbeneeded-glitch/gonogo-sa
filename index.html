@@ -8,8 +8,6 @@
 / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
 \____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
                     /_/
-        Created with Perplexity Computer
-        https://www.perplexity.ai/computer
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,129 +54,358 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script>(function(){var t=localStorage.getItem('gonogo_theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light-mode');})()</script>
 </head>
-<body>
+<body class="homepage-v2">
   <div id="nav"></div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div style="text-align:center;margin-bottom:var(--space-4)">
-        <img src="logos/gonogo-hero-dark.jpg" alt="GoNoGo SA — Honest Brand Ratings" class="hero-logo" style="height:80px;width:auto;display:block;margin:0 auto;border-radius:8px;">
-      </div>
-      <p class="hero-subtitle">Honest brand comparisons for the SA market. We rate every brand on a transparent 100-point scoring framework so you can decide: Go, or No Go. We help you know before you go!</p>
-      <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap;position:relative">
-        <a href="#industries" class="btn btn-primary btn-lg"><i class="fa-solid fa-compass"></i> Explore Brands</a>
-        <a href="#how-we-score" class="btn btn-secondary btn-lg"><i class="fa-solid fa-chart-simple"></i> How We Score</a>
-      </div>
-      <div class="brand-search-wrap" style="margin-top:var(--space-6);max-width:480px;margin-left:auto;margin-right:auto;position:relative">
-        <div class="brand-search-box" style="position:relative">
-          <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);position:absolute;left:16px;top:50%;transform:translateY(-50%)"></i>
-          <input type="text" id="hero-search" placeholder="Search for a brand..." autocomplete="off"
-            aria-label="Search for a brand"
-            style="width:100%;padding:14px 16px 14px 44px;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-lg);color:var(--text-primary);font-size:var(--text-base);outline:none;transition:border-color 0.2s"
-            onfocus="this.style.borderColor='var(--green)'" onblur="setTimeout(function(){document.getElementById('search-results').style.display='none';},200);this.style.borderColor='var(--border-primary)'"
-            oninput="searchBrands(this.value)">
-        </div>
-        <div id="search-results" role="listbox" aria-label="Brand search results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-lg);max-height:60vh;overflow-y:auto;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)"></div>
-      </div>
-    </div>
-  </section>
+  <main>
+    <section class="hero hero-homepage">
+      <div class="container">
+        <div class="homepage-hero-grid">
+          <div class="homepage-hero-copy animate-in">
+            <div class="homepage-kicker">
+              <span class="badge badge-go"><i class="fa-solid fa-shield-halved"></i> South Africa</span>
+              <span class="homepage-kicker-text">Transparent brand intelligence</span>
+            </div>
 
-  <!-- Industry Grid -->
-  <section class="section" id="industries">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Browse by Industry</h2>
-        <p class="section-subtitle">Explore brands across South African industries</p>
-      </div>
-      <div class="industry-grid-v2" id="industry-grid">
-        <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading industries...</div>
-      </div>
-    </div>
-  </section>
+            <div class="homepage-logo-wrap">
+              <img src="logos/gonogo-hero-dark.jpg" alt="GoNoGo SA — Honest Brand Ratings" class="homepage-hero-logo">
+            </div>
 
-  <!-- Compare CTA -->
-  <section class="section" style="background:var(--surface-1)">
-    <div class="container" style="text-align:center;max-width:640px">
-      <h2 class="section-title">Compare Brands</h2>
-      <p class="section-subtitle">Put any two brands side by side. See how they stack up across all scoring categories with a direct head-to-head comparison.</p>
-      <a href="compare.html" class="btn btn-primary btn-lg" style="margin-top:var(--space-4)">
-        <i class="fa-solid fa-code-compare"></i> Compare Now
-      </a>
-    </div>
-  </section>
+            <h1 class="hero-title homepage-title">
+              Honest brand ratings for South Africa.
+            </h1>
 
-  <!-- Top Rated -->
-  <section class="section" style="background:var(--surface-1)">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Top Rated Brands</h2>
-        <p class="section-subtitle">The highest-scoring brands across all industries</p>
-      </div>
-      <div class="brand-grid" id="top-brands">
-        <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading top brands...</div>
-      </div>
-    </div>
-  </section>
+            <p class="hero-subtitle homepage-subtitle">
+              GoNoGo helps people compare brands with transparent, data-driven scoring. Every rating is built around a 100-point framework so you can decide faster, with more confidence, whether a brand is a Go, a Go with Caution, or a No Go.
+            </p>
 
-  <!-- How We Score -->
-  <section class="section" id="how-we-score">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">How We Score</h2>
-        <p class="section-subtitle">Every brand is evaluated on a 100-point framework across multiple weighted categories</p>
+            <div class="homepage-hero-actions">
+              <a href="#industries" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-layer-group"></i> Browse Categories
+              </a>
+              <a href="compare.html" class="btn btn-secondary btn-lg">
+                <i class="fa-solid fa-code-compare"></i> Compare Brands
+              </a>
+              <a href="#how-we-score" class="btn btn-ghost btn-lg">
+                <i class="fa-solid fa-chart-simple"></i> How We Score
+              </a>
+            </div>
+
+            <div class="homepage-search-panel">
+              <div class="homepage-search-label">Search for a brand</div>
+              <div class="brand-search-wrap homepage-search-wrap">
+                <div class="brand-search-box">
+                  <i class="fa-solid fa-magnifying-glass homepage-search-icon"></i>
+                  <input
+                    type="text"
+                    id="hero-search"
+                    placeholder="Search brands, sectors, or categories..."
+                    autocomplete="off"
+                    aria-label="Search for a brand"
+                    class="homepage-search-input"
+                    onfocus="this.style.borderColor='var(--green)'"
+                    onblur="setTimeout(function(){document.getElementById('search-results').style.display='none';},200);this.style.borderColor='var(--border-primary)'"
+                    oninput="searchBrands(this.value)"
+                  >
+                </div>
+                <div id="search-results" role="listbox" aria-label="Brand search results" class="homepage-search-results"></div>
+              </div>
+            </div>
+
+            <div class="homepage-quick-links">
+              <a href="#industries" class="homepage-quick-link">
+                <i class="fa-solid fa-grid-2"></i>
+                <span>Categories</span>
+              </a>
+              <a href="#top-rated" class="homepage-quick-link">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Top Rated</span>
+              </a>
+              <a href="compare.html" class="homepage-quick-link">
+                <i class="fa-solid fa-code-compare"></i>
+                <span>Compare</span>
+              </a>
+              <a href="business.html" class="homepage-quick-link">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>For Business</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="homepage-hero-visual animate-in stagger-2">
+            <div class="homepage-signal-card">
+              <div class="homepage-signal-top">
+                <div>
+                  <div class="homepage-panel-label">Decision framework</div>
+                  <h2 class="homepage-panel-title">Go. Caution. No Go.</h2>
+                </div>
+                <span class="badge badge-go">100-point model</span>
+              </div>
+
+              <div class="homepage-score-showcase">
+                <div class="homepage-verdict-card homepage-verdict-go">
+                  <div class="homepage-verdict-number">80–100</div>
+                  <div class="homepage-verdict-label">GO</div>
+                  <p>Strong overall performance and trust signals.</p>
+                </div>
+                <div class="homepage-verdict-card homepage-verdict-caution">
+                  <div class="homepage-verdict-number">60–79</div>
+                  <div class="homepage-verdict-label">GO WITH CAUTION</div>
+                  <p>Some strengths, but also clear trade-offs.</p>
+                </div>
+                <div class="homepage-verdict-card homepage-verdict-nogo">
+                  <div class="homepage-verdict-number">&lt; 60</div>
+                  <div class="homepage-verdict-label">NO GO</div>
+                  <p>Higher risk, weaker experience, or major concerns.</p>
+                </div>
+              </div>
+
+              <div class="homepage-rubric-list">
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-shield-halved"></i> Compliance & Regulation</span>
+                  <span>Weighted</span>
+                </div>
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-face-smile"></i> Customer Satisfaction</span>
+                  <span>Weighted</span>
+                </div>
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-coins"></i> Product Value</span>
+                  <span>Weighted</span>
+                </div>
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-lightbulb"></i> Innovation</span>
+                  <span>Weighted</span>
+                </div>
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-headset"></i> Customer Support</span>
+                  <span>Weighted</span>
+                </div>
+                <div class="homepage-rubric-row">
+                  <span><i class="fa-solid fa-lock"></i> Accessibility & Security</span>
+                  <span>Weighted</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="homepage-micro-proof">
+              <div class="homepage-proof-item">
+                <span class="homepage-proof-value">Data-led</span>
+                <span class="homepage-proof-label">Brand scoring</span>
+              </div>
+              <div class="homepage-proof-item">
+                <span class="homepage-proof-value">Clear</span>
+                <span class="homepage-proof-label">Compare journeys</span>
+              </div>
+              <div class="homepage-proof-item">
+                <span class="homepage-proof-value">SA-first</span>
+                <span class="homepage-proof-label">Local relevance</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="category-grid" id="scoring-grid">
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-shield-halved"></i> Compliance &amp; Regulation</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Licensing, regulatory standing, industry body memberships, and legal compliance within the South African market.</p>
-        </div>
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-face-smile"></i> Customer Satisfaction</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Real user feedback from app stores, review platforms, social media sentiment, and complaint resolution rates.</p>
-        </div>
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-coins"></i> Product Value</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Pricing fairness, feature breadth, transparency of fees, and overall value for money in the South African context.</p>
-        </div>
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-lightbulb"></i> Innovation</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Technology adoption, digital experience quality, unique differentiators, and forward-thinking approach.</p>
-        </div>
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-headset"></i> Customer Support</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Availability of support channels, response times, resolution quality, and accessibility of help resources.</p>
-        </div>
-        <div class="category-card">
-          <div class="category-card-header">
-            <span class="category-card-name"><i class="fa-solid fa-lock"></i> Accessibility &amp; Security</span>
-          </div>
-          <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
-          <p class="category-card-desc">Platform accessibility, data security practices, POPIA compliance, and inclusive design considerations.</p>
+    </section>
+
+    <section class="section section-sm homepage-nav-strip">
+      <div class="container">
+        <div class="homepage-strip-grid">
+          <a href="#industries" class="homepage-strip-card">
+            <i class="fa-solid fa-layer-group"></i>
+            <div>
+              <strong>Browse categories</strong>
+              <span>Start with industry-level discovery</span>
+            </div>
+          </a>
+          <a href="compare.html" class="homepage-strip-card">
+            <i class="fa-solid fa-code-compare"></i>
+            <div>
+              <strong>Compare brands</strong>
+              <span>Side-by-side scoring and verdicts</span>
+            </div>
+          </a>
+          <a href="#top-rated" class="homepage-strip-card">
+            <i class="fa-solid fa-trophy"></i>
+            <div>
+              <strong>See top-rated brands</strong>
+              <span>Jump straight to leading performers</span>
+            </div>
+          </a>
+          <a href="business.html" class="homepage-strip-card">
+            <i class="fa-solid fa-briefcase"></i>
+            <div>
+              <strong>For businesses</strong>
+              <span>Reputation, visibility, and insights</span>
+            </div>
+          </a>
         </div>
       </div>
-      <p style="color:var(--text-muted);font-size:var(--text-xs);margin-top:var(--space-6);text-align:center">
-        Note: Each industry has its own specific scoring categories with tailored weightings. The categories above represent the general framework.
-      </p>
-    </div>
-  </section>
+    </section>
+
+    <section class="section homepage-value-section">
+      <div class="container">
+        <div class="section-header homepage-section-header">
+          <span class="homepage-section-tag">Why GoNoGo</span>
+          <h2 class="section-title homepage-section-title">Clarity before commitment.</h2>
+          <p class="section-subtitle homepage-section-subtitle">
+            Most people do not need more marketing. They need clearer signals. GoNoGo turns scattered trust indicators into a simpler decision framework for real-world brand choices.
+          </p>
+        </div>
+
+        <div class="homepage-value-grid">
+          <article class="homepage-feature-card">
+            <div class="homepage-feature-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+            <h3>Data-driven ratings</h3>
+            <p>Ratings are structured around transparent scoring categories instead of vague star scores alone.</p>
+          </article>
+          <article class="homepage-feature-card">
+            <div class="homepage-feature-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h3>Comparable decisions</h3>
+            <p>Users can compare competing brands in a format that is easier to understand and faster to act on.</p>
+          </article>
+          <article class="homepage-feature-card">
+            <div class="homepage-feature-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <h3>Built for South Africa</h3>
+            <p>Local context matters. Regulatory, service, and customer experience signals are evaluated in-market.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="industries">
+      <div class="container">
+        <div class="section-header homepage-section-header">
+          <span class="homepage-section-tag">Browse</span>
+          <h2 class="section-title homepage-section-title">Explore brands by category.</h2>
+          <p class="section-subtitle homepage-section-subtitle">
+            Start with the industries that matter most to your everyday life, from banking and insurance to mobile networks and delivery platforms.
+          </p>
+        </div>
+        <div class="industry-grid-v2" id="industry-grid">
+          <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading industries...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section homepage-compare-band">
+      <div class="container">
+        <div class="homepage-compare-panel">
+          <div class="homepage-compare-copy">
+            <span class="homepage-section-tag">Compare</span>
+            <h2 class="section-title homepage-section-title">Head-to-head brand comparisons.</h2>
+            <p class="section-subtitle homepage-section-subtitle">
+              Compare any two brands and see how they stack up across scoring categories, overall scores, and final verdicts.
+            </p>
+          </div>
+          <div class="homepage-compare-action">
+            <a href="compare.html" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-code-compare"></i> Open Compare Tool
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="top-rated">
+      <div class="container">
+        <div class="section-header homepage-section-header">
+          <span class="homepage-section-tag">Leaders</span>
+          <h2 class="section-title homepage-section-title">Top rated brands right now.</h2>
+          <p class="section-subtitle homepage-section-subtitle">
+            These are the strongest performers across the platform based on current scoring and verdict thresholds.
+          </p>
+        </div>
+        <div class="brand-grid" id="top-brands">
+          <div style="text-align:center;padding:var(--space-8);color:var(--text-muted)">Loading top brands...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-we-score">
+      <div class="container">
+        <div class="section-header homepage-section-header">
+          <span class="homepage-section-tag">Methodology</span>
+          <h2 class="section-title homepage-section-title">How the scoring framework works.</h2>
+          <p class="section-subtitle homepage-section-subtitle">
+            Every brand is evaluated on a weighted framework that combines trust, value, experience, and operating quality.
+          </p>
+        </div>
+
+        <div class="category-grid" id="scoring-grid">
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-shield-halved"></i> Compliance &amp; Regulation</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Licensing, regulatory standing, industry body memberships, and legal compliance within the South African market.</p>
+          </div>
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-face-smile"></i> Customer Satisfaction</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Real user feedback from app stores, review platforms, social media sentiment, and complaint resolution rates.</p>
+          </div>
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-coins"></i> Product Value</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Pricing fairness, feature breadth, transparency of fees, and overall value for money in the South African context.</p>
+          </div>
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-lightbulb"></i> Innovation</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Technology adoption, digital experience quality, unique differentiators, and forward-thinking approach.</p>
+          </div>
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-headset"></i> Customer Support</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Availability of support channels, response times, resolution quality, and accessibility of help resources.</p>
+          </div>
+          <div class="category-card homepage-score-card">
+            <div class="category-card-header">
+              <span class="category-card-name"><i class="fa-solid fa-lock"></i> Accessibility &amp; Security</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            <p class="category-card-desc">Platform accessibility, data security practices, POPIA compliance, and inclusive design considerations.</p>
+          </div>
+        </div>
+
+        <div class="homepage-method-note">
+          <p>
+            Note: Each industry has its own specific scoring categories with tailored weightings. The categories above represent the general framework.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section homepage-business-section">
+      <div class="container">
+        <div class="homepage-business-panel">
+          <div class="homepage-business-copy">
+            <span class="homepage-section-tag">For Business</span>
+            <h2 class="section-title homepage-section-title">Show up better when customers are deciding.</h2>
+            <p class="section-subtitle homepage-section-subtitle">
+              GoNoGo is not only for consumers. It is also a platform for businesses that want clearer visibility, better trust signals, and stronger category positioning.
+            </p>
+          </div>
+          <div class="homepage-business-actions">
+            <a href="business.html" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Business Page
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <div id="footer"></div>
+
   <script src="data/data_partA.js"></script>
   <script src="data/data_partB.js"></script>
   <script src="data/data_partC.js"></script>
@@ -231,6 +458,7 @@
     (async function() {
       var categories = await GoNoGoAPI.getCategoriesWithBrands();
       categories = categories.filter(function(cat) { return cat.hasBrands; });
+
       var industryGrid = document.getElementById('industry-grid');
       industryGrid.innerHTML = categories.map(function(cat) {
         var desc = categoryDescriptions[cat.id] || cat.brandCount + ' brands reviewed';
@@ -248,17 +476,20 @@
         var results = document.getElementById('search-results');
         query = query.trim().toLowerCase();
         if (query.length < 2) { results.style.display = 'none'; return; }
+
         var matches = allSearchBrands.filter(function(b) {
           return b.name.toLowerCase().indexOf(query) !== -1 || b.categoryName.toLowerCase().indexOf(query) !== -1;
         }).slice(0, 8);
+
         if (matches.length === 0) {
           results.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:var(--text-sm);text-align:center">No brands found for &quot;' + query + '&quot;</div>';
           results.style.display = 'block';
           return;
         }
+
         results.innerHTML = matches.map(function(b) {
           var scoreColor = b.overallScore >= 80 ? 'var(--green-text)' : b.overallScore >= 60 ? 'var(--orange-text)' : 'var(--red-text,#e74c3c)';
-          return '<a href="brand.html?id=' + b.id + '" style="display:flex;align-items:center;gap:10px;padding:8px 14px;text-decoration:none;color:var(--text-primary);transition:background 0.15s;border-bottom:1px solid var(--border-dim)" onmouseover="this.style.background=\'var(--surface-3)\'" onmouseout="this.style.background=\'transparent\'">' +
+          return '<a href="brand.html?id=' + b.id + '" style="display:flex;align-items:center;gap:10px;padding:10px 14px;text-decoration:none;color:var(--text-primary);transition:background 0.15s;border-bottom:1px solid var(--border-subtle)" onmouseover="this.style.background=\\'var(--surface-3)\\'" onmouseout="this.style.background=\\'transparent\\'">' +
             Components.renderLogo(b, 'brand-logo') +
             '<div style="flex:1;min-width:0">' +
               '<div style="font-weight:600;font-size:var(--text-sm)">' + b.name + '</div>' +
@@ -270,6 +501,7 @@
             '</div>' +
           '</a>';
         }).join('');
+
         results.style.display = 'block';
       };
 
