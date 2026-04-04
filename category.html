@@ -126,7 +126,7 @@
                 var itemLabel = cat.categoryType === 'branch' ? 'branch' : 'brand';
                 var itemLabelPlural = cat.brandCount !== 1 ? (itemLabel === 'branch' ? 'es' : 's') : '';
                 return '<a href="category.html?cat=' + cat.id + '" class="industry-card ' + (cat.hasBrands ? '' : 'no-data') + '">' +
-                  '<i class="fa-solid ' + cat.icon + '"></i>' +
+                  '<i class="fa-solid ' + cat.icon + '" style="color:' + (cat.icon_color || 'var(--green)') + '"></i>' +
                   '<div class="name">' + cat.name + '</div>' +
                   '<div class="count">' + cat.brandCount + ' ' + itemLabel + itemLabelPlural + '</div>' +
                 '</a>';
@@ -239,7 +239,7 @@
             '</div>' +
             '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
               '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
-                '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
+                '<i class="fa-solid ' + catInfo.icon + '" style="color:' + (catInfo.icon_color || 'var(--green)') + '"></i>' +
               '</div>' +
               '<div>' +
                 '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +
@@ -300,7 +300,7 @@
             '</div>' +
             '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
               '<div style="width:56px;height:56px;border-radius:var(--radius-lg);background:var(--green-bg);border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:var(--text-xl)">' +
-                '<i class="fa-solid ' + catInfo.icon + '" style="color:var(--green)"></i>' +
+                '<i class="fa-solid ' + catInfo.icon + '" style="color:' + (catInfo.icon_color || 'var(--green)') + '"></i>' +
               '</div>' +
               '<div>' +
                 '<h1 style="font-size:var(--text-2xl);font-weight:800;letter-spacing:-0.02em">' + catInfo.name + '</h1>' +

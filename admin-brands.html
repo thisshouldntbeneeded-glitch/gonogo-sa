@@ -61,7 +61,7 @@
     padding: var(--space-3); border-bottom: 1px solid var(--border-primary);
   }
   .cat-manage-row:last-child { border-bottom: none; }
-  .cat-manage-icon { font-size: 18px; color: var(--green); width: 28px; text-align: center; }
+  .cat-manage-icon { font-size: 18px; width: 28px; text-align: center; }
   .cat-manage-name { flex: 1; font-size: var(--text-sm); font-weight: 500; }
   .cat-manage-count { font-size: var(--text-xs); color: var(--text-muted); margin-right: var(--space-2); }
 
@@ -1267,7 +1267,7 @@
         var isBranch = cat.categoryType === 'branch' || cat.category_type === 'branch';
         var typeLabel = isBranch ? 'branch' : 'brand';
         return '<div class="cat-manage-row">' +
-          '<span class="cat-manage-icon"><i class="fa-solid ' + (cat.icon || 'fa-tag') + '"></i></span>' +
+          '<span class="cat-manage-icon" style="color:' + (cat.icon_color || '#11a551') + '"><i class="fa-solid ' + (cat.icon || 'fa-tag') + '"></i></span>' +
           '<span class="cat-manage-name">' + Components.escapeHTML(cat.name) +
             (isBranch ? ' <span style="font-size:10px;color:var(--orange);background:var(--orange-bg,rgba(255,152,0,0.1));padding:1px 6px;border-radius:var(--radius-full);margin-left:var(--space-1)">branch</span>' : '') +
           '</span>' +
