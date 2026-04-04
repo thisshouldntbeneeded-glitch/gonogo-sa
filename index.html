@@ -54,8 +54,9 @@
   <main>
     <section class="hero">
       <div class="container">
-        <div class="animate-in">
-          <div class="hero-logo-wrap">
+        <div class="animate-in" style="display:flex;flex-direction:column;align-items:center;">
+          <!-- PERFECTLY CENTRED HERO LOGO -->
+          <div class="hero-logo-wrap" style="width:100%;display:flex;justify-content:center;align-items:center;margin:0 auto var(--space-5);text-align:center;">
             <img
               src="logos/gonogo-hero-dark.jpg"
               alt="GoNoGo"
@@ -64,6 +65,7 @@
               height="122"
               loading="eager"
               decoding="async"
+              style="display:block;width:min(420px,78vw);max-width:100%;height:auto;margin:0 auto;object-fit:contain;"
             >
           </div>
 
@@ -74,11 +76,11 @@
             </span>
           </div>
 
-          <h1 class="hero-title" style="max-width: 12ch; margin-left:auto; margin-right:auto;">
+          <h1 class="hero-title" style="max-width:12ch;margin-left:auto;margin-right:auto;">
             Find the brands worth trusting.
           </h1>
 
-          <p class="hero-subtitle" style="max-width: 760px;">
+          <p class="hero-subtitle" style="max-width:760px;">
             GoNoGo helps South Africans compare brands with transparent, data-driven ratings. Browse by category, explore leading brands, and make faster decisions with clearer trust signals.
           </p>
 
