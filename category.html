@@ -73,36 +73,31 @@
     document.getElementById('footer').innerHTML = Components.renderFooter();
     Components.initTheme();
 
-    var CATEGORY_FRAMEWORK_OVERRIDES = {
-      'property-letting': [
-        { name: 'Compliance', max: 15 },
-        { name: 'Customer Satisfaction', max: 25 },
-        { name: 'Product Value', max: 30 },
-        { name: 'Innovation', max: 10 },
-        { name: 'Customer Support', max: 10 },
-        { name: 'Accessibility & Security', max: 10 }
-      ]
-    };
+    var STANDARD_FRAMEWORK = [
+      { name: 'Compliance', max: 15, description: 'Regulatory adherence, licensing, legal standing, and industry standard compliance.' },
+      { name: 'Customer Satisfaction', max: 25, description: 'User reviews, ratings, complaint resolution, and overall customer sentiment.' },
+      { name: 'Product Value', max: 30, description: 'Quality of products/services relative to price, features, and market competitiveness.' },
+      { name: 'Innovation', max: 10, description: 'Investment in new technology, service improvements, and forward-thinking initiatives.' },
+      { name: 'Customer Support', max: 10, description: 'Responsiveness, availability, resolution quality, and support channel accessibility.' },
+      { name: 'Accessibility & Security', max: 10, description: 'Ease of access across platforms, data protection, privacy practices, and inclusive design.' }
+    ];
 
-    function getCategoryFramework(catInfo) {
-      if (!catInfo) return [];
-
-      if (CATEGORY_FRAMEWORK_OVERRIDES[catInfo.id]) {
-        return CATEGORY_FRAMEWORK_OVERRIDES[catInfo.id];
-      }
-
-      return Array.isArray(catInfo.scoringCategories) ? catInfo.scoringCategories : [];
+    function getCategoryFramework() {
+      return STANDARD_FRAMEWORK;
     }
 
     function renderFrameworkHTML(scoringCategories) {
       return (scoringCategories || []).map(function(sc) {
         var pct = Math.round((Number(sc.max || 0) / 100) * 100);
-        return '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) 0">' +
-          '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
-          '<div class="score-bar" style="flex:1">' +
-            '<div class="score-bar-fill" style="width:' + pct + '%;background:var(--green)"></div>' +
+        return '<div style="padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle)">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-3)">' +
+            '<span style="font-size:var(--text-sm);font-weight:600;min-width:180px;color:var(--text-secondary)">' + sc.name + '</span>' +
+            '<div class="score-bar" style="flex:1">' +
+              '<div class="score-bar-fill" style="width:' + pct + '%;background:var(--green)"></div>' +
+            '</div>' +
+            '<span style="font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums;min-width:40px;text-align:right;color:var(--text-primary)">' + sc.max + '%</span>' +
           '</div>' +
-          '<span style="font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums;min-width:32px;text-align:right;color:var(--text-primary)">' + sc.max + '</span>' +
+          (sc.description ? '<p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-1);margin-left:0;line-height:1.5">' + sc.description + '</p>' : '') +
         '</div>';
       }).join('');
     }
@@ -221,16 +216,7 @@
           });
         }
 
-        var branchFramework = [
-          { name: 'Compliance', max: 15 },
-          { name: 'Customer Satisfaction', max: 25 },
-          { name: 'Service Offering', max: 30 },
-          { name: 'Innovation', max: 10 },
-          { name: 'Customer Support', max: 10 },
-          { name: 'Accessibility & Security', max: 10 }
-        ];
-
-        var frameworkHTML = renderFrameworkHTML(branchFramework);
+        var frameworkHTML = renderFrameworkHTML(STANDARD_FRAMEWORK);
 
         document.getElementById('page-content').innerHTML =
           '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
@@ -290,8 +276,7 @@
           });
         }
 
-        var scoringCategories = getCategoryFramework(catInfo);
-        var frameworkHTML = renderFrameworkHTML(scoringCategories);
+        var frameworkHTML = renderFrameworkHTML(STANDARD_FRAMEWORK);
 
         document.getElementById('page-content').innerHTML =
           '<section class="section-sm" style="border-bottom:1px solid var(--border-primary)"><div class="container">' +
