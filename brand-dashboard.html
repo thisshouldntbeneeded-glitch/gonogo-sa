@@ -1054,8 +1054,8 @@
 
     function renderImprovementPlan(brand, frameworkAnalysis, reviewAnalysis) {
       var heat = frameworkAnalysis.lowest.length ? frameworkAnalysis.lowest[0].pct : 100;
-      var heatClass = heat < 40 ? 'high' : (heat < 70 ? 'medium' : 'low');
-      var heatText = heat < 40 ? 'Urgent fix' : (heat < 70 ? 'Moderate gap' : 'Fine-tuning');
+      var heatClass = heat < 60 ? 'high' : (heat < 80 ? 'medium' : 'low');
+      var heatText = heat < 60 ? 'Urgent fix' : (heat < 80 ? 'Moderate gap' : 'Fine-tuning');
 
       document.getElementById('priority-heat-badge').innerHTML =
         '<span class="heat-badge ' + heatClass + '"><i class="fa-solid fa-bolt"></i> ' + heatText + '</span>';
@@ -1067,7 +1067,7 @@
 
       var html = '';
       frameworkAnalysis.lowest.slice(0, 4).forEach(function(item, index) {
-        var iconClass = item.pct < 40 ? 'critical' : (item.pct < 70 ? 'warning' : 'good');
+        var iconClass = item.pct < 60 ? 'critical' : (item.pct < 80 ? 'warning' : 'good');
         var title = buildPriorityTitle(item, index);
         var description = buildPriorityDescription(item, reviewAnalysis);
 
@@ -1611,9 +1611,9 @@
 
     function buildPriorityDescription(item, reviewAnalysis) {
       var theme = reviewAnalysis.topNegativeTheme ? reviewAnalysis.topNegativeTheme.label : '';
-      var prefix = item.pct < 40
+      var prefix = item.pct < 60
         ? 'This is a critical weakness.'
-        : (item.pct < 70 ? 'This is one of your most important improvement areas.' : 'This is a refinement opportunity.');
+        : (item.pct < 80 ? 'This is one of your most important improvement areas.' : 'This is a refinement opportunity.');
 
       var action = getCategoryAction(item.category, theme);
       return prefix + ' You have ' + item.missing + ' point' + (item.missing === 1 ? '' : 's') + ' available in this category. ' + action;

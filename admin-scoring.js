@@ -154,9 +154,9 @@ var SA_BANKING_RUBRIC = {
     }
   ],
   thresholds: {
-    go:      { min: 70, max: 100, label: 'Go',      description: 'Brand meets GoNoGo standards. Safe to recommend.' },
-    caution: { min: 40, max: 69,  label: 'Caution',  description: 'Mixed signals. Recommend with caveats or flag for manual review.' },
-    nogo:    { min: 0,  max: 39,  label: 'No-Go',    description: 'Brand fails minimum standards. Do not recommend.' }
+    go:      { min: 80, max: 100, label: 'Go',      description: 'Brand meets GoNoGo standards. Safe to recommend.' },
+    caution: { min: 60, max: 79,  label: 'Caution',  description: 'Mixed signals. Recommend with caveats or flag for manual review.' },
+    nogo:    { min: 0,  max: 59,  label: 'No-Go',    description: 'Brand fails minimum standards. Do not recommend.' }
   },
   hardFails: [
     'Active SARB curatorship or licence suspension → automatic No-Go regardless of score.',
@@ -484,8 +484,8 @@ function renderMiddleFramework(s) {
     return { name: c.name, weight: c.weight, score: score, contrib: (score * c.weight / 10) };
   });
   var finalScore = exRows.reduce(function (sum, r) { return sum + r.contrib; }, 0);
-  var verdict = finalScore >= 70 ? 'GO' : finalScore >= 40 ? 'CAUTION' : 'NO-GO';
-  var verdictColor = finalScore >= 70 ? '#86efac' : finalScore >= 40 ? '#fde68a' : '#fca5a5';
+  var verdict = finalScore >= 80 ? 'GO' : finalScore >= 60 ? 'CAUTION' : 'NO-GO';
+  var verdictColor = finalScore >= 80 ? '#86efac' : finalScore >= 60 ? '#fde68a' : '#fca5a5';
 
   html += '<div class="methodology-section"><h3 class="methodology-section-title">Worked Example</h3><div class="example-block">' +
     '<div class="example-title"><i class="fa-solid fa-flask"></i> Sample Brand Assessment</div>';
