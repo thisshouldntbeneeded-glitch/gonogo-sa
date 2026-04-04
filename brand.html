@@ -142,7 +142,7 @@
       ldScript.textContent = JSON.stringify(jsonLD);
       document.head.appendChild(ldScript);
 
-      var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-xl');
+      var logoHTML = Components.renderLogo(brand, 'brand-logo brand-logo-hero');
 
       var categoryCardsHTML = Object.entries(brand.categoryScores).map(function(entry) {
         var name = entry[0], data = entry[1];
@@ -194,18 +194,16 @@
 
       document.getElementById('page-content').innerHTML =
         '<section class="brand-hero"><div class="container">' +
-          '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-4)">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-3)">' +
             '<a href="category.html?cat=' + brand.categorySlug + '" style="color:var(--text-muted);font-size:var(--text-sm)">' +
               '<i class="fa-solid fa-arrow-left"></i> ' + brand.categoryName +
             '</a>' +
           '</div>' +
           '<div class="brand-hero-inner">' +
-            '<div class="brand-hero-score">' + Components.renderScoreCircle(brand.overallScore, 'xl') + '</div>' +
+            '<div class="brand-hero-logo">' + logoHTML + '</div>' +
+            '<div class="brand-hero-score">' + Components.renderScoreCircle(brand.overallScore, 'hero') + '</div>' +
             '<div class="brand-hero-info">' +
-              '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">' +
-                logoHTML +
-                '<h1 class="brand-hero-name">' + brand.name + '</h1>' +
-              '</div>' +
+              '<h1 class="brand-hero-name">' + brand.name + '</h1>' +
               '<div class="brand-hero-badges">' +
                 Components.renderVerdictBadge(brand.verdict) +
                 Components.renderScoreBadge(brand.overallScore) +
@@ -213,7 +211,7 @@
                   '<i class="fa-solid ' + brand.categoryIcon + '"></i> ' + brand.categoryName +
                 '</span>' +
               '</div>' +
-              '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap">' +
+              '<div style="display:flex;gap:var(--space-3);margin-top:var(--space-3);flex-wrap:wrap">' +
                 '<a href="compare.html?brands=' + brand.id + '" class="btn btn-secondary btn-sm"><i class="fa-solid fa-code-compare"></i> Compare</a>' +
                 (brand.website ? '<a href="' + brand.website + '" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Website</a>' : '') +
               '</div>' +

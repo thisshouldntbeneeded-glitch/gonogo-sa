@@ -44,7 +44,7 @@ const Components = {
   },
 
   renderLogo(brand, className = 'brand-logo') {
-    const size = className.includes('xl') ? 96 : className.includes('lg') ? 48 : 32;
+    const size = className.includes('hero') ? 88 : className.includes('xl') ? 96 : className.includes('lg') ? 48 : 32;
     const fallback = this.getLogoFallback(brand.name, size);
     if (brand.logo) {
       return `<img src="${brand.logo}" alt="${brand.name}" class="${className}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">`;
@@ -357,15 +357,15 @@ const Components = {
   // SCORE CIRCLE (SVG)
   // ============================================================
   renderScoreCircle(score, size = 'md') {
-    const sizeClass = size === 'xl' ? 'score-circle-xl' : size === 'lg' ? 'score-circle-lg' : '';
-    const r = size === 'xl' ? 72 : size === 'lg' ? 52 : 34;
-    const sw = size === 'xl' ? 10 : size === 'lg' ? 8 : 6;
+    const sizeClass = size === 'xl' ? 'score-circle-xl' : size === 'hero' ? 'score-circle-hero' : size === 'lg' ? 'score-circle-lg' : '';
+    const r = size === 'xl' ? 72 : size === 'hero' ? 52 : size === 'lg' ? 52 : 34;
+    const sw = size === 'xl' ? 10 : size === 'hero' ? 8 : size === 'lg' ? 8 : 6;
     const circumference = 2 * Math.PI * r;
     const offset = circumference - (score / 100) * circumference;
     const color = getScoreColor(score);
-    const cx = size === 'xl' ? 82 : size === 'lg' ? 60 : 40;
+    const cx = size === 'xl' ? 82 : size === 'hero' ? 60 : size === 'lg' ? 60 : 40;
     const cy = cx;
-    const viewBox = size === 'xl' ? '0 0 164 164' : size === 'lg' ? '0 0 120 120' : '0 0 80 80';
+    const viewBox = size === 'xl' ? '0 0 164 164' : size === 'hero' ? '0 0 120 120' : size === 'lg' ? '0 0 120 120' : '0 0 80 80';
 
     return `
       <div class="score-circle ${sizeClass}">

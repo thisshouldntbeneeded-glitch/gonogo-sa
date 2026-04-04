@@ -617,6 +617,15 @@ input:focus, select:focus, textarea:focus {
   font-size: 3rem;
 }
 
+.score-circle-hero {
+  width: 120px;
+  height: 120px;
+}
+
+.score-circle-hero .score-value {
+  font-size: var(--text-2xl);
+}
+
 .score-bar {
   height: 6px;
   background: var(--surface-3);
@@ -695,6 +704,13 @@ input:focus, select:focus, textarea:focus {
   height: 48px;
   border-radius: var(--radius-md);
   padding: 4px;
+}
+
+.brand-logo-hero {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-lg);
+  padding: 6px;
 }
 
 /* ============================================================
@@ -1178,14 +1194,18 @@ textarea {
    BRAND DETAIL PAGE
    ============================================================ */
 .brand-hero {
-  padding: var(--space-10) 0 var(--space-8);
+  padding: var(--space-6) 0 var(--space-5);
   border-bottom: 1px solid var(--border-primary);
 }
 
 .brand-hero-inner {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
+  gap: var(--space-6);
+}
+
+.brand-hero-logo {
+  flex-shrink: 0;
 }
 
 .brand-hero-score {
@@ -1198,16 +1218,16 @@ textarea {
 }
 
 .brand-hero-name {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin-bottom: var(--space-2);
 }
 
 .brand-hero-badges {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
@@ -1586,11 +1606,37 @@ textarea {
   .industry-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
+  .brand-hero {
+    padding: var(--space-4) 0 var(--space-4);
+  }
   .brand-hero-inner {
     flex-direction: column;
     text-align: center;
+    gap: var(--space-3);
+  }
+  .brand-hero-logo .brand-logo-hero {
+    width: 64px;
+    height: 64px;
+  }
+  .brand-hero-score .score-circle-hero {
+    width: 100px;
+    height: 100px;
+  }
+  .brand-hero-score .score-circle-hero .score-value {
+    font-size: var(--text-xl);
+  }
+  .brand-hero-name {
+    font-size: var(--text-lg);
   }
   .brand-hero-badges {
+    justify-content: center;
+    gap: var(--space-2);
+  }
+  .brand-hero-badges .badge {
+    font-size: var(--text-xs);
+    padding: 3px 8px;
+  }
+  .brand-hero-info > div:last-child {
     justify-content: center;
   }
   .category-grid {
