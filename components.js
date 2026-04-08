@@ -403,7 +403,7 @@ const Components = {
     const labels = Object.keys(brand.categoryScores);
     const data = labels.map(key => {
       const cs = brand.categoryScores[key];
-      return Math.round((cs.score / cs.max) * 100);
+      return cs.max > 0 ? Math.round((cs.score / cs.max) * 100) : Math.min(100, Math.round(cs.score || 0));
     });
 
     const shortLabels = labels.map(l => {
@@ -490,11 +490,11 @@ const Components = {
     const allLabels = Object.keys(brand1.categoryScores);
     const data1 = allLabels.map(key => {
       const cs = brand1.categoryScores[key];
-      return cs ? Math.round((cs.score / cs.max) * 100) : 0;
+      return cs ? (cs.max > 0 ? Math.round((cs.score / cs.max) * 100) : Math.min(100, Math.round(cs.score || 0))) : 0;
     });
     const data2 = allLabels.map(key => {
       const cs = brand2.categoryScores[key];
-      return cs ? Math.round((cs.score / cs.max) * 100) : 0;
+      return cs ? (cs.max > 0 ? Math.round((cs.score / cs.max) * 100) : Math.min(100, Math.round(cs.score || 0))) : 0;
     });
 
     const shortLabels = allLabels.map(l => l.length > 18 ? l.substring(0, 16) + '…' : l);
