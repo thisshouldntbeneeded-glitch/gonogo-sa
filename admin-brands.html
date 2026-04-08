@@ -660,7 +660,30 @@
     function parseScoringBreakdown(value) {
       if (!value) return null;
       if (typeof value === 'object') return value;
-      try { return JSON.parse(value); } catch (e) { return null; }
+      try { return JSON.parse(value); } catch (e) {}
+      // Parse text format: "categoryX,scoreN,maxN,descriptionText; ..."
+      try {
+        var catMap = {
+          'compliance': 'Compliance',
+          'customersatisfaction': 'Customer Satisfaction',
+          'productvalue': 'Product Value',
+          'innovation': 'Innovation',
+          'customersupport': 'Customer Support',
+          'accessibilitysecurity': 'Accessibility & Security'
+        };
+        var result = {};
+        value.split(';').forEach(function(entry) {
+          entry = entry.trim();
+          var cm = entry.match(/^category([^,]+)/i);
+          if (!cm) return;
+          var catName = catMap[cm[1].trim().toLowerCase()] || cm[1].trim();
+          var sm = entry.match(/,score(\d+(?:\.\d+)?)/i);
+          var mm = entry.match(/,max(\d+(?:\.\d+)?)/i);
+          var dm = entry.match(/,description(.+)$/i);
+          if (sm) result[catName] = { score: parseFloat(sm[1]) || 0, max: parseFloat(mm ? mm[1] : 0) || 0, description: dm ? dm[1].trim() : '' };
+        });
+        return Object.keys(result).length > 0 ? result : null;
+      } catch (e) { return null; }
     }
 
     function csvEscape(value) {
