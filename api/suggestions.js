@@ -5,6 +5,7 @@
 const SUPABASE_URL = 'https://fnpxaneextqidbessnej.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || 'sb_publishable_132Gl37kwIXtdJc5VHtGCw_iXPxa6cW';
 const PERPLEXITY_KEY = process.env.PERPLEXITY_API_KEY || '';
+const REGION = 'za';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -68,28 +69,32 @@ export default async function handler(req, res) {
     : 'none listed';
 
   const themeText = topNegativeTheme
-    ? '\nMost repeated customer complaint: "' + topNegativeTheme + '"'
+    ? '\nRecurring customer concern: "' + topNegativeTheme + '"'
     : '';
 
-  const prompt = `You are a brand improvement advisor for GoNoGo, South Africa's independent brand rating platform.
+  const prompt = `You are a senior brand strategist advising "${brandName}", a ${categoryName || 'South African'} brand, on how to meaningfully improve their GoNoGo score and the experience they deliver to customers.
 
-BRAND: "${brandName}"
-INDUSTRY: ${categoryName || 'General'}
-GONOGO SCORE: ${score}/100 (${verdict})
+BRAND CONTEXT:
+- GoNoGo Score: ${score}/100 (${verdict})
+- Industry: ${categoryName || 'General'}
+- Market: South Africa
 
-FRAMEWORK SCORES:
+SCORING FRAMEWORK RESULTS:
 ${frameworkText || 'No framework data available'}
 
-KEY CONCERNS: ${concernsText}
-KEY STRENGTHS: ${strengthsText}${themeText}
+BRAND STRENGTHS: ${strengthsText}
+AREAS WITH ROOM TO GROW: ${concernsText}${themeText}
 
-Your task: Generate a structured improvement plan with exactly 6 categories matching these names exactly:
+Your task is to craft a thoughtful, personalised improvement plan for "${brandName}" covering exactly 6 categories:
 Compliance, Customer Satisfaction, Product Value, Innovation, Customer Support, Accessibility & Security
 
-For each category, provide exactly 2 actionable steps. Each step must be:
-- Specific to "${brandName}" and their actual score/situation above (not generic advice)
-- Immediately actionable — something they can start this week
-- The "how" field must explain the implementation in 2–3 practical sentences with specific details
+For each category, provide exactly 2 improvement steps. Each step should:
+- Be genuinely specific to "${brandName}" — reference their actual score context, not generic advice
+- Offer a fresh, considered perspective — explore angles the brand may not have thought of
+- Be warm and constructive in tone, treating the brand as a capable partner, not a student being corrected
+- Avoid any time-bound language ("this week", "by Friday", "immediately", "start today") — frame suggestions as strategic directions, not urgent tasks
+- Explain the "how" in 2–3 sentences with practical, concrete detail that makes it easy to act on when ready
+- Favour approaches that are realistic for a South African market context (consider platforms like HelloPeter, local regulatory bodies, POPIA compliance, SA consumer expectations)
 
 Return ONLY valid JSON in this exact format, nothing else:
 {
@@ -97,8 +102,8 @@ Return ONLY valid JSON in this exact format, nothing else:
     {
       "name": "Compliance",
       "steps": [
-        {"title": "Concise specific action title", "how": "2-3 sentence practical explanation of exactly how to do this."},
-        {"title": "Concise specific action title", "how": "2-3 sentence practical explanation of exactly how to do this."}
+        {"title": "Specific, encouraging action title", "how": "2-3 sentences of warm, practical guidance on how to approach this."},
+        {"title": "Specific, encouraging action title", "how": "2-3 sentences of warm, practical guidance on how to approach this."}
       ]
     },
     {
@@ -132,19 +137,19 @@ Return ONLY valid JSON in this exact format, nothing else:
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'sonar',
+        model: 'sonar-pro',
         messages: [
           {
             role: 'system',
-            content: 'You are a precise brand improvement advisor. Return only valid JSON with no markdown fences or extra text.'
+            content: 'You are a thoughtful, experienced brand strategist. Your tone is warm, expert and encouraging — like a trusted advisor, not an auditor. Return only valid JSON with no markdown fences or extra commentary.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.4,
-        max_tokens: 2000
+        temperature: 0.6,
+        max_tokens: 2500
       })
     });
 
@@ -169,7 +174,6 @@ Return ONLY valid JSON in this exact format, nothing else:
       });
     }
 
-    // Validate basic structure
     if (!suggestions.categories || !Array.isArray(suggestions.categories)) {
       return res.status(500).json({ error: 'Invalid suggestions structure returned', raw: content.substring(0, 300) });
     }
@@ -197,7 +201,7 @@ Return ONLY valid JSON in this exact format, nothing else:
 async function fetchExisting(slug) {
   try {
     const url = SUPABASE_URL + '/rest/v1/brands?slug=eq.' + encodeURIComponent(slug) +
-      '&region=eq.za&select=ai_suggestions,ai_suggestions_updated_at&limit=1';
+      '&region=eq.' + REGION + '&select=ai_suggestions,ai_suggestions_updated_at&limit=1';
     const r = await fetch(url, {
       headers: {
         'apikey': SUPABASE_KEY,
@@ -213,7 +217,7 @@ async function fetchExisting(slug) {
 }
 
 async function supabasePatch(slug, data) {
-  const url = SUPABASE_URL + '/rest/v1/brands?slug=eq.' + encodeURIComponent(slug) + '&region=eq.za';
+  const url = SUPABASE_URL + '/rest/v1/brands?slug=eq.' + encodeURIComponent(slug) + '&region=eq.' + REGION;
   const r = await fetch(url, {
     method: 'PATCH',
     headers: {
