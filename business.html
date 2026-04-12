@@ -143,6 +143,30 @@
     </div>
   </section>
 
+  <section class="section business-video-section" style="padding-top:0">
+    <div class="container">
+      <div class="section-heading-wrap compact-heading">
+        <h2 class="business-subtitle">See GoNoGo Business in action</h2>
+        <p class="section-copy">
+          Watch a quick walkthrough of the GoNoGo Business experience, including score visibility, improvement planning and smarter customer response support.
+        </p>
+      </div>
+
+      <div class="business-video-shell">
+        <div class="business-video-wrapper">
+          <video
+            class="business-video"
+            controls
+            playsinline
+            preload="metadata">
+            <source src="/gonogo-business-demo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="portal">
     <div class="container">
       <div class="section-heading-wrap compact-heading">
@@ -279,7 +303,6 @@
         </p>
       </div>
 
-      
       <div class="pricing-grid pricing-grid-two">
         <article class="price-card featured single-focus">
           <div class="tag highlight">Core package</div>
@@ -388,7 +411,6 @@
     document.getElementById('footer').innerHTML = Components.renderFooter();
   </script>
 
-  <!-- same styles as UK page -->
   <style>
     .business-hero {
       display: grid;
@@ -446,7 +468,8 @@
     .portal-mockup,
     .portal-feature,
     .price-card,
-    .pricing-intro-callout {
+    .pricing-intro-callout,
+    .business-video-shell {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -524,6 +547,29 @@
     .business-subtitle {
       text-align: left !important;
       margin: 0 0 var(--space-3);
+    }
+    .business-video-shell {
+      padding: var(--space-4);
+    }
+    .business-video-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: calc(var(--radius-lg) - 4px);
+      background: #000;
+    }
+    .business-video-wrapper::before {
+      content: "";
+      display: block;
+      padding-bottom: 56.25%;
+    }
+    .business-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
     }
     .portal-showcase {
       display: grid;
@@ -980,6 +1026,9 @@
       .mockup-goal {
         flex-direction: column;
         align-items: flex-start;
+      }
+      .business-video-shell {
+        padding: var(--space-3);
       }
     }
   </style>
