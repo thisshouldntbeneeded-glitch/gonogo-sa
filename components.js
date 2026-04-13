@@ -325,6 +325,7 @@ const Components = {
               <a href="compare.html">Compare</a>
               <a href="about.html">About</a>
               <a href="privacy.html">Privacy Policy</a>
+              <a href="cookies.html">Cookie Policy</a>
               <a href="terms.html">Terms & Conditions</a>
               <a href="https://www.gonogo.co.uk" target="_blank" rel="noopener noreferrer">GoNoGo UK</a>
             </div>
