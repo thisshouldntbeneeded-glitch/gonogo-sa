@@ -482,6 +482,12 @@ var GoNoGoAPI = (function () {
       return this.getReviews(brandName);
     },
 
+    getPendingReviewCount: function () {
+      return reviewsRequest('reviews?status=eq.pending&select=id', { prefer: 'count=exact' })
+        .then(function (rows) { return (rows || []).length; })
+        .catch(function () { return 0; });
+    },
+
     getAllReviews: function () {
       return reviewsRequest('reviews?order=created_at.desc')
         .then(function (data) {
