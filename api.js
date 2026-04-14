@@ -1354,6 +1354,11 @@ var GoNoGoAPI = (function () {
           body: { p_token: token, p_new_hash: hash }
         });
       });
+    },
+
+    // Direct Supabase request (for admin pages)
+    supabaseRequest: function (path, options) {
+      return supabaseRequest(path, options);
     }
   };
 })();
