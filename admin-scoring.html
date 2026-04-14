@@ -541,9 +541,9 @@ function renderBrandScoring() {
 
   var html = '<div style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px">' +
     '<label class="text-sm text-muted" style="white-space:nowrap">Select brand:</label>' +
-    '<select id="brand-selector" onchange="loadBrandScores()" style="max-width:300px;padding:8px 12px;border-radius:10px;font-size:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--color-text,#fff)">' +
-    '<option value="">— Choose a brand —</option>' +
-    allBrands.map(function(b) { return '<option value="' + esc(b.slug) + '">' + esc(b.name) + '</option>'; }).join('') +
+    '<select id="brand-selector" onchange="loadBrandScores()" style="max-width:300px;padding:8px 12px;border-radius:10px;font-size:14px;border:1px solid rgba(255,255,255,0.1);background:#1a1a2e;color:#fff">' +
+    '<option value="" style="background:#1a1a2e;color:#fff">— Choose a brand —</option>' +
+    allBrands.map(function(b) { return '<option value="' + esc(b.slug) + '" style="background:#1a1a2e;color:#fff">' + esc(b.name) + '</option>'; }).join('') +
     '</select>' +
   '</div>';
 

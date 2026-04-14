@@ -26,6 +26,24 @@
         <div class="kpi-card"><div class="kpi-label">Loading...</div></div>
       </div>
 
+      <!-- Admin & Brand Portal Users -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6);" id="portal-users-grid">
+        <div class="card">
+          <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-shield-halved" style="color:var(--green);margin-right:var(--space-2)"></i>Admin Users</h3>
+          <table class="data-table" style="font-size:13px">
+            <thead><tr><th>Name</th><th>Email</th><th>Last Login</th></tr></thead>
+            <tbody id="admin-users-tbody"><tr><td colspan="3" class="text-sm text-muted" style="text-align:center">Loading...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-4)"><i class="fa-solid fa-building" style="color:var(--green);margin-right:var(--space-2)"></i>Brand Portal Users</h3>
+          <table class="data-table" style="font-size:13px">
+            <thead><tr><th>Name</th><th>Brand</th><th>Last Login</th></tr></thead>
+            <tbody id="brand-users-tbody"><tr><td colspan="3" class="text-sm text-muted" style="text-align:center">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Persona Insights -->
       <div class="card" style="margin-bottom:var(--space-6);" id="persona-insights" hidden>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-4)">
@@ -133,6 +151,7 @@
       }
 
       renderKPIs();
+      renderPortalUsers();
       renderPersonaInsights();
       filterUsers();
     }
@@ -351,6 +370,36 @@
       var days = Math.floor(hours / 24);
       if (days < 30) return days + 'd ago';
       return formatDate(iso);
+    }
+
+    async function renderPortalUsers() {
+      try {
+        var admins = await GoNoGoAPI.supabaseRequest('admin_users?select=display_name,email,role,last_login_at&order=created_at');
+        var tbody = document.getElementById('admin-users-tbody');
+        if (!admins || admins.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" class="text-sm text-muted" style="text-align:center">No admin users</td></tr>';
+        } else {
+          tbody.innerHTML = admins.map(function(a) {
+            var login = a.last_login_at ? timeAgo(a.last_login_at) : '<span class="text-muted">Never</span>';
+            return '<tr><td><strong>' + Components.escapeHTML(a.display_name || '—') + '</strong><br><span class="text-xs text-muted">' + Components.escapeHTML(a.role || '') + '</span></td><td class="text-sm">' + Components.escapeHTML(a.email) + '</td><td class="text-sm">' + login + '</td></tr>';
+          }).join('');
+        }
+      } catch(e) { console.error('Admin users error:', e); }
+
+      try {
+        var brandUsers = await GoNoGoAPI.supabaseRequest('brand_users?select=display_name,email,brand_slug,region,role,last_login_at&order=created_at');
+        var tbody2 = document.getElementById('brand-users-tbody');
+        if (!brandUsers || brandUsers.length === 0) {
+          tbody2.innerHTML = '<tr><td colspan="3" class="text-sm text-muted" style="text-align:center">No brand portal users</td></tr>';
+        } else {
+          tbody2.innerHTML = brandUsers.map(function(b) {
+            var login = b.last_login_at ? timeAgo(b.last_login_at) : '<span class="text-muted">Never</span>';
+            var brandName = Components.escapeHTML((b.brand_slug || '').replace(/-/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); }));
+            var regionFlag = b.region === 'za' ? '\ud83c\uddff\ud83c\udde6' : b.region === 'uk' ? '\ud83c\uddec\ud83c\udde7' : '';
+            return '<tr><td><strong>' + Components.escapeHTML(b.display_name || '—') + '</strong><br><span class="text-xs text-muted">' + Components.escapeHTML(b.email) + '</span></td><td class="text-sm">' + regionFlag + ' ' + brandName + '</td><td class="text-sm">' + login + '</td></tr>';
+          }).join('');
+        }
+      } catch(e) { console.error('Brand users error:', e); }
     }
 
     function exportUsersCSV() {
