@@ -512,7 +512,11 @@ function openBrandScoring() {
   currentView = 'brand-scoring';
   document.getElementById('page-title').textContent = 'Score Brands — ' + currentSector.name;
   document.getElementById('page-subtitle').innerHTML = '<div class="sc-breadcrumb"><a onclick="loadSectorList()">Sectors</a> <i class="fa-solid fa-chevron-right" style="font-size:10px"></i> <a onclick="openSector(\'' + esc(currentSector.slug) + '\',\'' + esc(currentSector.name) + '\')">' + esc(currentSector.name) + '</a> <i class="fa-solid fa-chevron-right" style="font-size:10px"></i> Brand Scoring</div>';
-  document.getElementById('header-actions').innerHTML = '<button class="btn btn-primary btn-sm" id="save-scores-btn" onclick="saveBrandScores()" disabled><i class="fa-solid fa-floppy-disk"></i> Save All Scores</button>';
+  document.getElementById('header-actions').innerHTML =
+    '<button class="btn btn-outline btn-sm" onclick="downloadScoringTemplate()" style="margin-right:4px"><i class="fa-solid fa-download"></i> Download Template</button>' +
+    '<button class="btn btn-secondary btn-sm" onclick="triggerCSVUpload()" style="margin-right:4px"><i class="fa-solid fa-upload"></i> Upload Scoring CSV</button>' +
+    '<input type="file" id="csv-upload-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">' +
+    '<button class="btn btn-primary btn-sm" id="save-scores-btn" onclick="saveBrandScores()" disabled><i class="fa-solid fa-floppy-disk"></i> Save All Scores</button>';
 
   var body = document.getElementById('page-body');
   body.innerHTML = '<div class="text-sm text-muted" style="padding:var(--space-6);text-align:center"><i class="fa-solid fa-spinner fa-spin"></i> Loading brands...</div>';
@@ -657,6 +661,8 @@ function saveBrandScores() {
     prefer: 'return=representation,resolution=merge-duplicates'
   }).then(function() {
     Components.showToast(rows.length + ' scores saved', 'success');
+    return rollupBrandScores(brandSlug);
+  }).then(function() {
     loadBrandScores();
   }).catch(function(err) {
     Components.showToast('Error saving: ' + err.message, 'error');
@@ -664,6 +670,261 @@ function saveBrandScores() {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save All Scores';
   });
+}
+
+// ══════════════════════════════════════════
+// CSV HELPERS
+// ══════════════════════════════════════════
+function csvQuote(val) {
+  var s = String(val == null ? '' : val);
+  if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function parseCSV(text) {
+  var rows = [];
+  var row = [];
+  var field = '';
+  var inQuotes = false;
+  var i = 0;
+  while (i < text.length) {
+    var ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < text.length && text[i + 1] === '"') {
+          field += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          i++;
+        }
+      } else {
+        field += ch;
+        i++;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+        i++;
+      } else if (ch === ',') {
+        row.push(field);
+        field = '';
+        i++;
+      } else if (ch === '\n' || ch === '\r') {
+        row.push(field);
+        field = '';
+        if (ch === '\r' && i + 1 < text.length && text[i + 1] === '\n') i++;
+        i++;
+        if (row.length > 1 || (row.length === 1 && row[0] !== '')) rows.push(row);
+        row = [];
+      } else {
+        field += ch;
+        i++;
+      }
+    }
+  }
+  // Last field
+  if (field !== '' || row.length > 0) {
+    row.push(field);
+    if (row.length > 1 || (row.length === 1 && row[0] !== '')) rows.push(row);
+  }
+  return rows;
+}
+
+// ══════════════════════════════════════════
+// DOWNLOAD TEMPLATE
+// ══════════════════════════════════════════
+function downloadScoringTemplate() {
+  if (!sectorTemplates.length) {
+    Components.showToast('No template criteria loaded', 'error');
+    return;
+  }
+  var csv = 'brand_slug,category,subcategory,point_description,max_points,scoring_rule,score,evidence,source_url\n';
+  sectorTemplates.forEach(function(t) {
+    csv += ',' + csvQuote(t.category) + ',' + csvQuote(t.subcategory) + ',' +
+           csvQuote(t.point_description) + ',' + t.max_points + ',' +
+           csvQuote(t.scoring_rule) + ',,,\n';
+  });
+
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'scoring_template_' + currentSector.slug + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════
+// CSV UPLOAD
+// ══════════════════════════════════════════
+function triggerCSVUpload() {
+  var inp = document.getElementById('csv-upload-input');
+  inp.value = '';
+  inp.click();
+}
+
+function handleCSVUpload(event) {
+  var file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    var parsed = parseCSV(text);
+    if (parsed.length < 2) {
+      Components.showToast('CSV is empty or has no data rows', 'error');
+      return;
+    }
+
+    // First row is header
+    var headers = parsed[0].map(function(h) { return h.trim().toLowerCase(); });
+    var colIdx = {};
+    ['brand_slug','category','subcategory','point_description','max_points','scoring_rule','score','evidence','source_url'].forEach(function(col) {
+      colIdx[col] = headers.indexOf(col);
+    });
+
+    if (colIdx.score === -1) {
+      Components.showToast('CSV missing required "score" column', 'error');
+      return;
+    }
+
+    // Build template lookup: category+subcategory+point_description -> template
+    var tmplLookup = {};
+    sectorTemplates.forEach(function(t) {
+      var key = (t.category || '').trim().toLowerCase() + '||' +
+                (t.subcategory || '').trim().toLowerCase() + '||' +
+                (t.point_description || '').trim().toLowerCase();
+      tmplLookup[key] = t;
+    });
+
+    var rows = [];
+    var errors = [];
+    var brandSlugs = {};
+
+    for (var i = 1; i < parsed.length; i++) {
+      var r = parsed[i];
+      var scoreVal = (colIdx.score !== -1 && r[colIdx.score] != null) ? r[colIdx.score].trim() : '';
+      if (scoreVal === '') continue; // skip rows without a score
+
+      var brandSlug = (colIdx.brand_slug !== -1 && r[colIdx.brand_slug] != null) ? r[colIdx.brand_slug].trim() : '';
+      if (!brandSlug) {
+        errors.push('Row ' + (i + 1) + ': missing brand_slug');
+        continue;
+      }
+
+      var cat = (colIdx.category !== -1 && r[colIdx.category] != null) ? r[colIdx.category].trim() : '';
+      var sub = (colIdx.subcategory !== -1 && r[colIdx.subcategory] != null) ? r[colIdx.subcategory].trim() : '';
+      var desc = (colIdx.point_description !== -1 && r[colIdx.point_description] != null) ? r[colIdx.point_description].trim() : '';
+
+      var lookupKey = cat.toLowerCase() + '||' + sub.toLowerCase() + '||' + desc.toLowerCase();
+      var tmpl = tmplLookup[lookupKey];
+
+      if (!tmpl) {
+        errors.push('Row ' + (i + 1) + ': no matching template for "' + cat + ' / ' + sub + ' / ' + desc.substring(0, 40) + '"');
+        continue;
+      }
+
+      var evidence = (colIdx.evidence !== -1 && r[colIdx.evidence] != null) ? r[colIdx.evidence].trim() : '';
+      var sourceUrl = (colIdx.source_url !== -1 && r[colIdx.source_url] != null) ? r[colIdx.source_url].trim() : '';
+
+      rows.push({
+        brand_slug: brandSlug,
+        template_id: tmpl.id,
+        score: parseFloat(scoreVal) || 0,
+        evidence: evidence,
+        source_url: sourceUrl,
+        scored_by: 'csv-upload'
+      });
+      brandSlugs[brandSlug] = true;
+    }
+
+    if (errors.length > 0) {
+      Components.showToast(errors.length + ' rows skipped — check console', 'error');
+      console.warn('CSV upload errors:', errors);
+    }
+
+    if (!rows.length) {
+      Components.showToast('No valid scores found in CSV', 'error');
+      return;
+    }
+
+    // POST scores
+    sbFetch('brand_scores', {
+      method: 'POST',
+      body: rows,
+      prefer: 'return=representation,resolution=merge-duplicates'
+    }).then(function() {
+      Components.showToast(rows.length + ' scores imported for ' + Object.keys(brandSlugs).length + ' brand(s)', 'success');
+
+      // Rollup for each affected brand
+      var slugList = Object.keys(brandSlugs);
+      var rollupPromises = slugList.map(function(slug) { return rollupBrandScores(slug); });
+      return Promise.all(rollupPromises);
+    }).then(function() {
+      // Reload current brand view if one is selected
+      var sel = document.getElementById('brand-selector');
+      if (sel && sel.value) loadBrandScores();
+    }).catch(function(err) {
+      Components.showToast('CSV import error: ' + err.message, 'error');
+    });
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════
+// ROLLUP: framework_breakdown + scoring_breakdown
+// ══════════════════════════════════════════
+function rollupBrandScores(brandSlug) {
+  return sbFetch('brand_scores?brand_slug=eq.' + encodeURIComponent(brandSlug) + '&select=template_id,score')
+    .then(function(scores) {
+      // Group by category using sectorTemplates
+      var catTotals = {};
+      sectorTemplates.forEach(function(t) {
+        if (!catTotals[t.category]) catTotals[t.category] = { earned: 0, max: 0 };
+        catTotals[t.category].max += parseFloat(t.max_points) || 0;
+      });
+
+      (scores || []).forEach(function(s) {
+        var tmpl = sectorTemplates.find(function(t) { return t.id === s.template_id; });
+        if (tmpl && catTotals[tmpl.category]) {
+          catTotals[tmpl.category].earned += parseFloat(s.score) || 0;
+        }
+      });
+
+      // Build framework_breakdown array
+      var breakdown = Object.keys(catTotals).map(function(cat) {
+        var c = catTotals[cat];
+        return {
+          category: cat,
+          score: Math.round(c.earned * 10) / 10 + '/' + Math.round(c.max * 10) / 10
+        };
+      });
+
+      // Compute total score
+      var totalEarned = 0, totalMax = 0;
+      breakdown.forEach(function(b) {
+        var parts = b.score.split('/');
+        totalEarned += parseFloat(parts[0]);
+        totalMax += parseFloat(parts[1]);
+      });
+
+      // Update brands table
+      return sbFetch('brands?slug=eq.' + encodeURIComponent(brandSlug), {
+        method: 'PATCH',
+        body: {
+          framework_breakdown: breakdown,
+          scoring_breakdown: {
+            total_score: Math.round(totalEarned * 10) / 10,
+            total_max: Math.round(totalMax * 10) / 10,
+            scored_at: new Date().toISOString(),
+            categories: catTotals
+          }
+        }
+      });
+    });
 }
 
 // ══════════════════════════════════════════
