@@ -1229,6 +1229,9 @@ const Components = {
             '</button>' +
             '<div class="auth-dropdown" id="auth-dropdown-desktop">' +
               '<div class="auth-dropdown-header">' + Components.escapeHTML(user.email) + '</div>' +
+              '<a href="/account" class="auth-dropdown-item">' +
+                '<i class="fa-solid fa-user-gear"></i> My Account' +
+              '</a>' +
               '<a href="#" class="auth-dropdown-item" onclick="Components.publicSignOut(); return false;">' +
                 '<i class="fa-solid fa-right-from-bracket"></i> Sign Out' +
               '</a>' +
@@ -1251,6 +1254,9 @@ const Components = {
             '<div class="text-sm" style="padding:var(--space-2) var(--space-3);color:var(--text-secondary)">' +
               '<i class="fa-solid fa-user-check" style="color:var(--green)"></i> ' + Components.escapeHTML(displayName) +
             '</div>' +
+            '<a href="/account" class="btn btn-sm btn-ghost" style="width:100%;text-align:left;padding:var(--space-2) var(--space-3);text-decoration:none;display:block">' +
+              '<i class="fa-solid fa-user-gear"></i> My Account' +
+            '</a>' +
             '<button class="btn btn-sm btn-ghost" onclick="Components.publicSignOut()" style="width:100%;text-align:left;padding:var(--space-2) var(--space-3)">' +
               '<i class="fa-solid fa-right-from-bracket"></i> Sign Out' +
             '</button>' +
@@ -1356,6 +1362,9 @@ const Components = {
       '<button class="btn btn-primary w-full" id="auth-submit-btn" onclick="Components.publicSignIn()">' +
         '<i class="fa-solid fa-right-to-bracket"></i> Sign In' +
       '</button>' +
+      '<div class="auth-forgot">' +
+        '<a href="#" onclick="Components.showForgotPassword(); return false;">Forgot your password?</a>' +
+      '</div>' +
       '<div class="auth-footer">' +
         'Don\'t have an account? <a href="#" onclick="Components.switchAuthTab(\'signup\'); return false;">Create one</a>' +
       '</div>'
@@ -1503,6 +1512,81 @@ const Components = {
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+    }
+  },
+
+  showForgotPassword() {
+    var area = document.getElementById('auth-form-area');
+    if (!area) return;
+    // Hide tabs
+    var tabs = document.querySelector('.auth-tabs');
+    if (tabs) tabs.style.display = 'none';
+
+    area.innerHTML =
+      '<div style="text-align:center;margin-bottom:var(--space-4)">' +
+        '<i class="fa-solid fa-envelope" style="font-size:36px;color:var(--green);display:block;margin-bottom:var(--space-3)"></i>' +
+        '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-2)">Reset your password</h3>' +
+        '<p class="text-sm text-secondary">Enter your email and we\'ll send you a reset link.</p>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Email</label>' +
+        '<input type="email" id="auth-reset-email" placeholder="you@example.com" onkeydown="if(event.key===\'Enter\')Components.requestPasswordReset()">' +
+      '</div>' +
+      '<div class="auth-error" id="auth-error"></div>' +
+      '<button class="btn btn-primary w-full" id="auth-submit-btn" onclick="Components.requestPasswordReset()">' +
+        '<i class="fa-solid fa-paper-plane"></i> Send Reset Link' +
+      '</button>' +
+      '<div class="auth-footer" style="margin-top:var(--space-4)">' +
+        '<a href="#" onclick="Components.backToSignIn(); return false;"><i class="fa-solid fa-arrow-left" style="margin-right:4px"></i> Back to Sign In</a>' +
+      '</div>';
+    setTimeout(function() {
+      var inp = document.getElementById('auth-reset-email');
+      if (inp) inp.focus();
+    }, 100);
+  },
+
+  backToSignIn() {
+    var tabs = document.querySelector('.auth-tabs');
+    if (tabs) tabs.style.display = 'flex';
+    Components.switchAuthTab('signin');
+  },
+
+  async requestPasswordReset() {
+    if (!supabaseAuth) return;
+    var email = document.getElementById('auth-reset-email').value.trim();
+    var errEl = document.getElementById('auth-error');
+    var btn = document.getElementById('auth-submit-btn');
+
+    if (!email) {
+      errEl.textContent = 'Please enter your email address.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+    errEl.style.display = 'none';
+
+    try {
+      var res = await supabaseAuth.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth/reset'
+      });
+      if (res.error) throw res.error;
+
+      document.getElementById('auth-form-area').innerHTML =
+        '<div style="text-align:center;padding:var(--space-4) 0">' +
+          '<i class="fa-solid fa-envelope-circle-check" style="font-size:48px;color:var(--green);margin-bottom:var(--space-4);display:block"></i>' +
+          '<h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-3)">Check your email</h3>' +
+          '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">' +
+            'If an account exists for <strong>' + Components.escapeHTML(email) + '</strong>, we\'ve sent a password reset link.' +
+          '</p>' +
+          '<button class="btn btn-ghost" onclick="Components.closeAuthModal()">Close</button>' +
+        '</div>';
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to send reset email. Please try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Reset Link';
     }
   },
 
