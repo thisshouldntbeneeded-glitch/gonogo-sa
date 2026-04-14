@@ -443,6 +443,7 @@ var GoNoGoAPI = (function () {
       };
 
       if (reviewData.verdict) body.verdict = reviewData.verdict;
+      if (reviewData.user_id) body.user_id = reviewData.user_id;
 
       return reviewsRequest('reviews', {
         method: 'POST',
