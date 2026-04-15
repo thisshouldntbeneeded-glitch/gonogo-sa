@@ -139,6 +139,8 @@ var GoNoGoAPI = (function () {
   }
 
   return {
+    SITE_REGION: SITE_REGION,
+
     isLive: function () {
       return true;
     },
