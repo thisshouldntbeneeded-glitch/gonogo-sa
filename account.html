@@ -651,8 +651,8 @@
       return maxW > 0 ? total / maxW : 0;
     }
 
-    // Categories that are location-specific rather than national brands
-    var LOCAL_CATS = ['traffic-department','home-affairs','airports','conference-centres','hospitals'];
+    // Only recommend from these high-interest national categories
+    var RECO_CATS = ['supermarkets','banking','insurance','mobile-networks','medical-aid'];
 
     async function loadRecommendations(priorities) {
       var grid = document.getElementById('reco-grid');
@@ -668,8 +668,8 @@
           return;
         }
 
-        // Filter out local/location-based categories
-        brands = brands.filter(function(b) { return LOCAL_CATS.indexOf(b.category_slug) === -1; });
+        // Only include selected national categories
+        brands = brands.filter(function(b) { return RECO_CATS.indexOf(b.category_slug) !== -1; });
 
         // Score and rank
         var scored = brands.map(function(b) {
