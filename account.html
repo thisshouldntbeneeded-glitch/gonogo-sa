@@ -651,6 +651,9 @@
       return maxW > 0 ? total / maxW : 0;
     }
 
+    // Categories that are location-specific rather than national brands
+    var LOCAL_CATS = ['traffic-department','home-affairs','airports','conference-centres','hospitals'];
+
     async function loadRecommendations(priorities) {
       var grid = document.getElementById('reco-grid');
       if (!grid) return;
@@ -665,6 +668,9 @@
           return;
         }
 
+        // Filter out local/location-based categories
+        brands = brands.filter(function(b) { return LOCAL_CATS.indexOf(b.category_slug) === -1; });
+
         // Score and rank
         var scored = brands.map(function(b) {
           var fb = b.framework_breakdown;
@@ -674,6 +680,15 @@
         }).filter(function(x) { return x && x.match > 0; });
 
         scored.sort(function(a, b) { return b.match - a.match; });
+
+        // Deduplicate: one brand per category (highest match wins)
+        var seenCats = {};
+        scored = scored.filter(function(item) {
+          var cat = item.brand.category_slug;
+          if (seenCats[cat]) return false;
+          seenCats[cat] = true;
+          return true;
+        });
 
         // Take top 6
         var top = scored.slice(0, 6);
