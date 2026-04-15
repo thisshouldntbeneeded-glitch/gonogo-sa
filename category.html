@@ -13,11 +13,12 @@
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
-  <meta name="keywords" content="industry comparison, brand rankings, South Africa brands, category ratings">
+  <meta name="description" content="Compare and rate South African brands by industry. Independent 100-point scores, side-by-side comparisons, and transparent ratings on GoNoGo.">
+  <meta name="keywords" content="brand comparison South Africa, industry ratings, company reviews, GoNoGo ratings, South Africa brand rankings">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.gonogo.co.za/category">
-  <meta property="og:title" content="Industry Brands — GoNoGo South Africa">
-  <meta property="og:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
+  <meta property="og:title" content="Brand Ratings by Industry — GoNoGo South Africa">
+  <meta property="og:description" content="Compare and rate South African brands by industry. Independent 100-point scores and transparent ratings.">
   <meta property="og:image" content="https://www.gonogo.co.za/logos/og-share.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -25,11 +26,10 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="GoNoGo South Africa">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Industry Brands — GoNoGo South Africa">
-  <meta name="twitter:description" content="Compare brands in this industry on GoNoGo South Africa. See scores, verdicts, and rankings across all rated companies.">
+  <meta name="twitter:title" content="Brand Ratings by Industry — GoNoGo South Africa">
+  <meta name="twitter:description" content="Compare and rate South African brands by industry. Independent 100-point scores and transparent ratings.">
   <meta name="twitter:image" content="https://www.gonogo.co.za/logos/og-share.jpg">
-  <meta name="robots" content="index, follow">
-  <title>Industry Brands — GoNoGo South Africa</title>
+  <title>Brand Ratings by Industry — GoNoGo South Africa</title>
 
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -158,19 +158,55 @@
 
       document.getElementById('nav').innerHTML = Components.renderPublicNav(slug);
       Components.updateThemeIcon();
-      document.title = catInfo.name + ' — GoNoGo South Africa';
 
       var isBranchCategory = catInfo.categoryType === 'branch';
       var itemLabel = isBranchCategory ? 'branch' : 'brand';
+      var itemLabelPlural = isBranchCategory ? 'branches' : 'brands';
 
-      var catDesc = 'Compare ' + catInfo.brandCount + ' ' + catInfo.name.toLowerCase() + ' ' + itemLabel + (catInfo.brandCount !== 1 ? (isBranchCategory ? 'es' : 's') : '') + ' in South Africa. Independent ratings on a 100-point scoring framework.';
-      var metaTag = document.querySelector('meta[name="description"]');
-      if (!metaTag) {
-        metaTag = document.createElement('meta');
-        metaTag.name = 'description';
-        document.head.appendChild(metaTag);
+      // === SEO: Dynamic meta tags for category pages ===
+      var seoTitle = catInfo.name + ' Ratings & Reviews — GoNoGo South Africa';
+      var catDesc = 'Compare ' + catInfo.brandCount + ' ' + catInfo.name.toLowerCase() + ' ' + itemLabelPlural + ' in South Africa. Independent ' + catInfo.name.toLowerCase() + ' ratings using a transparent 100-point scoring framework on GoNoGo.';
+      var canonicalUrl = 'https://www.gonogo.co.za/category.html?cat=' + slug;
+
+      document.title = seoTitle;
+
+      function setMeta(attr, attrVal, content) {
+        var el = document.querySelector('meta[' + attr + '="' + attrVal + '"]');
+        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, attrVal); document.head.appendChild(el); }
+        el.content = content;
       }
-      metaTag.content = catDesc;
+      setMeta('name', 'description', catDesc);
+      setMeta('name', 'keywords', catInfo.name + ' South Africa, ' + catInfo.name.toLowerCase() + ' ratings, ' + catInfo.name.toLowerCase() + ' comparison, best ' + catInfo.name.toLowerCase() + ' South Africa, GoNoGo ' + catInfo.name.toLowerCase());
+      setMeta('property', 'og:title', seoTitle);
+      setMeta('property', 'og:description', catDesc);
+      setMeta('property', 'og:url', canonicalUrl);
+      setMeta('name', 'twitter:title', seoTitle);
+      setMeta('name', 'twitter:description', catDesc);
+
+      var canonicalEl = document.querySelector('link[rel="canonical"]');
+      if (canonicalEl) canonicalEl.href = canonicalUrl;
+
+      // === SEO: JSON-LD structured data for category ===
+      var catJsonLD = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        'name': catInfo.name + ' Brand Ratings — GoNoGo South Africa',
+        'description': catDesc,
+        'url': canonicalUrl,
+        'isPartOf': {
+          '@type': 'WebSite',
+          'name': 'GoNoGo South Africa',
+          'url': 'https://www.gonogo.co.za'
+        },
+        'about': {
+          '@type': 'Thing',
+          'name': catInfo.name + ' in South Africa'
+        }
+      };
+      var catLdScript = document.createElement('script');
+      catLdScript.type = 'application/ld+json';
+      catLdScript.textContent = JSON.stringify(catJsonLD);
+      document.head.appendChild(catLdScript);
 
       if (isBranchCategory) {
         var branches = await GoNoGoAPI.getBranchesByCategory(slug);
