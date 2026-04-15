@@ -62,7 +62,7 @@
     try {
       var posts = await GoNoGoAPI.supabaseRequest(
         'blog_posts?status=eq.published&region=eq.' + GoNoGoAPI.SITE_REGION +
-        '&select=title,slug,excerpt,cover_image_url,author,published_at&order=published_at.desc'
+        '&select=title,slug,excerpt,cover_image_url,author,published_at,sort_order&order=sort_order.asc,published_at.desc'
       );
       var grid = document.getElementById('blog-grid');
       if (!posts || posts.length === 0) {

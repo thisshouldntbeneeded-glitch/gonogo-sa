@@ -104,6 +104,7 @@
 
   var editingId = null;
   var sourceMode = false;
+  var allPosts = [];
 
   async function initBlog() {
     document.getElementById('admin-content').style.display = '';
@@ -114,19 +115,23 @@
     try {
       var posts = await GoNoGoAPI.supabaseRequest(
         'blog_posts?region=eq.' + GoNoGoAPI.SITE_REGION +
-        '&select=id,title,slug,excerpt,author,status,published_at,created_at,updated_at&order=created_at.desc'
+        '&select=id,title,slug,excerpt,author,status,sort_order,published_at,created_at,updated_at&order=sort_order.asc,created_at.desc'
       );
+      allPosts = posts || [];
       var grid = document.getElementById('posts-grid');
       if (!posts || posts.length === 0) {
         grid.innerHTML = '<div class="card" style="text-align:center;padding:var(--space-8)"><i class="fa-solid fa-pen-nib" style="font-size:36px;color:var(--green);opacity:0.4;margin-bottom:var(--space-3);display:block"></i><p class="text-sm text-muted">No posts yet. Click <strong>New Post</strong> to get started.</p></div>';
         return;
       }
-      grid.innerHTML = posts.map(function(p) {
+      grid.innerHTML = posts.map(function(p, idx) {
         var date = p.published_at ? new Date(p.published_at).toLocaleDateString('en-ZA', {day:'numeric',month:'short',year:'numeric'}) : 'Not published';
         var badge = p.status === 'published'
           ? '<span style="background:#1a3d2e;color:#11a551;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">Published</span>'
           : '<span style="background:rgba(255,255,255,0.06);color:var(--text-muted);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">Draft</span>';
+        var upBtn = idx > 0 ? '<button class="btn btn-secondary btn-sm" onclick="movePost(' + idx + ',-1)" title="Move up"><i class="fa-solid fa-arrow-up"></i></button>' : '<button class="btn btn-secondary btn-sm" disabled style="opacity:0.3"><i class="fa-solid fa-arrow-up"></i></button>';
+        var downBtn = idx < posts.length - 1 ? '<button class="btn btn-secondary btn-sm" onclick="movePost(' + idx + ',1)" title="Move down"><i class="fa-solid fa-arrow-down"></i></button>' : '<button class="btn btn-secondary btn-sm" disabled style="opacity:0.3"><i class="fa-solid fa-arrow-down"></i></button>';
         return '<div class="card" style="padding:var(--space-4) var(--space-5);display:flex;align-items:center;justify-content:space-between;gap:var(--space-4)">' +
+          '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">' + upBtn + downBtn + '</div>' +
           '<div style="flex:1;min-width:0">' +
             '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-1)">' +
               '<h3 style="font-size:var(--text-sm);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.title) + '</h3>' +
@@ -147,6 +152,22 @@
   }
 
   function esc(s) { return Components.escapeHTML(s || ''); }
+
+  async function movePost(idx, direction) {
+    var swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= allPosts.length) return;
+    var a = allPosts[idx];
+    var b = allPosts[swapIdx];
+    try {
+      await Promise.all([
+        GoNoGoAPI.supabaseRequest('blog_posts?id=eq.' + a.id, { method: 'PATCH', body: { sort_order: swapIdx } }),
+        GoNoGoAPI.supabaseRequest('blog_posts?id=eq.' + b.id, { method: 'PATCH', body: { sort_order: idx } })
+      ]);
+      await loadPosts();
+    } catch(e) {
+      Components.showToast('Error reordering: ' + e.message, 'error');
+    }
+  }
 
   function showEditor(post) {
     editingId = post ? post.id : null;
