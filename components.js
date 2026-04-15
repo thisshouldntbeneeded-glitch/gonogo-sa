@@ -132,6 +132,7 @@ const Components = {
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
       { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' },
       { href: 'admin-scoring.html', label: 'Scoring Engine', icon: 'fa-scale-balanced', id: 'scoring' },
+      { href: 'admin-blog.html', label: 'Blog', icon: 'fa-pen-nib', id: 'blog' },
       { href: 'admin-users.html', label: 'Public Users', icon: 'fa-users', id: 'users' }
     ];
 
@@ -371,6 +372,7 @@ const Components = {
               <a href="index.html">Home</a>
               <a href="compare.html">Compare</a>
               <a href="about.html">About</a>
+              <a href="blog.html">Blog</a>
               <a href="privacy.html">Privacy Policy</a>
               <a href="cookies.html">Cookie Policy</a>
               <a href="terms.html">Terms & Conditions</a>
