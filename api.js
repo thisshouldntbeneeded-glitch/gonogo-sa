@@ -519,16 +519,13 @@ var GoNoGoAPI = (function () {
     },
 
     moderateReview: function (reviewId, newStatus, moderatedBy) {
-      return reviewsRequest('reviews?id=eq.' + encodeURIComponent(reviewId), {
-        method: 'PATCH',
+      return reviewsRequest('rpc/moderate_review', {
+        method: 'POST',
         body: {
-          status: newStatus,
-          moderated_by: moderatedBy || 'admin',
-          moderated_at: new Date().toISOString()
-        },
-        prefer: 'return=representation'
-      }).then(function () {
-        return { ok: true, id: reviewId, status: newStatus };
+          p_review_id: reviewId,
+          p_status: newStatus,
+          p_moderated_by: moderatedBy || 'admin'
+        }
       });
     },
 
@@ -940,75 +937,76 @@ var GoNoGoAPI = (function () {
       if (brandData.internal_score_justification) record.internal_score_justification = brandData.internal_score_justification;
       if (brandData.scoring_breakdown) record.scoring_breakdown = brandData.scoring_breakdown;
 
-      return checkSupabaseBrands().then(function (hasSB) {
-        if (hasSB) {
-          return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
-            method: 'PATCH',
-            body: record,
-            prefer: 'return=representation'
-          }).then(function (rows) {
-            if (rows && rows.length > 0) {
-              return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
-            }
-
-            record.slug = slug;
-            return supabaseRequest('brands', {
-              method: 'POST',
-              body: record
-            }).then(function () {
-              return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
-            });
-          });
+      var auth = this._getCallerAuth();
+      record.region = SITE_REGION;
+      return supabaseRequest('rpc/admin_save_brand', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_data: record
         }
-
-        var overrides = GoNoGoStorage.get('brandOverrides') || {};
-        overrides[slug] = record;
-        GoNoGoStorage.set('brandOverrides', overrides);
-
-        return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'localStorage' };
+      }).then(function () {
+        return { ok: true, gonogo_score: overallScore, verdict: verdict, source: 'supabase' };
       });
     },
 
     deleteBrand: function (slug) {
-      return checkSupabaseBrands().then(function (hasSB) {
-        if (hasSB) {
-          return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
-            method: 'DELETE'
-          }).then(function () {
-            return { ok: true };
-          });
+      var auth = this._getCallerAuth();
+      return supabaseRequest('rpc/admin_delete_brand', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_region: SITE_REGION
         }
-        throw new Error('Cannot delete brands without Supabase');
       });
     },
 
     // Set brand active/inactive (hides from site without deleting)
     setBrandActive: function (slug, isActive) {
-      return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
-        method: 'PATCH',
-        body: { is_active: isActive },
-        prefer: 'return=representation'
+      var auth = this._getCallerAuth();
+      return supabaseRequest('rpc/admin_set_brand_active', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_is_active: isActive,
+          p_region: SITE_REGION
+        }
       });
     },
 
     // Set brand workflow status: 'draft' or 'live'
     setBrandStatus: function (slug, status) {
-      return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
-        method: 'PATCH',
-        body: { status: status },
-        prefer: 'return=representation'
+      var auth = this._getCallerAuth();
+      return supabaseRequest('rpc/admin_set_brand_status', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_status: status,
+          p_region: SITE_REGION
+        }
       });
     },
 
     // Bulk approve: set multiple brands to live
     approveBrands: function (slugs) {
-      return Promise.all(slugs.map(function (slug) {
-        return supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug), {
-          method: 'PATCH',
-          body: { status: 'live' },
-          prefer: 'return=representation'
-        });
-      }));
+      var auth = this._getCallerAuth();
+      return supabaseRequest('rpc/admin_approve_brands', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slugs: slugs,
+          p_region: SITE_REGION
+        }
+      });
     },
 
     // ==========================================
@@ -1016,48 +1014,35 @@ var GoNoGoAPI = (function () {
     // ==========================================
     saveCategory: function (categoryData) {
       _categoryCache = null;
-      var patchBody = {
+      var auth = this._getCallerAuth();
+      var data = {
         name: categoryData.name,
         icon: categoryData.icon,
-        scoring_categories: categoryData.scoringCategories || []
+        scoring_categories: categoryData.scoringCategories || [],
+        region: SITE_REGION
       };
+      if (categoryData.category_type) data.category_type = categoryData.category_type;
+      if (categoryData.description !== undefined) data.description = categoryData.description;
+      if (categoryData.icon_color !== undefined) data.icon_color = categoryData.icon_color;
 
-      if (categoryData.category_type) patchBody.category_type = categoryData.category_type;
-      if (categoryData.description !== undefined) patchBody.description = categoryData.description;
-      if (categoryData.icon_color !== undefined) patchBody.icon_color = categoryData.icon_color;
-
-      return supabaseRequest('categories?slug=eq.' + encodeURIComponent(categoryData.slug), {
-        method: 'PATCH',
-        body: patchBody
-      }).then(function (rows) {
-        if (rows && rows.length > 0) return { ok: true };
-
-        var postBody = {
-          slug: categoryData.slug,
-          name: categoryData.name,
-          icon: categoryData.icon,
-          scoring_categories: categoryData.scoringCategories || [],
-          region: SITE_REGION
-        };
-
-        if (categoryData.category_type) postBody.category_type = categoryData.category_type;
-        if (categoryData.description) postBody.description = categoryData.description;
-        if (categoryData.icon_color) postBody.icon_color = categoryData.icon_color;
-
-        return supabaseRequest('categories', {
-          method: 'POST',
-          body: postBody
-        }).then(function () {
-          return { ok: true };
-        });
+      return supabaseRequest('rpc/admin_save_category', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: categoryData.slug,
+          p_data: data
+        }
+      }).then(function () {
+        return { ok: true };
       });
     },
 
     addCategory: function (categoryData) {
       _categoryCache = null;
+      var auth = this._getCallerAuth();
       var slug = categoryData.slug || categoryData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      var postBody = {
-        slug: slug,
+      var data = {
         name: categoryData.name,
         icon: categoryData.icon || 'fa-tag',
         scoring_categories: categoryData.scoringCategories || categoryData.scoring_categories || [
@@ -1070,14 +1055,18 @@ var GoNoGoAPI = (function () {
         ],
         region: SITE_REGION
       };
+      if (categoryData.description) data.description = categoryData.description;
+      if (categoryData.icon_color) data.icon_color = categoryData.icon_color;
+      if (categoryData.category_type) data.category_type = categoryData.category_type;
 
-      if (categoryData.description) postBody.description = categoryData.description;
-      if (categoryData.icon_color) postBody.icon_color = categoryData.icon_color;
-      if (categoryData.category_type) postBody.category_type = categoryData.category_type;
-
-      return supabaseRequest('categories', {
+      return supabaseRequest('rpc/admin_save_category', {
         method: 'POST',
-        body: postBody
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_data: data
+        }
       }).then(function () {
         return { ok: true };
       });
@@ -1085,17 +1074,15 @@ var GoNoGoAPI = (function () {
 
     deleteCategory: function (slug) {
       _categoryCache = null;
-      return supabaseRequest('brands?category_slug=eq.' + encodeURIComponent(slug) + '&select=slug&limit=1')
-        .then(function (rows) {
-          if (rows && rows.length > 0) {
-            throw new Error('Cannot delete category — it still has brands assigned to it. Remove or reassign all brands first.');
-          }
-          return supabaseRequest('categories?slug=eq.' + encodeURIComponent(slug), {
-            method: 'DELETE'
-          }).then(function () {
-            return { ok: true };
-          });
-        });
+      var auth = this._getCallerAuth();
+      return supabaseRequest('rpc/admin_delete_category', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug
+        }
+      });
     },
 
     // ==========================================
