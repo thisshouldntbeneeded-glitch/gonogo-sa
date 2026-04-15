@@ -20,8 +20,12 @@ export default async function handler(req, res) {
     // Homepage
     xml += url(SITE_URL + '/', today, '1.0', 'daily');
 
-    // Compare page
+    // Static pages
     xml += url(SITE_URL + '/compare.html', today, '0.6', 'weekly');
+    xml += url(SITE_URL + '/business.html', today, '0.7', 'weekly');
+    xml += url(SITE_URL + '/about.html', today, '0.5', 'monthly');
+    xml += url(SITE_URL + '/privacy.html', today, '0.3', 'monthly');
+    xml += url(SITE_URL + '/terms.html', today, '0.3', 'monthly');
 
     // Category pages
     for (const cat of cats) {
