@@ -208,6 +208,7 @@ var GoNoGoAPI = (function () {
 
     updateCategory: function (slug, data) {
       _categoryCache = null;
+      var auth = this._getCallerAuth();
       var body = {};
 
       if (typeof data.name !== 'undefined') body.name = data.name;
@@ -217,21 +218,27 @@ var GoNoGoAPI = (function () {
       if (typeof data.category_type !== 'undefined') body.category_type = data.category_type;
       if (typeof data.scoring_categories !== 'undefined') body.scoring_categories = data.scoring_categories;
 
-      return supabaseRequest('categories?slug=eq.' + encodeURIComponent(slug), {
-        method: 'PATCH',
-        body: body
-      }).then(function (rows) {
-        if (!rows || rows.length === 0) throw new Error('Category not found');
+      return supabaseRequest('rpc/admin_save_category', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug: slug,
+          p_data: body
+        }
+      }).then(function () {
         return { ok: true };
       });
     },
 
     // Propagate a category description change into every brand's framework_breakdown
     updateBrandFrameworkDescriptions: function (categorySlug, categoryName, description) {
+      var self = this;
       return supabaseRequest(
         'brands?region=eq.' + SITE_REGION + '&category_slug=eq.' + encodeURIComponent(categorySlug) + '&select=slug,framework_breakdown'
       ).then(function (brands) {
         if (!brands || !brands.length) return;
+        var auth = self._getCallerAuth();
         return Promise.all(brands.map(function (brand) {
           var fb = (brand.framework_breakdown || []).map(function (entry) {
             if (entry.category === categoryName) {
@@ -239,10 +246,15 @@ var GoNoGoAPI = (function () {
             }
             return entry;
           });
-          return supabaseRequest(
-            'brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(brand.slug),
-            { method: 'PATCH', body: { framework_breakdown: fb } }
-          );
+          return supabaseRequest('rpc/admin_save_brand', {
+            method: 'POST',
+            body: {
+              p_caller_id: auth.p_caller_id,
+              p_caller_hash: auth.p_caller_hash,
+              p_slug: brand.slug,
+              p_data: { framework_breakdown: fb }
+            }
+          });
         }));
       });
     },
