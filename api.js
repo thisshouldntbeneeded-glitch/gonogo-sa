@@ -172,8 +172,11 @@ var GoNoGoAPI = (function () {
               counts[b.category_slug] = (counts[b.category_slug] || 0) + 1;
             });
 
+            // Only count branches for categories that have no brands
             branches.forEach(function (b) {
-              counts[b.category_slug] = (counts[b.category_slug] || 0) + 1;
+              if (!counts[b.category_slug]) {
+                counts[b.category_slug] = (counts[b.category_slug] || 0) + 1;
+              }
             });
 
             return cats.map(function (c) {

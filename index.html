@@ -474,22 +474,6 @@
     Components.initPublicAuth();
     document.getElementById('footer').innerHTML = Components.renderFooter();
 
-    var categoryDescriptions = {
-      'banking': 'Digital banks, traditional banks, and credit cards.',
-      'mobile-networks': 'Coverage, plans, pricing, and customer service.',
-      'hr-software': 'HR management, payroll, and employee tools.',
-      'accounting-software': 'Accounting, invoicing, and reporting platforms.',
-      'property-letting': 'Agents, rental platforms, and property services.',
-      'online-retailers': 'Ecommerce platforms and online stores.',
-      'medical-aid': 'Medical schemes, plans, and healthcare cover.',
-      'insurance': 'Cover providers across major insurance categories.',
-      'home-cleaning': 'Domestic and specialist cleaning services.',
-      'car-dealers': 'Vehicle retailers and dealership groups.',
-      'food-delivery': 'Delivery apps, platforms, and meal services.',
-      'armed-response': 'Security, monitoring, and response providers.',
-      'car-rentals': 'Vehicle rental and mobility providers.'
-    };
-
     (async function () {
       try {
         var categories = await GoNoGoAPI.getCategoriesWithBrands();
@@ -497,7 +481,7 @@
 
         var industryGrid = document.getElementById('industry-grid');
         industryGrid.innerHTML = categories.map(function (cat) {
-          var desc = categoryDescriptions[cat.id] || (cat.brandCount + ' brands reviewed');
+          var desc = cat.description || (cat.brandCount + ' brands reviewed');
           var color = cat.icon_color || '#11a551';
           return ''
             + '<a href="category.html?cat=' + cat.id + '" class="industry-card-v2">'
