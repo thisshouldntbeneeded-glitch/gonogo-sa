@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="index, follow">
+<meta name="description" content="Read the latest insights, guides, and brand analysis from GoNoGo South Africa.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="https://www.gonogo.co.za/blog">
+<meta property="og:title" content="Blog — GoNoGo South Africa">
+<meta property="og:description" content="Read the latest insights, guides, and brand analysis from GoNoGo South Africa.">
+<meta property="og:image" content="https://www.gonogo.co.za/logos/og-share.jpg">
+<meta property="og:url" content="https://www.gonogo.co.za/blog">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="GoNoGo South Africa">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blog — GoNoGo South Africa">
+<meta name="twitter:description" content="Read the latest insights, guides, and brand analysis from GoNoGo South Africa.">
+<meta name="twitter:image" content="https://www.gonogo.co.za/logos/og-share.jpg">
 <title>Blog — GoNoGo South Africa</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -67,10 +79,57 @@
       if (!posts || posts.length === 0) { showNotFound(); return; }
       var post = posts[0];
 
-      document.title = post.title + ' — GoNoGo South Africa';
-      var metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) { metaDesc = document.createElement('meta'); metaDesc.name='description'; document.head.appendChild(metaDesc); }
-      metaDesc.content = post.excerpt || post.title;
+      // === SEO: Dynamic meta tags for blog posts ===
+      var postTitle = post.title + ' — GoNoGo South Africa';
+      var postDesc = post.excerpt || post.title;
+      var postUrl = 'https://www.gonogo.co.za/blog-post.html?slug=' + encodeURIComponent(post.slug);
+      var postImage = post.cover_image_url || 'https://www.gonogo.co.za/logos/og-share.jpg';
+
+      document.title = postTitle;
+
+      function setMeta(attr, attrVal, content) {
+        var el = document.querySelector('meta[' + attr + '="' + attrVal + '"]');
+        if (!el) { el = document.createElement('meta'); el.setAttribute(attr, attrVal); document.head.appendChild(el); }
+        el.content = content;
+      }
+      setMeta('name', 'description', postDesc);
+      setMeta('property', 'og:title', postTitle);
+      setMeta('property', 'og:description', postDesc);
+      setMeta('property', 'og:url', postUrl);
+      setMeta('property', 'og:image', postImage);
+      setMeta('name', 'twitter:title', postTitle);
+      setMeta('name', 'twitter:description', postDesc);
+      setMeta('name', 'twitter:image', postImage);
+
+      var canonicalEl = document.querySelector('link[rel="canonical"]');
+      if (canonicalEl) canonicalEl.href = postUrl;
+
+      // === SEO: Article JSON-LD structured data ===
+      var articleLD = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        'headline': post.title,
+        'description': postDesc,
+        'url': postUrl,
+        'datePublished': post.published_at || new Date().toISOString(),
+        'author': {
+          '@type': 'Organization',
+          'name': post.author || 'GoNoGo Team',
+          'url': 'https://www.gonogo.co.za'
+        },
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'GoNoGo South Africa',
+          'url': 'https://www.gonogo.co.za',
+          'logo': { '@type': 'ImageObject', 'url': 'https://www.gonogo.co.za/logos/og-share.jpg' }
+        },
+        'mainEntityOfPage': { '@type': 'WebPage', '@id': postUrl }
+      };
+      if (post.cover_image_url) articleLD.image = post.cover_image_url;
+      var ldScript = document.createElement('script');
+      ldScript.type = 'application/ld+json';
+      ldScript.textContent = JSON.stringify(articleLD);
+      document.head.appendChild(ldScript);
 
       document.getElementById('post-title').textContent = post.title;
       var date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-ZA', { year:'numeric', month:'long', day:'numeric' }) : '';
