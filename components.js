@@ -127,6 +127,7 @@ const Components = {
     const links = [
       { href: 'admin.html', label: 'Dashboard', icon: 'fa-gauge', id: 'dashboard' },
       { href: 'admin-brands.html', label: 'Brands', icon: 'fa-tags', id: 'brands' },
+      { href: 'admin-categories.html', label: 'Categories', icon: 'fa-folder-open', id: 'categories' },
       { href: 'admin-comments.html', label: 'Comments', icon: 'fa-comments', id: 'comments' },
       { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' },
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
