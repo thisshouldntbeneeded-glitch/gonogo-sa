@@ -202,6 +202,30 @@
   .pri-bar-row.rank-3 .pri-bar-fill { background: rgba(17,165,81,0.35); }
   .pri-bar-row.rank-0 .pri-bar-fill { background: var(--border-primary); }
 
+  /* ── Recommendations ── */
+  .reco-card {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .reco-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(17,165,81,0.3);
+    transform: translateY(-1px);
+  }
+  .reco-match {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--green);
+    background: rgba(17,165,81,0.12);
+    padding: 2px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
   /* ── Reviews ── */
   .rv-list { list-style: none; padding: 0; margin: 0; }
   .rv-item { padding: var(--space-4); border-bottom: 1px solid var(--border-subtle); transition: background 0.15s; }
@@ -409,6 +433,7 @@
       var reviews = await reviewsP;
       var rc = reviews.length;
       var hasPers = _profile && _profile.priorities && _profile.priorities.length >= 3;
+      var _initPriorities = hasPers ? _profile.priorities : null;
 
       // ─── Build page ───
       page.innerHTML =
@@ -495,6 +520,8 @@
 
           '</div>' + // acct-content
         '</div>'; // acct-layout
+      // Load recommendations after page render if persona exists
+      if (_initPriorities) setTimeout(function() { loadRecommendations(_initPriorities); }, 50);
     })();
 
     // ═══════════════════════════════════════════════════════
@@ -537,6 +564,7 @@
         await patchProfile({ priorities: _picks, persona: persona.name, persona_set_at: new Date().toISOString(), updated_at: new Date().toISOString() });
         _profile = { priorities: _picks, persona: persona.name };
         document.getElementById('persona-card').innerHTML = renderPersonaResult(_picks);
+        loadRecommendations(_picks);
         // Remove the NEW badge from tab
         var badge = document.querySelector('.acct-tab[data-tab="persona"] .tab-badge');
         if (badge) badge.remove();
@@ -575,6 +603,11 @@
           '<div class="pr-chips">' + chips + '</div>' +
         '</div>' +
         '<div class="pri-bars">' + bars + '</div>' +
+        '<div id="reco-section" style="margin-top:var(--space-6)">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-1)"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--green)"></i><h3 style="font-size:var(--text-base);font-weight:700;margin:0">Recommended for You</h3></div>' +
+          '<p class="text-xs text-muted" style="margin-bottom:var(--space-4)">Top-scoring brands based on your priorities. Weighted by what matters most to you.</p>' +
+          '<div id="reco-grid" style="display:grid;gap:var(--space-3)"><div class="text-sm text-muted" style="text-align:center;padding:var(--space-4)"><i class="fa-solid fa-spinner fa-spin"></i> Finding your best matches...</div></div>' +
+        '</div>' +
         '<div style="text-align:center;padding-top:var(--space-5)">' +
           '<button class="btn btn-sm btn-ghost" onclick="resetPersona()" style="color:var(--text-muted)"><i class="fa-solid fa-arrows-rotate"></i> Retake</button>' +
         '</div>';
@@ -582,6 +615,116 @@
     function resetPersona() {
       _picks = [];
       document.getElementById('persona-card').innerHTML = renderPicker();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // Personalised recommendations
+    // ═══════════════════════════════════════════════════════
+    var CAT_MAP = {
+      compliance: 'Compliance', satisfaction: 'Customer Satisfaction',
+      product_value: 'Product Value', innovation: 'Innovation',
+      customer_support: 'Customer Support', accessibility: 'Accessibility & Security'
+    };
+
+    function parseScore(str) {
+      if (!str) return 0;
+      var parts = str.split('/');
+      if (parts.length !== 2) return 0;
+      var earned = parseFloat(parts[0]), max = parseFloat(parts[1]);
+      return max > 0 ? earned / max : 0;
+    }
+
+    function weightedScore(breakdown, priorities) {
+      var weights = [3, 2, 1];
+      var total = 0, maxW = 0;
+      for (var i = 0; i < priorities.length && i < 3; i++) {
+        var catName = CAT_MAP[priorities[i]];
+        if (!catName) continue;
+        for (var j = 0; j < breakdown.length; j++) {
+          if (breakdown[j].category === catName || breakdown[j].category === catName.replace(' & ', ' &amp; ')) {
+            total += parseScore(breakdown[j].score) * weights[i];
+            maxW += weights[i];
+            break;
+          }
+        }
+      }
+      return maxW > 0 ? total / maxW : 0;
+    }
+
+    async function loadRecommendations(priorities) {
+      var grid = document.getElementById('reco-grid');
+      if (!grid) return;
+      try {
+        var brands = await GoNoGoAPI.supabaseRequest(
+          'brands?region=eq.' + GoNoGoAPI.SITE_REGION +
+          '&select=slug,name,category_slug,logo_url,gonogo_score,framework_breakdown' +
+          '&framework_breakdown=not.is.null&order=gonogo_score.desc'
+        );
+        if (!brands || brands.length === 0) {
+          grid.innerHTML = '<div class="text-sm text-muted" style="text-align:center;padding:var(--space-4)">No scored brands available yet.</div>';
+          return;
+        }
+
+        // Score and rank
+        var scored = brands.map(function(b) {
+          var fb = b.framework_breakdown;
+          if (typeof fb === 'string') try { fb = JSON.parse(fb); } catch(e) { fb = []; }
+          if (!Array.isArray(fb) || fb.length === 0) return null;
+          return { brand: b, match: weightedScore(fb, priorities), breakdown: fb };
+        }).filter(function(x) { return x && x.match > 0; });
+
+        scored.sort(function(a, b) { return b.match - a.match; });
+
+        // Take top 6
+        var top = scored.slice(0, 6);
+        if (top.length === 0) {
+          grid.innerHTML = '<div class="text-sm text-muted" style="text-align:center;padding:var(--space-4)">Not enough scored brands to generate recommendations yet.</div>';
+          return;
+        }
+
+        // Build priority category labels for mini-bars
+        var priCats = priorities.slice(0, 3).map(function(k) { return CAT_MAP[k]; });
+
+        grid.innerHTML = top.map(function(item, idx) {
+          var b = item.brand;
+          var pct = Math.round(item.match * 100);
+          var catSlug = (b.category_slug || '').replace(/-/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+          var logo = b.logo_url
+            ? '<img src="' + Components.escapeHTML(b.logo_url) + '" alt="" style="width:36px;height:36px;border-radius:8px;object-fit:contain;background:rgba(255,255,255,0.06);flex-shrink:0">'
+            : '<div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--green),#065f28);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:14px;color:#fff">' + (b.name || '?').charAt(0) + '</div>';
+
+          // Mini priority score bars
+          var miniBars = '';
+          for (var i = 0; i < priCats.length; i++) {
+            for (var j = 0; j < item.breakdown.length; j++) {
+              if (item.breakdown[j].category === priCats[i] || item.breakdown[j].category === priCats[i].replace(' & ', ' &amp; ')) {
+                var s = parseScore(item.breakdown[j].score);
+                var barPct = Math.round(s * 100);
+                var shortName = priCats[i].replace('Customer ', '').replace('Compliance & Regulation', 'Compliance').replace('Accessibility & Security', 'Access & Security');
+                miniBars += '<div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted)"><span style="width:85px;text-align:right;flex-shrink:0">' + shortName + '</span><div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + barPct + '%;background:var(--green);border-radius:2px"></div></div><span style="width:28px">' + barPct + '%</span></div>';
+                break;
+              }
+            }
+          }
+
+          return '<a href="brand.html?id=' + encodeURIComponent(b.slug) + '" class="reco-card" style="text-decoration:none;color:inherit">' +
+            '<div style="display:flex;align-items:center;gap:var(--space-3)">' +
+              logo +
+              '<div style="flex:1;min-width:0">' +
+                '<div style="display:flex;align-items:center;gap:var(--space-2)">' +
+                  '<span style="font-weight:700;font-size:var(--text-sm)">' + Components.escapeHTML(b.name) + '</span>' +
+                  '<span class="reco-match">' + pct + '% match</span>' +
+                '</div>' +
+                '<div class="text-xs text-muted">' + catSlug + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div style="margin-top:var(--space-2);display:flex;flex-direction:column;gap:3px">' + miniBars + '</div>' +
+          '</a>';
+        }).join('');
+      } catch(e) {
+        console.error('Recommendations error:', e);
+        grid.innerHTML = '<div class="text-sm text-muted" style="text-align:center;padding:var(--space-4)">Unable to load recommendations.</div>';
+      }
     }
 
     // ═══════════════════════════════════════════════════════
