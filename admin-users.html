@@ -218,7 +218,7 @@
       // Category frequency (count how often each cat appears as a priority)
       var catCounts = {};
       var catFirst = {};
-      var catNames = { product_value: 'Product Value', innovation: 'Innovation', customer_support: 'Customer Support', compliance: 'Compliance', sustainability: 'Sustainability', satisfaction: 'Customer Satisfaction' };
+      var catNames = { product_value: 'Product Value', innovation: 'Innovation', customer_support: 'Customer Support', compliance: 'Compliance', accessibility: 'Accessibility & Security', satisfaction: 'Customer Satisfaction' };
       Object.keys(catNames).forEach(function(k) { catCounts[k] = 0; catFirst[k] = 0; });
       withPersona.forEach(function(u) {
         u.priorities.forEach(function(k) { catCounts[k] = (catCounts[k] || 0) + 1; });
