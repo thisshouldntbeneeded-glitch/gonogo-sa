@@ -230,12 +230,12 @@
       if (editingId) {
         await GoNoGoAPI.supabaseRequest('blog_posts?id=eq.' + editingId, {
           method: 'PATCH',
-          body: JSON.stringify(payload)
+          body: payload
         });
       } else {
         await GoNoGoAPI.supabaseRequest('blog_posts', {
           method: 'POST',
-          body: JSON.stringify(payload)
+          body: payload
         });
       }
       Components.showToast(status === 'published' ? 'Post published!' : 'Draft saved!', 'success');
