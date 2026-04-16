@@ -637,11 +637,15 @@
     })();
 
     function loadGranularScores(brandSlug) {
+      function normCat(s) { return s.replace(/&/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
       GoNoGoAPI.getBrandGranularScores(brandSlug).then(function(grouped) {
         if (!grouped) return;
+        // Build normalised lookup so "Accessibility & Security" matches "Accessibility Security"
+        var normMap = {};
+        Object.keys(grouped).forEach(function(k) { normMap[normCat(k)] = grouped[k]; });
         document.querySelectorAll('.category-card[data-category]').forEach(function(card) {
           var cat = card.getAttribute('data-category');
-          var data = grouped[cat];
+          var data = normMap[normCat(cat)];
           if (!data || !data.criteria.length) return;
 
           // Make card expandable
