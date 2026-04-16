@@ -62,11 +62,29 @@
           </div>
 
         </div>
-        <div class="bz-hero-media">
-          <div class="bz-video-wrap">
-            <video autoplay muted loop playsinline preload="metadata" poster="logos/og-share.jpg">
-              <source src="gonogo-business-demo.mp4" type="video/mp4">
-            </video>
+        <div class="bz-hero-visual">
+          <div class="bz-hero-card">
+            <div class="bz-hc-header">
+              <i class="fa-solid fa-chart-line" style="color:var(--green)"></i>
+              <span>GoNoGo Score</span>
+              <span class="bz-hc-live">Live</span>
+            </div>
+            <div class="bz-hc-score">
+              <span class="bz-hc-num">74</span>
+              <span class="bz-hc-label">out of 100</span>
+            </div>
+            <div class="bz-hc-cats">
+              <div class="bz-hc-cat"><span>Compliance & Regulation</span><div class="bz-hc-bar"><div style="width:82%"></div></div><span>82</span></div>
+              <div class="bz-hc-cat"><span>Customer Satisfaction</span><div class="bz-hc-bar"><div style="width:76%"></div></div><span>76</span></div>
+              <div class="bz-hc-cat"><span>Product Value</span><div class="bz-hc-bar"><div style="width:68%"></div></div><span>68</span></div>
+              <div class="bz-hc-cat"><span>Innovation</span><div class="bz-hc-bar"><div style="width:71%"></div></div><span>71</span></div>
+              <div class="bz-hc-cat"><span>Customer Support</span><div class="bz-hc-bar"><div style="width:78%"></div></div><span>78</span></div>
+              <div class="bz-hc-cat"><span>Accessibility & Security</span><div class="bz-hc-bar"><div style="width:69%"></div></div><span>69</span></div>
+            </div>
+            <div class="bz-hc-footer">
+              <i class="fa-solid fa-brain" style="color:var(--green)"></i>
+              <span>AI Action Plan: <strong>3 priority actions</strong> identified</span>
+            </div>
           </div>
         </div>
       </div>
@@ -429,17 +447,90 @@
       font-weight: 700;
     }
 
-    .bz-video-wrap {
+    /* ── Hero score card ── */
+    .bz-hero-visual { perspective: 1000px; }
+    .bz-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-primary);
       border-radius: var(--radius-xl);
       overflow: hidden;
-      border: 1px solid var(--border-primary);
       box-shadow: var(--shadow-lg);
-      background: var(--bg-card);
+      transform: rotateY(-2deg) rotateX(1deg);
+      transition: transform 0.4s ease;
     }
-    .bz-video-wrap video {
-      display: block;
-      width: 100%;
-      height: auto;
+    .bz-hero-card:hover { transform: rotateY(0) rotateX(0); }
+    .bz-hc-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border-primary);
+      font-weight: 700;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+    }
+    .bz-hc-live {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(17,165,81,0.1);
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .bz-hc-score {
+      padding: var(--space-5) var(--space-5) var(--space-3);
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
+    }
+    .bz-hc-num {
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--green);
+      line-height: 1;
+    }
+    .bz-hc-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .bz-hc-cats {
+      padding: 0 var(--space-5) var(--space-4);
+      display: grid;
+      gap: 8px;
+    }
+    .bz-hc-cat {
+      display: grid;
+      grid-template-columns: 160px 1fr 28px;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .bz-hc-bar {
+      height: 6px;
+      background: var(--bg-primary);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bz-hc-bar div {
+      height: 100%;
+      background: var(--green);
+      border-radius: 999px;
+    }
+    .bz-hc-footer {
+      padding: var(--space-3) var(--space-5);
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
     }
 
     /* ── Value strip ── */
