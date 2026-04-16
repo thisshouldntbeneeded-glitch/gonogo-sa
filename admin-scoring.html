@@ -518,9 +518,6 @@ function openBrandScoring() {
   document.getElementById('page-title').textContent = 'Score Brands — ' + currentSector.name;
   document.getElementById('page-subtitle').innerHTML = '<div class="sc-breadcrumb"><a onclick="loadSectorList()">Sectors</a> <i class="fa-solid fa-chevron-right" style="font-size:10px"></i> <a onclick="openSector(\'' + esc(currentSector.slug) + '\',\'' + esc(currentSector.name) + '\')">' + esc(currentSector.name) + '</a> <i class="fa-solid fa-chevron-right" style="font-size:10px"></i> Brand Scoring</div>';
   document.getElementById('header-actions').innerHTML =
-    '<button class="btn btn-outline btn-sm" onclick="downloadScoringTemplate()" style="margin-right:4px"><i class="fa-solid fa-download"></i> Download Template</button>' +
-    '<button class="btn btn-secondary btn-sm" onclick="triggerCSVUpload()" style="margin-right:4px"><i class="fa-solid fa-upload"></i> Upload Scoring CSV</button>' +
-    '<input type="file" id="csv-upload-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">' +
     '<button class="btn btn-primary btn-sm" id="save-scores-btn" onclick="saveBrandScores()" disabled><i class="fa-solid fa-floppy-disk"></i> Save All Scores</button>';
 
   var body = document.getElementById('page-body');
@@ -550,6 +547,14 @@ function renderBrandScoring() {
     '<option value="" style="background:#1a1a2e;color:#fff">— Choose a brand —</option>' +
     allBrands.map(function(b) { return '<option value="' + esc(b.slug) + '" style="background:#1a1a2e;color:#fff">' + esc(b.name) + '</option>'; }).join('') +
     '</select>' +
+  '</div>';
+
+  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:var(--space-5);padding:16px;background:var(--color-surface,#1c1b19);border:1px solid rgba(255,255,255,0.08);border-radius:12px">' +
+    '<span class="text-sm" style="font-weight:600;color:var(--color-text);display:flex;align-items:center;gap:6px;margin-right:auto"><i class="fa-solid fa-file-csv" style="color:var(--green-text)"></i> Category CSV</span>' +
+    '<button class="btn btn-outline btn-sm" onclick="downloadScoringTemplate()" title="Empty template with criteria columns — fill in brand scores"><i class="fa-solid fa-file-arrow-down"></i> Empty Template</button>' +
+    '<button class="btn btn-outline btn-sm" onclick="downloadCategoryScores()" title="All brands\' scores for this category"><i class="fa-solid fa-download"></i> Download All Scores</button>' +
+    '<button class="btn btn-secondary btn-sm" onclick="triggerCSVUpload()"><i class="fa-solid fa-upload"></i> Upload Scores CSV</button>' +
+    '<input type="file" id="csv-upload-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">' +
   '</div>';
 
   html += '<div id="brand-score-area"></div>';
@@ -750,9 +755,9 @@ function downloadScoringTemplate() {
     Components.showToast('No template criteria loaded', 'error');
     return;
   }
-  var csv = 'brand_slug,category,subcategory,point_description,max_points,scoring_rule,score,evidence,source_url\n';
+  var csv = 'brand_slug,brand_name,category,subcategory,point_description,max_points,scoring_rule,score,evidence,source_url\n';
   sectorTemplates.forEach(function(t) {
-    csv += ',' + csvQuote(t.category) + ',' + csvQuote(t.subcategory) + ',' +
+    csv += ',,' + csvQuote(t.category) + ',' + csvQuote(t.subcategory) + ',' +
            csvQuote(t.point_description) + ',' + t.max_points + ',' +
            csvQuote(t.scoring_rule) + ',,,\n';
   });
@@ -764,6 +769,66 @@ function downloadScoringTemplate() {
   a.download = 'scoring_template_' + currentSector.slug + '.csv';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════
+// DOWNLOAD ALL CATEGORY SCORES
+// ══════════════════════════════════════════
+function downloadCategoryScores() {
+  if (!sectorTemplates.length || !allBrands.length) {
+    Components.showToast('No templates or brands loaded', 'error');
+    return;
+  }
+
+  // Fetch ALL brand_scores whose template_id is in this sector's templates
+  var templateIds = sectorTemplates.map(function(t) { return t.id; });
+  var brandSlugs = allBrands.map(function(b) { return b.slug; });
+
+  // Fetch scores for all brands in this sector
+  sbFetch('brand_scores?brand_slug=in.(' + brandSlugs.map(encodeURIComponent).join(',') + ')&template_id=in.(' + templateIds.join(',') + ')&select=brand_slug,template_id,score,evidence,source_url')
+    .then(function(scores) {
+      // Index scores by brand_slug + template_id
+      var scoreMap = {};
+      (scores || []).forEach(function(s) {
+        scoreMap[s.brand_slug + '||' + s.template_id] = s;
+      });
+
+      // Build brand name lookup
+      var brandNames = {};
+      allBrands.forEach(function(b) { brandNames[b.slug] = b.name; });
+
+      // Build CSV: one row per brand × criterion
+      var csv = 'brand_slug,brand_name,category,subcategory,point_description,max_points,scoring_rule,score,evidence,source_url\n';
+
+      allBrands.forEach(function(brand) {
+        sectorTemplates.forEach(function(t) {
+          var key = brand.slug + '||' + t.id;
+          var s = scoreMap[key] || {};
+          csv += csvQuote(brand.slug) + ',' +
+                 csvQuote(brand.name) + ',' +
+                 csvQuote(t.category) + ',' +
+                 csvQuote(t.subcategory) + ',' +
+                 csvQuote(t.point_description) + ',' +
+                 t.max_points + ',' +
+                 csvQuote(t.scoring_rule) + ',' +
+                 (s.score != null ? s.score : '') + ',' +
+                 csvQuote(s.evidence || '') + ',' +
+                 csvQuote(s.source_url || '') + '\n';
+        });
+      });
+
+      var blob = new Blob([csv], { type: 'text/csv' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'scores_' + currentSector.slug + '_all_brands.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      Components.showToast('Exported scores for ' + allBrands.length + ' brands', 'success');
+    })
+    .catch(function(err) {
+      Components.showToast('Error exporting: ' + err.message, 'error');
+    });
 }
 
 // ══════════════════════════════════════════
