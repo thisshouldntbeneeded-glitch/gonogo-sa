@@ -555,6 +555,7 @@ function renderBrandScoring() {
     '<button class="btn btn-outline btn-sm" onclick="downloadCategoryScores()" title="All brands\' scores for this category"><i class="fa-solid fa-download"></i> Download All Scores</button>' +
     '<button class="btn btn-secondary btn-sm" onclick="triggerCSVUpload()"><i class="fa-solid fa-upload"></i> Upload Scores CSV</button>' +
     '<input type="file" id="csv-upload-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">' +
+    '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none" onclick="deleteCategoryScores()" title="Delete all scored data for every brand in this sector"><i class="fa-solid fa-trash"></i> Delete All Scores</button>' +
   '</div>';
 
   html += '<div id="brand-score-area"></div>';
@@ -865,12 +866,13 @@ function handleCSVUpload(event) {
       return;
     }
 
+    // Normalise all dash/hyphen variants to standard hyphen for matching
+    function normKey(s) { return (s || '').trim().toLowerCase().replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-'); }
+
     // Build template lookup: category+subcategory+point_description -> template
     var tmplLookup = {};
     sectorTemplates.forEach(function(t) {
-      var key = (t.category || '').trim().toLowerCase() + '||' +
-                (t.subcategory || '').trim().toLowerCase() + '||' +
-                (t.point_description || '').trim().toLowerCase();
+      var key = normKey(t.category) + '||' + normKey(t.subcategory) + '||' + normKey(t.point_description);
       tmplLookup[key] = t;
     });
 
@@ -893,7 +895,7 @@ function handleCSVUpload(event) {
       var sub = (colIdx.subcategory !== -1 && r[colIdx.subcategory] != null) ? r[colIdx.subcategory].trim() : '';
       var desc = (colIdx.point_description !== -1 && r[colIdx.point_description] != null) ? r[colIdx.point_description].trim() : '';
 
-      var lookupKey = cat.toLowerCase() + '||' + sub.toLowerCase() + '||' + desc.toLowerCase();
+      var lookupKey = normKey(cat) + '||' + normKey(sub) + '||' + normKey(desc);
       var tmpl = tmplLookup[lookupKey];
 
       if (!tmpl) {
@@ -950,6 +952,35 @@ function handleCSVUpload(event) {
     });
   };
   reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════
+// DELETE ALL SCORES FOR THIS SECTOR
+// ══════════════════════════════════════════
+function deleteCategoryScores() {
+  if (!sectorTemplates.length) { Components.showToast('No sector loaded', 'error'); return; }
+  var sectorName = sectorTemplates[0].sector_name || currentSectorSlug;
+  if (!confirm('Delete ALL scored data for every brand in "' + sectorName + '"?\n\nThis cannot be undone.')) return;
+
+  var templateIds = sectorTemplates.map(function(t) { return t.id; });
+  var auth = GoNoGoAPI._getCallerAuth();
+
+  sbFetch('rpc/admin_delete_sector_scores', {
+    method: 'POST',
+    body: {
+      p_caller_id: auth.p_caller_id,
+      p_caller_hash: auth.p_caller_hash,
+      p_template_ids: templateIds
+    }
+  }).then(function(res) {
+    var count = (res && res.deleted) || 0;
+    Components.showToast(count + ' scores deleted for ' + sectorName, 'success');
+    // Reload brand view if one is selected
+    var sel = document.getElementById('brand-selector');
+    if (sel && sel.value) loadBrandScores();
+  }).catch(function(err) {
+    Components.showToast('Delete error: ' + err.message, 'error');
+  });
 }
 
 // ══════════════════════════════════════════
