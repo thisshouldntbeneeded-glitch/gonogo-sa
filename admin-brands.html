@@ -1612,7 +1612,7 @@
       csvLog('Columns: ' + headers.join(', '), 'info');
 
       var nameCol = findCol(headers, ['brandname', 'brand_name', 'brand', 'name']);
-      var catCol = findCol(headers, ['categoryslug', 'category_slug', 'category', 'categoryname', 'industry']);
+      var catCol = findCol(headers, ['categoryslug', 'category_slug', 'category', 'categoryname', 'category_name', 'industry', 'sector', 'sector_slug', 'sectorslug']);
       if (nameCol === -1) {
         csvLog('Error: No brand name column found. Expected: BrandName, Brand, or Name', 'error');
         document.getElementById('csv-status').innerHTML = '<span class="text-sm" style="color:var(--red-text)">Import failed</span>';
@@ -1757,6 +1757,11 @@
         }
 
         brandData._csvImport = true; // QA: CSV imports land as draft
+        if (!brandData.categorySlug) {
+          csvLog('Row ' + i + ': ' + brandName + ' — ERROR: No category found. CSV needs a Category or Industry column.', 'error');
+          errors++;
+          continue;
+        }
         try {
           await GoNoGoAPI.saveBrand(brandData);
           csvLog('Row ' + i + ': ' + brandName + ' — saved as draft (pending review)', 'success');
