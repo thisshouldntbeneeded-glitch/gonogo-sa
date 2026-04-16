@@ -605,6 +605,11 @@
         }
       };
 
+      // Auth may have resolved before the form was rendered — sync now
+      if (Components._currentUser) {
+        window._updateReviewFormAuth(Components._currentUser);
+      }
+
       await loadReviews();
     })();
 

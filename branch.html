@@ -292,7 +292,7 @@
             '<div class="card" style="max-width:600px">' +
               '<h4 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4)">Rate ' + Components.escapeHTML(branch.branch_name) + '</h4>' +
               '<p class="text-sm text-secondary" style="margin-bottom:var(--space-4)">Would you recommend this branch? Cast your vote and tell us why.</p>' +
-              '<div class="form-group">' +
+              '<div class="form-group" id="review-name-group">' +
                 '<label class="form-label">Your Name</label>' +
                 '<input type="text" id="review-name" placeholder="Enter your name">' +
               '</div>' +
@@ -482,22 +482,53 @@
           '<button class="btn btn-secondary btn-sm" onclick="loadMoreReviews()">Show more (' + remaining + ' remaining)</button>' : '';
       }
 
+      // Update review form when auth state changes
+      window._updateReviewFormAuth = function(user) {
+        var group = document.getElementById('review-name-group');
+        if (!group) return;
+        if (user) {
+          var displayName = (user.user_metadata && user.user_metadata.display_name) || user.email.split('@')[0];
+          group.innerHTML =
+            '<div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) 0;margin-bottom:var(--space-1)">' +
+              '<i class="fa-solid fa-user-check" style="color:var(--green)"></i>' +
+              '<span class="text-sm">Reviewing as <strong>' + Components.escapeHTML(displayName) + '</strong></span>' +
+            '</div>' +
+            '<input type="hidden" id="review-name" value="' + Components.escapeHTML(displayName) + '">';
+        } else {
+          group.innerHTML =
+            '<label class="form-label">Your Name</label>' +
+            '<input type="text" id="review-name" placeholder="Enter your name">';
+        }
+      };
+
+      // Auth may have resolved before the form was rendered — sync now
+      if (Components._currentUser) {
+        window._updateReviewFormAuth(Components._currentUser);
+      }
+
       window.submitReview = async function() {
         var name = document.getElementById('review-name').value.trim();
         var text = document.getElementById('review-text').value.trim();
         if (!name || !selectedVerdict) {
-          Components.showToast('Please enter your name and select Go or No Go', 'error');
+          var msg = Components._currentUser ? 'Please select Go or No Go' : 'Please enter your name and select Go or No Go';
+          Components.showToast(msg, 'error');
           return;
         }
         try {
-          await GoNoGoAPI.submitReview({
+          var reviewData = {
             category: branch.category_slug,
             brand_name: branch.branch_name,
             reviewer_name: name,
             review_text: text,
             verdict: selectedVerdict
-          });
-          document.getElementById('review-name').value = '';
+          };
+          if (Components._currentUser) {
+            reviewData.user_id = Components._currentUser.id;
+          }
+          await GoNoGoAPI.submitReview(reviewData);
+          if (!Components._currentUser) {
+            document.getElementById('review-name').value = '';
+          }
           document.getElementById('review-text').value = '';
           selectedVerdict = null;
           document.querySelectorAll('.verdict-btn').forEach(function(b) {
