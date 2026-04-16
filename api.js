@@ -947,10 +947,10 @@ var GoNoGoAPI = (function () {
       if ('overview' in brandData) record.overview = brandData.overview || '';
       if ('ratingSummary' in brandData) record.rating_summary = brandData.ratingSummary || '';
       if (brandData.reviewed_by) record.reviewed_by = brandData.reviewed_by;
-      if (brandData.reviewed_at) record.reviewed_at = brandData.reviewed_at;
-      if (brandData.created_at) record.created_at = brandData.created_at;
-      if (brandData.internal_score_justification) record.internal_score_justification = brandData.internal_score_justification;
-      if (brandData.scoring_breakdown) record.scoring_breakdown = brandData.scoring_breakdown;
+      if (brandData.reviewed_at && /^\d{4}-\d{2}-\d{2}/.test(brandData.reviewed_at)) record.reviewed_at = brandData.reviewed_at;
+      if (brandData.created_at && /^\d{4}-\d{2}-\d{2}/.test(brandData.created_at)) record.created_at = brandData.created_at;
+      if (brandData.internal_score_justification && typeof brandData.internal_score_justification === 'string' && brandData.internal_score_justification.length > 2) record.internal_score_justification = brandData.internal_score_justification;
+      if (brandData.scoring_breakdown && typeof brandData.scoring_breakdown === 'object') record.scoring_breakdown = brandData.scoring_breakdown;
 
       var auth = this._getCallerAuth();
       record.region = SITE_REGION;
