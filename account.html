@@ -331,7 +331,7 @@
     // Categories & Persona engine
     // ═══════════════════════════════════════════════════════
     var CATS = [
-      { key: 'compliance',       name: 'Compliance & Regulation',   icon: 'fa-solid fa-scale-balanced', desc: 'Licensing, regulatory standing, industry body memberships, and legal compliance in South Africa' },
+      { key: 'compliance',       name: 'Compliance & Regulation',   icon: 'fa-solid fa-scale-balanced', desc: 'Licensing, regulatory standing, industry body memberships, and legal compliance' },
       { key: 'satisfaction',     name: 'Customer Satisfaction',     icon: 'fa-solid fa-face-smile',     desc: 'Real user feedback, review signals, complaint trends, and overall customer sentiment' },
       { key: 'product_value',    name: 'Product Value',             icon: 'fa-solid fa-coins',          desc: 'Pricing fairness, feature depth, fee transparency, and value for money' },
       { key: 'innovation',       name: 'Innovation',                icon: 'fa-solid fa-lightbulb',      desc: 'Technology adoption, digital experience, differentiation, and forward-thinking delivery' },
@@ -534,8 +534,17 @@
           '<span class="t-badge"></span><span class="t-icon"><i class="' + c.icon + '"></i></span>' +
           '<div class="t-name">' + c.name + '</div><div class="t-desc">' + c.desc + '</div></div>';
       }).join('');
-      return '<h2><i class="fa-solid fa-fingerprint"></i> Your Consumer Persona</h2>' +
-        '<div class="pp-intro"><strong>What matters most to you when choosing a brand?</strong> Pick your top 3 in order of importance. We\'ll build your consumer persona and use it to tailor your GoNoGo experience.</div>' +
+      var isOnboarding = window.location.hash === '#persona' && !_profile;
+      var welcomeHTML = isOnboarding
+        ? '<div style="text-align:center;margin-bottom:var(--space-6);padding:var(--space-5) 0 0">' +
+            '<div style="font-size:40px;margin-bottom:var(--space-3)">\uD83D\uDC4B</div>' +
+            '<h2 style="font-size:var(--text-xl);font-weight:800;margin-bottom:var(--space-2)">Welcome to GoNoGo</h2>' +
+            '<p style="color:var(--text-secondary);font-size:var(--text-sm);max-width:42ch;margin:0 auto">Let\u2019s personalise your experience. Tell us what matters most when you\u2019re choosing a brand, and we\u2019ll rank them your way.</p>' +
+          '</div>'
+        : '';
+      return welcomeHTML +
+        '<h2><i class="fa-solid fa-fingerprint"></i> ' + (isOnboarding ? 'Choose What Matters to You' : 'Your Consumer Persona') + '</h2>' +
+        '<div class="pp-intro"><strong>Pick your top 3 priorities in order of importance.</strong> We\'ll build your consumer persona and use it to tailor your GoNoGo experience.</div>' +
         '<div class="pp-grid">' + tiles + '</div>' +
         '<div class="pp-counter" id="pp-count">Tap your <strong>first</strong> priority</div>' +
         '<div class="acct-toast" id="t-persona"></div>' +
@@ -608,7 +617,8 @@
           '<p class="text-xs text-muted" style="margin-bottom:var(--space-4)">Top-scoring brands based on your priorities. Weighted by what matters most to you.</p>' +
           '<div id="reco-grid" style="display:grid;gap:var(--space-3)"><div class="text-sm text-muted" style="text-align:center;padding:var(--space-4)"><i class="fa-solid fa-spinner fa-spin"></i> Finding your best matches...</div></div>' +
         '</div>' +
-        '<div style="text-align:center;padding-top:var(--space-5)">' +
+        '<div style="text-align:center;padding-top:var(--space-5);display:flex;justify-content:center;gap:var(--space-3);flex-wrap:wrap">' +
+          '<a href="index.html#categories" class="btn btn-primary"><i class="fa-solid fa-compass"></i> Browse Categories</a>' +
           '<button class="btn btn-sm btn-ghost" onclick="resetPersona()" style="color:var(--text-muted)"><i class="fa-solid fa-arrows-rotate"></i> Retake</button>' +
         '</div>';
     }
