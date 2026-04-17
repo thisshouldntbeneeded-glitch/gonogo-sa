@@ -139,6 +139,7 @@
           <div class="form-group"><label class="form-label">Password</label><input type="password" id="bu-password" required placeholder="Set a password" minlength="6"></div>
           <div class="form-group"><label class="form-label">Display Name</label><input type="text" id="bu-name" placeholder="e.g. FNB Team"></div>
           <div class="form-group"><label class="form-label">Brand</label><select id="bu-brand" required><option value="">Loading brands...</option></select></div>
+          <div class="form-group"><label class="form-label">Tier</label><select id="bu-tier"><option value="basic">Basic — Reviews only</option><option value="full">Full — All tabs</option></select></div>
         </div>
         <button type="submit" class="btn btn-primary btn-sm" style="margin-top:var(--space-3)" id="bu-btn"><i class="fa-solid fa-user-plus"></i> Create Account</button>
       </form>
@@ -326,14 +327,21 @@
         return;
       }
       container.innerHTML = '<table class="data-table" style="width:100%"><thead><tr>' +
-        '<th>Email</th><th>Name</th><th>Brand</th><th>Role</th><th>Created</th><th></th>' +
+        '<th>Email</th><th>Name</th><th>Brand</th><th>Tier</th><th>Created</th><th></th>' +
         '</tr></thead><tbody>' +
         users.map(function(u) {
+          var tierVal = u.tier || 'basic';
+          var tierBg = tierVal === 'full' ? 'var(--green-bg, rgba(17,165,81,0.12))' : 'var(--blue-dim, rgba(59,130,246,0.12))';
+          var tierColor = tierVal === 'full' ? 'var(--green-text, #11a551)' : 'var(--blue, #3b82f6)';
+          var tierLabel = tierVal === 'full' ? 'Full' : 'Basic';
           return '<tr>' +
             '<td style="font-size:var(--text-sm)">' + Components.escapeHTML(u.email) + '</td>' +
             '<td style="font-size:var(--text-sm)">' + Components.escapeHTML(u.display_name || '-') + '</td>' +
             '<td style="font-size:var(--text-sm);font-weight:600">' + Components.escapeHTML(u.brand_slug) + '</td>' +
-            '<td><span style="font-size:10px;padding:2px 8px;border-radius:var(--radius-sm);background:var(--blue-dim);color:var(--blue);font-weight:600">' + (u.role || 'brand_viewer') + '</span></td>' +
+            '<td><select onchange="changeBrandTier(\'' + u.id + '\', this.value)" style="font-size:11px;padding:2px 6px;border-radius:var(--radius-sm);border:1px solid var(--border-primary);background:' + tierBg + ';color:' + tierColor + ';font-weight:600;cursor:pointer">' +
+              '<option value="basic"' + (tierVal === 'basic' ? ' selected' : '') + '>Basic</option>' +
+              '<option value="full"' + (tierVal === 'full' ? ' selected' : '') + '>Full</option>' +
+            '</select></td>' +
             '<td style="font-size:var(--text-xs);color:var(--text-muted)">' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '') + '</td>' +
             '<td><button class="btn btn-ghost btn-sm" style="color:var(--red-text)" onclick="removeBrandUser(\'' + u.id + '\', \'' + Components.escapeHTML(u.email).replace(/'/g, "\\'") + '\')"><i class="fa-solid fa-trash"></i></button></td>' +
           '</tr>';
@@ -355,12 +363,13 @@
     var pw = document.getElementById('bu-password').value;
     var name = document.getElementById('bu-name').value.trim();
     var brandSlug = document.getElementById('bu-brand').value;
+    var tier = document.getElementById('bu-tier').value;
 
     if (!brandSlug) {
       throw new Error('Please select a brand');
     }
 
-    await GoNoGoAPI.addBrandUser(email, pw, name, brandSlug, 'za');
+    await GoNoGoAPI.addBrandUser(email, pw, name, brandSlug, 'za', tier);
     Components.showToast('Brand user created: ' + email);
     document.getElementById('brand-user-form').reset();
     document.getElementById('brand-user-form').style.display = 'none';
@@ -378,6 +387,16 @@
     try {
       await GoNoGoAPI.removeBrandUser(userId);
       Components.showToast('Removed ' + email);
+      loadBrandUsers();
+    } catch(err) {
+      Components.showToast('Error: ' + err.message, 'error');
+    }
+  }
+
+  async function changeBrandTier(userId, tier) {
+    try {
+      await GoNoGoAPI.updateBrandTier(userId, tier);
+      Components.showToast('Tier updated to ' + tier);
       loadBrandUsers();
     } catch(err) {
       Components.showToast('Error: ' + err.message, 'error');
