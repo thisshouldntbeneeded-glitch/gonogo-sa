@@ -81,6 +81,7 @@
           date: r.createdat || '',
           brandName: r.brandname || r.BrandName || '',
           category: r.category || '',
+          branch: r.branch || '',
           status: r.status || r.Status || 'pending'
         };
       });
@@ -158,6 +159,7 @@
         '<div class="comment-header">'+
           '<div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">'+
             '<span class="comment-author">'+c.author+'</span>'+
+            (c.branch ? '<span class="text-xs text-muted"><i class="fa-solid fa-location-dot" style="font-size:10px"></i> '+c.branch+'</span>' : '')+
             (c.verdict==='GO' ? '<span style="color:var(--green-text);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-check"></i> Go</span>' : c.verdict==='NOGO' ? '<span style="color:var(--red-text,#e74c3c);font-size:var(--text-xs);font-weight:600"><i class="fa-solid fa-circle-xmark"></i> No Go</span>' : '') +
             '<span class="text-xs text-muted">on <strong>'+c.brandName+'</strong></span>'+
             '<span class="text-xs text-muted">'+c.category+'</span>'+
