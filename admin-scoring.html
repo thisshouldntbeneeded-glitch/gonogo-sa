@@ -536,18 +536,19 @@ function openBrandScoring() {
 
 function renderBrandScoring() {
   var body = document.getElementById('page-body');
-  if (!allBrands.length) {
-    body.innerHTML = '<div style="text-align:center;padding:var(--space-10)"><i class="fa-solid fa-store" style="font-size:var(--text-2xl);color:var(--text-faint);display:block;margin-bottom:var(--space-3)"></i><p class="text-sm text-muted">No brands found in this sector.</p></div>';
-    return;
-  }
 
-  var html = '<div style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px">' +
-    '<label class="text-sm text-muted" style="white-space:nowrap">Select brand:</label>' +
-    '<select id="brand-selector" onchange="loadBrandScores()" style="max-width:300px;padding:8px 12px;border-radius:10px;font-size:14px;border:1px solid rgba(255,255,255,0.1);background:#1a1a2e;color:#fff">' +
-    '<option value="" style="background:#1a1a2e;color:#fff">— Choose a brand —</option>' +
-    allBrands.map(function(b) { return '<option value="' + esc(b.slug) + '" style="background:#1a1a2e;color:#fff">' + esc(b.name) + '</option>'; }).join('') +
-    '</select>' +
-  '</div>';
+  // CSV toolbar always visible so you can upload scores even before brands exist
+  var html = '';
+
+  if (allBrands.length) {
+    html += '<div style="margin-bottom:var(--space-4);display:flex;align-items:center;gap:12px">' +
+      '<label class="text-sm text-muted" style="white-space:nowrap">Select brand:</label>' +
+      '<select id="brand-selector" onchange="loadBrandScores()" style="max-width:300px;padding:8px 12px;border-radius:10px;font-size:14px;border:1px solid rgba(255,255,255,0.1);background:#1a1a2e;color:#fff">' +
+      '<option value="" style="background:#1a1a2e;color:#fff">— Choose a brand —</option>' +
+      allBrands.map(function(b) { return '<option value="' + esc(b.slug) + '" style="background:#1a1a2e;color:#fff">' + esc(b.name) + '</option>'; }).join('') +
+      '</select>' +
+    '</div>';
+  }
 
   html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:var(--space-5);padding:16px;background:var(--color-surface,#1c1b19);border:1px solid rgba(255,255,255,0.08);border-radius:12px">' +
     '<span class="text-sm" style="font-weight:600;color:var(--color-text);display:flex;align-items:center;gap:6px;margin-right:auto"><i class="fa-solid fa-file-csv" style="color:var(--green-text)"></i> Category CSV</span>' +
@@ -558,12 +559,18 @@ function renderBrandScoring() {
     '<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none" onclick="deleteCategoryScores()" title="Delete all scored data for every brand in this sector"><i class="fa-solid fa-trash"></i> Delete All Scores</button>' +
   '</div>';
 
+  if (!allBrands.length) {
+    html += '<div style="text-align:center;padding:var(--space-10)"><i class="fa-solid fa-store" style="font-size:var(--text-2xl);color:var(--text-faint);display:block;margin-bottom:var(--space-3)"></i><p class="text-sm text-muted">No brands found in this sector. Upload brands first, or use the CSV tools above.</p></div>';
+  }
+
   html += '<div id="brand-score-area"></div>';
   body.innerHTML = html;
 }
 
 function loadBrandScores() {
-  var slug = document.getElementById('brand-selector').value;
+  var sel = document.getElementById('brand-selector');
+  if (!sel) return;
+  var slug = sel.value;
   var area = document.getElementById('brand-score-area');
   if (!slug) { area.innerHTML = ''; document.getElementById('save-scores-btn').disabled = true; return; }
 
