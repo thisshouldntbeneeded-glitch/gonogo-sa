@@ -1581,7 +1581,8 @@ const Components = {
         email: email,
         password: password,
         options: {
-          data: { display_name: name, region: SITE_REGION }
+          data: { display_name: name, region: SITE_REGION },
+          emailRedirectTo: window.location.origin + '/account#persona'
         }
       });
       if (res.error) throw res.error;
