@@ -203,19 +203,14 @@
       // ============================
       // 2. Sentiment Donut
       // ============================
-      var goCount = reviews.filter(function(r) { return r.verdict && r.verdict.toUpperCase() === 'GO'; }).length;
+      var goCount = reviews.filter(function(r) { var v = (r.verdict || '').toUpperCase(); return v === 'GO' || v === 'GO WITH CAUTION' || v === 'CAUTION' || v === 'TOP PERFORMER'; }).length;
       var nogoCount = reviews.filter(function(r) { return r.verdict && r.verdict.toUpperCase() === 'NOGO'; }).length;
-      var cautionCount = reviews.filter(function(r) {
-        var v = (r.verdict || '').toUpperCase();
-        return v !== 'GO' && v !== 'NOGO' && v !== '';
-      }).length;
-      var noVerdict = reviews.length - goCount - nogoCount - cautionCount;
+      var noVerdict = reviews.length - goCount - nogoCount;
 
       var sentimentLabels = [];
       var sentimentData = [];
       var sentimentColors = [];
       if (goCount > 0) { sentimentLabels.push('Go'); sentimentData.push(goCount); sentimentColors.push('#11a551'); }
-      if (cautionCount > 0) { sentimentLabels.push('Caution'); sentimentData.push(cautionCount); sentimentColors.push('#ff9800'); }
       if (nogoCount > 0) { sentimentLabels.push('NoGo'); sentimentData.push(nogoCount); sentimentColors.push('#e74c3c'); }
       if (noVerdict > 0) { sentimentLabels.push('No Verdict'); sentimentData.push(noVerdict); sentimentColors.push('#666666'); }
 

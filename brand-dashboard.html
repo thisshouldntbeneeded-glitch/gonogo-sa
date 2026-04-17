@@ -1016,7 +1016,7 @@
 
       var negativeReviews = reviews.filter(function(r) {
         var v = normalizeVerdict(r.verdict);
-        return v === 'NOGO' || v === 'GO WITH CAUTION';
+        return v === 'NOGO';
       });
 
       var avgSentiment = reviews.length > 0 ? Math.round((goReviews.length / reviews.length) * 100) : 0;
@@ -1316,7 +1316,7 @@
       var colors = [];
 
       if (reviewAnalysis.go > 0) { labels.push('Go'); data.push(reviewAnalysis.go); colors.push('#11a551'); }
-      if (reviewAnalysis.caution > 0) { labels.push('Caution'); data.push(reviewAnalysis.caution); colors.push('#ff9800'); }
+
       if (reviewAnalysis.nogo > 0) { labels.push('NoGo'); data.push(reviewAnalysis.nogo); colors.push('#e74c3c'); }
       if (reviewAnalysis.noVerdict > 0) { labels.push('No Verdict'); data.push(reviewAnalysis.noVerdict); colors.push('#666666'); }
 
@@ -1733,14 +1733,13 @@
 
     function analyseReviews(reviews) {
       var total = reviews.length;
-      var go = 0, caution = 0, nogo = 0, noVerdict = 0;
+      var go = 0, nogo = 0, noVerdict = 0;
       var positiveThemes = {};
       var negativeThemes = {};
 
       reviews.forEach(function(review) {
         var verdict = normalizeVerdict(review.verdict);
-        if (verdict === 'GO') go++;
-        else if (verdict === 'GO WITH CAUTION') caution++;
+        if (verdict === 'GO' || verdict === 'TOP PERFORMER') go++;
         else if (verdict === 'NOGO') nogo++;
         else noVerdict++;
 
@@ -1762,7 +1761,6 @@
       return {
         total: total,
         go: go,
-        caution: caution,
         nogo: nogo,
         noVerdict: noVerdict,
         positiveThemes: positive,
@@ -1929,7 +1927,7 @@
 
     function normalizeVerdict(verdict) {
       var v = String(verdict || '').toUpperCase().trim();
-      if (v === 'CAUTION') return 'GO WITH CAUTION';
+      if (v === 'CAUTION' || v === 'GO WITH CAUTION') return 'GO';
       return v;
     }
 

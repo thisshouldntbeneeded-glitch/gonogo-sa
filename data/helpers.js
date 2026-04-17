@@ -161,8 +161,8 @@ function getScoreLabel(score) {
 }
 
 function getVerdictFromScore(score) {
-  if (score >= 80) return 'GO';
-  if (score >= 60) return 'GO WITH CAUTION';
+  if (score >= 80) return 'TOP PERFORMER';
+  if (score >= 60) return 'GO';
   return 'NOGO';
 }
 
