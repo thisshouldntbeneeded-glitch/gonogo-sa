@@ -11,6 +11,9 @@
     .cat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:var(--space-4); }
     .cat-card { padding:var(--space-4) var(--space-5); border-radius:var(--radius-lg); background:var(--surface-1); border:1px solid var(--border-primary); transition:border-color 0.15s,transform 0.15s; cursor:pointer; }
     .cat-card:hover { border-color:rgba(17,165,81,0.3); transform:translateY(-2px); }
+    .move-btn { background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:14px;line-height:1;transition:color 0.15s,background 0.15s; }
+    .move-btn:hover { color:var(--green);background:rgba(17,165,81,0.1); }
+    .move-btn:disabled { opacity:0.2;cursor:default;background:none;color:var(--text-muted); }
     .cat-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0; }
     .cat-meta { font-size:var(--text-xs); color:var(--text-muted); margin-top:var(--space-1); }
     .cat-badge { font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;background:rgba(17,165,81,0.12);color:var(--green); }
@@ -136,7 +139,7 @@
   async function loadAll() {
     try {
       var cats = await GoNoGoAPI.supabaseRequest(
-        'categories?region=eq.' + GoNoGoAPI.SITE_REGION + '&select=*&order=name'
+        'categories?region=eq.' + GoNoGoAPI.SITE_REGION + '&select=*&order=sort_order,name'
       );
       allCats = cats || [];
 
@@ -175,21 +178,29 @@
       grid.innerHTML = '<div class="text-sm text-muted" style="text-align:center;padding:var(--space-8)">No categories yet.</div>';
       return;
     }
-    grid.innerHTML = allCats.map(function(c) {
+    grid.innerHTML = allCats.map(function(c, idx) {
       var cnt = brandCounts[c.slug] || 0;
       var typeLabel = c.category_type === 'branch' ? '<span class="cat-badge branch">Branch</span>' : '';
-      return '<div class="cat-card" onclick="editCat(\'' + esc(c.slug) + '\')">' +
-        '<div style="display:flex;align-items:center;gap:var(--space-3)">' +
-          '<div class="cat-icon" style="background:' + (c.icon_color || '#11a551') + '20;color:' + (c.icon_color || '#11a551') + '"><i class="fa-solid ' + esc(c.icon || 'fa-tag') + '"></i></div>' +
-          '<div style="flex:1;min-width:0">' +
-            '<div style="display:flex;align-items:center;gap:var(--space-2)">' +
-              '<span style="font-weight:700;font-size:var(--text-sm)">' + esc(c.name) + '</span>' +
-              typeLabel +
-            '</div>' +
-            '<div class="cat-meta">' + cnt + ' brand' + (cnt !== 1 ? 's' : '') + ' · ' + esc(c.slug) + '</div>' +
-          '</div>' +
+      var upDis = idx === 0 ? ' disabled' : '';
+      var dnDis = idx === allCats.length - 1 ? ' disabled' : '';
+      return '<div class="cat-card" style="display:flex;align-items:center;gap:var(--space-3)">' +
+        '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">' +
+          '<button class="move-btn"' + upDis + ' onclick="event.stopPropagation();moveCategory(' + idx + ',-1)" title="Move up"><i class="fa-solid fa-chevron-up"></i></button>' +
+          '<button class="move-btn"' + dnDis + ' onclick="event.stopPropagation();moveCategory(' + idx + ',1)" title="Move down"><i class="fa-solid fa-chevron-down"></i></button>' +
         '</div>' +
-        (c.description ? '<div class="text-xs text-muted" style="margin-top:var(--space-2);line-height:1.5">' + esc(c.description) + '</div>' : '') +
+        '<div style="flex:1;min-width:0;cursor:pointer" onclick="editCat(\'' + esc(c.slug) + '\')">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-3)">' +
+            '<div class="cat-icon" style="background:' + (c.icon_color || '#11a551') + '20;color:' + (c.icon_color || '#11a551') + '"><i class="fa-solid ' + esc(c.icon || 'fa-tag') + '"></i></div>' +
+            '<div style="flex:1;min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:var(--space-2)">' +
+                '<span style="font-weight:700;font-size:var(--text-sm)">' + esc(c.name) + '</span>' +
+                typeLabel +
+              '</div>' +
+              '<div class="cat-meta">' + cnt + ' brand' + (cnt !== 1 ? 's' : '') + ' · ' + esc(c.slug) + '</div>' +
+            '</div>' +
+          '</div>' +
+          (c.description ? '<div class="text-xs text-muted" style="margin-top:var(--space-2);line-height:1.5">' + esc(c.description) + '</div>' : '') +
+        '</div>' +
       '</div>';
     }).join('');
   }
@@ -303,6 +314,29 @@
       Components.showToast('Error: ' + e.message, 'error');
     }
     btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Category';
+  }
+
+  async function moveCategory(idx, dir) {
+    var swapIdx = idx + dir;
+    if (swapIdx < 0 || swapIdx >= allCats.length) return;
+    var a = allCats[idx], b = allCats[swapIdx];
+    try {
+      var auth = GoNoGoAPI._getCallerAuth();
+      await GoNoGoAPI.supabaseRequest('rpc/admin_reorder_categories', {
+        method: 'POST',
+        body: {
+          p_caller_id: auth.p_caller_id,
+          p_caller_hash: auth.p_caller_hash,
+          p_slug_a: a.slug,
+          p_order_a: b.sort_order,
+          p_slug_b: b.slug,
+          p_order_b: a.sort_order
+        }
+      });
+      await loadAll();
+    } catch(e) {
+      Components.showToast('Reorder failed: ' + e.message, 'error');
+    }
   }
 </script>
 </body>
