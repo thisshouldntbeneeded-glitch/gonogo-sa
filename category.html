@@ -293,10 +293,18 @@
       } else {
         var brands = await GoNoGoAPI.getBrandsByCategory(slug);
         var currentSort = 'score-desc';
+        var userPriorities = null;
 
         window.sortBrands = function(key) {
           currentSort = key;
-          if (key === 'score-desc') brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
+          if (key === 'for-you' && userPriorities) {
+            brands.sort(function(a, b) {
+              var sa = Components.personaWeightedScore(a.breakdown || [], userPriorities);
+              var sb = Components.personaWeightedScore(b.breakdown || [], userPriorities);
+              return sb - sa || b.overallScore - a.overallScore;
+            });
+          }
+          else if (key === 'score-desc') brands.sort(function(a, b) { return b.overallScore - a.overallScore; });
           else if (key === 'score-asc') brands.sort(function(a, b) { return a.overallScore - b.overallScore; });
           else if (key === 'name-asc') brands.sort(function(a, b) { return a.name.localeCompare(b.name); });
           else if (key === 'name-desc') brands.sort(function(a, b) { return b.name.localeCompare(a.name); });
@@ -305,7 +313,15 @@
 
         function renderBrands() {
           var grid = document.getElementById('brand-grid');
-          grid.innerHTML = brands.map(function(brand, i) { return Components.renderBrandCard(brand, i); }).join('');
+          grid.innerHTML = brands.map(function(brand, i) {
+            var card = Components.renderBrandCard(brand, i);
+            if (currentSort === 'for-you' && userPriorities) {
+              var match = Components.personaWeightedScore(brand.breakdown || [], userPriorities);
+              var matchBadge = '<div style="text-align:center;padding:4px 0 2px;font-size:11px;font-weight:600;color:var(--green)"><i class="fa-solid fa-fingerprint" style="margin-right:3px"></i>' + match + '% match</div>';
+              card = card.replace('</a>', matchBadge + '</a>');
+            }
+            return card;
+          }).join('');
           brands.forEach(function(brand) {
             Components.createRadarChart('radar-' + brand.id, brand, { showTicks: false, labelSize: 9, pointRadius: 2 });
           });
@@ -339,15 +355,44 @@
           '<section class="section"><div class="container">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6)">' +
               '<h2 style="font-size:var(--text-lg);font-weight:700">All Brands</h2>' +
-              '<div class="filter-pills">' +
-                '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score ↓</button>' +
-                '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score ↑</button>' +
-                '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A–Z</button>' +
-                '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z–A</button>' +
+              '<div class="filter-pills" id="sort-pills">' +
+                '<button class="filter-pill sort-btn active" data-sort="score-desc" onclick="sortBrands(\'score-desc\')"><i class="fa-solid fa-arrow-down-wide-short"></i> Score \u2193</button>' +
+                '<button class="filter-pill sort-btn" data-sort="score-asc" onclick="sortBrands(\'score-asc\')"><i class="fa-solid fa-arrow-up-wide-short"></i> Score \u2191</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-asc" onclick="sortBrands(\'name-asc\')"><i class="fa-solid fa-arrow-down-a-z"></i> Name A\u2013Z</button>' +
+                '<button class="filter-pill sort-btn" data-sort="name-desc" onclick="sortBrands(\'name-desc\')"><i class="fa-solid fa-arrow-up-z-a"></i> Name Z\u2013A</button>' +
               '</div>' +
             '</div>' +
+            '<div id="persona-cta"></div>' +
             '<div class="brand-grid" id="brand-grid"></div>' +
           '</div></section>';
+
+        // Load persona and enhance if available
+        (async function() {
+          var pris = await Components.loadUserPriorities();
+          var pills = document.getElementById('sort-pills');
+          var cta = document.getElementById('persona-cta');
+          if (pris) {
+            userPriorities = pris;
+            // Add "For You" pill at the start
+            var forYouBtn = document.createElement('button');
+            forYouBtn.className = 'filter-pill sort-btn';
+            forYouBtn.dataset.sort = 'for-you';
+            forYouBtn.onclick = function() { sortBrands('for-you'); };
+            forYouBtn.innerHTML = '<i class="fa-solid fa-fingerprint"></i> For You';
+            forYouBtn.style.cssText = 'background:var(--green);color:#fff;border-color:var(--green);';
+            pills.insertBefore(forYouBtn, pills.firstChild);
+          } else if (!Components._currentUser && cta) {
+            // Subtle CTA for anonymous users
+            cta.innerHTML =
+              '<div style="background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin-bottom:var(--space-6);display:flex;align-items:center;gap:var(--space-4);flex-wrap:wrap">' +
+                '<div style="flex:1;min-width:200px">' +
+                  '<div style="font-weight:700;font-size:var(--text-sm);margin-bottom:2px"><i class="fa-solid fa-fingerprint" style="color:var(--green);margin-right:var(--space-2)"></i>Personalised rankings</div>' +
+                  '<div style="font-size:var(--text-xs);color:var(--text-secondary)">Create a free account and tell us what matters most to you. We\u2019ll re-rank brands based on your priorities.</div>' +
+                '</div>' +
+                '<button class="btn btn-sm" onclick="Components.showAuthModal()" style="background:var(--green);color:#fff;white-space:nowrap">Get Started</button>' +
+              '</div>';
+          }
+        })();
 
         renderBrands();
       }

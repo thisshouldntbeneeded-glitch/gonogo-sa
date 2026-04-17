@@ -1219,9 +1219,17 @@ const Components = {
       // Show welcome modal for anonymous visitors (once per session)
       if (!session) Components._maybeShowWelcome();
     });
-    supabaseAuth.auth.onAuthStateChange(function(event, session) {
+    supabaseAuth.auth.onAuthStateChange(async function(event, session) {
       Components._currentUser = session ? session.user : null;
+      Components._userPriorities = null;
       Components._updateNavAuth();
+      // After email confirmation redirect, nudge to persona builder if not set
+      if (event === 'SIGNED_IN' && session && !window.location.pathname.includes('/account')) {
+        var pris = await Components.loadUserPriorities();
+        if (!pris) {
+          window.location.href = '/account#persona';
+        }
+      }
     });
   },
 
@@ -1684,9 +1692,59 @@ const Components = {
   async publicSignOut() {
     if (!supabaseAuth) return;
     await supabaseAuth.auth.signOut();
+    Components._userPriorities = null;
     Components.showToast('You have been signed out.');
-    // Close dropdown if open
     var dd = document.getElementById('auth-dropdown-desktop');
     if (dd) dd.classList.remove('open');
+  },
+
+  // ============================================================
+  // PERSONA — shared across pages
+  // ============================================================
+  _userPriorities: null,
+  _CAT_MAP: {
+    compliance: 'Compliance', satisfaction: 'Customer Satisfaction',
+    product_value: 'Product Value', innovation: 'Innovation',
+    customer_support: 'Customer Support', accessibility: 'Accessibility & Security'
+  },
+
+  async loadUserPriorities() {
+    if (this._userPriorities) return this._userPriorities;
+    if (!supabaseAuth || !this._currentUser) return null;
+    try {
+      var sess = await supabaseAuth.auth.getSession();
+      if (!sess.data.session) return null;
+      var r = await fetch(
+        'https://fnpxaneextqidbessnej.supabase.co/rest/v1/profiles?id=eq.' + this._currentUser.id + '&select=priorities',
+        { headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZucHhhbmVleHRxaWRiZXNzbmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NzI5NzUsImV4cCI6MjA4ODU0ODk3NX0.dX140oHkk_AfBjFPo-MfJvMVJLsJ7WJJZGAIJBeC10I', 'Authorization': 'Bearer ' + sess.data.session.access_token } }
+      );
+      var rows = await r.json();
+      if (rows && rows.length && rows[0].priorities && rows[0].priorities.length >= 3) {
+        this._userPriorities = rows[0].priorities;
+        return this._userPriorities;
+      }
+    } catch (e) { /* silent */ }
+    return null;
+  },
+
+  personaWeightedScore(breakdown, priorities) {
+    if (!priorities || priorities.length < 3 || !breakdown || !breakdown.length) return 0;
+    var weights = [3, 2, 1], total = 0, maxW = 0;
+    for (var i = 0; i < 3; i++) {
+      var catName = this._CAT_MAP[priorities[i]];
+      if (!catName) continue;
+      for (var j = 0; j < breakdown.length; j++) {
+        var bc = breakdown[j].category || '';
+        if (bc === catName || bc.replace(' & ', ' &amp; ') === catName || bc.replace('&amp;', '&') === catName) {
+          var parts = (breakdown[j].score || '').split('/');
+          if (parts.length === 2) {
+            var earned = parseFloat(parts[0]), max = parseFloat(parts[1]);
+            if (max > 0) { total += (earned / max) * weights[i]; maxW += weights[i]; }
+          }
+          break;
+        }
+      }
+    }
+    return maxW > 0 ? Math.round(total / maxW * 100) : 0;
   }
 };

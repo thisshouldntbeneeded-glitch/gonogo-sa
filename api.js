@@ -132,6 +132,7 @@ var GoNoGoAPI = (function () {
       reviewed_at: row.reviewed_at || '',
       created_at: row.created_at || '',
       internal_score_justification: row.internal_score_justification || '',
+      breakdown: row.framework_breakdown || [],
       scoring_breakdown: row.scoring_breakdown || null,
       is_active: row.is_active !== false,
       status: row.status || 'live'
