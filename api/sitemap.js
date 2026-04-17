@@ -27,6 +27,8 @@ export default async function handler(req, res) {
     xml += url(SITE_URL + '/about.html', today, '0.5', 'monthly');
     xml += url(SITE_URL + '/privacy.html', today, '0.3', 'monthly');
     xml += url(SITE_URL + '/terms.html', today, '0.3', 'monthly');
+    xml += url(SITE_URL + '/faq.html', today, '0.5', 'monthly');
+    xml += url(SITE_URL + '/cookies.html', today, '0.3', 'monthly');
 
     // Category pages
     for (const cat of cats) {
