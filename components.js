@@ -479,9 +479,58 @@ const Components = {
   // USER-WEIGHTED SCORE ("Weight this yourself")
   // Lets users re-weight the scoring categories client-side and see
   // their personalised score alongside GoNoGo's independent score.
-  // Nothing is sent anywhere; saved to localStorage only.
+  // Their weights are saved to localStorage. When a user actually changes
+  // the defaults we also send a single anonymous, aggregate event
+  // (category + weights, no user identifier) to help editorial prioritise
+  // what categories matter most. See sendWeightEvent below.
   // ============================================================
   USER_WEIGHTS_STORAGE_KEY: 'gonogo_user_weights_v1',
+
+  // Anonymous analytics: aggregated weight events.
+  // No session id, no IP retention, no PII. Insert-only via RLS.
+  // We send one event when the user closes the panel having actually changed the defaults.
+  WEIGHT_ANALYTICS: {
+    url: 'https://kkpbzttwljxvyjbvggqr.supabase.co/rest/v1/weight_events',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrcGJ6dHR3bGp4dnlqYnZnZ3FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjk2MTcsImV4cCI6MjA4ODgwNTYxN30.lNvYPegElDYbS5heD4DXUxIgfy2qPDzx8S2K22F1p3A',
+    site: 'sa'
+  },
+
+  sendWeightEvent(payload) {
+    try {
+      var cfg = this.WEIGHT_ANALYTICS;
+      if (!cfg || !cfg.url) return;
+      var body = JSON.stringify({
+        site: cfg.site,
+        page: payload.page,
+        brand_slug: payload.brandSlug || null,
+        category_slug: payload.categorySlug,
+        weights: payload.weights,
+        default_weights: payload.defaultWeights || null,
+        user_score: (typeof payload.userScore === 'number') ? payload.userScore : null,
+        gonogo_score: (typeof payload.gonogoScore === 'number') ? payload.gonogoScore : null
+      });
+      // Prefer sendBeacon so a tab-close still delivers; fall back to fetch keepalive.
+      var headers = { type: 'application/json' };
+      if (navigator && typeof navigator.sendBeacon === 'function') {
+        // Beacons cannot set custom headers, so include the apikey in the URL.
+        var beaconUrl = cfg.url + '?apikey=' + encodeURIComponent(cfg.anonKey);
+        var blob = new Blob([body], headers);
+        if (navigator.sendBeacon(beaconUrl, blob)) return;
+      }
+      fetch(cfg.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': cfg.anonKey,
+          'Authorization': 'Bearer ' + cfg.anonKey,
+          'Prefer': 'return=minimal'
+        },
+        body: body,
+        keepalive: true,
+        mode: 'cors'
+      }).catch(function () { /* swallow — analytics must never break the page */ });
+    } catch (e) { /* noop */ }
+  },
 
   loadUserWeights(categorySlug) {
     try {
