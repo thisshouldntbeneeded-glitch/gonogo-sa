@@ -130,6 +130,7 @@ const Components = {
       { href: 'admin-categories.html', label: 'Categories', icon: 'fa-folder-open', id: 'categories' },
       { href: 'admin-comments.html', label: 'Comments', icon: 'fa-comments', id: 'comments' },
       { href: 'admin-research.html', label: 'Research', icon: 'fa-flask', id: 'research' },
+      { href: 'admin-weights.html', label: 'Weight Analytics', icon: 'fa-sliders', id: 'weights' },
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
       { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' },
       { href: 'admin-scoring.html', label: 'Scoring Engine', icon: 'fa-scale-balanced', id: 'scoring' },
@@ -731,6 +732,29 @@ const Components = {
       emit();
       if (typeof onChange === 'function') onChange(null);
     });
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        if (!lastWeights) {
+          dirty = true;
+          emit();
+        } else {
+          dirty = true;
+        }
+        maybeSendAnalytics();
+        if (savedMsg) {
+          savedMsg.style.display = 'block';
+          clearTimeout(saveBtn._t);
+          saveBtn._t = setTimeout(() => { savedMsg.style.display = 'none'; }, 3000);
+        }
+        const lbl = saveBtn.querySelector('.uw-save-label');
+        if (lbl) {
+          const orig = lbl.textContent;
+          lbl.textContent = 'Saved';
+          setTimeout(() => { lbl.textContent = orig; }, 2000);
+        }
+      });
+    }
 
     window.addEventListener('pagehide', maybeSendAnalytics, { once: false });
 
