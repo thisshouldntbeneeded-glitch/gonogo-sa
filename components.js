@@ -574,7 +574,7 @@ const Components = {
     );
   },
 
-  attachUserWeights(containerId, scoringCategories, categorySlug, onChange) {
+  attachUserWeights(containerId, scoringCategories, categorySlug, onChange, options) {
     const wrap = document.getElementById(containerId);
     if (!wrap) return;
     const toggle = wrap.querySelector('.uw-toggle');
@@ -583,6 +583,11 @@ const Components = {
     const sliders = Array.prototype.slice.call(wrap.querySelectorAll('.uw-slider'));
     const resetBtn = wrap.querySelector('.uw-reset');
     const defaults = this.defaultWeightsFrom(scoringCategories);
+    const opts = options || {};
+    const self = this;
+    let dirty = false;
+    let lastWeights = null;
+    let lastSent = null;
 
     const saved = this.loadUserWeights(categorySlug);
     if (saved) {
@@ -601,7 +606,46 @@ const Components = {
         if (label) label.textContent = Math.round(((parseInt(s.value, 10) || 0) / total) * 100) + '%';
       });
       this.saveUserWeights(categorySlug, weights);
+      lastWeights = weights;
       if (typeof onChange === 'function') onChange(weights);
+    };
+
+    // Decide whether to fire an analytics event for the current weights.
+    // Skip if (a) user never moved a slider this session AND no saved weights existed,
+    // (b) weights match defaults exactly, or (c) we already sent the same payload.
+    const maybeSendAnalytics = () => {
+      if (!opts.page) return;
+      if (!dirty && !saved) return;
+      if (!lastWeights) return;
+      let changed = false;
+      for (const k in lastWeights) {
+        if (lastWeights[k] !== defaults[k]) { changed = true; break; }
+      }
+      if (!changed) return;
+      const payloadKey = JSON.stringify([opts.page, opts.brandSlug || null, categorySlug, lastWeights]);
+      if (payloadKey === lastSent) return;
+      lastSent = payloadKey;
+
+      let userScore = null, gonogoScore = null;
+      if (typeof opts.getBrandsForScoring === 'function') {
+        try {
+          const brands = opts.getBrandsForScoring() || [];
+          if (brands.length === 1 && brands[0]) {
+            userScore = self.computeWeightedScore(brands[0], lastWeights);
+            gonogoScore = brands[0].overallScore || null;
+          }
+        } catch (e) { /* noop */ }
+      }
+
+      self.sendWeightEvent({
+        page: opts.page,
+        brandSlug: opts.brandSlug || null,
+        categorySlug: categorySlug,
+        weights: lastWeights,
+        defaultWeights: defaults,
+        userScore: userScore,
+        gonogoScore: gonogoScore
+      });
     };
 
     toggle.addEventListener('click', () => {
@@ -611,9 +655,12 @@ const Components = {
       if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
       const lbl = wrap.querySelector('.uw-toggle-label');
       if (lbl) lbl.textContent = open ? 'Weight this yourself' : 'Hide weights';
+      if (open) maybeSendAnalytics();
     });
 
-    sliders.forEach(s => s.addEventListener('input', emit));
+    sliders.forEach(s => {
+      s.addEventListener('input', () => { dirty = true; emit(); });
+    });
 
     resetBtn.addEventListener('click', () => {
       sliders.forEach(s => {
@@ -621,9 +668,14 @@ const Components = {
         s.value = typeof defaults[cat] === 'number' ? defaults[cat] : 0;
       });
       this.clearUserWeights(categorySlug);
+      dirty = false;
+      lastWeights = null;
+      lastSent = null;
       emit();
       if (typeof onChange === 'function') onChange(null);
     });
+
+    window.addEventListener('pagehide', maybeSendAnalytics, { once: false });
 
     if (saved) {
       toggle.click();
