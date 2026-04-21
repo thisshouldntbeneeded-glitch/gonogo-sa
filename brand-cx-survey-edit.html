@@ -239,7 +239,7 @@ async function init() {
 /* ── Events ── */
 function wireEvents() {
   document.getElementById('btn-save').addEventListener('click', save);
-  document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('published'); });
+  document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('active'); });
   document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
   document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
   document.getElementById('btn-add-q').addEventListener('click', function(){
@@ -673,8 +673,8 @@ function updateStatusUI() {
   badge.textContent = s;
 
   document.getElementById('btn-publish').style.display = (s === 'draft' || s === 'paused') ? '' : 'none';
-  document.getElementById('btn-pause').style.display = (s === 'published' || s === 'active') ? '' : 'none';
-  document.getElementById('btn-unpublish').style.display = (s === 'published' || s === 'active' || s === 'paused') ? '' : 'none';
+  document.getElementById('btn-pause').style.display = (s === 'active') ? '' : 'none';
+  document.getElementById('btn-unpublish').style.display = (s === 'active' || s === 'paused') ? '' : 'none';
 }
 
 async function setStatus(status) {
@@ -742,7 +742,7 @@ function renderLinks() {
 async function createLink() {
   if (!_survey || !_survey.id) { toast('Save the survey first', 'error'); return; }
   var s = _survey.status;
-  if (s !== 'published' && s !== 'active') {
+  if (s !== 'active') {
     if (!confirm('Survey is not published \u2014 links will not accept responses until you publish. Continue?')) return;
   }
   var label = document.getElementById('f-link-label').value.trim();
