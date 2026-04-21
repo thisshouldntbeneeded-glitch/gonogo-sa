@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>GoNoGo SA Survey Builder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    .builder-shell { display:grid; grid-template-columns: 300px minmax(0,1fr) 360px; gap:var(--space-6); align-items:start; }
+    .builder-panel, .builder-canvas, .builder-settings {
+      border:1px solid var(--border-primary);
+      background:var(--surface-2);
+      border-radius:var(--radius-lg);
+      padding:var(--space-5);
+    }
+    .panel-title { font-size:var(--text-sm); font-weight:800; color:var(--text-primary); margin-bottom:6px; }
+    .panel-copy { font-size:var(--text-xs); color:var(--text-secondary); line-height:1.6; margin-bottom:var(--space-4); max-width:none; }
+
+    .topbar-row { display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); margin-bottom:var(--space-6); flex-wrap:wrap; }
+    .topbar-meta { display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:center; }
+    .status-pill, .meta-pill {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+      border-radius:999px; font-size:11px; font-weight:800;
+      border:1px solid var(--border-primary); background:var(--surface-3); color:var(--text-secondary);
+    }
+    .status-pill.live { background:rgba(17,165,81,0.12); color:#11a551; border-color:rgba(17,165,81,0.25); }
+    .status-pill.draft { background:rgba(255,152,0,0.12); color:#ff9800; border-color:rgba(255,152,0,0.25); }
+
+    .field-grid { display:grid; gap:var(--space-4); }
+    .field-group { display:grid; gap:8px; }
+    .field-label { font-size:var(--text-xs); font-weight:800; color:var(--text-primary); letter-spacing:0.02em; }
+    .input, .select, .textarea {
+      width:100%; padding:12px 14px; border-radius:var(--radius-md); border:1px solid var(--border-primary);
+      background:var(--surface-1); color:var(--text-primary); font-size:var(--text-sm);
+    }
+    .textarea { min-height:96px; resize:vertical; }
+    .input:focus, .select:focus, .textarea:focus {
+      outline:none; border-color:rgba(17,165,81,0.45); box-shadow:0 0 0 3px rgba(17,165,81,0.12);
+    }
+
+    .block-list, .canvas-list, .option-list, .channel-list { list-style:none; margin:0; padding:0; display:grid; gap:var(--space-3); }
+    .block-card, .canvas-card, .mini-card {
+      border:1px solid var(--border-primary);
+      background:var(--surface-1);
+      border-radius:var(--radius-lg);
+      padding:var(--space-4);
+    }
+    .block-card { cursor:grab; }
+    .block-card:hover { border-color:rgba(17,165,81,0.24); box-shadow:0 0 0 3px rgba(17,165,81,0.06); }
+    .block-head, .canvas-head { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-3); }
+    .block-icon, .canvas-icon {
+      width:32px; height:32px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center;
+      background:rgba(17,165,81,0.12); color:#11a551; flex-shrink:0;
+    }
+    .block-name, .canvas-name { font-size:var(--text-sm); font-weight:800; color:var(--text-primary); margin-bottom:4px; }
+    .block-copy, .canvas-copy { font-size:var(--text-xs); color:var(--text-secondary); line-height:1.55; max-width:none; }
+    .block-tag {
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px;
+      font-size:11px; font-weight:700; border:1px solid var(--border-primary); background:var(--surface-3); color:var(--text-muted);
+    }
+
+    .canvas-dropzone {
+      border:1px dashed var(--border-primary);
+      border-radius:var(--radius-lg);
+      background:var(--surface-1);
+      padding:var(--space-6);
+      text-align:center;
+      color:var(--text-muted);
+      font-size:var(--text-sm);
+      margin-bottom:var(--space-4);
+    }
+    .canvas-card { cursor:pointer; }
+    .canvas-card.active { border-color:rgba(17,165,81,0.35); box-shadow:0 0 0 3px rgba(17,165,81,0.08); }
+    .canvas-toolbar { display:flex; gap:var(--space-2); flex-wrap:wrap; margin-top:var(--space-3); }
+    .tool-btn {
+      display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:var(--radius-md);
+      border:1px solid var(--border-primary); background:var(--surface-3); color:var(--text-secondary);
+      font-size:11px; font-weight:700; cursor:pointer;
+    }
+    .tool-btn:hover { background:rgba(17,165,81,0.10); color:#11a551; border-color:rgba(17,165,81,0.25); }
+
+    .canvas-meta-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .canvas-pill {
+      display:inline-flex; align-items:center; gap:6px; padding:5px 8px; border-radius:999px;
+      font-size:11px; font-weight:700; background:var(--surface-3); color:var(--text-secondary); border:1px solid var(--border-primary);
+    }
+
+    .mode-grid, .collection-grid, .preview-toggle-grid { display:grid; gap:var(--space-3); }
+    .mode-option, .channel-option, .preview-toggle {
+      border:1px solid var(--border-primary);
+      border-radius:var(--radius-lg);
+      background:var(--surface-1);
+      padding:var(--space-4);
+      cursor:pointer;
+    }
+    .mode-option.active, .channel-option.active, .preview-toggle.active {
+      border-color:rgba(17,165,81,0.35);
+      box-shadow:0 0 0 3px rgba(17,165,81,0.08);
+      background:linear-gradient(135deg, rgba(17,165,81,0.10), rgba(59,130,246,0.04));
+    }
+
+    .option-chip-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .option-chip {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+      font-size:11px; font-weight:700; background:var(--surface-3); color:var(--text-secondary); border:1px solid var(--border-primary);
+    }
+
+    .phone-preview {
+      border:1px solid var(--border-primary);
+      background:#0f172a;
+      border-radius:28px;
+      padding:14px;
+      width:100%;
+      max-width:290px;
+      margin:0 auto;
+      box-shadow:0 18px 40px rgba(15,23,42,0.18);
+    }
+    .phone-screen {
+      background:linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
+      color:#111827;
+      border-radius:20px;
+      min-height:540px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .phone-topbar { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px; color:#64748b; }
+    .phone-progress {
+      width:100%; height:8px; border-radius:999px; background:#e5e7eb; overflow:hidden;
+    }
+    .phone-progress-fill {
+      height:100%; width:35%; border-radius:999px; background:linear-gradient(90deg, #11a551, #0d8742);
+    }
+    .phone-question {
+      font-size:1.1rem; line-height:1.35; font-weight:800; color:#111827;
+    }
+    .phone-subcopy { font-size:13px; line-height:1.55; color:#475569; }
+    .phone-answer-stack { display:grid; gap:10px; }
+    .phone-answer {
+      border:1px solid #dbe3ea; background:#fff; border-radius:14px; padding:12px 14px; font-size:13px; color:#0f172a;
+    }
+    .phone-party-card {
+      border-radius:18px; padding:18px; color:#fff;
+      background:linear-gradient(135deg, #11a551, #0d8742 50%, #0f766e);
+      box-shadow:0 12px 28px rgba(17,165,81,0.22);
+    }
+    .phone-party-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .party-btn {
+      border:none; border-radius:14px; padding:12px; font-size:13px; font-weight:800; cursor:pointer;
+    }
+    .party-btn.no { background:#fff1f2; color:#be123c; }
+    .party-btn.yes { background:#ecfdf5; color:#047857; }
+
+    .settings-empty {
+      padding:var(--space-6);
+      border-radius:var(--radius-lg);
+      border:1px dashed var(--border-primary);
+      background:var(--surface-1);
+      text-align:center;
+      color:var(--text-muted);
+      font-size:var(--text-sm);
+    }
+
+    .settings-section { margin-bottom:var(--space-5); }
+    .settings-section:last-child { margin-bottom:0; }
+
+    .choice-row { display:grid; grid-template-columns:1fr auto; gap:var(--space-2); align-items:center; }
+    .inline-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:36px; height:36px; border-radius:10px; border:1px solid var(--border-primary);
+      background:var(--surface-3); color:var(--text-secondary); cursor:pointer;
+    }
+
+    .footer-actions {
+      display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); flex-wrap:wrap;
+      margin-top:var(--space-6);
+    }
+
+    @media (max-width: 1280px) {
+      .builder-shell { grid-template-columns: 280px minmax(0,1fr); }
+      .builder-settings { grid-column: 1 / -1; }
+    }
+    @media (max-width: 900px) {
+      .builder-shell { grid-template-columns: 1fr; }
+      .builder-panel, .builder-canvas, .builder-settings { padding:var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <div id="sidebar-container"></div>
+
+    <main class="admin-main" id="builder-content" style="display:none;">
+      <div class="topbar-row">
+        <div>
+          <h1 class="admin-title" style="margin-bottom:6px;">Survey Builder</h1>
+          <p class="text-sm text-secondary">Build a survey with drag-and-drop question blocks, choose the experience mode, and prepare collection channels.</p>
+        </div>
+        <div class="topbar-meta">
+          <span class="status-pill draft" id="survey-status-pill"><i class="fa-solid fa-pen"></i> Draft</span>
+          <span class="meta-pill"><i class="fa-solid fa-mobile-screen"></i> Mobile-first</span>
+          <span class="meta-pill"><i class="fa-solid fa-hand-pointer"></i> Drag & drop</span>
+        </div>
+      </div>
+
+      <div class="field-grid" style="margin-bottom:var(--space-6);">
+        <div class="builder-panel">
+          <div class="panel-title">Survey basics</div>
+          <div class="panel-copy">Start from blank, then add question blocks. Templates can come later, but the main workflow is direct building.</div>
+
+          <div class="field-grid">
+            <div class="field-group">
+              <label class="field-label" for="survey-name">Survey name</label>
+              <input id="survey-name" class="input" type="text" value="New Customer Pulse" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="survey-purpose">Purpose</label>
+              <input id="survey-purpose" class="input" type="text" value="Capture feedback after purchase or service interaction" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="survey-intro">Intro copy</label>
+              <textarea id="survey-intro" class="textarea">Thanks for your time. This short survey helps us improve the experience quickly.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-shell">
+        <aside class="builder-panel">
+          <div class="panel-title">Question blocks</div>
+          <div class="panel-copy">Drag a block into the canvas or click “Add” to insert it.</div>
+          <ul class="block-list" id="block-library"></ul>
+        </aside>
+
+        <section class="builder-canvas">
+          <div class="panel-title">Survey flow</div>
+          <div class="panel-copy">Reorder questions, duplicate them, or open one to edit settings and answer options.</div>
+
+          <div class="canvas-dropzone" id="dropzone">
+            Drop question blocks here or use the Add buttons to build the flow.
+          </div>
+
+          <ul class="canvas-list" id="canvas-list"></ul>
+
+          <div class="footer-actions">
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="saveSurveyDraft()">
+                <i class="fa-solid fa-floppy-disk"></i> Save draft
+              </button>
+              <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);" onclick="duplicateSelectedQuestion()">
+                <i class="fa-solid fa-copy"></i> Duplicate selected
+              </button>
+              <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);" onclick="deleteSelectedQuestion()">
+                <i class="fa-solid fa-trash"></i> Delete selected
+              </button>
+            </div>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);" onclick="previewNextQuestion()">
+                <i class="fa-solid fa-eye"></i> Refresh preview
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="goToCampaignSetup()">
+                <i class="fa-solid fa-share-nodes"></i> Continue to collection setup
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="builder-settings">
+          <div class="panel-title">Selected block</div>
+          <div class="panel-copy">Edit the chosen question, answer labels, logic, and visibility rules.</div>
+
+          <div id="settings-empty" class="settings-empty">
+            Select a question in the survey flow to edit its settings.
+          </div>
+
+          <div id="settings-panel" style="display:none;">
+            <div class="settings-section">
+              <div class="field-group">
+                <label class="field-label" for="question-label">Question label</label>
+                <textarea id="question-label" class="textarea"></textarea>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="field-group">
+                <label class="field-label" for="question-help">Helper text</label>
+                <input id="question-help" class="input" type="text" />
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="field-group">
+                <label class="field-label" for="question-required">Required</label>
+                <select id="question-required" class="select">
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section" id="options-section" style="display:none;">
+              <div class="field-label" style="margin-bottom:8px;">Answer options</div>
+              <div class="field-grid" id="option-editor-list"></div>
+              <button class="btn btn-sm" style="margin-top:var(--space-3);background:var(--surface-3);color:var(--text-secondary);border:1px solid var(--border-primary);" onclick="addOptionRow()">
+                <i class="fa-solid fa-plus"></i> Add option
+              </button>
+            </div>
+
+            <div class="settings-section">
+              <div class="field-group">
+                <label class="field-label" for="question-followup">Follow-up logic</label>
+                <select id="question-followup" class="select">
+                  <option value="none">No conditional follow-up</option>
+                  <option value="low-score">Show follow-up on low score</option>
+                  <option value="high-score">Show follow-up on high score</option>
+                  <option value="negative-choice">Show follow-up on negative choice</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="field-group">
+                <label class="field-label" for="question-branch">Branch / segment tag</label>
+                <input id="question-branch" class="input" type="text" />
+              </div>
+            </div>
+
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="applyQuestionSettings()">
+                <i class="fa-solid fa-check"></i> Apply changes
+              </button>
+            </div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border-primary);margin:var(--space-5) 0;">
+
+          <div class="panel-title">Survey mode</div>
+          <div class="panel-copy">Party Mode is only an alternate way to answer the same survey.</div>
+          <div class="mode-grid" id="mode-grid">
+            <button class="mode-option active" data-mode="standard" type="button">
+              <div class="block-name">Standard</div>
+              <div class="block-copy">Classic one-question-at-a-time mobile survey.</div>
+            </button>
+            <button class="mode-option" data-mode="party" type="button">
+              <div class="block-name">Party Mode</div>
+              <div class="block-copy">Swipe/tap-led response mode for high-energy, phone-first collection.</div>
+            </button>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border-primary);margin:var(--space-5) 0;">
+
+          <div class="panel-title">Collection methods</div>
+          <div class="panel-copy">These are the main launch channels to support next.</div>
+          <div class="collection-grid" id="collection-grid">
+            <button class="channel-option active" data-channel="link" type="button">
+              <div class="block-name">Direct link</div>
+              <div class="block-copy">Shareable URL for email, CRM, SMS, and agent workflows.</div>
+            </button>
+            <button class="channel-option active" data-channel="whatsapp" type="button">
+              <div class="block-name">WhatsApp</div>
+              <div class="block-copy">Short-link driven survey launches inside WhatsApp messages.</div>
+            </button>
+            <button class="channel-option active" data-channel="qr" type="button">
+              <div class="block-name">QR</div>
+              <div class="block-copy">For in-store, event, packaging, and receipt-led capture.</div>
+            </button>
+            <button class="channel-option active" data-channel="onsite" type="button">
+              <div class="block-name">In-app / on-site</div>
+              <div class="block-copy">Prompt the survey inside your site, product, or post-purchase flow.</div>
+            </button>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border-primary);margin:var(--space-5) 0;">
+
+          <div class="panel-title">Mobile preview</div>
+          <div class="panel-copy">Quick respondent preview of the currently selected mode and question.</div>
+          <div class="preview-toggle-grid" style="margin-bottom:var(--space-3);">
+            <button class="preview-toggle active" type="button" data-preview="current">Current question</button>
+          </div>
+
+          <div class="phone-preview">
+            <div class="phone-screen" id="phone-screen"></div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script src="components.js"></script>
+  <script>
+    const BLOCK_LIBRARY = [
+      { type:'nps', icon:'fa-hashtag', name:'NPS', copy:'0-10 recommendation score question', options:[] },
+      { type:'csat', icon:'fa-face-smile', name:'CSAT', copy:'Satisfaction rating block', options:['Very satisfied','Satisfied','Neutral','Dissatisfied'] },
+      { type:'thumbs', icon:'fa-thumbs-up', name:'Thumbs', copy:'Fast yes/no or like/dislike feedback', options:['Positive','Negative'] },
+      { type:'single', icon:'fa-circle-dot', name:'Single choice', copy:'Choose one option from a list', options:['Option 1','Option 2','Option 3'] },
+      { type:'multi', icon:'fa-square-check', name:'Multi-select', copy:'Choose multiple options', options:['Option 1','Option 2','Option 3'] },
+      { type:'text', icon:'fa-keyboard', name:'Long text', copy:'Open feedback comment', options:[] },
+      { type:'short-text', icon:'fa-i-cursor', name:'Short text', copy:'Name, email, or short answer', options:[] },
+      { type:'matrix', icon:'fa-table-cells', name:'Matrix', copy:'Multi-row rating or scoring grid', options:['Row 1','Row 2','Row 3'] },
+      { type:'image-choice', icon:'fa-image', name:'Image choice', copy:'Tap one visual option', options:['Image A','Image B'] },
+      { type:'consent', icon:'fa-shield-halved', name:'Consent', copy:'Consent or permission block', options:['I agree'] }
+    ];
+
+    let survey = {
+      id: 'draft-survey-1',
+      name: 'New Customer Pulse',
+      purpose: 'Capture feedback after purchase or service interaction',
+      intro: 'Thanks for your time. This short survey helps us improve the experience quickly.',
+      mode: 'standard',
+      channels: ['link','whatsapp','qr','onsite'],
+      status: 'draft',
+      questions: [
+        { id:'q1', type:'csat', label:'How satisfied are you with your overall experience?', help:'Choose the option that best matches your visit.', required:'yes', options:['Very satisfied','Satisfied','Neutral','Dissatisfied'], followup:'low-score', branch:'' },
+        { id:'q2', type:'text', label:'What should we improve first?', help:'Optional but useful.', required:'no', options:[], followup:'none', branch:'' }
+      ]
+    };
+
+    let selectedQuestionId = 'q1';
+
+    function initPage() {
+      document.getElementById('builder-content').style.display = '';
+      if (window.Components && Components.renderBrandSidebar) {
+        document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('surveys');
+        if (Components.initTheme) Components.initTheme();
+      }
+      renderLibrary();
+      renderCanvas();
+      renderSettings();
+      renderMode();
+      renderChannels();
+      renderPhonePreview();
+      bindBasics();
+      bindModeButtons();
+      bindChannelButtons();
+    }
+
+    function bindBasics() {
+      document.getElementById('survey-name').addEventListener('input', e => survey.name = e.target.value);
+      document.getElementById('survey-purpose').addEventListener('input', e => survey.purpose = e.target.value);
+      document.getElementById('survey-intro').addEventListener('input', e => survey.intro = e.target.value);
+    }
+
+    function renderLibrary() {
+      const list = document.getElementById('block-library');
+      list.innerHTML = BLOCK_LIBRARY.map(block => `
+        <li class="block-card" draggable="true" ondragstart="dragBlockStart(event, '${block.type}')">
+          <div class="block-head">
+            <div style="display:flex;gap:12px;min-width:0;">
+              <span class="block-icon"><i class="fa-solid ${block.icon}"></i></span>
+              <div>
+                <div class="block-name">${escapeHtml(block.name)}</div>
+                <div class="block-copy">${escapeHtml(block.copy)}</div>
+              </div>
+            </div>
+            <span class="block-tag">Drag</span>
+          </div>
+          <div class="canvas-toolbar">
+            <button class="tool-btn" type="button" onclick="addBlock('${block.type}')"><i class="fa-solid fa-plus"></i> Add</button>
+          </div>
+        </li>
+      `).join('');
+
+      const dropzone = document.getElementById('dropzone');
+      dropzone.addEventListener('dragover', e => e.preventDefault());
+      dropzone.addEventListener('drop', handleDropOnCanvas);
+    }
+
+    function createQuestionFromType(type) {
+      const base = BLOCK_LIBRARY.find(b => b.type === type);
+      const count = survey.questions.length + 1;
+      return {
+        id: 'q' + Date.now(),
+        type,
+        label: base ? `${base.name} question ${count}` : `Question ${count}`,
+        help: '',
+        required: 'yes',
+        options: base ? [...base.options] : [],
+        followup: 'none',
+        branch: ''
+      };
+    }
+
+    function addBlock(type) {
+      const q = createQuestionFromType(type);
+      survey.questions.push(q);
+      selectedQuestionId = q.id;
+      renderCanvas();
+      renderSettings();
+      renderPhonePreview();
+    }
+
+    function dragBlockStart(event, type) {
+      event.dataTransfer.setData('text/plain', type);
+    }
+
+    function handleDropOnCanvas(event) {
+      event.preventDefault();
+      const type = event.dataTransfer.getData('text/plain');
+      if (!type) return;
+      addBlock(type);
+    }
+
+    function renderCanvas() {
+      const list = document.getElementById('canvas-list');
+      if (!survey.questions.length) {
+        list.innerHTML = `<li class="settings-empty">No questions yet. Add your first block from the left.</li>`;
+        return;
+      }
+
+      list.innerHTML = survey.questions.map((q, index) => `
+        <li class="canvas-card ${q.id === selectedQuestionId ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
+          <div class="canvas-head">
+            <div style="display:flex;gap:12px;min-width:0;">
+              <span class="canvas-icon"><i class="fa-solid ${iconForType(q.type)}"></i></span>
+              <div style="min-width:0;">
+                <div class="canvas-name">${index + 1}. ${escapeHtml(q.label)}</div>
+                <div class="canvas-copy">${escapeHtml(typeLabel(q.type))}</div>
+                <div class="canvas-meta-row">
+                  <span class="canvas-pill"><i class="fa-solid fa-asterisk"></i> ${q.required === 'yes' ? 'Required' : 'Optional'}</span>
+                  <span class="canvas-pill"><i class="fa-solid fa-code-branch"></i> ${followupLabel(q.followup)}</span>
+                  <span class="canvas-pill"><i class="fa-solid fa-layer-group"></i> ${q.options && q.options.length ? q.options.length + ' options' : 'No options'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="canvas-toolbar">
+            <button class="tool-btn" type="button" onclick="event.stopPropagation(); moveQuestion('${q.id}', -1)"><i class="fa-solid fa-arrow-up"></i> Up</button>
+            <button class="tool-btn" type="button" onclick="event.stopPropagation(); moveQuestion('${q.id}', 1)"><i class="fa-solid fa-arrow-down"></i> Down</button>
+            <button class="tool-btn" type="button" onclick="event.stopPropagation(); cloneQuestion('${q.id}')"><i class="fa-solid fa-copy"></i> Duplicate</button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    function selectQuestion(id) {
+      selectedQuestionId = id;
+      renderCanvas();
+      renderSettings();
+      renderPhonePreview();
+    }
+
+    function getSelectedQuestion() {
+      return survey.questions.find(q => q.id === selectedQuestionId) || null;
+    }
+
+    function renderSettings() {
+      const q = getSelectedQuestion();
+      const empty = document.getElementById('settings-empty');
+      const panel = document.getElementById('settings-panel');
+      const optionsSection = document.getElementById('options-section');
+
+      if (!q) {
+        empty.style.display = '';
+        panel.style.display = 'none';
+        return;
+      }
+
+      empty.style.display = 'none';
+      panel.style.display = '';
+
+      document.getElementById('question-label').value = q.label || '';
+      document.getElementById('question-help').value = q.help || '';
+      document.getElementById('question-required').value = q.required || 'yes';
+      document.getElementById('question-followup').value = q.followup || 'none';
+      document.getElementById('question-branch').value = q.branch || '';
+
+      const supportsOptions = ['single','multi','csat','thumbs','matrix','image-choice','consent'].includes(q.type);
+      optionsSection.style.display = supportsOptions ? '' : 'none';
+
+      if (supportsOptions) {
+        renderOptionEditor(q);
+      }
+    }
+
+    function renderOptionEditor(q) {
+      const wrap = document.getElementById('option-editor-list');
+      wrap.innerHTML = (q.options || []).map((opt, idx) => `
+        <div class="choice-row">
+          <input class="input" type="text" value="${escapeAttr(opt)}" oninput="updateOption(${idx}, this.value)" />
+          <button class="inline-btn" type="button" onclick="removeOption(${idx})"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      `).join('');
+    }
+
+    function addOptionRow() {
+      const q = getSelectedQuestion();
+      if (!q) return;
+      if (!Array.isArray(q.options)) q.options = [];
+      q.options.push('New option');
+      renderOptionEditor(q);
+      renderCanvas();
+      renderPhonePreview();
+    }
+
+    function updateOption(index, value) {
+      const q = getSelectedQuestion();
+      if (!q || !q.options) return;
+      q.options[index] = value;
+      renderCanvas();
+      renderPhonePreview();
+    }
+
+    function removeOption(index) {
+      const q = getSelectedQuestion();
+      if (!q || !q.options) return;
+      q.options.splice(index, 1);
+      renderOptionEditor(q);
+      renderCanvas();
+      renderPhonePreview();
+    }
+
+    function applyQuestionSettings() {
+      const q = getSelectedQuestion();
+      if (!q) return;
+
+      q.label = document.getElementById('question-label').value.trim() || q.label;
+      q.help = document.getElementById('question-help').value.trim();
+      q.required = document.getElementById('question-required').value;
+      q.followup = document.getElementById('question-followup').value;
+      q.branch = document.getElementById('question-branch').value.trim();
+
+      renderCanvas();
+      renderPhonePreview();
+      alert('Question updated.');
+    }
+
+    function moveQuestion(id, dir) {
+      const idx = survey.questions.findIndex(q => q.id === id);
+      if (idx < 0) return;
+      const target = idx + dir;
+      if (target < 0 || target >= survey.questions.length) return;
+      const temp = survey.questions[idx];
+      survey.questions[idx] = survey.questions[target];
+      survey.questions[target] = temp;
+      renderCanvas();
+      renderPhonePreview();
+    }
+
+    function cloneQuestion(id) {
+      const q = survey.questions.find(x => x.id === id);
+      if (!q) return;
+      const clone = JSON.parse(JSON.stringify(q));
+      clone.id = 'q' + Date.now();
+      const idx = survey.questions.findIndex(x => x.id === id);
+      survey.questions.splice(idx + 1, 0, clone);
+      selectedQuestionId = clone.id;
+      renderCanvas();
+      renderSettings();
+      renderPhonePreview();
+    }
+
+    function duplicateSelectedQuestion() {
+      if (!selectedQuestionId) return;
+      cloneQuestion(selectedQuestionId);
+    }
+
+    function deleteSelectedQuestion() {
+      if (!selectedQuestionId) return;
+      const idx = survey.questions.findIndex(q => q.id === selectedQuestionId);
+      if (idx < 0) return;
+      survey.questions.splice(idx, 1);
+      selectedQuestionId = survey.questions[0] ? survey.questions[0].id : null;
+      renderCanvas();
+      renderSettings();
+      renderPhonePreview();
+    }
+
+    function bindModeButtons() {
+      document.querySelectorAll('#mode-grid .mode-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          survey.mode = btn.getAttribute('data-mode') || 'standard';
+          renderMode();
+          renderPhonePreview();
+        });
+      });
+    }
+
+    function renderMode() {
+      document.querySelectorAll('#mode-grid .mode-option').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-mode') === survey.mode);
+      });
+    }
+
+    function bindChannelButtons() {
+      document.querySelectorAll('#collection-grid .channel-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const channel = btn.getAttribute('data-channel');
+          if (!channel) return;
+          if (survey.channels.includes(channel)) {
+            survey.channels = survey.channels.filter(c => c !== channel);
+          } else {
+            survey.channels.push(channel);
+          }
+          renderChannels();
+        });
+      });
+    }
+
+    function renderChannels() {
+      document.querySelectorAll('#collection-grid .channel-option').forEach(btn => {
+        const channel = btn.getAttribute('data-channel');
+        btn.classList.toggle('active', survey.channels.includes(channel));
+      });
+    }
+
+    function renderPhonePreview() {
+      const phone = document.getElementById('phone-screen');
+      const q = getSelectedQuestion() || survey.questions[0];
+
+      if (!q) {
+        phone.innerHTML = `<div class="phone-question">No question selected</div>`;
+        return;
+      }
+
+      if (survey.mode === 'party') {
+        phone.innerHTML = `
+          <div class="phone-topbar">
+            <span>GoNoGo Party Mode</span>
+            <span>Question ${survey.questions.findIndex(x => x.id === q.id) + 1}/${survey.questions.length}</span>
+          </div>
+          <div class="phone-progress"><div class="phone-progress-fill"></div></div>
+          <div class="phone-party-card">
+            <div style="font-size:11px;opacity:.84;margin-bottom:8px;">Swipe-first response mode</div>
+            <div class="phone-question" style="color:#fff;">${escapeHtml(q.label)}</div>
+            <div style="font-size:13px;line-height:1.55;opacity:.92;margin-top:10px;">${escapeHtml(q.help || 'Fast mobile answering with stronger momentum and larger touch targets.')}</div>
+          </div>
+          <div class="phone-party-actions">
+            <button class="party-btn no">Not great</button>
+            <button class="party-btn yes">Love it</button>
+          </div>
+          <div class="phone-subcopy">Party Mode still uses the same survey data, logic, and completion flow.</div>
+        `;
+        return;
+      }
+
+      let answers = '';
+      if (['single','multi','csat','thumbs','matrix','image-choice','consent'].includes(q.type) && q.options && q.options.length) {
+        answers = `<div class="phone-answer-stack">${q.options.map(opt => `<div class="phone-answer">${escapeHtml(opt)}</div>`).join('')}</div>`;
+      } else if (q.type === 'nps') {
+        answers = `
+          <div class="phone-answer-stack">
+            <div class="phone-answer">0 1 2 3 4 5 6 7 8 9 10</div>
+          </div>
+        `;
+      } else {
+        answers = `<div class="phone-answer">Open text response area</div>`;
+      }
+
+      phone.innerHTML = `
+        <div class="phone-topbar">
+          <span>GoNoGo Survey</span>
+          <span>Question ${survey.questions.findIndex(x => x.id === q.id) + 1}/${survey.questions.length}</span>
+        </div>
+        <div class="phone-progress"><div class="phone-progress-fill"></div></div>
+        <div class="phone-question">${escapeHtml(q.label)}</div>
+        <div class="phone-subcopy">${escapeHtml(q.help || survey.intro || 'Quick customer feedback survey')}</div>
+        ${answers}
+      `;
+    }
+
+    function previewNextQuestion() {
+      renderPhonePreview();
+    }
+
+    function saveSurveyDraft() {
+      survey.name = document.getElementById('survey-name').value.trim() || survey.name;
+      survey.purpose = document.getElementById('survey-purpose').value.trim() || survey.purpose;
+      survey.intro = document.getElementById('survey-intro').value.trim() || survey.intro;
+      survey.status = 'draft';
+      document.getElementById('survey-status-pill').innerHTML = '<i class="fa-solid fa-pen"></i> Draft';
+      document.getElementById('survey-status-pill').className = 'status-pill draft';
+      alert('Draft saved. Next wire this to Supabase survey definitions.');
+    }
+
+    function goToCampaignSetup() {
+      alert('Next upload should be the campaign / collection setup page that reads this survey definition.');
+    }
+
+    function iconForType(type) {
+      const map = {
+        nps:'fa-hashtag', csat:'fa-face-smile', thumbs:'fa-thumbs-up', single:'fa-circle-dot',
+        multi:'fa-square-check', text:'fa-keyboard', 'short-text':'fa-i-cursor', matrix:'fa-table-cells',
+        'image-choice':'fa-image', consent:'fa-shield-halved'
+      };
+      return map[type] || 'fa-list';
+    }
+
+    function typeLabel(type) {
+      const map = {
+        nps:'NPS score', csat:'Satisfaction choice', thumbs:'Positive / negative', single:'Single choice',
+        multi:'Multi-select', text:'Long text', 'short-text':'Short text', matrix:'Matrix', 'image-choice':'Image choice', consent:'Consent'
+      };
+      return map[type] || 'Question';
+    }
+
+    function followupLabel(value) {
+      const map = {
+        none:'No follow-up',
+        'low-score':'Follow-up on low score',
+        'high-score':'Follow-up on high score',
+        'negative-choice':'Follow-up on negative choice'
+      };
+      return map[value] || 'No follow-up';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
