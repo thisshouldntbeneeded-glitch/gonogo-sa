@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>GoNoGo Party Survey Preview</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --party-bg:
+        radial-gradient(circle at 18% 12%, rgba(29,209,161,0.18), transparent 28%),
+        radial-gradient(circle at 86% 14%, rgba(124,58,237,0.22), transparent 32%),
+        radial-gradient(circle at 50% 100%, rgba(245,158,11,0.14), transparent 28%),
+        linear-gradient(180deg, #0d1020 0%, #11162a 55%, #171b31 100%);
+      --glass: rgba(16, 20, 39, 0.76);
+      --glass-2: rgba(255,255,255,0.06);
+      --glass-3: rgba(255,255,255,0.1);
+      --text-main: #f8fafc;
+      --text-soft: rgba(226,232,240,0.78);
+      --text-faint: rgba(226,232,240,0.56);
+      --mint: #1dd1a1;
+      --violet: #8b5cf6;
+      --amber: #f59e0b;
+      --rose: #fb7185;
+      --danger: #ff5c7a;
+      --card-radius: 28px;
+      --card-shadow: 0 24px 80px rgba(4, 8, 24, 0.42);
+      --safe-bottom: calc(env(safe-area-inset-bottom) + 14px);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      background: var(--party-bg);
+      color: var(--text-main);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+    }
+    button, input, textarea { font: inherit; }
+    .party-shell {
+      position: relative;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 14px var(--safe-bottom);
+      gap: 12px;
+      overflow: hidden;
+    }
+    .party-shell::before,
+    .party-shell::after {
+      content: '';
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(22px);
+      pointer-events: none;
+      opacity: .8;
+      z-index: 0;
+    }
+    .party-shell::before {
+      width: 180px; height: 180px; left: -52px; top: 96px; background: rgba(29,209,161,0.16);
+    }
+    .party-shell::after {
+      width: 220px; height: 220px; right: -74px; bottom: 140px; background: rgba(124,58,237,0.18);
+    }
+    .topbar,
+    .statusbar,
+    .previewbar,
+    .card-stack-wrap,
+    .dock,
+    .success-shell { position: relative; z-index: 1; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 2px 0;
+    }
+    .brand-block { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+      overflow: hidden;
+    }
+    .brand-mark img { width: 100%; height: 100%; object-fit: contain; }
+    .brand-name { font-size: 15px; font-weight: 800; line-height: 1.1; }
+    .brand-sub { font-size: 12px; color: var(--text-soft); margin-top: 4px; }
+    .pill {
+      min-height: 40px; padding: 10px 12px; border-radius: 999px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-main); font-size: 12px; font-weight: 800; white-space: nowrap;
+      backdrop-filter: blur(18px);
+    }
+    .statusbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 20px;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.2);
+      backdrop-filter: blur(18px);
+    }
+    .streak {
+      min-width: 56px; min-height: 44px; padding: 0 12px;
+      border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(251,113,133,0.16));
+      color: #fff; font-size: 13px; font-weight: 800;
+    }
+    .progress-copy { min-width: 0; }
+    .progress-label { font-size: 12px; color: var(--text-soft); margin-bottom: 6px; }
+    .progress-track {
+      width: 100%; height: 10px; border-radius: 999px; overflow: hidden;
+      background: rgba(255,255,255,0.09);
+    }
+    .progress-fill {
+      height: 100%; width: 0%; border-radius: inherit;
+      background: linear-gradient(90deg, var(--mint), var(--violet), var(--amber));
+      transition: width 180ms ease;
+    }
+    .progress-value { font-size: 12px; font-weight: 800; color: #fff; }
+    .card-stack-wrap {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+    }
+    .previewbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+    }
+    .preview-copy { min-width: 0; }
+    .preview-title { font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .preview-sub { font-size: 12px; color: var(--text-soft); }
+    .preview-actions { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .mode-btn {
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: linear-gradient(135deg, rgba(29,209,161,0.26), rgba(139,92,246,0.24));
+      border-color: rgba(29,209,161,0.4);
+    }
+    .card-stack {
+      position: relative;
+      width: 100%;
+      height: min(72vh, 680px);
+      min-height: 520px;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+    .survey-card {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--card-radius);
+      background: linear-gradient(180deg, rgba(17,22,42,0.98), rgba(21,26,48,0.96));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      touch-action: none;
+      transform-origin: center 120%;
+      transition: transform 180ms ease, opacity 180ms ease, box-shadow 180ms ease;
+      will-change: transform;
+    }
+    .survey-card.hidden { display: none; }
+    .survey-card.peek-1,
+    .survey-card.peek-2 { opacity: 0; pointer-events: none; transform: translateY(0) scale(1); }
+    .survey-card.flat-preview:not(.active) { display: none; }
+    .survey-card:not(.active) { opacity: 0; pointer-events: none; transform: translateY(0) scale(1); }
+    .survey-card.active { opacity: 1; pointer-events: auto; }
+    .card-bg-glow {
+      position: absolute;
+      inset: auto -30px -40px auto;
+      width: 180px; height: 180px; border-radius: 999px;
+      background: radial-gradient(circle, rgba(29,209,161,0.22), rgba(29,209,161,0));
+      pointer-events: none;
+    }
+    .card-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+      padding: 18px;
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .q-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: rgba(255,255,255,0.08); color: #fff; font-size: 11px; font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .swipe-hint { font-size: 11px; color: var(--text-faint); text-align: right; max-width: 110px; }
+    .question-area { display: grid; gap: 12px; }
+    .question-title {
+      font-size: clamp(1.6rem, 1.18rem + 1.2vw, 2.3rem);
+      line-height: 1.02;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+    .question-meta { font-size: 14px; color: var(--text-soft); line-height: 1.55; max-width: none; }
+    .gesture-caption {
+      display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: var(--text-soft);
+    }
+    .gesture-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--mint); }
+    .answer-zone {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+    .binary-lanes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .lane {
+      min-height: 120px;
+      border-radius: 22px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .lane.no { background: linear-gradient(180deg, rgba(255,92,122,0.13), rgba(255,255,255,0.04)); }
+    .lane.yes { background: linear-gradient(180deg, rgba(29,209,161,0.14), rgba(255,255,255,0.04)); }
+    .lane-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .lane-icon {
+      width: 38px; height: 38px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 15px;
+      background: rgba(255,255,255,0.12); color: #fff;
+    }
+    .lane-label { font-size: 15px; font-weight: 800; }
+    .lane-copy { font-size: 12px; line-height: 1.55; color: var(--text-soft); max-width: none; }
+    .option-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .option-chip,
+    .dock-btn,
+    .quick-btn,
+    .advance-btn,
+    .submit-btn {
+      -webkit-tap-highlight-color: transparent;
+    }
+    .option-chip {
+      width: 100%; min-height: 56px; border-radius: 18px; padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05); color: #fff;
+      text-align: left; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+    .option-chip:active,
+    .dock-btn:active,
+    .quick-btn:active,
+    .advance-btn:active,
+    .submit-btn:active { transform: scale(0.985); }
+    .option-chip.active {
+      background: linear-gradient(135deg, rgba(29,209,161,0.18), rgba(124,58,237,0.18));
+      border-color: rgba(255,255,255,0.14);
+      box-shadow: 0 12px 34px rgba(124,58,237,0.16);
+    }
+    .scale-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .scale-btn {
+      min-height: 60px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .scale-btn.active {
+      background: linear-gradient(135deg, rgba(29,209,161,0.18), rgba(124,58,237,0.18));
+      border-color: rgba(255,255,255,0.14);
+      box-shadow: 0 12px 34px rgba(29,209,161,0.14);
+    }
+    .scale-legend {
+      display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--text-faint);
+    }
+    .text-box {
+      width: 100%; min-height: 160px; resize: none;
+      border-radius: 22px; padding: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; line-height: 1.55;
+      outline: none;
+    }
+    .text-box::placeholder { color: rgba(226,232,240,0.42); }
+    .text-box:focus { border-color: rgba(29,209,161,0.4); box-shadow: 0 0 0 4px rgba(29,209,161,0.1); }
+    .quick-row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .quick-btn {
+      min-height: 40px; padding: 10px 12px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.07); color: #fff;
+      font-size: 12px; font-weight: 800;
+    }
+    .advance-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .advance-copy { font-size: 12px; color: var(--text-soft); }
+    .advance-btn {
+      min-height: 50px; padding: 0 18px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--mint), var(--violet)); color: #fff; border: none;
+      font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 9px; justify-content: center;
+      box-shadow: 0 14px 30px rgba(29,209,161,0.14);
+    }
+    .swipe-badges {
+      position: absolute;
+      inset: 18px 18px auto 18px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .swipe-badge {
+      min-width: 92px;
+      text-align: center;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 2px solid currentColor;
+      opacity: 0;
+      transform: scale(0.92) rotate(-6deg);
+    }
+    .swipe-badge.left { color: var(--danger); }
+    .swipe-badge.right { color: var(--mint); transform: scale(0.92) rotate(6deg); }
+    .dock {
+      display: grid;
+      grid-template-columns: 56px 1fr 56px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0 0;
+    }
+    .dock-btn {
+      height: 56px; width: 56px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06); color: #fff; font-size: 18px; display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+    }
+    .dock-btn.primary {
+      height: 58px; width: 100%; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(29,209,161,0.22), rgba(124,58,237,0.22));
+      font-size: 14px; font-weight: 800; gap: 10px;
+    }
+    .dock-btn:disabled,
+    .advance-btn:disabled,
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    .success-shell {
+      display: none;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-card {
+      width: 100%; max-width: 640px;
+      padding: 26px 22px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(17,22,42,0.96), rgba(21,26,48,0.94));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--card-shadow);
+      text-align: center;
+    }
+    .success-icon {
+      width: 76px; height: 76px; border-radius: 999px; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff;
+      background: linear-gradient(135deg, rgba(29,209,161,0.24), rgba(124,58,237,0.26));
+      box-shadow: 0 22px 40px rgba(124,58,237,0.18);
+    }
+    .success-title { font-size: clamp(1.8rem, 1.35rem + 1vw, 2.5rem); line-height: 1.04; margin: 0 0 10px; }
+    .success-copy { font-size: 15px; line-height: 1.65; color: var(--text-soft); max-width: none; }
+    .submit-panel {
+      margin-top: 18px; display: grid; gap: 12px; text-align: left;
+      padding: 16px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    }
+    .submit-title { font-size: 14px; font-weight: 800; }
+    .submit-grid { display: grid; gap: 10px; }
+    .input {
+      width: 100%; min-height: 52px; border-radius: 16px; padding: 14px 15px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; outline: none;
+    }
+    .input::placeholder { color: rgba(226,232,240,0.42); }
+    .submit-btn {
+      min-height: 54px; width: 100%; border-radius: 18px; border: none;
+      background: linear-gradient(135deg, var(--mint), var(--violet)); color: #fff;
+      font-size: 15px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 18px 36px rgba(124,58,237,0.22);
+    }
+    .micro-copy { font-size: 12px; color: var(--text-faint); }
+    .confetti-layer {
+      position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60;
+    }
+    .confetti {
+      position: absolute; top: -30px; width: 10px; height: 22px; border-radius: 4px; opacity: 0;
+      animation: fall 1500ms ease-in forwards;
+    }
+    @keyframes fall {
+      0% { transform: translate3d(0,0,0) rotate(0deg); opacity: 1; }
+      100% { transform: translate3d(var(--dx), 110vh, 0) rotate(var(--rot)); opacity: 0; }
+    }
+    @media (min-width: 760px) {
+      .party-shell { padding: 18px 18px var(--safe-bottom); }
+      .card-body { padding: 22px; }
+      .option-grid.two { grid-template-columns: 1fr 1fr; }
+      .submit-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .confetti { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="party-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" id="brand-mark"><i class="fa-solid fa-wave-square" style="color:var(--mint);"></i></div>
+        <div>
+          <div class="brand-name" id="brand-name">GoNoGo Party Survey</div>
+          <div class="brand-sub" id="brand-sub">Swipe-based mobile feedback</div>
+        </div>
+      </div>
+      <div class="pill"><i class="fa-solid fa-bolt"></i> Party mode</div>
+    </header>
+
+    <section class="statusbar">
+      <div class="streak"><i class="fa-solid fa-fire"></i> <span id="streak-count">0</span></div>
+      <div class="progress-copy">
+        <div class="progress-label" id="progress-label">Fast phone-native feedback flow</div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <div class="progress-value" id="progress-value">0 / 0</div>
+    </section>
+
+    <section class="card-stack-wrap" id="card-stack-wrap">
+      <div class="card-stack" id="card-stack"></div>
+    </section>
+
+    <section class="success-shell" id="success-shell">
+      <div class="success-card">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <h1 class="success-title">Feedback captured</h1>
+        <p class="success-copy" id="success-copy">Thanks — your response has been sent to the brand team. That was designed to be quick because mobile users should not have to fight a form.</p>
+        <div class="submit-panel">
+          <div class="submit-title">Optional follow-up</div>
+          <div class="submit-grid">
+            <input id="customer-name" class="input" type="text" placeholder="Your name (optional)" />
+            <input id="customer-email" class="input" type="email" placeholder="Email address (optional)" />
+          </div>
+          <button type="button" class="submit-btn" id="submit-btn"><i class="fa-solid fa-paper-plane"></i> Submit final feedback</button>
+          <div class="micro-copy">No public posting. Internal brand feedback only.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="dock" id="dock">
+      <button type="button" class="dock-btn" id="back-btn" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i></button>
+      <button type="button" class="dock-btn primary" id="skip-btn" onclick="handleSkip()"><i class="fa-solid fa-forward"></i> Skip for now</button>
+      <button type="button" class="dock-btn" id="info-btn" onclick="flashHint()"><i class="fa-solid fa-hand-pointer"></i></button>
+    </footer>
+  </div>
+
+  <div class="confetti-layer" id="confetti-layer"></div>
+
+  <script src="components.js"></script>
+  <script src="api.js"></script>
+  <script>
+    var campaignId = null;
+    var campaign = null;
+    var brand = null;
+    var answers = {};
+    var historyStack = [];
+    var currentIndex = 0;
+    var streak = 0;
+    var surveyFlow = [];
+    var dragState = null;
+
+    var BUILTIN_SURVEYS = {
+      'customer-pulse': {
+        id: 'customer-pulse',
+        name: 'Customer Pulse',
+        intro: 'Quick swipes and taps. Tell us what this experience felt like on your phone, in under a minute.',
+        questions: [
+          { key: 'felt_good', type: 'swipe-binary', label: 'Did this experience feel good overall?', left: 'Not really', right: 'Yes, definitely', leftValue: 'negative', rightValue: 'positive', leftCopy: 'Swipe left if the experience missed the mark.', rightCopy: 'Swipe right if this felt smooth and satisfying.' },
+          { key: 'ease_score', type: 'scale', label: 'How easy was it to get what you needed?', minLabel: 'Hard', maxLabel: 'Easy', values: [1,2,3,4,5] },
+          { key: 'best_part', type: 'single', label: 'What stood out most?', options: ['Speed', 'Service quality', 'Clear communication', 'Good value'] },
+          { key: 'friction_point', type: 'text', label: 'What slowed you down or frustrated you?', quick: ['Slow response', 'Confusing process', 'Too expensive', 'No issue really'] },
+          { key: 'return_likelihood', type: 'swipe-binary', label: 'Would you come back or use this brand again?', left: 'Unlikely', right: 'Very likely', leftValue: 'unlikely', rightValue: 'likely', leftCopy: 'Swipe left if trust is still low.', rightCopy: 'Swipe right if you would happily return.' }
+        ]
+      },
+      'post-purchase': {
+        id: 'post-purchase',
+        name: 'Post-Purchase Flow',
+        intro: 'A swipe-led check-in on how the purchase journey actually felt.',
+        questions: [
+          { key: 'met_expectation', type: 'swipe-binary', label: 'Did the purchase experience match what you expected?', left: 'Below expectation', right: 'Yes it did', leftValue: 'below', rightValue: 'matched', leftCopy: 'Swipe left if the promise and reality did not align.', rightCopy: 'Swipe right if the journey lived up to the pitch.' },
+          { key: 'confidence_score', type: 'scale', label: 'How confident did you feel before paying?', minLabel: 'Unsure', maxLabel: 'Confident', values: [1,2,3,4,5] },
+          { key: 'decision_driver', type: 'single', label: 'What most helped you complete the purchase?', options: ['Price', 'Reviews', 'Sales support', 'Brand trust'] },
+          { key: 'almost_stopped', type: 'text', label: 'What almost stopped you from buying?', quick: ['Checkout friction', 'Price too high', 'Needed more info', 'Nothing stopped me'] }
+        ]
+      },
+      'support-check': {
+        id: 'support-check',
+        name: 'Support Swipe Check',
+        intro: 'Fast feedback on whether support actually solved the problem.',
+        questions: [
+          { key: 'resolved_feel', type: 'swipe-binary', label: 'Did support leave you feeling sorted?', left: 'Not sorted', right: 'Yes, sorted', leftValue: 'not_resolved', rightValue: 'resolved', leftCopy: 'Swipe left if the issue still feels open.', rightCopy: 'Swipe right if the problem was handled properly.' },
+          { key: 'speed_score', type: 'scale', label: 'How fast did the support feel?', minLabel: 'Slow', maxLabel: 'Fast', values: [1,2,3,4,5] },
+          { key: 'team_tone', type: 'single', label: 'What best describes the support team?', options: ['Helpful', 'Friendly', 'Confusing', 'Dismissive'] },
+          { key: 'still_missing', type: 'text', label: 'What is still missing, if anything?', quick: ['Need follow-up', 'Need refund', 'Need explanation', 'All good now'] }
+        ]
+      },
+      'nps-lite': {
+        id: 'nps-lite',
+        name: 'Recommend or Not',
+        intro: 'A fast recommendation pulse with one key comment.',
+        questions: [
+          { key: 'recommend', type: 'swipe-binary', label: 'Would you recommend this brand to a friend?', left: 'No chance', right: 'Absolutely', leftValue: 'nogo', rightValue: 'go', leftCopy: 'Swipe left if you would warn others away.', rightCopy: 'Swipe right if you would actively recommend them.' },
+          { key: 'recommend_score', type: 'scale', label: 'How strong is that feeling?', minLabel: 'Low', maxLabel: 'High', values: [1,2,3,4,5] },
+          { key: 'main_reason', type: 'text', label: 'What is the biggest reason behind that answer?', quick: ['Great service', 'Poor service', 'Good value', 'Needs work'] }
+        ]
+      }
+    };
+
+    initPage();
+
+    async function initPage() {
+      campaignId = new URLSearchParams(window.location.search).get('campaign') || 'sample-campaign';
+      await loadCampaign();
+      setupFlow();
+      renderStack();
+      bindSubmit();
+      updateProgress();
+    }
+
+    async function loadCampaign() {
+      try {
+        if (GoNoGoAPI.getPublicSurveyCampaign) campaign = await GoNoGoAPI.getPublicSurveyCampaign(campaignId);
+      } catch (e) {
+        console.error('Failed to load public campaign', e);
+      }
+      if (!campaign) campaign = getFallbackCampaign();
+      try {
+        if (campaign.brandslug && GoNoGoAPI.getBrandData) {
+          var brandData = await GoNoGoAPI.getBrandData(campaign.brandslug);
+          if (brandData && brandData.normalized) brand = brandData.normalized;
+        }
+      } catch (e) {
+        console.error('Unable to load brand data', e);
+      }
+      document.getElementById('brand-name').textContent = brand && brand.name ? brand.name : 'GoNoGo Party Survey';
+      document.getElementById('brand-sub').textContent = campaign.name || 'Swipe-based mobile feedback';
+      if (brand && brand.logo) {
+        document.getElementById('brand-mark').innerHTML = '<img src="' + brand.logo + '" alt="' + escapeHtml(brand.name || 'Brand') + ' logo" onerror="this.parentNode.innerHTML=\'<i class=\\"fa-solid fa-wave-square\\" style=\\"color:var(--mint);\\"></i>\'">';
+      }
+    }
+
+    function getFallbackCampaign() {
+      return {
+        id: campaignId,
+        brandslug: 'sample-brand',
+        name: 'Customer Pulse Party Mode',
+        templateid: 'customer-pulse',
+        introtext: 'Quick swipes and taps. Designed for fast feedback on mobile.',
+        channel: 'web',
+        status: 'live'
+      };
+    }
+
+    function setupFlow() {
+      var template = BUILTIN_SURVEYS[campaign.templateid] || BUILTIN_SURVEYS['customer-pulse'];
+      surveyFlow = template.questions.slice();
+      document.getElementById('progress-label').textContent = campaign.introtext || template.intro || 'Quick swipes and taps';
+    }
+
+    function renderStack() {
+      if ((campaign.status || 'live') !== 'live') {
+        document.getElementById('card-stack-wrap').innerHTML = '<div class="success-card" style="display:block"><h1 class="success-title">Survey closed</h1><p class="success-copy">This survey is no longer accepting responses.</p></div>';
+        document.getElementById('dock').style.display = 'none';
+        return;
+      }
+
+      if (currentIndex >= surveyFlow.length) {
+        showSuccessShell();
+        return;
+      }
+
+      var stack = document.getElementById('card-stack');
+      stack.innerHTML = '';
+      for (var offset = 0; offset < 3; offset++) {
+        var idx = currentIndex + offset;
+        if (!surveyFlow[idx]) continue;
+        var question = surveyFlow[idx];
+        var card = document.createElement('article');
+        card.className = 'survey-card ' + (offset === 0 ? 'active' : offset === 1 ? 'peek-1' : 'peek-2');
+        card.dataset.index = idx;
+        card.innerHTML = buildCardHtml(question, idx + 1, surveyFlow.length, offset === 0);
+        stack.appendChild(card);
+        if (offset === 0 && question.type === 'swipe-binary') bindSwipe(card, question);
+      }
+      updateProgress();
+    }
+
+    function buildCardHtml(question, number, total, isActive) {
+      return '' +
+        '<div class="swipe-badges">' +
+          '<div class="swipe-badge left" id="badge-left">NOPE</div>' +
+          '<div class="swipe-badge right" id="badge-right">YES</div>' +
+        '</div>' +
+        '<div class="card-bg-glow"></div>' +
+        '<div class="card-body">' +
+          '<div class="card-top">' +
+            '<div class="q-badge"><i class="fa-solid fa-layer-group"></i> Question ' + number + ' of ' + total + '</div>' +
+            '<div class="swipe-hint">' + escapeHtml(getHint(question)) + '</div>' +
+          '</div>' +
+          '<div class="question-area">' +
+            '<h1 class="question-title">' + escapeHtml(question.label) + '</h1>' +
+            '<div class="question-meta">' + escapeHtml(getMeta(question)) + '</div>' +
+            '<div class="gesture-caption"><span class="gesture-dot"></span>' + escapeHtml(getCaption(question)) + '</div>' +
+          '</div>' +
+          '<div class="answer-zone">' + buildAnswerUI(question, isActive) + '</div>' +
+        '</div>';
+    }
+
+    function getHint(question) {
+      if (question.type === 'swipe-binary') return 'Swipe left or right';
+      if (question.type === 'scale') return 'Tap once to answer';
+      if (question.type === 'single') return 'Big thumb targets';
+      return 'Short and optional detail';
+    }
+
+    function getMeta(question) {
+      if (question.type === 'swipe-binary') return 'Phone-native choice: one quick gesture, instant momentum.';
+      if (question.type === 'scale') return 'A compact five-point feel check keeps answers fast without losing signal.';
+      if (question.type === 'single') return 'Choose the option that best captures the moment.';
+      return 'Keep it short. Fast comments are better than abandoned forms.';
+    }
+
+    function getCaption(question) {
+      if (question.type === 'swipe-binary') return 'Drag the card or tap the left and right lanes.';
+      if (question.type === 'scale') return 'One tap answers it and moves you on.';
+      if (question.type === 'single') return 'Tap the strongest fit and keep going.';
+      return 'Type a quick answer or tap a ready-made prompt.';
+    }
+
+    function buildAnswerUI(question) {
+      if (question.type === 'swipe-binary') {
+        return '' +
+          '<div class="binary-lanes">' +
+            '<button type="button" class="lane no" onclick="answerBinary(\'' + question.key + '\', \'left\')">' +
+              '<div class="lane-top"><span class="lane-icon"><i class="fa-solid fa-xmark"></i></span><span class="lane-label">' + escapeHtml(question.left) + '</span></div>' +
+              '<div class="lane-copy">' + escapeHtml(question.leftCopy || '') + '</div>' +
+            '</button>' +
+            '<button type="button" class="lane yes" onclick="answerBinary(\'' + question.key + '\', \'right\')">' +
+              '<div class="lane-top"><span class="lane-icon"><i class="fa-solid fa-check"></i></span><span class="lane-label">' + escapeHtml(question.right) + '</span></div>' +
+              '<div class="lane-copy">' + escapeHtml(question.rightCopy || '') + '</div>' +
+            '</button>' +
+          '</div>';
+      }
+      if (question.type === 'scale') {
+        return '' +
+          '<div class="scale-row">' + question.values.map(function(v) {
+            return '<button type="button" class="scale-btn" onclick="answerScale(\'' + question.key + '\',' + v + ')">' + v + '</button>';
+          }).join('') + '</div>' +
+          '<div class="scale-legend"><span>' + escapeHtml(question.minLabel || 'Low') + '</span><span>' + escapeHtml(question.maxLabel || 'High') + '</span></div>';
+      }
+      if (question.type === 'single') {
+        return '<div class="option-grid ' + (question.options.length === 4 ? 'two' : '') + '">' + question.options.map(function(opt) {
+          return '<button type="button" class="option-chip" onclick="answerSingle(\'' + question.key + '\',\'' + escapeJs(opt) + '\', this)"><span>' + escapeHtml(opt) + '</span><i class="fa-solid fa-arrow-right"></i></button>';
+        }).join('') + '</div>';
+      }
+      return '' +
+        '<textarea class="text-box" id="text-' + question.key + '" placeholder="Type a quick answer here..."></textarea>' +
+        '<div class="quick-row">' + (question.quick || []).map(function(opt) {
+          return '<button type="button" class="quick-btn" onclick="appendQuick(\'' + question.key + '\',\'' + escapeJs(opt) + '\')">' + escapeHtml(opt) + '</button>';
+        }).join('') + '</div>' +
+        '<div class="advance-row">' +
+          '<div class="advance-copy">You can keep it short. Tap next when ready.</div>' +
+          '<button type="button" class="advance-btn" onclick="answerText(\'' + question.key + '\')"><i class="fa-solid fa-arrow-right"></i> Next</button>' +
+        '</div>';
+    }
+
+    function bindSwipe(card, question) {
+      var threshold = 90;
+      var startX = 0;
+      var startY = 0;
+      var currentX = 0;
+      var active = false;
+      var leftBadge = card.querySelector('.swipe-badge.left');
+      var rightBadge = card.querySelector('.swipe-badge.right');
+
+      card.addEventListener('pointerdown', function(e) {
+        if (e.target.closest('button, textarea, input')) return;
+        active = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        currentX = 0;
+        dragState = card;
+        card.setPointerCapture(e.pointerId);
+      });
+
+      card.addEventListener('pointermove', function(e) {
+        if (!active) return;
+        currentX = e.clientX - startX;
+        var currentY = e.clientY - startY;
+        var rotate = currentX * 0.06;
+        card.style.transform = 'translate(' + currentX + 'px,' + (currentY * 0.15) + 'px) rotate(' + rotate + 'deg)';
+        leftBadge.style.opacity = currentX < 0 ? Math.min(Math.abs(currentX) / 110, 1) : 0;
+        rightBadge.style.opacity = currentX > 0 ? Math.min(Math.abs(currentX) / 110, 1) : 0;
+      });
+
+      function release(pointerId) {
+        if (!active) return;
+        active = false;
+        if (pointerId !== undefined) card.releasePointerCapture(pointerId);
+        if (currentX > threshold) {
+          flyOut(card, 'right', function() { answerBinary(question.key, 'right', true); });
+        } else if (currentX < -threshold) {
+          flyOut(card, 'left', function() { answerBinary(question.key, 'left', true); });
+        } else {
+          card.style.transform = '';
+          leftBadge.style.opacity = 0;
+          rightBadge.style.opacity = 0;
+        }
+      }
+
+      card.addEventListener('pointerup', function(e) { release(e.pointerId); });
+      card.addEventListener('pointercancel', function(e) { release(e.pointerId); });
+    }
+
+    function flyOut(card, direction, done) {
+      card.style.transition = 'transform 180ms ease, opacity 180ms ease';
+      card.style.transform = direction === 'right'
+        ? 'translate(120vw, -20px) rotate(18deg)'
+        : 'translate(-120vw, -20px) rotate(-18deg)';
+      card.style.opacity = 0;
+      setTimeout(done, 170);
+    }
+
+    function answerBinary(key, direction, fromSwipe) {
+      var question = surveyFlow[currentIndex];
+      if (!question || question.key !== key) return;
+      var value = direction === 'right' ? question.rightValue : question.leftValue;
+      answers[key] = value;
+      pushHistory();
+      streak++;
+      nextCard();
+    }
+
+    function answerScale(key, value) {
+      answers[key] = value;
+      pushHistory();
+      streak++;
+      nextCard();
+    }
+
+    function answerSingle(key, value, el) {
+      answers[key] = value;
+      if (el) {
+        var chips = el.parentNode.querySelectorAll('.option-chip');
+        chips.forEach(function(chip){ chip.classList.remove('active'); });
+        el.classList.add('active');
+      }
+      pushHistory();
+      streak++;
+      setTimeout(nextCard, 120);
+    }
+
+    function answerText(key) {
+      var box = document.getElementById('text-' + key);
+      var value = box ? box.value.trim() : '';
+      answers[key] = value;
+      pushHistory();
+      streak++;
+      nextCard();
+    }
+
+    function appendQuick(key, text) {
+      var box = document.getElementById('text-' + key);
+      if (!box) return;
+      box.value = box.value ? box.value + (box.value.endsWith('.') ? ' ' : ', ') + text : text;
+      box.focus();
+    }
+
+    function pushHistory() {
+      historyStack.push(currentIndex);
+    }
+
+    function nextCard() {
+      currentIndex++;
+      renderStack();
+    }
+
+    function goBack() {
+      if (!historyStack.length) return;
+      currentIndex = historyStack.pop();
+      streak = Math.max(0, streak - 1);
+      renderStack();
+    }
+
+    function handleSkip() {
+      streak = 0;
+      currentIndex++;
+      renderStack();
+    }
+
+    function flashHint() {
+      var active = document.querySelector('.survey-card.active');
+      if (!active) return;
+      active.style.boxShadow = '0 0 0 2px rgba(29,209,161,0.45), var(--card-shadow)';
+      setTimeout(function(){ active.style.boxShadow = ''; }, 300);
+    }
+
+    function updateProgress() {
+      var total = surveyFlow.length;
+      var done = Math.min(currentIndex, total);
+      var pct = total ? Math.round((done / total) * 100) : 0;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-value').textContent = done + ' / ' + total;
+      document.getElementById('streak-count').textContent = streak;
+      document.getElementById('back-btn').disabled = !historyStack.length;
+      document.getElementById('skip-btn').disabled = currentIndex >= total;
+    }
+
+    function showSuccessShell() {
+      document.getElementById('card-stack-wrap').style.display = 'none';
+      document.getElementById('dock').style.display = 'none';
+      document.getElementById('success-shell').style.display = 'flex';
+      var brandName = brand && brand.name ? brand.name : 'the brand team';
+      document.getElementById('success-copy').textContent = 'Thanks — your response is ready to send to ' + brandName + '. That was designed to feel closer to how people actually use their phones.';
+      launchConfetti();
+      updateProgress();
+    }
+
+    function bindSubmit() {
+      document.getElementById('submit-btn').addEventListener('click', submitSurvey);
+    }
+
+    async function submitSurvey() {
+      var template = BUILTIN_SURVEYS[campaign.templateid] || BUILTIN_SURVEYS['customer-pulse'];
+      var payload = {
+        campaignid: campaign.id,
+        brandslug: campaign.brandslug,
+        customername: (document.getElementById('customer-name').value || '').trim(),
+        customeremail: (document.getElementById('customer-email').value || '').trim(),
+        answers: answers,
+        submittedat: new Date().toISOString(),
+        rating: deriveHeadlineRating(template, answers),
+        comment: deriveHeadlineComment(template, answers),
+        channel: campaign.channel || 'web'
+      };
+
+      try {
+        if (GoNoGoAPI.submitSurveyResponse) await GoNoGoAPI.submitSurveyResponse(payload);
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check"></i> Feedback submitted';
+      } catch (e) {
+        console.error('Survey submission failed', e);
+        alert('Unable to submit feedback right now. Please try again shortly.');
+      }
+    }
+
+    function deriveHeadlineRating(template, answerSet) {
+      var values = [];
+      template.questions.forEach(function(q) {
+        if (q.type === 'scale' && typeof answerSet[q.key] === 'number') values.push(answerSet[q.key] * 2);
+        if (q.type === 'swipe-binary') values.push(answerSet[q.key] === q.rightValue ? 9 : 3);
+      });
+      if (!values.length) return null;
+      var avg = values.reduce(function(a,b){ return a + b; }, 0) / values.length;
+      return Math.round(avg * 10) / 10;
+    }
+
+    function deriveHeadlineComment(template, answerSet) {
+      var firstText = template.questions.find(function(q){ return q.type === 'text'; });
+      return firstText ? (answerSet[firstText.key] || '') : '';
+    }
+
+    function launchConfetti() {
+      var layer = document.getElementById('confetti-layer');
+      layer.innerHTML = '';
+      var colors = ['#1dd1a1', '#8b5cf6', '#f59e0b', '#fb7185', '#ffffff'];
+      for (var i = 0; i < 34; i++) {
+        var piece = document.createElement('span');
+        piece.className = 'confetti';
+        piece.style.left = (Math.random() * 100) + 'vw';
+        piece.style.background = colors[i % colors.length];
+        piece.style.setProperty('--dx', ((Math.random() * 220) - 110) + 'px');
+        piece.style.setProperty('--rot', ((Math.random() * 900) - 450) + 'deg');
+        piece.style.animationDelay = (Math.random() * 220) + 'ms';
+        layer.appendChild(piece);
+      }
+      setTimeout(function(){ layer.innerHTML = ''; }, 1900);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJs(value) {
+      return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+  </script>
+</body>
+</html>
