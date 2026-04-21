@@ -143,7 +143,7 @@
       <div class="se-pane" id="right-pane">
         <div class="se-tabs" id="pane-tabs">
           <button class="se-tab active" data-tab="question">Question</button>
-          <button class="se-tab" data-tab="settings" id="tab-settings">Survey settings</button>
+          <button class="se-tab" data-tab="settings">Survey settings</button>
           <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Share links</button>
         </div>
         <div id="panel-question"></div>
@@ -151,685 +151,712 @@
         <div id="panel-links" style="display:none"></div>
       </div>
     </div>
+
+    <div style="padding:var(--space-6) 0;text-align:center;">
+      <p class="text-xs text-muted">&copy; 2026 GoNoGo &mdash; CX Suite (internal only)</p>
+    </div>
   </main>
 </div>
 
+<!-- Toast -->
 <div class="se-toast" id="toast"></div>
 
+<script src="data/helpers.js"></script>
+<script src="components.js"></script>
 <script src="api.js"></script>
 <script>
+Components.initTheme();
+document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
+
+if (Components.checkBrandAuth()) init();
+
 /* ── State ── */
-var _surveyId = null;
+var _surveyId = new URLSearchParams(location.search).get('id');
 var _survey = null;
 var _questions = [];
 var _links = [];
 var _selectedIdx = -1;
 var _dirty = false;
 var _saving = false;
+var esc = Components.escapeHTML.bind(Components);
 
-/* ── Helpers ── */
-function esc(s){return (s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'})[c]})}
-function toast(msg,type){
-  var el=document.getElementById('toast');
-  el.textContent=msg;
-  el.className='se-toast '+(type||'success');
-  el.classList.add('show');
-  setTimeout(function(){el.classList.remove('show');},2800);
-}
+var QTYPES = [
+  {v:'short_text',   l:'Short text',       icon:'fa-font'},
+  {v:'long_text',    l:'Long text',        icon:'fa-align-left'},
+  {v:'single_select',l:'Single select',    icon:'fa-circle-dot'},
+  {v:'multi_select', l:'Multi select',     icon:'fa-square-check'},
+  {v:'rating_1_5',   l:'Rating 1\u20135',  icon:'fa-star'},
+  {v:'nps_0_10',     l:'NPS 0\u201310',    icon:'fa-gauge-high'},
+  {v:'yes_no',       l:'Yes / No',         icon:'fa-toggle-on'},
+  {v:'email',        l:'Email',            icon:'fa-envelope'},
+  {v:'phone',        l:'Phone',            icon:'fa-phone'},
+  {v:'name',         l:'Name',             icon:'fa-user'},
+  {v:'consent',      l:'Consent checkbox', icon:'fa-check-double'}
+];
+function qtypeLabel(v){ for(var i=0;i<QTYPES.length;i++) if(QTYPES[i].v===v) return QTYPES[i].l; return v; }
+function qtypeIcon(v){ for(var i=0;i<QTYPES.length;i++) if(QTYPES[i].v===v) return QTYPES[i].icon; return 'fa-question'; }
 
-/* ── Init ── */
-document.addEventListener('DOMContentLoaded',async function(){
-  try{
-    await GoNoGoAPI.initBrandLayout('brand-content','Surveys');
-    var params=new URLSearchParams(window.location.search);
-    var id=params.get('id');
-    if(id){
-      _surveyId=id;
-      var data=await GoNoGoAPI.cx.getSurvey(id);
-      _survey=data.survey;
-      _questions=(data.questions||[]).map(function(q){return{qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]};});
-      _links=data.links||[];
-      document.getElementById('title-text').textContent='Edit: '+_survey.name;
-      document.getElementById('tab-links').style.display='';
-      renderRail();
-      renderQuestionPanel();
-      renderSurveySettings();
+async function init() {
+  var user = Components.getBrandUser();
+  if (!user) return;
+  document.getElementById('brand-content').style.display = '';
+  document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
+
+  wireEvents();
+  renderSettingsPanel();
+
+  if (_surveyId) {
+    try {
+      var data = await GoNoGoAPI.cx.getSurvey(_surveyId);
+      _survey = data.survey;
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _links = data.links || [];
+      document.getElementById('title-text').textContent = 'Edit: ' + _survey.name;
+      document.getElementById('tab-links').style.display = '';
+      populateSettings();
+      updateStatusUI();
       renderLinks();
-      updateStatusUI();
-    }else{
-      _survey={status:'draft'};
-      renderRail();
-      renderQuestionPanel();
-      renderSurveySettings();
-      updateStatusUI();
+    } catch(e) {
+      toast('Could not load survey: ' + (e.message||'error'), 'error');
+      return;
     }
-  }catch(e){
-    console.error(e);
-    toast('Failed to load survey: '+(e.message||'error'),'error');
+  } else {
+    // New survey defaults
+    _questions = [
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', required:true, options:[], help_text:''},
+      {qtype:'long_text', prompt:'Tell us more about your experience', required:false, options:[], help_text:''}
+    ];
+    populateSettingsDefaults();
   }
 
-  document.getElementById('btn-add-q').addEventListener('click',showQTypePicker);
-  document.getElementById('btn-save').addEventListener('click',save);
-  document.getElementById('btn-publish').addEventListener('click',function(){ setStatus('active'); });
-  document.getElementById('btn-pause').addEventListener('click',function(){ setStatus('paused'); });
-  document.getElementById('btn-unpublish').addEventListener('click',function(){ setStatus('draft'); });
-
-  document.querySelectorAll('.se-tab').forEach(function(t){
-    t.addEventListener('click',function(){ switchTab(t.dataset.tab); });
-  });
-
-  window.addEventListener('beforeunload',function(e){
-    if(_dirty){
-      e.preventDefault();
-      e.returnValue='';
-    }
-  });
-});
-
-/* ── Tabs ── */
-function switchTab(name){
-  document.querySelectorAll('.se-tab').forEach(function(t){ t.classList.toggle('active',t.dataset.tab===name); });
-  document.getElementById('panel-question').style.display=name==='question'?'block':'none';
-  document.getElementById('panel-settings').style.display=name==='settings'?'block':'none';
-  document.getElementById('panel-links').style.display=name==='links'?'block':'none';
-}
-
-/* ── Question rail ── */
-function renderRail(){
-  var container=document.getElementById('q-list');
-  if(!_questions.length){
-    container.innerHTML='<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div><h3>No questions yet</h3><p>Add a few questions to start collecting customer feedback.</p><button class="btn btn-sm se-add-btn" onclick="showQTypePicker()"><i class="fa-solid fa-plus"></i> Add question</button></div>';
-    return;
-  }
-  var html='';
-  _questions.forEach(function(q,i){
-    var icon='fa-circle-question';
-    if(q.qtype==='scale')icon='fa-gauge-high';
-    else if(q.qtype==='nps')icon='fa-face-smile';
-    else if(q.qtype==='yesno')icon='fa-toggle-on';
-    else if(q.qtype==='multi')icon='fa-list-check';
-    else if(q.qtype==='contact')icon='fa-address-card';
-    else if(q.qtype==='text')icon='fa-align-left';
-    var active=i===_selectedIdx?' active':'';
-    html+='<div class="se-q-item'+active+'" data-idx="'+i+'" draggable="true">'+
-      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>'+
-      '<span class="qicon"><i class="fa-solid '+icon+'"></i></span>'+
-      '<span class="qlabel">'+(q.prompt||'(Untitled question)')+'</span>'+
-      (q.required?'<span class="req-dot">*</span>':'')+
-      '<button class="del-btn" data-del="'+i+'"><i class="fa-solid fa-trash-can"></i></button>'+
-      '</div>';
-  });
-  container.innerHTML=html;
-
-  container.querySelectorAll('.se-q-item').forEach(function(el){
-    el.addEventListener('click',function(e){
-      if(e.target.closest('.del-btn'))return;
-      _selectedIdx=parseInt(el.dataset.idx,10);
-      renderRail();
-      renderQuestionPanel();
-    });
-    el.addEventListener('dragstart',function(e){
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed='move';
-      e.dataTransfer.setData('text/plain',el.dataset.idx);
-    });
-    el.addEventListener('dragend',function(){el.classList.remove('dragging');});
-    el.addEventListener('dragover',function(e){
-      e.preventDefault();
-      el.classList.add('drag-over');
-    });
-    el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
-    el.addEventListener('drop',function(e){
-      e.preventDefault();
-      el.classList.remove('drag-over');
-      var from=parseInt(e.dataTransfer.getData('text/plain'),10);
-      var to=parseInt(el.dataset.idx,10);
-      if(from===to)return;
-      var item=_questions.splice(from,1)[0];
-      _questions.splice(to,0,item);
-      _selectedIdx=to;
-      _dirty=true;
-      renderRail();
-      renderQuestionPanel();
-    });
-  });
-
-  container.querySelectorAll('.del-btn').forEach(function(btn){
-    btn.addEventListener('click',function(e){
-      e.stopPropagation();
-      var idx=parseInt(btn.dataset.del,10);
-      if(confirm('Delete this question?')){
-        _questions.splice(idx,1);
-        if(_selectedIdx>=_questions.length)_selectedIdx=_questions.length-1;
-        _dirty=true;
-        renderRail();
-        renderQuestionPanel();
-      }
-    });
-  });
-}
-
-/* ── Question type picker ── */
-function showQTypePicker(){
-  var picker=document.querySelector('.se-qtype-picker');
-  if(!picker){
-    var bar=document.querySelector('.se-add-bar');
-    var html='<div class="se-qtype-picker">'+
-      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:var(--space-2)">Choose question type</div>'+
-      '<div class="se-qtype-grid">'+
-      card('nps','fa-face-smile','Net Promoter Score','0–10 scale with detractors, passives and promoters')+
-      card('scale','fa-gauge-high','Satisfaction scale','1–5 or 1–7 agreement/satisfaction scale')+
-      card('yesno','fa-toggle-on','Yes / No','Binary question with optional follow-up')+
-      card('multi','fa-list-check','Multiple choice','Choose one or more options')+
-      card('text','fa-align-left','Open text','Free‑form response for comments')+
-      card('contact','fa-address-card','Contact capture','Name, email and phone fields')+
-      '</div></div>';
-    bar.insertAdjacentHTML('beforeend',html);
-    picker=bar.querySelector('.se-qtype-picker');
-    picker.addEventListener('click',function(e){
-      var cardEl=e.target.closest('.se-qtype-card');
-      if(!cardEl)return;
-      var type=cardEl.dataset.type;
-      addQuestion(type);
-      picker.classList.remove('show');
-      setTimeout(function(){picker.remove();},150);
-    });
-    document.addEventListener('click',function handler(e){
-      if(!picker.contains(e.target) && !e.target.closest('.se-add-btn')){
-        picker.classList.remove('show');
-        setTimeout(function(){picker.remove();},150);
-        document.removeEventListener('click',handler);
-      }
-    });
-  }
-  picker.classList.add('show');
-
-  function card(type,icon,title,desc){
-    return '<div class="se-qtype-card" data-type="'+type+'">'+
-      '<i class="fa-solid '+icon+'"></i>'+
-      '<div class="se-qtype-card-title"><div>'+title+'</div>'+
-      '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+desc+'</div></div></div>';
-  }
-}
-
-/* ── Question editing panel ── */
-function addQuestion(type){
-  var q={qtype:type,prompt:'',help_text:'',required:true,options:[]};
-  if(type==='scale'){q.options=[1,2,3,4,5].map(function(v){return String(v);});}
-  else if(type==='nps'){q.options=['0','1','2','3','4','5','6','7','8','9','10'];}
-  else if(type==='yesno'){q.options=['Yes','No'];}
-  else if(type==='multi'){q.options=['Option 1','Option 2'];}
-  _questions.push(q);
-  _selectedIdx=_questions.length-1;
-  _dirty=true;
+  renderRail();
+  if (_questions.length > 0) { _selectedIdx = 0; } else { _selectedIdx = -1; }
   renderRail();
   renderQuestionPanel();
 }
 
-function renderQuestionPanel(){
-  var panel=document.getElementById('panel-question');
-  if(_selectedIdx<0 || !_questions[_selectedIdx]){
-    panel.innerHTML='<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-hand-pointer"></i></div><h3>Select a question</h3><p>Pick a question from the left or add a new one.</p></div>';
+/* ── Events ── */
+function wireEvents() {
+  document.getElementById('btn-save').addEventListener('click', save);
+  document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('active'); });
+  document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
+  document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
+  document.getElementById('btn-add-q').addEventListener('click', function(){
+    _selectedIdx = -1;
+    showTab('question');
+    renderQuestionPanel();
+  });
+  document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
+
+  // Dirty guard
+  window.addEventListener('beforeunload', function(e){
+    if (_dirty && !_saving) { e.preventDefault(); e.returnValue = ''; }
+  });
+}
+
+function markDirty(){ _dirty = true; }
+
+/* ── Tabs ── */
+function showTab(name) {
+  document.querySelectorAll('.se-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
+  document.getElementById('panel-question').style.display = name === 'question' ? '' : 'none';
+  document.getElementById('panel-settings').style.display = name === 'settings' ? '' : 'none';
+  document.getElementById('panel-links').style.display = name === 'links' ? '' : 'none';
+  if (name === 'question') renderQuestionPanel();
+}
+
+/* ── Qtype picker (rendered inline in right pane) ── */
+function qtypePickerHTML(titleHtml) {
+  var html = '<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>';
+  html += (titleHtml || '<h3>Choose a question type</h3><p>Pick the format that best fits what you want to learn.</p>');
+  html += '<div class="se-qtype-grid">';
+  QTYPES.forEach(function(t){
+    html += '<div class="se-qtype-card" data-qtype="' + t.v + '"><i class="fa-solid ' + t.icon + '"></i><span class="se-qtype-card-title">' + esc(t.l) + '</span></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+function wireQtypePicker(root) {
+  root.querySelectorAll('.se-qtype-card').forEach(function(el){
+    el.addEventListener('click', function(){ addQuestion(el.dataset.qtype); });
+  });
+}
+
+/* ── Question management ── */
+function addQuestion(qtype) {
+  _questions.push({qtype:qtype||'short_text', prompt:'', help_text:'', required:false, options:[]});
+  _selectedIdx = _questions.length - 1;
+  markDirty();
+  renderRail();
+  renderQuestionPanel();
+  showTab('question');
+}
+
+function deleteQuestion(idx) {
+  _questions.splice(idx, 1);
+  if (_selectedIdx >= _questions.length) _selectedIdx = _questions.length - 1;
+  if (_selectedIdx < 0) _selectedIdx = -1;
+  markDirty();
+  renderRail();
+  renderQuestionPanel();
+}
+
+/* ── Left rail rendering ── */
+function renderRail() {
+  var list = document.getElementById('q-list');
+  if (!_questions.length) {
+    list.innerHTML = '';
+    renderEmptyState();
     return;
   }
-  var q=_questions[_selectedIdx];
-  var html='';
-  html+='<div class="se-field"><label class="se-label">Question text</label>'+
-    '<input class="se-input" id="q-prompt" value="'+esc(q.prompt)+'" placeholder="How likely are you to recommend GoNoGo to a friend?"></div>';
+  // Remove empty state if present
+  var empty = document.getElementById('panel-question').querySelector('.se-empty');
+  if (empty && _questions.length) { /* will be replaced by renderQuestionPanel */ }
 
-  html+='<div class="se-field"><label class="se-label">Help text (optional)</label>'+
-    '<textarea class="se-textarea" id="q-help" placeholder="Short description shown under the question.">'+esc(q.help_text)+'</textarea>'+
-    '<div class="se-hint">Use this to clarify context or add instructions.</div></div>';
+  list.innerHTML = _questions.map(function(q, i){
+    var active = i === _selectedIdx ? ' active' : '';
+    var icon = qtypeIcon(q.qtype);
+    var label = q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>';
+    return '<div class="se-q-item' + active + '" data-idx="' + i + '" draggable="true">' +
+      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      '<span class="qicon"><i class="fa-solid ' + icon + '"></i></span>' +
+      '<span class="qlabel">' + label + '</span>' +
+      (q.required ? '<span class="req-dot"><i class="fa-solid fa-asterisk"></i></span>' : '') +
+      '<button class="del-btn" data-delidx="' + i + '" title="Delete"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>';
+  }).join('');
 
-  html+='<div class="se-field"><label class="se-label">Required</label>'+
-    '<label class="se-toggle"><input type="checkbox" id="q-required" '+(q.required?'checked':'')+'> This question must be answered</label></div>';
-
-  if(q.qtype==='scale'){
-    html+=renderScaleEditor(q);
-  }else if(q.qtype==='nps'){
-    html+=renderNPSEditor(q);
-  }else if(q.qtype==='yesno' || q.qtype==='multi'){
-    html+=renderOptionsEditor(q);
-  }else if(q.qtype==='contact'){
-    html+='<div class="se-field"><label class="se-label">Contact fields</label>'+
-      '<p class="se-hint">This block always includes name, email and phone fields.</p></div>';
-  }else if(q.qtype==='text'){
-    html+='<div class="se-field"><label class="se-label">Response type</label>'+
-      '<p class="se-hint">Free‑form long‑text answer.</p></div>';
-  }
-
-  html+=renderPreview(q);
-  panel.innerHTML=html;
-
-  document.getElementById('q-prompt').addEventListener('input',function(e){
-    q.prompt=e.target.value;
-    _dirty=true;
-    renderRail();
-    updatePreview();
-  });
-  document.getElementById('q-help').addEventListener('input',function(e){
-    q.help_text=e.target.value;
-    _dirty=true;
-    updatePreview();
-  });
-  document.getElementById('q-required').addEventListener('change',function(e){
-    q.required=e.target.checked;
-    _dirty=true;
-    renderRail();
-    updatePreview();
-  });
-
-  if(q.qtype==='scale'){
-    bindScaleEditor(q);
-  }else if(q.qtype==='nps'){
-    bindNPSEditor(q);
-  }else if(q.qtype==='yesno' || q.qtype==='multi'){
-    bindOptionsEditor(q);
-  }
-
-  function renderScaleEditor(q){
-    var min=1,max=5;
-    if(q.options && q.options.length){
-      min=parseInt(q.options[0],10);
-      max=parseInt(q.options[q.options.length-1],10);
-    }
-    return '<div class="se-row">'+
-      '<div class="se-field"><label class="se-label">Min value</label>'+
-      '<input class="se-input" id="scale-min" type="number" value="'+min+'"></div>'+
-      '<div class="se-field"><label class="se-label">Max value</label>'+
-      '<input class="se-input" id="scale-max" type="number" value="'+max+'"></div></div>'+
-      '<div class="se-hint">Typical scales are 1–5 or 1–7.</div>';
-  }
-
-  function bindScaleEditor(q){
-    function recompute(){
-      var min=parseInt(document.getElementById('scale-min').value,10);
-      var max=parseInt(document.getElementById('scale-max').value,10);
-      if(isNaN(min)||isNaN(max)||min>=max)return;
-      q.options=[];
-      for(var v=min;v<=max;v++)q.options.push(String(v));
-      _dirty=true;
-      updatePreview();
-    }
-    document.getElementById('scale-min').addEventListener('change',recompute);
-    document.getElementById('scale-max').addEventListener('change',recompute);
-  }
-
-  function renderNPSEditor(q){
-    return '<div class="se-field"><label class="se-label">NPS scale</label>'+
-      '<p class="se-hint">Fixed 0–10 scale, grouped into detractors (0–6), passives (7–8) and promoters (9–10).</p></div>';
-  }
-
-  function bindNPSEditor(q){
-    q.options=['0','1','2','3','4','5','6','7','8','9','10'];
-  }
-
-  function renderOptionsEditor(q){
-    var opts=q.options||[];
-    var rows=opts.map(function(opt,i){
-      return '<div class="se-opt-row" data-idx="'+i+'">'+
-        '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>'+
-        '<input class="se-input" value="'+esc(opt)+'">'+
-        '<button class="del-btn" type="button"><i class="fa-solid fa-xmark"></i></button></div>';
-    }).join('');
-    return '<div class="se-field"><label class="se-label">Options</label>'+
-      '<div id="opt-container">'+rows+'</div>'+
-      '<button class="btn btn-sm" id="btn-add-opt"><i class="fa-solid fa-plus"></i> Add option</button>'+
-      '<div class="se-hint">'+(q.qtype==='yesno'?'Keep this as Yes / No for simple binary questions.':'Use multiple choice for categories or labelled responses.')+'</div></div>';
-  }
-
-  function bindOptionsEditor(q){
-    var container=document.getElementById('opt-container');
-    container.querySelectorAll('.se-opt-row input').forEach(function(input){
-      input.addEventListener('input',function(){
-        var idx=parseInt(input.parentElement.dataset.idx,10);
-        q.options[idx]=input.value;
-        _dirty=true;
-        updatePreview();
-      });
+  // Click to select
+  list.querySelectorAll('.se-q-item').forEach(function(el){
+    el.addEventListener('click', function(e){
+      if (e.target.closest('.del-btn')) return;
+      _selectedIdx = parseInt(el.dataset.idx, 10);
+      renderRail();
+      renderQuestionPanel();
+      showTab('question');
     });
-    container.querySelectorAll('.del-btn').forEach(function(btn){
-      btn.addEventListener('click',function(){
-        var idx=parseInt(btn.parentElement.dataset.idx,10);
-        q.options.splice(idx,1);
-        _dirty=true;
-        renderQuestionPanel();
-      });
+  });
+
+  // Delete buttons
+  list.querySelectorAll('.del-btn').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      deleteQuestion(parseInt(b.dataset.delidx, 10));
     });
-    document.getElementById('btn-add-opt').addEventListener('click',function(){
-      q.options.push('Option '+(q.options.length+1));
-      _dirty=true;
+  });
+
+  // Drag-and-drop reorder
+  wireRailDragDrop(list);
+}
+
+function wireRailDragDrop(list) {
+  var dragIdx = null;
+  list.querySelectorAll('.se-q-item').forEach(function(el){
+    el.addEventListener('dragstart', function(e){
+      dragIdx = parseInt(el.dataset.idx, 10);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', dragIdx);
+    });
+    el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
+    el.addEventListener('dragover', function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e){
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      var toIdx = parseInt(el.dataset.idx, 10);
+      if (dragIdx === null || dragIdx === toIdx) return;
+      var moved = _questions.splice(dragIdx, 1)[0];
+      _questions.splice(toIdx, 0, moved);
+      if (_selectedIdx === dragIdx) _selectedIdx = toIdx;
+      else if (dragIdx < _selectedIdx && toIdx >= _selectedIdx) _selectedIdx--;
+      else if (dragIdx > _selectedIdx && toIdx <= _selectedIdx) _selectedIdx++;
+      markDirty();
+      renderRail();
       renderQuestionPanel();
     });
+  });
+}
 
-    container.querySelectorAll('.se-opt-row').forEach(function(el){
-      el.addEventListener('dragstart',function(e){
-        el.classList.add('dragging');
-        e.dataTransfer.effectAllowed='move';
-        e.dataTransfer.setData('text/plain',el.dataset.idx);
-      });
-      el.addEventListener('dragend',function(){el.classList.remove('dragging');});
-      el.addEventListener('dragover',function(e){
-        e.preventDefault();
-        el.classList.add('drag-over');
-      });
-      el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
-      el.addEventListener('drop',function(e){
-        e.preventDefault();
-        el.classList.remove('drag-over');
-        var from=parseInt(e.dataTransfer.getData('text/plain'),10);
-        var to=parseInt(el.dataset.idx,10);
-        if(from===to)return;
-        var item=q.options.splice(from,1)[0];
-        q.options.splice(to,0,item);
-        _dirty=true;
-        renderQuestionPanel();
-      });
+/* ── Right pane: question editor ── */
+function renderQuestionPanel() {
+  var panel = document.getElementById('panel-question');
+  if (_selectedIdx < 0 || _selectedIdx >= _questions.length) {
+    renderEmptyState();
+    return;
+  }
+  var q = _questions[_selectedIdx];
+  var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select';
+
+  var html = '';
+
+  // Qtype selector
+  html += '<div class="se-field"><label class="se-label">Question type</label><select class="se-select" id="ed-qtype">';
+  QTYPES.forEach(function(t){ html += '<option value="' + t.v + '"' + (t.v === q.qtype ? ' selected' : '') + '>' + esc(t.l) + '</option>'; });
+  html += '</select></div>';
+
+  // Prompt
+  html += '<div class="se-field"><label class="se-label">Prompt *</label><input class="se-input" id="ed-prompt" value="' + esc(q.prompt) + '" placeholder="Question text"></div>';
+
+  // Help text
+  html += '<div class="se-field"><label class="se-label">Help text</label><textarea class="se-textarea" id="ed-help" placeholder="Optional guidance for the respondent">' + esc(q.help_text) + '</textarea></div>';
+
+  // Required toggle
+  html += '<div class="se-field"><label class="se-toggle"><input type="checkbox" id="ed-required"' + (q.required ? ' checked' : '') + '> Required</label></div>';
+
+  // Per-qtype extras
+  if (isSelect) {
+    html += '<div class="se-field"><label class="se-label">Options</label><div id="ed-options"></div>';
+    html += '<button class="btn btn-sm" id="btn-add-opt" style="margin-top:var(--space-2)"><i class="fa-solid fa-plus"></i> Add option</button></div>';
+  }
+
+  if (q.qtype === 'consent') {
+    var consentLabel = (q.options && q.options[0]) || 'I agree to the terms';
+    html += '<div class="se-field"><label class="se-label">Consent label</label><input class="se-input" id="ed-consent-label" value="' + esc(consentLabel) + '"></div>';
+  }
+
+  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
+    var placeholder = (q.options && q.options[0]) || '';
+    html += '<div class="se-field"><label class="se-label">Placeholder text</label><input class="se-input" id="ed-placeholder" value="' + esc(placeholder) + '" placeholder="Optional placeholder"></div>';
+  }
+
+  // Live preview
+  html += '<div class="se-preview"><div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q) + '</div>';
+
+  panel.innerHTML = html;
+  wireQuestionEditor();
+}
+
+function wireQuestionEditor() {
+  var q = _questions[_selectedIdx];
+  if (!q) return;
+
+  document.getElementById('ed-qtype').addEventListener('change', function(){
+    q.qtype = this.value;
+    // Reset options when switching to select
+    if ((q.qtype === 'single_select' || q.qtype === 'multi_select') && (!q.options || !q.options.length)) {
+      q.options = ['Option 1', 'Option 2'];
+    }
+    markDirty(); renderRail(); renderQuestionPanel();
+  });
+  document.getElementById('ed-prompt').addEventListener('input', function(){ q.prompt = this.value; markDirty(); updateRailLabel(); updatePreview(); });
+  document.getElementById('ed-help').addEventListener('input', function(){ q.help_text = this.value; markDirty(); updatePreview(); });
+  document.getElementById('ed-required').addEventListener('change', function(){ q.required = this.checked; markDirty(); renderRail(); });
+
+  if (q.qtype === 'single_select' || q.qtype === 'multi_select') {
+    renderOptionsEditor();
+    document.getElementById('btn-add-opt').addEventListener('click', function(){
+      q.options.push('');
+      markDirty(); renderOptionsEditor(); updatePreview();
     });
   }
 
-  function renderPreview(q){
-    var html='<div class="se-preview"><div class="se-preview-title">Live preview</div>';
-    html+='<div class="q-prompt">'+esc(q.prompt||'How likely are you to recommend GoNoGo to a friend?')+'</div>';
-    if(q.help_text)html+='<div class="q-help">'+esc(q.help_text)+'</div>';
-
-    if(q.qtype==='scale'){
-      html+='<div class="scale-grid">';
-      (q.options||[]).forEach(function(opt){html+='<button type="button" class="scale-btn">'+esc(opt)+'</button>';});
-      html+='</div>';
-    }else if(q.qtype==='nps'){
-      html+='<div class="scale-grid">';
-      (q.options||[]).forEach(function(opt){
-        var num=parseInt(opt,10);
-        var cls=num<=6?'nps-red':(num<=8?'nps-amber':'nps-green');
-        html+='<button type="button" class="scale-btn '+cls+'">'+esc(opt)+'</button>';
-      });
-      html+='</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
-    }else if(q.qtype==='yesno'){
-      html+='<div class="scale-grid">';
-      (q.options||[]).forEach(function(opt){html+='<button type="button" class="scale-btn">'+esc(opt)+'</button>';});
-      html+='</div>';
-    }else if(q.qtype==='multi'){
-      (q.options||[]).forEach(function(opt){
-        html+='<div class="radio-row"><input type="checkbox" disabled><span>'+esc(opt)+'</span></div>';
-      });
-    }else if(q.qtype==='contact'){
-      html+='<div class="se-field"><input type="text" placeholder="Name"></div>'+
-        '<div class="se-field"><input type="email" placeholder="Email"></div>'+
-        '<div class="se-field"><input type="tel" placeholder="Phone"></div>';
-    }else if(q.qtype==='text'){
-      html+='<div class="se-field"><textarea placeholder="Type your answer..."></textarea></div>';
-    }
-
-    html+='</div>';
-    return html;
+  if (q.qtype === 'consent') {
+    document.getElementById('ed-consent-label').addEventListener('input', function(){
+      q.options = [this.value];
+      markDirty(); updatePreview();
+    });
   }
 
-  function updatePreview(){
-    var q=_questions[_selectedIdx];
-    var prev=document.querySelector('.se-preview');
-    if(prev)prev.outerHTML=renderPreview(q);
+  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
+    var phEl = document.getElementById('ed-placeholder');
+    if (phEl) phEl.addEventListener('input', function(){
+      q.options = this.value ? [this.value] : [];
+      markDirty(); updatePreview();
+    });
   }
+}
+
+function updateRailLabel() {
+  var el = document.querySelector('.se-q-item[data-idx="' + _selectedIdx + '"] .qlabel');
+  if (el) {
+    var q = _questions[_selectedIdx];
+    el.innerHTML = q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>';
+  }
+}
+
+function updatePreview() {
+  var q = _questions[_selectedIdx];
+  if (!q) return;
+  var container = document.querySelector('.se-preview');
+  if (container) {
+    container.innerHTML = '<div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q);
+  }
+}
+
+/* ── Options editor for select types ── */
+function renderOptionsEditor() {
+  var q = _questions[_selectedIdx];
+  var container = document.getElementById('ed-options');
+  if (!container) return;
+  container.innerHTML = (q.options || []).map(function(opt, i){
+    return '<div class="se-opt-row" data-oidx="' + i + '" draggable="true">' +
+      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      '<input class="se-input" value="' + esc(opt) + '" data-oidx="' + i + '" placeholder="Option ' + (i+1) + '">' +
+      '<button class="del-btn" data-delidx="' + i + '"><i class="fa-solid fa-trash"></i></button></div>';
+  }).join('');
+
+  container.querySelectorAll('.se-opt-row input').forEach(function(el){
+    el.addEventListener('input', function(){
+      q.options[parseInt(el.dataset.oidx,10)] = el.value;
+      markDirty(); updatePreview();
+    });
+  });
+  container.querySelectorAll('.se-opt-row .del-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      q.options.splice(parseInt(b.dataset.delidx,10),1);
+      markDirty(); renderOptionsEditor(); updatePreview();
+    });
+  });
+
+  // Drag-drop for options
+  var dragIdx = null;
+  container.querySelectorAll('.se-opt-row').forEach(function(el){
+    el.addEventListener('dragstart', function(e){
+      dragIdx = parseInt(el.dataset.oidx,10);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
+    el.addEventListener('dragover', function(e){ e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e){
+      e.preventDefault(); el.classList.remove('drag-over');
+      var toIdx = parseInt(el.dataset.oidx,10);
+      if (dragIdx === null || dragIdx === toIdx) return;
+      var moved = q.options.splice(dragIdx,1)[0];
+      q.options.splice(toIdx,0,moved);
+      markDirty(); renderOptionsEditor(); updatePreview();
+    });
+  });
+}
+
+/* ── Live preview rendering ── */
+function renderPreview(q) {
+  var html = '<div class="q-prompt">' + esc(q.prompt || 'Question prompt') + (q.required ? ' <span style="color:var(--red)">*</span>' : '') + '</div>';
+  if (q.help_text) html += '<div class="q-help">' + esc(q.help_text) + '</div>';
+
+  switch(q.qtype) {
+    case 'short_text':
+    case 'name':
+      html += '<input type="text" disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer…') + '">';
+      if (q.qtype === 'name') html += '<div class="se-hint">Respondent\'s name — validated on submit</div>';
+      break;
+    case 'long_text':
+      html += '<textarea disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer…') + '"></textarea>';
+      break;
+    case 'email':
+      html += '<input type="email" disabled placeholder="name@example.com">';
+      html += '<div class="se-hint">Email format validated on submit</div>';
+      break;
+    case 'phone':
+      html += '<input type="tel" disabled placeholder="+27 xx xxx xxxx">';
+      html += '<div class="se-hint">Phone format validated on submit</div>';
+      break;
+    case 'single_select':
+      (q.options||[]).forEach(function(o){ html += '<div class="radio-row"><input type="radio" disabled> ' + esc(o||'Option') + '</div>'; });
+      break;
+    case 'multi_select':
+      (q.options||[]).forEach(function(o){ html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(o||'Option') + '</div>'; });
+      break;
+    case 'rating_1_5':
+      html += '<div class="scale-grid" style="grid-template-columns:repeat(5,1fr)">';
+      for(var i=1;i<=5;i++) html += '<div class="scale-btn"><i class="fa-solid fa-star" style="margin-right:4px;font-size:11px;color:var(--green)"></i>' + i + '</div>';
+      html += '</div>';
+      break;
+    case 'nps_0_10':
+      html += '<div class="scale-grid" style="grid-template-columns:repeat(11,1fr)">';
+      for(var i=0;i<=10;i++){
+        var cls = i<=6 ? 'nps-red' : (i<=8 ? 'nps-amber' : 'nps-green');
+        html += '<div class="scale-btn ' + cls + '">' + i + '</div>';
+      }
+      html += '</div>';
+      html += '<div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
+      break;
+    case 'yes_no':
+      html += '<div class="radio-row"><input type="radio" disabled> Yes</div>';
+      html += '<div class="radio-row"><input type="radio" disabled> No</div>';
+      break;
+    case 'consent':
+      var label = (q.options && q.options[0]) || 'I agree to the terms';
+      html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(label) + '</div>';
+      break;
+  }
+  return html;
+}
+
+/* ── Empty state (no questions OR clicked Add question) ── */
+function renderEmptyState() {
+  var panel = document.getElementById('panel-question');
+  var titleHtml = _questions.length === 0
+    ? '<h3>Add your first question</h3><p>Pick a question type to start building the survey.</p>'
+    : '<h3>Add a question</h3><p>Pick a question type to add to this survey.</p>';
+  panel.innerHTML = qtypePickerHTML(titleHtml);
+  wireQtypePicker(panel);
 }
 
 /* ── Survey settings panel ── */
-function renderSurveySettings(){
-  var panel=document.getElementById('panel-settings');
-  var s=_survey||{status:'draft'};
-  var html='<div class="se-row">'+
-    '<div class="se-field"><label class="se-label">Survey name</label>'+
-    '<input class="se-input" id="s-name" placeholder="Gonogo customer survey" value="'+esc(s.name||'')+'"></div>'+
-    '<div class="se-field"><label class="se-label">Slug</label>'+
-    '<input class="se-input" id="s-slug" placeholder="gonogo-cx" value="'+esc(s.slug||'')+'">'+
-    '<div class="se-hint">Used in URLs and internal references.</div></div></div>';
+function renderSettingsPanel() {
+  var html = '';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Survey name *</label><input class="se-input" id="s-name" placeholder="e.g. Post-visit feedback"></div>';
+  html += '<div class="se-field"><label class="se-label">Slug</label><input class="se-input" id="s-slug" placeholder="auto from name"></div></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Intro title</label><input class="se-input" id="s-intro-title" placeholder="We\'d love your feedback"></div>';
+  html += '<div class="se-field"><label class="se-label">Status</label><input class="se-input" id="s-status" readonly style="opacity:.6"></div></div>';
+  html += '<div class="se-field"><label class="se-label">Intro text</label><textarea class="se-textarea" id="s-intro-text" placeholder="Shown above the first question"></textarea></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Thank-you title</label><input class="se-input" id="s-ty-title" value="Thank you"></div>';
+  html += '<div class="se-field"><label class="se-label">Thank-you text</label><input class="se-input" id="s-ty-text" value="Your feedback has been received."></div></div>';
+  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3)">';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-anon" checked> Anonymous responses</label>';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-contact" checked> Allow contact capture</label></div>';
+  html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response.</div>';
 
-  html+='<div class="se-row">'+
-    '<div class="se-field"><label class="se-label">Intro title</label>'+
-    '<input class="se-input" id="s-intro-title" value="'+esc(s.intro_title||'Tell us how you feel about GoNoGo')+'"></div>'+
-    '<div class="se-field"><label class="se-label">Intro text</label>'+
-    '<textarea class="se-textarea" id="s-intro-text">'+esc(s.intro_text||'This quick survey helps us understand your experience so we can keep improving.')+'</textarea></div></div>';
+  document.getElementById('panel-settings').innerHTML = html;
 
-  html+='<div class="se-row">'+
-    '<div class="se-field"><label class="se-label">Thank you title</label>'+
-    '<input class="se-input" id="s-ty-title" value="'+esc(s.thank_you_title||'Thanks for sharing your feedback')+'"></div>'+
-    '<div class="se-field"><label class="se-label">Thank you text</label>'+
-    '<textarea class="se-textarea" id="s-ty-text">'+esc(s.thank_you_text||'We really appreciate your time. Your feedback directly shapes the improvements we make.')+'</textarea></div></div>';
+  // Auto-generate slug from name
+  document.getElementById('s-name').addEventListener('input', function(){
+    var slug = document.getElementById('s-slug');
+    if (!slug.dataset.manual) {
+      slug.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+    markDirty();
+  });
+  document.getElementById('s-slug').addEventListener('input', function(){
+    this.dataset.manual = '1';
+    this.value = this.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+    markDirty();
+  });
+  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', markDirty);
+  });
+  ['s-anon','s-contact'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', markDirty);
+  });
+}
 
-  html+='<div class="se-row">'+
-    '<div class="se-field"><label class="se-label">Anonymous responses</label>'+
-    '<label class="se-toggle"><input type="checkbox" id="s-anon" '+(s.is_anonymous!==false?'checked':'')+'> Do not collect identifiable info by default</label>'+
-    '<div class="se-hint">If enabled, responses are stored without tying them to a specific customer identity.</div></div>'+
-    '<div class="se-field"><label class="se-label">Allow contact capture</label>'+
-    '<label class="se-toggle"><input type="checkbox" id="s-contact" '+(s.allow_contact_capture?'checked':'')+'> Let customers optionally leave contact details</label>'+
-    '<div class="se-hint">Adds an optional contact block at the end of the survey for follow‑ups.</div></div></div>';
+function populateSettings() {
+  var s = _survey;
+  document.getElementById('s-name').value = s.name || '';
+  document.getElementById('s-slug').value = s.slug || '';
+  if (s.slug) document.getElementById('s-slug').dataset.manual = '1';
+  document.getElementById('s-intro-title').value = s.intro_title || '';
+  document.getElementById('s-intro-text').value = s.intro_text || '';
+  document.getElementById('s-ty-title').value = s.thank_you_title || 'Thank you';
+  document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
+  document.getElementById('s-anon').checked = !!s.is_anonymous;
+  document.getElementById('s-contact').checked = !!s.allow_contact_capture;
+  var _sLabels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
+  document.getElementById('s-status').value = _sLabels[s.status] || s.status || 'Draft';
+}
 
-  html+='<div class="se-field"><label class="se-label">Status</label><input class="se-input" id="s-status" readonly style="opacity:.6"></div>';
-
-  panel.innerHTML=html;
-
-  var labels={draft:'Draft',active:'Published',paused:'Paused',archived:'Archived'};
-  document.getElementById('s-status').value=labels[s.status]||s.status||'Draft';
-
-  document.getElementById('s-name').addEventListener('input',function(e){
-    if(_survey)_survey.name=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-slug').addEventListener('input',function(e){
-    if(_survey)_survey.slug=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-intro-title').addEventListener('input',function(e){
-    if(_survey)_survey.intro_title=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-intro-text').addEventListener('input',function(e){
-    if(_survey)_survey.intro_text=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-ty-title').addEventListener('input',function(e){
-    if(_survey)_survey.thank_you_title=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-ty-text').addEventListener('input',function(e){
-    if(_survey)_survey.thank_you_text=e.target.value;
-    _dirty=true;
-  });
-  document.getElementById('s-anon').addEventListener('change',function(e){
-    if(_survey)_survey.is_anonymous=e.target.checked;
-    _dirty=true;
-  });
-  document.getElementById('s-contact').addEventListener('change',function(e){
-    if(_survey)_survey.allow_contact_capture=e.target.checked;
-    _dirty=true;
-  });
+function populateSettingsDefaults() {
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-slug').value = '';
+  document.getElementById('s-intro-title').value = '';
+  document.getElementById('s-intro-text').value = '';
+  document.getElementById('s-ty-title').value = 'Thank you';
+  document.getElementById('s-ty-text').value = 'Your feedback has been received.';
+  document.getElementById('s-anon').checked = true;
+  document.getElementById('s-contact').checked = true;
+  document.getElementById('s-status').value = 'Draft';
 }
 
 /* ── Status UI ── */
-function updateStatusUI(){
-  var s=_survey ? _survey.status : 'draft';
-  // Normalise any legacy 'published' value that predates the active/draft schema
-  if(s==='published'){ s='active'; if(_survey)_survey.status='active'; }
-  var badge=document.getElementById('status-badge');
-  badge.style.display='';
-  badge.className='cx-badge cx-b-'+s;
-  var labels={draft:'Draft',active:'Published',paused:'Paused',archived:'Archived'};
-  badge.textContent=labels[s]||s;
-
-  document.getElementById('btn-publish').style.display=(s==='draft'||s==='paused')?'':'none';
-  document.getElementById('btn-pause').style.display=(s==='active')?'':'none';
-  document.getElementById('btn-unpublish').style.display=(s==='active'||s==='paused')?'':'none';
-
-  var statusInput=document.getElementById('s-status');
-  if(statusInput){
-    statusInput.value=labels[s]||s;
+function updateStatusUI() {
+  var s = _survey ? _survey.status : 'draft';
+  if (s === 'published') {
+    s = 'active';
+    if (_survey) _survey.status = 'active';
   }
+
+  var badge = document.getElementById('status-badge');
+  var labels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
+
+  badge.style.display = '';
+  badge.className = 'cx-badge cx-b-' + s;
+  badge.textContent = labels[s] || s;
+
+  document.getElementById('btn-publish').style.display = (s === 'draft' || s === 'paused') ? '' : 'none';
+  document.getElementById('btn-pause').style.display = (s === 'active') ? '' : 'none';
+  document.getElementById('btn-unpublish').style.display = (s === 'active' || s === 'paused') ? '' : 'none';
+
+  var statusInput = document.getElementById('s-status');
+  if (statusInput) statusInput.value = labels[s] || s;
 }
 
-async function setStatus(status){
-  if(!_survey || !_survey.id){ toast('Save the survey first','error'); return; }
-  try{
-    await GoNoGoAPI.cx.setSurveyStatus(_survey.id,status);
-    _survey.status=status;
+async function setStatus(status) {
+  if (!_survey || !_survey.id) { toast('Save the survey first', 'error'); return; }
+  try {
+    await GoNoGoAPI.cx.setSurveyStatus(_survey.id, status);
+    _survey.status = status;
+    document.getElementById('s-status').value = status;
     updateStatusUI();
-    toast('Status changed to '+status,'success');
-  }catch(e){
-    toast('Failed: '+(e.message||'error'),'error');
-  }
+    toast('Status changed to ' + status, 'success');
+  } catch(e) { toast('Failed: ' + (e.message||'error'), 'error'); }
 }
 
 /* ── Share links ── */
-function renderLinks(){
-  var panel=document.getElementById('panel-links');
-  var base=window.location.origin+'/cx-survey?t=';
-  var html='<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Share links let customers respond without logging in. Revoke any time.</p>';
-  if(!_links.length){
-    html+='<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-link"></i></div><h3>No share links yet</h3><p>Create a unique link for each channel (in‑store QR, email, social, etc.) so you can track performance.</p><button class="btn btn-sm" id="btn-create-link"><i class="fa-solid fa-plus"></i> Generate new link</button></div>';
-    panel.innerHTML=html;
-  }else{
-    html+='<div id="links-list">';
+function renderLinks() {
+  var panel = document.getElementById('panel-links');
+  var base = window.location.origin + '/cx-survey?t=';
+  var html = '<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Share links let customers respond without logging in. Revoke any time.</p>';
+
+  if (_links.length) {
     _links.forEach(function(l){
-      var full=base+encodeURIComponent(l.token);
-      var statusCls=l.revoked?'se-link-revoked':'se-link-active';
-      var statusText=l.revoked?'Revoked':'Active';
-      html+='<div class="se-link-row" data-id="'+l.id+'">'+
-        '<input type="text" value="'+esc(full)+'" readonly>'+
-        '<span class="se-link-status '+statusCls+'">'+statusText+'</span>'+
-        '<span>'+esc(l.label||'')+'</span>'+
-        '<button class="btn btn-xs" data-copy="'+esc(full)+'"><i class="fa-solid fa-copy"></i></button>'+
-        (!l.revoked?'<button class="btn btn-xs" data-revoke="'+l.id+'"><i class="fa-solid fa-ban"></i></button>':'')+
+      var statusCls = l.revoked ? 'se-link-revoked' : 'se-link-active';
+      var statusText = l.revoked ? 'Revoked' : 'Active';
+      html += '<div class="se-link-row' + (l.revoked ? ' revoked' : '') + '">' +
+        '<strong style="color:var(--green);min-width:100px">' + esc(l.label || 'Link') + '</strong>' +
+        '<input readonly value="' + base + esc(l.token) + '">' +
+        '<span class="se-link-status ' + statusCls + '">' + statusText + '</span>' +
+        '<button class="btn btn-sm" data-copy="' + base + esc(l.token) + '" title="Copy URL"><i class="fa-solid fa-copy"></i></button>' +
+        (l.revoked ? '' : '<button class="btn btn-sm" data-revoke="' + l.id + '" title="Revoke" style="color:var(--red)"><i class="fa-solid fa-ban"></i></button>') +
         '</div>';
     });
-    html+='</div><button class="btn btn-sm" id="btn-create-link"><i class="fa-solid fa-plus"></i> Generate new link</button>';
-    panel.innerHTML=html;
+  } else {
+    html += '<p class="text-sm text-muted" style="margin-bottom:var(--space-3)">No share links yet.</p>';
   }
 
-  var btnCreate=document.getElementById('btn-create-link');
-  if(btnCreate){
-    btnCreate.addEventListener('click',async function(){
-      if(!_survey || !_survey.id){ toast('Save the survey first','error'); return; }
-      var label=prompt('Label for this link (e.g. In‑store QR, Email campaign, Social)?');
-      if(!label)return;
-      try{
-        await GoNoGoAPI.cx.createLink(_survey.id,label);
-        var data=await GoNoGoAPI.cx.getSurvey(_survey.id);
-        _survey=data.survey;
-        _links=data.links||[];
-        renderLinks();
-        toast('Link created','success');
-      }catch(e){
-        toast('Failed to create link: '+(e.message||'error'),'error');
-      }
+  html += '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">';
+  html += '<input class="se-input" id="f-link-label" placeholder="Link label (e.g. In-store QR)" style="flex:1">';
+  html += '<button class="btn btn-sm" id="btn-new-link" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-link"></i> Generate new link</button></div>';
+
+  panel.innerHTML = html;
+
+  panel.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      navigator.clipboard.writeText(b.dataset.copy);
+      b.innerHTML = '<i class="fa-solid fa-check"></i>';
+      setTimeout(function(){ b.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 1200);
     });
+  });
+  panel.querySelectorAll('[data-revoke]').forEach(function(b){
+    b.addEventListener('click', async function(){
+      if (!confirm('Revoke this link? Respondents will no longer be able to submit.')) return;
+      try {
+        await GoNoGoAPI.cx.revokeLink(b.dataset.revoke);
+        var data = await GoNoGoAPI.cx.getSurvey(_survey.id);
+        _links = data.links || [];
+        renderLinks();
+        toast('Link revoked', 'success');
+      } catch(e){ toast('Revoke failed', 'error'); }
+    });
+  });
+  var newLinkBtn = document.getElementById('btn-new-link');
+  if (newLinkBtn) newLinkBtn.addEventListener('click', createLink);
+}
+
+async function createLink() {
+  if (!_survey || !_survey.id) { toast('Save the survey first', 'error'); return; }
+  var s = _survey.status;
+  if (s !== 'active') {
+    if (!confirm('Survey is not published \u2014 links will not accept responses until you publish. Continue?')) return;
   }
-
-  panel.querySelectorAll('[data-copy]').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var val=btn.dataset.copy;
-      navigator.clipboard.writeText(val).then(function(){
-        toast('Link copied to clipboard','success');
-      },function(){
-        toast('Copy failed','error');
-      });
-    });
-  });
-
-  panel.querySelectorAll('[data-revoke]').forEach(function(btn){
-    btn.addEventListener('click',async function(){
-      var id=btn.dataset.revoke;
-      if(!confirm('Revoke this link? It will stop accepting responses.'))return;
-      try{
-        await GoNoGoAPI.cx.revokeLink(id);
-        var data=await GoNoGoAPI.cx.getSurvey(_survey.id);
-        _survey=data.survey;
-        _links=data.links||[];
-        renderLinks();
-        toast('Link revoked','success');
-      }catch(e){
-        toast('Failed to revoke link: '+(e.message||'error'),'error');
-      }
-    });
-  });
+  var label = document.getElementById('f-link-label').value.trim();
+  try {
+    await GoNoGoAPI.cx.createLink(_survey.id, label);
+    document.getElementById('f-link-label').value = '';
+    var data = await GoNoGoAPI.cx.getSurvey(_survey.id);
+    _links = data.links || [];
+    renderLinks();
+    toast('Link created', 'success');
+  } catch(e) { toast('Could not create link: ' + (e.message||'error'), 'error'); }
 }
 
 /* ── Save ── */
-async function save(){
-  if(_saving)return;
-  var name=document.getElementById('s-name').value.trim();
-  if(!name){ toast('Give your survey a name','error'); return; }
-
-  var btn=document.getElementById('btn-save');
-  btn.disabled=true;
-  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-  _saving=true;
-
-  try{
-    var statusValue = _survey ? _survey.status : 'draft';
-    if(['draft','active','paused','archived'].indexOf(statusValue)===-1){
-      statusValue='draft';
+async function save() {
+  // Client-side validation
+  var name = document.getElementById('s-name').value.trim();
+  if (!name) { toast('Survey name is required', 'error'); showTab('settings'); document.getElementById('s-name').focus(); return; }
+  if (!_questions.length) { toast('Add at least one question', 'error'); return; }
+  for (var i = 0; i < _questions.length; i++) {
+    if (!_questions[i].prompt || !_questions[i].prompt.trim()) {
+      toast('Question ' + (i+1) + ' needs a prompt', 'error');
+      _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
+      return;
     }
+    if ((_questions[i].qtype === 'single_select' || _questions[i].qtype === 'multi_select') && (!_questions[i].options || _questions[i].options.filter(Boolean).length < 2)) {
+      toast('Question ' + (i+1) + ' needs at least 2 options', 'error');
+      _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
+      return;
+    }
+  }
 
-    var payload={
-      id:_survey?_survey.id:null,
-      name:name,
-      slug:document.getElementById('s-slug').value.trim()||null,
-      intro_title:document.getElementById('s-intro-title').value.trim(),
-      intro_text:document.getElementById('s-intro-text').value.trim(),
-      thank_you_title:document.getElementById('s-ty-title').value.trim(),
-      thank_you_text:document.getElementById('s-ty-text').value.trim(),
-      is_anonymous:document.getElementById('s-anon').checked,
-      allow_contact_capture:document.getElementById('s-contact').checked,
-      status:statusValue,
-      questions:_questions.map(function(q){
-        return{
-          qtype:q.qtype,
-          prompt:q.prompt.trim(),
-          help_text:(q.help_text||'').trim(),
-          required:!!q.required,
-          options:q.options||[]
+  var btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving\u2026';
+  _saving = true;
+
+  try {
+    var payload = {
+      id: _survey ? _survey.id : null,
+      name: name,
+      slug: document.getElementById('s-slug').value.trim() || null,
+      intro_title: document.getElementById('s-intro-title').value.trim(),
+      intro_text: document.getElementById('s-intro-text').value.trim(),
+      thank_you_title: document.getElementById('s-ty-title').value.trim(),
+      thank_you_text: document.getElementById('s-ty-text').value.trim(),
+      is_anonymous: document.getElementById('s-anon').checked,
+      allow_contact_capture: document.getElementById('s-contact').checked,
+      status: (function(){
+        var v = _survey ? _survey.status : 'draft';
+        return ['draft','active','paused','archived'].indexOf(v) !== -1 ? v : 'draft';
+      })(),
+      questions: _questions.map(function(q){
+        return {
+          qtype: q.qtype,
+          prompt: q.prompt.trim(),
+          help_text: (q.help_text || '').trim(),
+          required: !!q.required,
+          options: q.options || []
         };
-      }).filter(function(q){return q.prompt;})
+      }).filter(function(q){ return q.prompt; })
     };
 
-    var resultId=await GoNoGoAPI.cx.upsertSurvey(payload);
+    var resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
 
-    var id=(_survey && _survey.id)||resultId;
-    if(id){
-      var data=await GoNoGoAPI.cx.getSurvey(id);
-      _survey=data.survey;
-      _surveyId=_survey.id;
-      _questions=(data.questions||[]).map(function(q){return{qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]};});
-      _links=data.links||[];
-      if(!window.location.search.includes('id=')){
-        history.replaceState(null,'','brand-cx-survey-edit.html?id='+_survey.id);
+    // Reload the survey to get server-generated fields
+    var id = (_survey && _survey.id) || resultId;
+    if (id) {
+      var data = await GoNoGoAPI.cx.getSurvey(id);
+      _survey = data.survey;
+      _surveyId = _survey.id;
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _links = data.links || [];
+
+      // Update URL without reload
+      if (!window.location.search.includes('id=')) {
+        history.replaceState(null, '', 'brand-cx-survey-edit.html?id=' + _survey.id);
       }
-      document.getElementById('title-text').textContent='Edit: '+_survey.name;
-      document.getElementById('tab-links').style.display='';
+
+      document.getElementById('title-text').textContent = 'Edit: ' + _survey.name;
+      document.getElementById('tab-links').style.display = '';
+      updateStatusUI();
       renderRail();
       renderQuestionPanel();
-      renderSurveySettings();
       renderLinks();
-      updateStatusUI();
     }
 
-    _dirty=false;
-    toast('Survey saved','success');
-  }catch(e){
-    toast('Save failed: '+(e.message||'error'),'error');
-  }finally{
-    _saving=false;
-    btn.disabled=false;
-    btn.innerHTML='<i class="fa-solid fa-save"></i> Save';
+    _dirty = false;
+    toast('Survey saved', 'success');
+  } catch(e) {
+    toast('Save failed: ' + (e.message || 'error'), 'error');
+  } finally {
+    _saving = false;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save';
   }
 }
 
-/* ── Before running a party link ── */
-async function startPartyLink(){
-  if(!_survey || !_survey.id){ toast('Save the survey first','error'); return; }
-  var s=_survey.status;
-  if(s!=='active'){
-    if(!confirm('Survey is not published — links will not accept responses until you publish. Continue?'))return;
-  }
-  // Implementation of party mode lives elsewhere
+/* ── Toast ── */
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'se-toast ' + (type || 'success') + ' show';
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('show'); }, 3000);
 }
 </script>
 </body>
