@@ -35,6 +35,8 @@
   .nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted, #6b7280); margin-top: 4px; }
   .submit-btn { background: #11a551; color: #fff; border: 0; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; }
   .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .mode-btn{appearance:none;border:0;background:#fff;color:#111827;padding:8px 12px;border-radius:999px;font-weight:700;cursor:pointer}
+  .mode-btn.active{background:#111827;color:#fff}
   .error-text { color: #dc2626; font-size: 13px; margin-top: 4px; }
   .thank-wrap { text-align: center; padding: 40px 20px; }
   .thank-wrap h2 { color: #11a551; }
@@ -42,6 +44,7 @@
   /* Focus ring */
   *:focus-visible { outline: 2px solid #11a551; outline-offset: 2px; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 <div class="survey-wrap" id="root">
@@ -50,7 +53,7 @@
 <script src="api.js"></script>
 <script>
 var token = new URLSearchParams(location.search).get('t');
-var state = { survey: null, questions: [], values: {} };
+var state = { survey: null, questions: [], values: {}, mode: 'classic', currentIdx: 0, streak: 0, answeredCount: 0 };
 
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
@@ -61,6 +64,8 @@ async function load() {
     if (!res || !res.ok) { showError((res && res.error) || 'Survey not available.'); return; }
     state.survey = res.survey;
     state.questions = res.questions || [];
+    state.mode = res && res.survey && res.survey.party_mode_default ? 'party' : 'classic';
+    state.currentIdx = 0;
     render();
   } catch(e) {
     showError(e.message || 'Failed to load survey.');
@@ -71,9 +76,16 @@ function showError(msg) {
   document.getElementById('root').innerHTML = '<div class="survey-card"><h2>Unavailable</h2><p>' + esc(msg) + '</p></div>';
 }
 
+
 function render() {
+  if (state.mode === 'party') { renderParty(); return; }
+  renderClassic();
+}
+
+function renderClassic() {
   var s = state.survey;
   var html = '<div class="survey-card">';
+  html += renderModeToggle();
   if (s.intro_title) html += '<h1 style="margin-top:0;">' + esc(s.intro_title) + '</h1>';
   if (s.intro_text) html += '<p style="color:#555;">' + esc(s.intro_text) + '</p>';
   html += '<form id="survey-form" onsubmit="return false;">';
@@ -90,20 +102,141 @@ function render() {
   html += '<div class="brand-mark">Powered by GoNoGo</div>';
   document.getElementById('root').innerHTML = html;
 
-  // Wire inputs
   state.questions.forEach(function(q, idx) { wireQuestion(q, idx); });
   document.getElementById('submit-btn').onclick = submit;
+  bindModeToggle();
 
-  // Enter key submits when focused on last required question's input
   document.getElementById('survey-form').addEventListener('keydown', function(e){
     if (e.key !== 'Enter') return;
     var tag = e.target.tagName;
-    if (tag === 'TEXTAREA') return; // allow newlines in textarea
+    if (tag === 'TEXTAREA') return;
     if (tag === 'INPUT' || tag === 'BUTTON') {
       e.preventDefault();
       submit();
     }
   });
+}
+
+function renderModeToggle() {
+  return '<div style="display:flex;justify-content:flex-end;margin:0 0 16px">' +
+    '<div style="display:inline-flex;gap:8px;background:#f3f4f6;border:1px solid #e5e7eb;padding:6px;border-radius:999px">' +
+    '<button type="button" class="mode-btn' + (state.mode === 'classic' ? ' active' : '') + '" data-mode="classic">Classic</button>' +
+    '<button type="button" class="mode-btn' + (state.mode === 'party' ? ' active' : '') + '" data-mode="party">Party</button>' +
+    '</div></div>';
+}
+
+function bindModeToggle() {
+  document.querySelectorAll('[data-mode]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.mode = btn.getAttribute('data-mode');
+      render();
+    });
+  });
+}
+
+function renderParty() {
+  var s = state.survey || {};
+  var q = state.questions[state.currentIdx];
+  var total = state.questions.length || 1;
+  var pct = Math.round((state.currentIdx / total) * 100);
+  var html = '';
+  html += '<div style="min-height:100vh;background:radial-gradient(circle at top left, rgba(17,165,81,.18), transparent 28%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%), linear-gradient(180deg,#0b1020 0%,#111827 100%);padding:16px;color:#fff">';
+  html += '<div style="max-width:640px;margin:0 auto">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px">';
+  html += '<div><div style="font-size:12px;opacity:.78">Party mode</div><div style="font-size:18px;font-weight:800">' + esc(s.intro_title || 'Quick feedback') + '</div></div>';
+  html += '<div style="display:flex;gap:8px;align-items:center">';
+  html += '<span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;font-weight:700">🔥 ' + state.streak + '</span>';
+  html += '<button type="button" class="mode-btn active" data-mode="classic" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff">Classic</button>';
+  html += '</div></div>';
+  html += '<div style="background:rgba(255,255,255,.1);height:10px;border-radius:999px;overflow:hidden;margin-bottom:16px"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#22c55e,#a855f7,#f59e0b)"></div></div>';
+  html += '<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px);border-radius:28px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.35)">';
+  html += '<div style="font-size:12px;opacity:.76;margin-bottom:8px">Question ' + (state.currentIdx + 1) + ' of ' + total + '</div>';
+  html += '<div style="font-size:28px;line-height:1.15;font-weight:800;margin-bottom:10px">' + esc(q.prompt) + (q.required ? ' *' : '') + '</div>';
+  if (q.help_text) html += '<div style="opacity:.82;margin-bottom:18px">' + esc(q.help_text) + '</div>';
+  html += '<div id="party-answer">' + renderPartyInput(q, state.currentIdx) + '</div>';
+  html += '<div id="party-affirm" style="margin-top:14px;font-size:13px;color:#a7f3d0;min-height:18px"></div>';
+  html += '<div style="display:flex;gap:10px;margin-top:20px">';
+  html += '<button type="button" id="party-prev" style="flex:1;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-weight:700">Back</button>';
+  html += '<button type="button" id="party-next" style="flex:1;padding:14px 16px;border-radius:16px;border:0;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:800">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
+  html += '</div></div>';
+  html += '<div style="text-align:center;color:rgba(255,255,255,.72);font-size:12px;margin-top:14px">Fast, mobile-first feedback. Switch back to Classic any time.</div>';
+  html += '</div></div>';
+  document.getElementById('root').innerHTML = html;
+  wireQuestion(q, state.currentIdx);
+  bindModeToggle();
+  var prev = document.getElementById('party-prev');
+  if (prev) prev.disabled = state.currentIdx === 0;
+  if (prev) prev.style.opacity = state.currentIdx === 0 ? '.45' : '1';
+  if (prev) prev.onclick = function(){ if (state.currentIdx > 0) { state.currentIdx--; renderParty(); } };
+  document.getElementById('party-next').onclick = async function(){
+    if (!validatePartyQuestion(q, state.currentIdx)) return;
+    celebrateStep();
+    if (state.currentIdx === total - 1) return submit();
+    state.currentIdx++;
+    renderParty();
+  };
+}
+
+function renderPartyInput(q, idx) {
+  var val = state.values[q.id];
+  if (q.qtype === 'yes_no') {
+    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+      '<button type="button" class="party-choice" data-party-val="Yes" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='Yes'?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👍 Yes</button>' +
+      '<button type="button" class="party-choice" data-party-val="No" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='No'?'rgba(244,63,94,.24)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👎 No</button>' +
+      '</div>';
+  }
+  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
+    var opts = q.qtype === 'rating_1_5' ? ['1','2','3','4','5'] : ['0','1','2','3','4','5','6','7','8','9','10'];
+    return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:10px">' + opts.map(function(o){ return '<button type="button" class="party-choice" data-party-val="'+o+'" style="padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (String(val && val.value_number)===o || String(val)===o?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:18px;font-weight:800">'+o+'</button>'; }).join('') + '</div>';
+  }
+  if (q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'consent') {
+    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
+    var selected = Array.isArray(val) ? val : [val && val.value_text ? val.value_text : val].filter(Boolean);
+    return '<div style="display:grid;gap:10px">' + opts.map(function(o){ var on = selected.indexOf(o) !== -1; return '<button type="button" class="party-choice" data-party-val="'+esc(o)+'" style="text-align:left;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (on?'rgba(34,197,94,.22)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:16px;font-weight:700">'+esc(o)+'</button>'; }).join('') + '</div>';
+  }
+  if (q.qtype === 'long_text') return '<textarea class="party-text-input" id="input-'+idx+'" style="width:100%;min-height:140px;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="Tell us more...">' + esc(val && val.value_text ? val.value_text : '') + '</textarea>';
+  var type = q.qtype === 'email' ? 'email' : (q.qtype === 'phone' ? 'tel' : 'text');
+  var placeholder = q.qtype === 'name' ? 'Your name' : (q.qtype === 'email' ? 'Your email' : (q.qtype === 'phone' ? 'Your phone number' : 'Type your answer'));
+  return '<input class="party-text-input" id="input-'+idx+'" type="'+type+'" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="'+placeholder+'" value="' + esc(val && val.value_text ? val.value_text : '') + '">';
+}
+
+function validatePartyQuestion(q, idx) {
+  syncPartyInput(q, idx);
+  var v = state.values[q.id];
+  var ok = true;
+  if (q.required) {
+    if (Array.isArray(v)) ok = v.length > 0;
+    else if (v && typeof v === 'object') ok = !!(v.value_text || v.value_number || v.value_json);
+    else ok = !(v == null || v === '');
+  }
+  if (!ok) {
+    var affirm = document.getElementById('party-affirm');
+    if (affirm) affirm.textContent = 'Answer this one first to keep the streak going.';
+    return false;
+  }
+  return true;
+}
+
+function syncPartyInput(q, idx) {
+  var el = document.getElementById('input-' + idx);
+  if (!el) return;
+  var v = (el.value || '').trim();
+  if (!v) { delete state.values[q.id]; return; }
+  if (q.qtype === 'email' || q.qtype === 'phone' || q.qtype === 'name' || q.qtype === 'short_text' || q.qtype === 'long_text') {
+    state.values[q.id] = { value_text: v };
+  }
+}
+
+function celebrateStep() {
+  state.answeredCount += 1;
+  state.streak += 1;
+  var affirm = document.getElementById('party-affirm');
+  var msgs = ['Nice one.', 'That helps.', 'Great — keep going.', 'Fast feedback unlocked.', 'You are flying through this.'];
+  if (affirm) affirm.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  if (navigator.vibrate) navigator.vibrate(18);
+  if (window.confetti) {
+    window.confetti({ particleCount: 28, spread: 60, origin: { y: 0.7 } });
+  }
 }
 
 function renderInput(q, idx) {
@@ -146,41 +279,67 @@ function wireQuestion(q, idx) {
   var name = 'q' + idx;
   if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
     var container = document.getElementById(name);
-    if (!container) return;
-    var btns = container.querySelectorAll('.scale-btn');
-    btns.forEach(function(btn){
-      btn.onclick = function() {
-        btns.forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
-      };
-    });
-    // Arrow key navigation within scale buttons
-    container.addEventListener('keydown', function(e){
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      var arr = Array.prototype.slice.call(btns);
-      var cur = arr.indexOf(document.activeElement);
-      if (cur < 0) return;
-      e.preventDefault();
-      var next = e.key === 'ArrowRight' ? Math.min(cur+1, arr.length-1) : Math.max(cur-1, 0);
-      arr[next].focus();
-    });
+    if (container) {
+      var btns = container.querySelectorAll('.scale-btn');
+      btns.forEach(function(btn){
+        btn.onclick = function() {
+          btns.forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
+        };
+      });
+      container.addEventListener('keydown', function(e){
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        var arr = Array.prototype.slice.call(btns);
+        var cur = arr.indexOf(document.activeElement);
+        if (cur < 0) return;
+        e.preventDefault();
+        var next = e.key === 'ArrowRight' ? Math.min(cur+1, arr.length-1) : Math.max(cur-1, 0);
+        arr[next].focus();
+      });
+    }
+  }
+
+  document.querySelectorAll('.party-choice').forEach(function(btn){
+    btn.onclick = function(){
+      var pv = btn.getAttribute('data-party-val');
+      if (q.qtype === 'multi_select') {
+        var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : [];
+        var i = curr.indexOf(pv);
+        if (i === -1) curr.push(pv); else curr.splice(i,1);
+        state.values[q.id] = curr;
+      } else if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
+        state.values[q.id] = { value_number: parseInt(pv, 10) };
+      } else {
+        state.values[q.id] = { value_text: pv };
+      }
+      if (state.mode === 'party') renderParty();
+    };
+  });
+
+  var textInput = document.getElementById('input-' + idx);
+  if (textInput) {
+    textInput.addEventListener('input', function(){ syncPartyInput(q, idx); });
   }
 }
 
 function collectAnswer(q, idx) {
   var name = 'q' + idx;
   var t = q.qtype;
+  if (state.mode === 'party') syncPartyInput(q, idx);
   if (t === 'short_text' || t === 'name' || t === 'email' || t === 'phone' || t === 'long_text') {
+    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
     var el = document.getElementById(name);
     var v = el ? el.value.trim() : '';
     return v ? { value_text: v } : null;
   }
   if (t === 'single_select' || t === 'yes_no' || t === 'consent') {
+    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
     var sel = document.querySelector('input[name="' + name + '"]:checked');
     return sel ? { value_text: sel.value } : null;
   }
   if (t === 'multi_select') {
+    if (Array.isArray(state.values[q.id])) return state.values[q.id].length ? { value_json: state.values[q.id] } : null;
     var vals = Array.prototype.slice.call(document.querySelectorAll('input[name="' + name + '"]:checked')).map(function(el){ return el.value; });
     return vals.length ? { value_json: vals } : null;
   }
