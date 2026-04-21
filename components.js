@@ -1552,7 +1552,8 @@ const Components = {
       role: 'admin',
       brand_slug: slug,
       region: admin.region,
-      tier: 'full'
+      tier: 'full',
+      _ah: admin._ah
     };
     Components._brandUser = user;
     GoNoGoStorage.set('brandUser', user);
