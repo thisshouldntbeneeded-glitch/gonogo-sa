@@ -609,10 +609,11 @@ function renderSettingsPanel() {
   html += '<div class="se-field"><label class="se-label">Intro text</label><textarea class="se-textarea" id="s-intro-text" placeholder="Shown above the first question"></textarea></div>';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Thank-you title</label><input class="se-input" id="s-ty-title" value="Thank you"></div>';
   html += '<div class="se-field"><label class="se-label">Thank-you text</label><input class="se-input" id="s-ty-text" value="Your feedback has been received."></div></div>';
-  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3)">';
+  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3);flex-wrap:wrap">';
   html += '<label class="se-toggle"><input type="checkbox" id="s-anon" checked> Anonymous responses</label>';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-contact" checked> Allow contact capture</label></div>';
-  html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response.</div>';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-contact" checked> Allow contact capture</label>';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-party-default"> Default to Party mode</label></div>';
+  html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response. Party mode starts respondents in a faster, swipe-friendly mobile flow, but they can switch back to Classic mode any time.</div>';
 
   document.getElementById('panel-settings').innerHTML = html;
 
@@ -632,7 +633,7 @@ function renderSettingsPanel() {
   ['s-intro-title','s-intro-text','s-ty-title','s-ty-text'].forEach(function(id){
     document.getElementById(id).addEventListener('input', markDirty);
   });
-  ['s-anon','s-contact'].forEach(function(id){
+  ['s-anon','s-contact','s-party-default'].forEach(function(id){
     document.getElementById(id).addEventListener('change', markDirty);
   });
 }
@@ -648,6 +649,8 @@ function populateSettings() {
   document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
   document.getElementById('s-anon').checked = !!s.is_anonymous;
   document.getElementById('s-contact').checked = !!s.allow_contact_capture;
+  var partyToggle = document.getElementById('s-party-default');
+  if (partyToggle) partyToggle.checked = !!s.party_mode_default;
   var _sLabels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
   document.getElementById('s-status').value = _sLabels[s.status] || s.status || 'Draft';
 }
@@ -661,6 +664,8 @@ function populateSettingsDefaults() {
   document.getElementById('s-ty-text').value = 'Your feedback has been received.';
   document.getElementById('s-anon').checked = true;
   document.getElementById('s-contact').checked = true;
+  var partyToggle = document.getElementById('s-party-default');
+  if (partyToggle) partyToggle.checked = false;
   document.getElementById('s-status').value = 'Draft';
 }
 
@@ -800,6 +805,7 @@ async function save() {
       thank_you_text: document.getElementById('s-ty-text').value.trim(),
       is_anonymous: document.getElementById('s-anon').checked,
       allow_contact_capture: document.getElementById('s-contact').checked,
+      party_mode_default: !!document.getElementById('s-party-default').checked,
       status: (function(){
         var v = _survey ? _survey.status : 'draft';
         return ['draft','active','paused','archived'].indexOf(v) !== -1 ? v : 'draft';
