@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GoNoGo — Survey Editor</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ── Top header bar ── */
+.se-header{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-5)}
+.se-header h1{font-size:18px;font-weight:700;margin:0;flex:1;min-width:200px}
+.se-header .cx-badge{font-size:11px}
+.se-actions{display:flex;gap:var(--space-2);flex-wrap:wrap}
+
+/* ── Two-column layout ── */
+.se-grid{display:grid;grid-template-columns:320px 1fr;gap:var(--space-5);align-items:start}
+@media(max-width:860px){.se-grid{grid-template-columns:1fr}}
+
+/* ── Left rail (question list) ── */
+.se-rail{position:sticky;top:var(--space-4);background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-3);max-height:calc(100vh - 120px);overflow-y:auto}
+.se-q-item{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;border-left:3px solid transparent;margin-bottom:2px;background:var(--surface-1);transition:background .12s}
+.se-q-item:hover{background:var(--surface-3)}
+.se-q-item.active{border-left-color:var(--green);background:var(--surface-3)}
+.se-q-item .handle{color:var(--text-muted);cursor:grab;font-size:13px;flex-shrink:0}
+.se-q-item .handle:active{cursor:grabbing}
+.se-q-item .qicon{color:var(--green);width:18px;text-align:center;flex-shrink:0;font-size:12px}
+.se-q-item .qlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-primary)}
+.se-q-item .req-dot{color:var(--red);font-size:10px;flex-shrink:0}
+.se-q-item .del-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:var(--radius-sm);flex-shrink:0}
+.se-q-item .del-btn:hover{color:var(--red);background:var(--red-dim)}
+.se-q-item.dragging{opacity:.4}
+.se-q-item.drag-over{border-top:2px solid var(--green)}
+.se-add-bar{margin-top:var(--space-3);position:relative}
+.se-add-btn{width:100%;text-align:left}
+.se-qtype-picker{position:absolute;left:0;right:0;bottom:100%;margin-bottom:4px;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-2);z-index:10;box-shadow:var(--shadow-md);display:none;max-height:280px;overflow-y:auto}
+.se-qtype-picker.show{display:block}
+.se-qtype-opt{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text-primary)}
+.se-qtype-opt:hover{background:var(--surface-3)}
+.se-qtype-opt i{color:var(--green);width:18px;text-align:center}
+
+/* ── Right pane ── */
+.se-pane{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-5);min-height:400px}
+.se-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-primary);margin-bottom:var(--space-4)}
+.se-tab{padding:var(--space-3) var(--space-4);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent}
+.se-tab.active{color:var(--text-primary);border-bottom-color:var(--green)}
+
+/* ── Form controls (reuse existing patterns) ── */
+.se-label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-1);text-transform:uppercase;letter-spacing:.05em}
+.se-input,.se-select,.se-textarea{width:100%;background:var(--surface-1);border:1px solid var(--border-primary);color:var(--text-primary);padding:8px 10px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit}
+.se-textarea{resize:vertical;min-height:60px}
+.se-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3)}
+.se-field{margin-bottom:var(--space-3)}
+.se-toggle{display:flex;align-items:center;gap:var(--space-2);font-size:13px;cursor:pointer}
+.se-hint{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ── Options editor ── */
+.se-opt-row{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2)}
+.se-opt-row input{flex:1}
+.se-opt-row .handle{color:var(--text-muted);cursor:grab;font-size:12px}
+.se-opt-row .del-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:var(--radius-sm)}
+.se-opt-row .del-btn:hover{color:var(--red)}
+.se-opt-row.dragging{opacity:.4}
+.se-opt-row.drag-over{border-top:2px solid var(--green)}
+
+/* ── Live preview card ── */
+.se-preview{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4);margin-top:var(--space-4)}
+.se-preview-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:var(--space-3)}
+.se-preview .q-prompt{font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:4px}
+.se-preview .q-help{font-size:12px;color:var(--text-muted);margin-bottom:var(--space-2)}
+.se-preview .scale-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(38px,1fr));gap:4px;margin-top:var(--space-2)}
+.se-preview .scale-btn{padding:8px 0;border:1px solid var(--border-primary);background:var(--surface-2);border-radius:var(--radius-sm);font-weight:600;font-size:13px;text-align:center;color:var(--text-primary)}
+.se-preview .nps-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px}
+.se-preview .nps-red{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.3);color:var(--red-text)}
+.se-preview .nps-amber{background:rgba(234,179,8,.12);border-color:rgba(234,179,8,.3);color:#fbbf24}
+.se-preview .nps-green{background:rgba(17,165,81,.12);border-color:rgba(17,165,81,.3);color:var(--green-text)}
+.se-preview .radio-row{display:flex;align-items:center;gap:var(--space-2);padding:6px 0;font-size:13px;color:var(--text-primary)}
+.se-preview input[type="text"],.se-preview input[type="email"],.se-preview input[type="tel"],.se-preview textarea{width:100%;padding:8px 10px;border:1px solid var(--border-primary);background:var(--surface-2);border-radius:var(--radius-sm);font-size:13px;color:var(--text-primary);font-family:inherit}
+.se-preview textarea{min-height:60px;resize:vertical}
+
+/* ── Empty state ── */
+.se-empty{text-align:center;padding:var(--space-10) var(--space-5)}
+.se-empty i{font-size:40px;color:var(--text-muted);margin-bottom:var(--space-3)}
+.se-empty p{color:var(--text-muted);margin-bottom:var(--space-4);font-size:14px}
+
+/* ── Share links ── */
+.se-link-row{display:flex;gap:var(--space-2);align-items:center;background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-2);font-size:12px}
+.se-link-row input{flex:1;background:transparent;border:none;color:var(--text-primary);font-family:var(--font-mono,ui-monospace,monospace);font-size:12px}
+.se-link-row.revoked{opacity:.5;text-decoration:line-through}
+.se-link-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:999px}
+.se-link-active{background:rgba(34,197,94,.18);color:#4ade80}
+.se-link-revoked{background:rgba(100,116,139,.18);color:#94a3b8}
+
+/* ── Toast ── */
+.se-toast{position:fixed;bottom:var(--space-5);right:var(--space-5);padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);font-size:13px;font-weight:600;z-index:200;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none}
+.se-toast.show{opacity:1;transform:translateY(0)}
+.se-toast.success{background:var(--green);color:#fff}
+.se-toast.error{background:var(--red);color:#fff}
+
+/* ── Badge (reused from surveys list) ── */
+.cx-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.cx-b-draft{background:rgba(148,163,184,.2);color:#cbd5e1}
+.cx-b-published{background:rgba(34,197,94,.18);color:#4ade80}
+.cx-b-active{background:rgba(34,197,94,.18);color:#4ade80}
+.cx-b-paused{background:rgba(234,179,8,.18);color:#fbbf24}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-container"></div>
+  <main class="admin-main" id="brand-content" style="display:none;">
+    <!-- Top header -->
+    <div class="se-header">
+      <h1 id="page-title"><i class="fa-solid fa-pen-to-square" style="color:var(--green);margin-right:var(--space-2)"></i> <span id="title-text">New Survey</span></h1>
+      <span class="cx-badge" id="status-badge" style="display:none"></span>
+      <div class="se-actions">
+        <a href="brand-cx-surveys.html" class="btn btn-sm" style="background:var(--surface-3)"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <button class="btn btn-sm" id="btn-save" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-save"></i> Save</button>
+        <button class="btn btn-sm" id="btn-publish" style="display:none;background:var(--green);color:#fff;border:none"><i class="fa-solid fa-rocket"></i> Publish</button>
+        <button class="btn btn-sm" id="btn-pause" style="display:none;background:var(--orange);color:#fff;border:none"><i class="fa-solid fa-pause"></i> Pause</button>
+        <button class="btn btn-sm" id="btn-unpublish" style="display:none;background:var(--surface-3)"><i class="fa-solid fa-eye-slash"></i> Unpublish</button>
+      </div>
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="se-grid">
+      <!-- Left rail: question list -->
+      <div class="se-rail" id="rail">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:var(--space-2)">Questions</div>
+        <div id="q-list"></div>
+        <div class="se-add-bar">
+          <button class="btn btn-sm se-add-btn" id="btn-add-q"><i class="fa-solid fa-plus"></i> Add question</button>
+          <div class="se-qtype-picker" id="qtype-picker"></div>
+        </div>
+      </div>
+
+      <!-- Right pane -->
+      <div class="se-pane" id="right-pane">
+        <div class="se-tabs" id="pane-tabs">
+          <button class="se-tab active" data-tab="question">Question</button>
+          <button class="se-tab" data-tab="settings">Survey settings</button>
+          <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Share links</button>
+        </div>
+        <div id="panel-question"></div>
+        <div id="panel-settings" style="display:none"></div>
+        <div id="panel-links" style="display:none"></div>
+      </div>
+    </div>
+
+    <div style="padding:var(--space-6) 0;text-align:center;">
+      <p class="text-xs text-muted">&copy; 2026 GoNoGo &mdash; CX Suite (internal only)</p>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="se-toast" id="toast"></div>
+
+<script src="data/helpers.js"></script>
+<script src="components.js"></script>
+<script src="api.js"></script>
+<script>
+Components.initTheme();
+document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
+
+if (Components.checkBrandAuth()) init();
+
+/* ── State ── */
+var _surveyId = new URLSearchParams(location.search).get('id');
+var _survey = null;
+var _questions = [];
+var _links = [];
+var _selectedIdx = -1;
+var _dirty = false;
+var _saving = false;
+var esc = Components.escapeHTML.bind(Components);
+
+var QTYPES = [
+  {v:'short_text',   l:'Short text',       icon:'fa-font'},
+  {v:'long_text',    l:'Long text',        icon:'fa-align-left'},
+  {v:'single_select',l:'Single select',    icon:'fa-circle-dot'},
+  {v:'multi_select', l:'Multi select',     icon:'fa-square-check'},
+  {v:'rating_1_5',   l:'Rating 1\u20135',  icon:'fa-star'},
+  {v:'nps_0_10',     l:'NPS 0\u201310',    icon:'fa-gauge-high'},
+  {v:'yes_no',       l:'Yes / No',         icon:'fa-toggle-on'},
+  {v:'email',        l:'Email',            icon:'fa-envelope'},
+  {v:'phone',        l:'Phone',            icon:'fa-phone'},
+  {v:'name',         l:'Name',             icon:'fa-user'},
+  {v:'consent',      l:'Consent checkbox', icon:'fa-check-double'}
+];
+function qtypeLabel(v){ for(var i=0;i<QTYPES.length;i++) if(QTYPES[i].v===v) return QTYPES[i].l; return v; }
+function qtypeIcon(v){ for(var i=0;i<QTYPES.length;i++) if(QTYPES[i].v===v) return QTYPES[i].icon; return 'fa-question'; }
+
+async function init() {
+  var user = Components.getBrandUser();
+  if (!user) return;
+  document.getElementById('brand-content').style.display = '';
+  document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
+
+  wireEvents();
+  buildQtypePicker();
+  renderSettingsPanel();
+
+  if (_surveyId) {
+    try {
+      var data = await GoNoGoAPI.cx.getSurvey(_surveyId);
+      _survey = data.survey;
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _links = data.links || [];
+      document.getElementById('title-text').textContent = 'Edit: ' + _survey.name;
+      document.getElementById('tab-links').style.display = '';
+      populateSettings();
+      updateStatusUI();
+      renderLinks();
+    } catch(e) {
+      toast('Could not load survey: ' + (e.message||'error'), 'error');
+      return;
+    }
+  } else {
+    // New survey defaults
+    _questions = [
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', required:true, options:[], help_text:''},
+      {qtype:'long_text', prompt:'Tell us more about your experience', required:false, options:[], help_text:''}
+    ];
+    populateSettingsDefaults();
+  }
+
+  renderRail();
+  if (_questions.length > 0) { _selectedIdx = 0; } else { _selectedIdx = -1; }
+  renderRail();
+  renderQuestionPanel();
+}
+
+/* ── Events ── */
+function wireEvents() {
+  document.getElementById('btn-save').addEventListener('click', save);
+  document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('published'); });
+  document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
+  document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
+  document.getElementById('btn-add-q').addEventListener('click', toggleQtypePicker);
+  document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
+
+  // Close picker on outside click
+  document.addEventListener('click', function(e){
+    var picker = document.getElementById('qtype-picker');
+    if (picker.classList.contains('show') && !picker.contains(e.target) && e.target.id !== 'btn-add-q' && !e.target.closest('#btn-add-q')) {
+      picker.classList.remove('show');
+    }
+  });
+
+  // Dirty guard
+  window.addEventListener('beforeunload', function(e){
+    if (_dirty && !_saving) { e.preventDefault(); e.returnValue = ''; }
+  });
+}
+
+function markDirty(){ _dirty = true; }
+
+/* ── Tabs ── */
+function showTab(name) {
+  document.querySelectorAll('.se-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
+  document.getElementById('panel-question').style.display = name === 'question' ? '' : 'none';
+  document.getElementById('panel-settings').style.display = name === 'settings' ? '' : 'none';
+  document.getElementById('panel-links').style.display = name === 'links' ? '' : 'none';
+  if (name === 'question') renderQuestionPanel();
+}
+
+/* ── Qtype picker ── */
+function buildQtypePicker() {
+  var picker = document.getElementById('qtype-picker');
+  picker.innerHTML = QTYPES.map(function(t){
+    return '<div class="se-qtype-opt" data-qtype="' + t.v + '"><i class="fa-solid ' + t.icon + '"></i> ' + esc(t.l) + '</div>';
+  }).join('');
+  picker.querySelectorAll('.se-qtype-opt').forEach(function(el){
+    el.addEventListener('click', function(){
+      addQuestion(el.dataset.qtype);
+      picker.classList.remove('show');
+    });
+  });
+}
+function toggleQtypePicker(e) {
+  e.stopPropagation();
+  document.getElementById('qtype-picker').classList.toggle('show');
+}
+
+/* ── Question management ── */
+function addQuestion(qtype) {
+  _questions.push({qtype:qtype||'short_text', prompt:'', help_text:'', required:false, options:[]});
+  _selectedIdx = _questions.length - 1;
+  markDirty();
+  renderRail();
+  renderQuestionPanel();
+  showTab('question');
+}
+
+function deleteQuestion(idx) {
+  _questions.splice(idx, 1);
+  if (_selectedIdx >= _questions.length) _selectedIdx = _questions.length - 1;
+  if (_selectedIdx < 0) _selectedIdx = -1;
+  markDirty();
+  renderRail();
+  renderQuestionPanel();
+}
+
+/* ── Left rail rendering ── */
+function renderRail() {
+  var list = document.getElementById('q-list');
+  if (!_questions.length) {
+    list.innerHTML = '';
+    renderEmptyState();
+    return;
+  }
+  // Remove empty state if present
+  var empty = document.getElementById('panel-question').querySelector('.se-empty');
+  if (empty && _questions.length) { /* will be replaced by renderQuestionPanel */ }
+
+  list.innerHTML = _questions.map(function(q, i){
+    var active = i === _selectedIdx ? ' active' : '';
+    var icon = qtypeIcon(q.qtype);
+    var label = q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>';
+    return '<div class="se-q-item' + active + '" data-idx="' + i + '" draggable="true">' +
+      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      '<span class="qicon"><i class="fa-solid ' + icon + '"></i></span>' +
+      '<span class="qlabel">' + label + '</span>' +
+      (q.required ? '<span class="req-dot"><i class="fa-solid fa-asterisk"></i></span>' : '') +
+      '<button class="del-btn" data-delidx="' + i + '" title="Delete"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>';
+  }).join('');
+
+  // Click to select
+  list.querySelectorAll('.se-q-item').forEach(function(el){
+    el.addEventListener('click', function(e){
+      if (e.target.closest('.del-btn')) return;
+      _selectedIdx = parseInt(el.dataset.idx, 10);
+      renderRail();
+      renderQuestionPanel();
+      showTab('question');
+    });
+  });
+
+  // Delete buttons
+  list.querySelectorAll('.del-btn').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      deleteQuestion(parseInt(b.dataset.delidx, 10));
+    });
+  });
+
+  // Drag-and-drop reorder
+  wireRailDragDrop(list);
+}
+
+function wireRailDragDrop(list) {
+  var dragIdx = null;
+  list.querySelectorAll('.se-q-item').forEach(function(el){
+    el.addEventListener('dragstart', function(e){
+      dragIdx = parseInt(el.dataset.idx, 10);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', dragIdx);
+    });
+    el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
+    el.addEventListener('dragover', function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e){
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      var toIdx = parseInt(el.dataset.idx, 10);
+      if (dragIdx === null || dragIdx === toIdx) return;
+      var moved = _questions.splice(dragIdx, 1)[0];
+      _questions.splice(toIdx, 0, moved);
+      if (_selectedIdx === dragIdx) _selectedIdx = toIdx;
+      else if (dragIdx < _selectedIdx && toIdx >= _selectedIdx) _selectedIdx--;
+      else if (dragIdx > _selectedIdx && toIdx <= _selectedIdx) _selectedIdx++;
+      markDirty();
+      renderRail();
+      renderQuestionPanel();
+    });
+  });
+}
+
+/* ── Right pane: question editor ── */
+function renderQuestionPanel() {
+  var panel = document.getElementById('panel-question');
+  if (_selectedIdx < 0 || _selectedIdx >= _questions.length) {
+    renderEmptyState();
+    return;
+  }
+  var q = _questions[_selectedIdx];
+  var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select';
+
+  var html = '';
+
+  // Qtype selector
+  html += '<div class="se-field"><label class="se-label">Question type</label><select class="se-select" id="ed-qtype">';
+  QTYPES.forEach(function(t){ html += '<option value="' + t.v + '"' + (t.v === q.qtype ? ' selected' : '') + '>' + esc(t.l) + '</option>'; });
+  html += '</select></div>';
+
+  // Prompt
+  html += '<div class="se-field"><label class="se-label">Prompt *</label><input class="se-input" id="ed-prompt" value="' + esc(q.prompt) + '" placeholder="Question text"></div>';
+
+  // Help text
+  html += '<div class="se-field"><label class="se-label">Help text</label><textarea class="se-textarea" id="ed-help" placeholder="Optional guidance for the respondent">' + esc(q.help_text) + '</textarea></div>';
+
+  // Required toggle
+  html += '<div class="se-field"><label class="se-toggle"><input type="checkbox" id="ed-required"' + (q.required ? ' checked' : '') + '> Required</label></div>';
+
+  // Per-qtype extras
+  if (isSelect) {
+    html += '<div class="se-field"><label class="se-label">Options</label><div id="ed-options"></div>';
+    html += '<button class="btn btn-sm" id="btn-add-opt" style="margin-top:var(--space-2)"><i class="fa-solid fa-plus"></i> Add option</button></div>';
+  }
+
+  if (q.qtype === 'consent') {
+    var consentLabel = (q.options && q.options[0]) || 'I agree to the terms';
+    html += '<div class="se-field"><label class="se-label">Consent label</label><input class="se-input" id="ed-consent-label" value="' + esc(consentLabel) + '"></div>';
+  }
+
+  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
+    var placeholder = (q.options && q.options[0]) || '';
+    html += '<div class="se-field"><label class="se-label">Placeholder text</label><input class="se-input" id="ed-placeholder" value="' + esc(placeholder) + '" placeholder="Optional placeholder"></div>';
+  }
+
+  // Live preview
+  html += '<div class="se-preview"><div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q) + '</div>';
+
+  panel.innerHTML = html;
+  wireQuestionEditor();
+}
+
+function wireQuestionEditor() {
+  var q = _questions[_selectedIdx];
+  if (!q) return;
+
+  document.getElementById('ed-qtype').addEventListener('change', function(){
+    q.qtype = this.value;
+    // Reset options when switching to select
+    if ((q.qtype === 'single_select' || q.qtype === 'multi_select') && (!q.options || !q.options.length)) {
+      q.options = ['Option 1', 'Option 2'];
+    }
+    markDirty(); renderRail(); renderQuestionPanel();
+  });
+  document.getElementById('ed-prompt').addEventListener('input', function(){ q.prompt = this.value; markDirty(); updateRailLabel(); updatePreview(); });
+  document.getElementById('ed-help').addEventListener('input', function(){ q.help_text = this.value; markDirty(); updatePreview(); });
+  document.getElementById('ed-required').addEventListener('change', function(){ q.required = this.checked; markDirty(); renderRail(); });
+
+  if (q.qtype === 'single_select' || q.qtype === 'multi_select') {
+    renderOptionsEditor();
+    document.getElementById('btn-add-opt').addEventListener('click', function(){
+      q.options.push('');
+      markDirty(); renderOptionsEditor(); updatePreview();
+    });
+  }
+
+  if (q.qtype === 'consent') {
+    document.getElementById('ed-consent-label').addEventListener('input', function(){
+      q.options = [this.value];
+      markDirty(); updatePreview();
+    });
+  }
+
+  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
+    var phEl = document.getElementById('ed-placeholder');
+    if (phEl) phEl.addEventListener('input', function(){
+      q.options = this.value ? [this.value] : [];
+      markDirty(); updatePreview();
+    });
+  }
+}
+
+function updateRailLabel() {
+  var el = document.querySelector('.se-q-item[data-idx="' + _selectedIdx + '"] .qlabel');
+  if (el) {
+    var q = _questions[_selectedIdx];
+    el.innerHTML = q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>';
+  }
+}
+
+function updatePreview() {
+  var q = _questions[_selectedIdx];
+  if (!q) return;
+  var container = document.querySelector('.se-preview');
+  if (container) {
+    container.innerHTML = '<div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q);
+  }
+}
+
+/* ── Options editor for select types ── */
+function renderOptionsEditor() {
+  var q = _questions[_selectedIdx];
+  var container = document.getElementById('ed-options');
+  if (!container) return;
+  container.innerHTML = (q.options || []).map(function(opt, i){
+    return '<div class="se-opt-row" data-oidx="' + i + '" draggable="true">' +
+      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      '<input class="se-input" value="' + esc(opt) + '" data-oidx="' + i + '" placeholder="Option ' + (i+1) + '">' +
+      '<button class="del-btn" data-delidx="' + i + '"><i class="fa-solid fa-trash"></i></button></div>';
+  }).join('');
+
+  container.querySelectorAll('.se-opt-row input').forEach(function(el){
+    el.addEventListener('input', function(){
+      q.options[parseInt(el.dataset.oidx,10)] = el.value;
+      markDirty(); updatePreview();
+    });
+  });
+  container.querySelectorAll('.se-opt-row .del-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      q.options.splice(parseInt(b.dataset.delidx,10),1);
+      markDirty(); renderOptionsEditor(); updatePreview();
+    });
+  });
+
+  // Drag-drop for options
+  var dragIdx = null;
+  container.querySelectorAll('.se-opt-row').forEach(function(el){
+    el.addEventListener('dragstart', function(e){
+      dragIdx = parseInt(el.dataset.oidx,10);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
+    el.addEventListener('dragover', function(e){ e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e){
+      e.preventDefault(); el.classList.remove('drag-over');
+      var toIdx = parseInt(el.dataset.oidx,10);
+      if (dragIdx === null || dragIdx === toIdx) return;
+      var moved = q.options.splice(dragIdx,1)[0];
+      q.options.splice(toIdx,0,moved);
+      markDirty(); renderOptionsEditor(); updatePreview();
+    });
+  });
+}
+
+/* ── Live preview rendering ── */
+function renderPreview(q) {
+  var html = '<div class="q-prompt">' + esc(q.prompt || 'Question prompt') + (q.required ? ' <span style="color:var(--red)">*</span>' : '') + '</div>';
+  if (q.help_text) html += '<div class="q-help">' + esc(q.help_text) + '</div>';
+
+  switch(q.qtype) {
+    case 'short_text':
+    case 'name':
+      html += '<input type="text" disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer…') + '">';
+      if (q.qtype === 'name') html += '<div class="se-hint">Respondent\'s name — validated on submit</div>';
+      break;
+    case 'long_text':
+      html += '<textarea disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer…') + '"></textarea>';
+      break;
+    case 'email':
+      html += '<input type="email" disabled placeholder="name@example.com">';
+      html += '<div class="se-hint">Email format validated on submit</div>';
+      break;
+    case 'phone':
+      html += '<input type="tel" disabled placeholder="+27 xx xxx xxxx">';
+      html += '<div class="se-hint">Phone format validated on submit</div>';
+      break;
+    case 'single_select':
+      (q.options||[]).forEach(function(o){ html += '<div class="radio-row"><input type="radio" disabled> ' + esc(o||'Option') + '</div>'; });
+      break;
+    case 'multi_select':
+      (q.options||[]).forEach(function(o){ html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(o||'Option') + '</div>'; });
+      break;
+    case 'rating_1_5':
+      html += '<div class="scale-grid" style="grid-template-columns:repeat(5,1fr)">';
+      for(var i=1;i<=5;i++) html += '<div class="scale-btn"><i class="fa-solid fa-star" style="margin-right:4px;font-size:11px;color:var(--green)"></i>' + i + '</div>';
+      html += '</div>';
+      break;
+    case 'nps_0_10':
+      html += '<div class="scale-grid" style="grid-template-columns:repeat(11,1fr)">';
+      for(var i=0;i<=10;i++){
+        var cls = i<=6 ? 'nps-red' : (i<=8 ? 'nps-amber' : 'nps-green');
+        html += '<div class="scale-btn ' + cls + '">' + i + '</div>';
+      }
+      html += '</div>';
+      html += '<div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
+      break;
+    case 'yes_no':
+      html += '<div class="radio-row"><input type="radio" disabled> Yes</div>';
+      html += '<div class="radio-row"><input type="radio" disabled> No</div>';
+      break;
+    case 'consent':
+      var label = (q.options && q.options[0]) || 'I agree to the terms';
+      html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(label) + '</div>';
+      break;
+  }
+  return html;
+}
+
+/* ── Empty state (no questions) ── */
+function renderEmptyState() {
+  var panel = document.getElementById('panel-question');
+  var html = '<div class="se-empty"><i class="fa-solid fa-clipboard-list"></i><p>Add your first question to start building the survey</p>';
+  html += '<div style="display:inline-block;text-align:left">';
+  QTYPES.forEach(function(t){
+    html += '<div class="se-qtype-opt" data-qtype="' + t.v + '" style="padding:6px 12px"><i class="fa-solid ' + t.icon + '"></i> ' + esc(t.l) + '</div>';
+  });
+  html += '</div></div>';
+  panel.innerHTML = html;
+  panel.querySelectorAll('.se-qtype-opt').forEach(function(el){
+    el.addEventListener('click', function(){ addQuestion(el.dataset.qtype); });
+  });
+}
+
+/* ── Survey settings panel ── */
+function renderSettingsPanel() {
+  var html = '';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Survey name *</label><input class="se-input" id="s-name" placeholder="e.g. Post-visit feedback"></div>';
+  html += '<div class="se-field"><label class="se-label">Slug</label><input class="se-input" id="s-slug" placeholder="auto from name"></div></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Intro title</label><input class="se-input" id="s-intro-title" placeholder="We\'d love your feedback"></div>';
+  html += '<div class="se-field"><label class="se-label">Status</label><input class="se-input" id="s-status" readonly style="opacity:.6"></div></div>';
+  html += '<div class="se-field"><label class="se-label">Intro text</label><textarea class="se-textarea" id="s-intro-text" placeholder="Shown above the first question"></textarea></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Thank-you title</label><input class="se-input" id="s-ty-title" value="Thank you"></div>';
+  html += '<div class="se-field"><label class="se-label">Thank-you text</label><input class="se-input" id="s-ty-text" value="Your feedback has been received."></div></div>';
+  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3)">';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-anon" checked> Anonymous responses</label>';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-contact" checked> Allow contact capture</label></div>';
+  html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response.</div>';
+
+  document.getElementById('panel-settings').innerHTML = html;
+
+  // Auto-generate slug from name
+  document.getElementById('s-name').addEventListener('input', function(){
+    var slug = document.getElementById('s-slug');
+    if (!slug.dataset.manual) {
+      slug.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+    markDirty();
+  });
+  document.getElementById('s-slug').addEventListener('input', function(){
+    this.dataset.manual = '1';
+    this.value = this.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+    markDirty();
+  });
+  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', markDirty);
+  });
+  ['s-anon','s-contact'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', markDirty);
+  });
+}
+
+function populateSettings() {
+  var s = _survey;
+  document.getElementById('s-name').value = s.name || '';
+  document.getElementById('s-slug').value = s.slug || '';
+  if (s.slug) document.getElementById('s-slug').dataset.manual = '1';
+  document.getElementById('s-intro-title').value = s.intro_title || '';
+  document.getElementById('s-intro-text').value = s.intro_text || '';
+  document.getElementById('s-ty-title').value = s.thank_you_title || 'Thank you';
+  document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
+  document.getElementById('s-anon').checked = !!s.is_anonymous;
+  document.getElementById('s-contact').checked = !!s.allow_contact_capture;
+  document.getElementById('s-status').value = s.status || 'draft';
+}
+
+function populateSettingsDefaults() {
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-slug').value = '';
+  document.getElementById('s-intro-title').value = '';
+  document.getElementById('s-intro-text').value = '';
+  document.getElementById('s-ty-title').value = 'Thank you';
+  document.getElementById('s-ty-text').value = 'Your feedback has been received.';
+  document.getElementById('s-anon').checked = true;
+  document.getElementById('s-contact').checked = true;
+  document.getElementById('s-status').value = 'draft';
+}
+
+/* ── Status UI ── */
+function updateStatusUI() {
+  var s = _survey ? _survey.status : 'draft';
+  var badge = document.getElementById('status-badge');
+  badge.style.display = '';
+  badge.className = 'cx-badge cx-b-' + s;
+  badge.textContent = s;
+
+  document.getElementById('btn-publish').style.display = (s === 'draft' || s === 'paused') ? '' : 'none';
+  document.getElementById('btn-pause').style.display = (s === 'published' || s === 'active') ? '' : 'none';
+  document.getElementById('btn-unpublish').style.display = (s === 'published' || s === 'active' || s === 'paused') ? '' : 'none';
+}
+
+async function setStatus(status) {
+  if (!_survey || !_survey.id) { toast('Save the survey first', 'error'); return; }
+  try {
+    await GoNoGoAPI.cx.setSurveyStatus(_survey.id, status);
+    _survey.status = status;
+    document.getElementById('s-status').value = status;
+    updateStatusUI();
+    toast('Status changed to ' + status, 'success');
+  } catch(e) { toast('Failed: ' + (e.message||'error'), 'error'); }
+}
+
+/* ── Share links ── */
+function renderLinks() {
+  var panel = document.getElementById('panel-links');
+  var base = window.location.origin + '/cx-survey?t=';
+  var html = '<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Share links let customers respond without logging in. Revoke any time.</p>';
+
+  if (_links.length) {
+    _links.forEach(function(l){
+      var statusCls = l.revoked ? 'se-link-revoked' : 'se-link-active';
+      var statusText = l.revoked ? 'Revoked' : 'Active';
+      html += '<div class="se-link-row' + (l.revoked ? ' revoked' : '') + '">' +
+        '<strong style="color:var(--green);min-width:100px">' + esc(l.label || 'Link') + '</strong>' +
+        '<input readonly value="' + base + esc(l.token) + '">' +
+        '<span class="se-link-status ' + statusCls + '">' + statusText + '</span>' +
+        '<button class="btn btn-sm" data-copy="' + base + esc(l.token) + '" title="Copy URL"><i class="fa-solid fa-copy"></i></button>' +
+        (l.revoked ? '' : '<button class="btn btn-sm" data-revoke="' + l.id + '" title="Revoke" style="color:var(--red)"><i class="fa-solid fa-ban"></i></button>') +
+        '</div>';
+    });
+  } else {
+    html += '<p class="text-sm text-muted" style="margin-bottom:var(--space-3)">No share links yet.</p>';
+  }
+
+  html += '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">';
+  html += '<input class="se-input" id="f-link-label" placeholder="Link label (e.g. In-store QR)" style="flex:1">';
+  html += '<button class="btn btn-sm" id="btn-new-link" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-link"></i> Generate new link</button></div>';
+
+  panel.innerHTML = html;
+
+  panel.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      navigator.clipboard.writeText(b.dataset.copy);
+      b.innerHTML = '<i class="fa-solid fa-check"></i>';
+      setTimeout(function(){ b.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 1200);
+    });
+  });
+  panel.querySelectorAll('[data-revoke]').forEach(function(b){
+    b.addEventListener('click', async function(){
+      if (!confirm('Revoke this link? Respondents will no longer be able to submit.')) return;
+      try {
+        await GoNoGoAPI.cx.revokeLink(b.dataset.revoke);
+        var data = await GoNoGoAPI.cx.getSurvey(_survey.id);
+        _links = data.links || [];
+        renderLinks();
+        toast('Link revoked', 'success');
+      } catch(e){ toast('Revoke failed', 'error'); }
+    });
+  });
+  var newLinkBtn = document.getElementById('btn-new-link');
+  if (newLinkBtn) newLinkBtn.addEventListener('click', createLink);
+}
+
+async function createLink() {
+  if (!_survey || !_survey.id) { toast('Save the survey first', 'error'); return; }
+  var s = _survey.status;
+  if (s !== 'published' && s !== 'active') {
+    if (!confirm('Survey is not published \u2014 links will not accept responses until you publish. Continue?')) return;
+  }
+  var label = document.getElementById('f-link-label').value.trim();
+  try {
+    await GoNoGoAPI.cx.createLink(_survey.id, label);
+    document.getElementById('f-link-label').value = '';
+    var data = await GoNoGoAPI.cx.getSurvey(_survey.id);
+    _links = data.links || [];
+    renderLinks();
+    toast('Link created', 'success');
+  } catch(e) { toast('Could not create link: ' + (e.message||'error'), 'error'); }
+}
+
+/* ── Save ── */
+async function save() {
+  // Client-side validation
+  var name = document.getElementById('s-name').value.trim();
+  if (!name) { toast('Survey name is required', 'error'); showTab('settings'); document.getElementById('s-name').focus(); return; }
+  if (!_questions.length) { toast('Add at least one question', 'error'); return; }
+  for (var i = 0; i < _questions.length; i++) {
+    if (!_questions[i].prompt || !_questions[i].prompt.trim()) {
+      toast('Question ' + (i+1) + ' needs a prompt', 'error');
+      _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
+      return;
+    }
+    if ((_questions[i].qtype === 'single_select' || _questions[i].qtype === 'multi_select') && (!_questions[i].options || _questions[i].options.filter(Boolean).length < 2)) {
+      toast('Question ' + (i+1) + ' needs at least 2 options', 'error');
+      _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
+      return;
+    }
+  }
+
+  var btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving\u2026';
+  _saving = true;
+
+  try {
+    var payload = {
+      id: _survey ? _survey.id : null,
+      name: name,
+      slug: document.getElementById('s-slug').value.trim() || null,
+      intro_title: document.getElementById('s-intro-title').value.trim(),
+      intro_text: document.getElementById('s-intro-text').value.trim(),
+      thank_you_title: document.getElementById('s-ty-title').value.trim(),
+      thank_you_text: document.getElementById('s-ty-text').value.trim(),
+      is_anonymous: document.getElementById('s-anon').checked,
+      allow_contact_capture: document.getElementById('s-contact').checked,
+      status: _survey ? _survey.status : 'draft',
+      questions: _questions.map(function(q){
+        return {
+          qtype: q.qtype,
+          prompt: q.prompt.trim(),
+          help_text: (q.help_text || '').trim(),
+          required: !!q.required,
+          options: q.options || []
+        };
+      }).filter(function(q){ return q.prompt; })
+    };
+
+    var resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
+
+    // Reload the survey to get server-generated fields
+    var id = (_survey && _survey.id) || resultId;
+    if (id) {
+      var data = await GoNoGoAPI.cx.getSurvey(id);
+      _survey = data.survey;
+      _surveyId = _survey.id;
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _links = data.links || [];
+
+      // Update URL without reload
+      if (!window.location.search.includes('id=')) {
+        history.replaceState(null, '', 'brand-cx-survey-edit.html?id=' + _survey.id);
+      }
+
+      document.getElementById('title-text').textContent = 'Edit: ' + _survey.name;
+      document.getElementById('tab-links').style.display = '';
+      updateStatusUI();
+      renderRail();
+      renderQuestionPanel();
+      renderLinks();
+    }
+
+    _dirty = false;
+    toast('Survey saved', 'success');
+  } catch(e) {
+    toast('Save failed: ' + (e.message || 'error'), 'error');
+  } finally {
+    _saving = false;
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save';
+  }
+}
+
+/* ── Toast ── */
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'se-toast ' + (type || 'success') + ' show';
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>

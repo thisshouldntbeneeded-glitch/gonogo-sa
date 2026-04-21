@@ -20,14 +20,27 @@
   .opt-row { display:flex; align-items:center; padding:8px 0; cursor:pointer; }
   .opt-row input { margin-right: 10px; }
   .scale-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
-  .scale-btn { padding: 10px 0; border: 1px solid var(--border-primary, #d1d5db); background: var(--surface-1, #fff); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .scale-btn { padding: 10px 0; border: 1px solid var(--border-primary, #d1d5db); background: var(--surface-1, #fff); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background .12s, border-color .12s; }
+  .scale-btn:hover { background: rgba(17,165,81,.08); }
   .scale-btn.active { background: #11a551; color: #fff; border-color: #11a551; }
+  /* Rating 1-5: bigger buttons with star icon */
+  .rating-grid .scale-btn { padding: 14px 0; font-size: 16px; min-height: 48px; }
+  /* NPS color bands */
+  .nps-grid .scale-btn.nps-red { background: rgba(231,76,60,.08); border-color: rgba(231,76,60,.25); }
+  .nps-grid .scale-btn.nps-amber { background: rgba(234,179,8,.08); border-color: rgba(234,179,8,.25); }
+  .nps-grid .scale-btn.nps-green { background: rgba(17,165,81,.08); border-color: rgba(17,165,81,.25); }
+  .nps-grid .scale-btn.active.nps-red { background: #dc2626; border-color: #dc2626; color: #fff; }
+  .nps-grid .scale-btn.active.nps-amber { background: #d97706; border-color: #d97706; color: #fff; }
+  .nps-grid .scale-btn.active.nps-green { background: #11a551; border-color: #11a551; color: #fff; }
+  .nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted, #6b7280); margin-top: 4px; }
   .submit-btn { background: #11a551; color: #fff; border: 0; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; }
   .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   .error-text { color: #dc2626; font-size: 13px; margin-top: 4px; }
   .thank-wrap { text-align: center; padding: 40px 20px; }
   .thank-wrap h2 { color: #11a551; }
   .brand-mark { text-align: center; font-size: 12px; color: var(--text-muted, #6b7280); margin-top: 20px; }
+  /* Focus ring */
+  *:focus-visible { outline: 2px solid #11a551; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -80,6 +93,17 @@ function render() {
   // Wire inputs
   state.questions.forEach(function(q, idx) { wireQuestion(q, idx); });
   document.getElementById('submit-btn').onclick = submit;
+
+  // Enter key submits when focused on last required question's input
+  document.getElementById('survey-form').addEventListener('keydown', function(e){
+    if (e.key !== 'Enter') return;
+    var tag = e.target.tagName;
+    if (tag === 'TEXTAREA') return; // allow newlines in textarea
+    if (tag === 'INPUT' || tag === 'BUTTON') {
+      e.preventDefault();
+      submit();
+    }
+  });
 }
 
 function renderInput(q, idx) {
@@ -101,15 +125,18 @@ function renderInput(q, idx) {
     }).join('');
   }
   if (t === 'rating_1_5') {
-    var html = '<div class="scale-grid" id="' + name + '">';
-    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">' + i + '</button>';
+    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
+    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">&#9733; ' + i + '</button>';
     html += '</div>';
     return html;
   }
   if (t === 'nps_0_10') {
-    var html = '<div class="scale-grid" id="' + name + '">';
-    for (var i=0; i<=10; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">' + i + '</button>';
-    html += '</div>';
+    var html = '<div class="scale-grid nps-grid" id="' + name + '" style="grid-template-columns:repeat(11,1fr)">';
+    for (var i=0; i<=10; i++) {
+      var cls = i <= 6 ? 'nps-red' : (i <= 8 ? 'nps-amber' : 'nps-green');
+      html += '<button type="button" class="scale-btn ' + cls + '" data-val="' + i + '">' + i + '</button>';
+    }
+    html += '</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
     return html;
   }
   return '<input class="q-input" type="text" id="' + name + '">';
@@ -120,12 +147,23 @@ function wireQuestion(q, idx) {
   if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
     var container = document.getElementById(name);
     if (!container) return;
-    container.querySelectorAll('.scale-btn').forEach(function(btn){
+    var btns = container.querySelectorAll('.scale-btn');
+    btns.forEach(function(btn){
       btn.onclick = function() {
-        container.querySelectorAll('.scale-btn').forEach(function(b){ b.classList.remove('active'); });
+        btns.forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
         state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
       };
+    });
+    // Arrow key navigation within scale buttons
+    container.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var arr = Array.prototype.slice.call(btns);
+      var cur = arr.indexOf(document.activeElement);
+      if (cur < 0) return;
+      e.preventDefault();
+      var next = e.key === 'ArrowRight' ? Math.min(cur+1, arr.length-1) : Math.max(cur-1, 0);
+      arr[next].focus();
     });
   }
 }
@@ -170,6 +208,26 @@ async function submit() {
       err.style.display = 'block';
       hasError = true;
       return;
+    }
+    // Email validation
+    if (a && q.qtype === 'email' && a.value_text) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.value_text)) {
+        var err = document.getElementById('err-' + idx);
+        err.textContent = 'Please enter a valid email address.';
+        err.style.display = 'block';
+        hasError = true;
+        return;
+      }
+    }
+    // Phone validation
+    if (a && q.qtype === 'phone' && a.value_text) {
+      if (!/^[+\d][\d\s\-()]{6,}$/.test(a.value_text)) {
+        var err = document.getElementById('err-' + idx);
+        err.textContent = 'Please enter a valid phone number.';
+        err.style.display = 'block';
+        hasError = true;
+        return;
+      }
     }
     if (a) {
       var entry = { question_id: q.id };

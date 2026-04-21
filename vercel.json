@@ -31,6 +31,7 @@
     { "source": "/brand-cx-surveys", "destination": "/brand-cx-surveys.html" },
     { "source": "/brand-cx-responses", "destination": "/brand-cx-responses.html" },
     { "source": "/brand-cx-case", "destination": "/brand-cx-case.html" },
+    { "source": "/brand-cx-survey-edit", "destination": "/brand-cx-survey-edit.html" },
     { "source": "/cx-survey", "destination": "/cx-survey.html" }
   ],
   "headers": [
