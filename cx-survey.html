@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
   body { background: var(--surface-2, #f8fafc); }
-  .survey-wrap { max-width: 680px; margin: 40px auto; padding: 24px; }
+  .survey-wrap { max-width: 680px; margin: 0 auto; padding: 0; min-height:100vh; background:#050505; }
   .survey-card { background: var(--surface-1, #fff); border:1px solid var(--border-primary, #e5e7eb); border-radius: 12px; padding: 32px; }
   .q-block { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-primary, #e5e7eb); }
   .q-block:last-of-type { border-bottom: 0; }
@@ -140,16 +140,16 @@ function renderParty() {
   var total = state.questions.length || 1;
   var pct = Math.round((state.currentIdx / total) * 100);
   var html = '';
-  html += '<div style="min-height:100vh;background:radial-gradient(circle at top left, rgba(17,165,81,.18), transparent 28%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%), linear-gradient(180deg,#0b1020 0%,#111827 100%);padding:16px;color:#fff">';
+  html += '<div style="min-height:100vh;background:linear-gradient(180deg,#050505 0%,#0a0a0a 100%);padding:16px;color:#fff">';
   html += '<div style="max-width:640px;margin:0 auto">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px">';
   html += '<div><div style="font-size:12px;opacity:.78">Party mode</div><div style="font-size:18px;font-weight:800">' + esc(s.intro_title || 'Quick feedback') + '</div></div>';
   html += '<div style="display:flex;gap:8px;align-items:center">';
-  html += '<span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;font-weight:700">🔥 ' + state.streak + '</span>';
-  html += '<button type="button" class="mode-btn active" data-mode="classic" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff">Classic</button>';
+  html += '<span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;font-weight:700">🔥 ' + state.streak + '</span>';
+  html += '<button type="button" class="mode-btn active" data-mode="classic" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff">Classic</button>';
   html += '</div></div>';
-  html += '<div style="background:rgba(255,255,255,.1);height:10px;border-radius:999px;overflow:hidden;margin-bottom:16px"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#22c55e,#a855f7,#f59e0b)"></div></div>';
-  html += '<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px);border-radius:28px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.35)">';
+  html += '<div style="background:rgba(255,255,255,.1);height:10px;border-radius:999px;overflow:hidden;margin-bottom:16px"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#16a34a,#22c55e)"></div></div>';
+  html += '<div style="background:linear-gradient(180deg,rgba(13,13,13,.98),rgba(20,20,20,.98));border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);border-radius:28px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.45)">';
   html += '<div style="font-size:12px;opacity:.76;margin-bottom:8px">Question ' + (state.currentIdx + 1) + ' of ' + total + '</div>';
   html += '<div style="font-size:28px;line-height:1.15;font-weight:800;margin-bottom:10px">' + esc(q.prompt) + (q.required ? ' *' : '') + '</div>';
   if (q.help_text) html += '<div style="opacity:.82;margin-bottom:18px">' + esc(q.help_text) + '</div>';
@@ -171,7 +171,10 @@ function renderParty() {
   document.getElementById('party-next').onclick = async function(){
     if (!validatePartyQuestion(q, state.currentIdx)) return;
     celebrateStep();
-    if (state.currentIdx === total - 1) return submit();
+    if (state.currentIdx === total - 1) {
+      syncPartyInput(q, state.currentIdx);
+      return submit();
+    }
     state.currentIdx++;
     renderParty();
   };
@@ -181,18 +184,18 @@ function renderPartyInput(q, idx) {
   var val = state.values[q.id];
   if (q.qtype === 'yes_no') {
     return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
-      '<button type="button" class="party-choice" data-party-val="Yes" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='Yes'?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👍 Yes</button>' +
-      '<button type="button" class="party-choice" data-party-val="No" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='No'?'rgba(244,63,94,.24)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👎 No</button>' +
+      '<button type="button" class="party-choice" data-party-val="Yes" style="position:relative;z-index:3;pointer-events:auto;padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (((val&&val.value_text)||val)==='Yes'?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👍 Yes</button>' +
+      '<button type="button" class="party-choice" data-party-val="No" style="position:relative;z-index:3;pointer-events:auto;padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (((val&&val.value_text)||val)==='No'?'rgba(244,63,94,.24)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👎 No</button>' +
       '</div>';
   }
   if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
     var opts = q.qtype === 'rating_1_5' ? ['1','2','3','4','5'] : ['0','1','2','3','4','5','6','7','8','9','10'];
-    return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:10px">' + opts.map(function(o){ return '<button type="button" class="party-choice" data-party-val="'+o+'" style="padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (String(val && val.value_number)===o || String(val)===o?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:18px;font-weight:800">'+o+'</button>'; }).join('') + '</div>';
+    return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:10px">' + opts.map(function(o){ return '<button type="button" class="party-choice" data-party-val="'+o+'" style="position:relative;z-index:3;pointer-events:auto;padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (String(val && val.value_number)===o || String(val)===o?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:18px;font-weight:800">'+o+'</button>'; }).join('') + '</div>';
   }
   if (q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'consent') {
     var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
     var selected = Array.isArray(val) ? val : [val && val.value_text ? val.value_text : val].filter(Boolean);
-    return '<div style="display:grid;gap:10px">' + opts.map(function(o){ var on = selected.indexOf(o) !== -1; return '<button type="button" class="party-choice" data-party-val="'+esc(o)+'" style="text-align:left;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (on?'rgba(34,197,94,.22)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:16px;font-weight:700">'+esc(o)+'</button>'; }).join('') + '</div>';
+    return '<div style="display:grid;gap:10px">' + opts.map(function(o){ var on = selected.indexOf(o) !== -1; return '<button type="button" class="party-choice" data-party-val="'+esc(o)+'" style="position:relative;z-index:3;pointer-events:auto;text-align:left;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (on?'rgba(34,197,94,.22)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:16px;font-weight:700">'+esc(o)+'</button>'; }).join('') + '</div>';
   }
   if (q.qtype === 'long_text') return '<textarea class="party-text-input" id="input-'+idx+'" style="width:100%;min-height:140px;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="Tell us more...">' + esc(val && val.value_text ? val.value_text : '') + '</textarea>';
   var type = q.qtype === 'email' ? 'email' : (q.qtype === 'phone' ? 'tel' : 'text');
