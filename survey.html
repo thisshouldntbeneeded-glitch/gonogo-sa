@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>GoNoGo Survey</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --survey-bg: #f5f7fb;
+      --survey-card: #ffffff;
+      --survey-border: #dbe3ea;
+      --survey-text: #0f172a;
+      --survey-muted: #64748b;
+      --survey-green: #11a551;
+      --survey-green-dark: #0d8742;
+      --survey-soft: #eef7f1;
+      --survey-soft-2: #f8fafc;
+      --survey-red-soft: #fff1f2;
+      --survey-red: #be123c;
+    }
+
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:linear-gradient(180deg, #f5f7fb 0%, #eef3f7 100%);
+      color:var(--survey-text);
+      min-height:100vh;
+    }
+
+    .survey-shell {
+      min-height:100vh;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .survey-stage {
+      width:100%;
+      max-width:520px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .survey-card {
+      background:var(--survey-card);
+      border:1px solid var(--survey-border);
+      border-radius:28px;
+      padding:20px;
+      box-shadow:0 18px 40px rgba(15,23,42,0.08);
+    }
+
+    .survey-topbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .brand-chip, .mode-chip {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      border:1px solid var(--survey-border);
+      background:#fff;
+      color:var(--survey-muted);
+    }
+
+    .mode-chip.party {
+      background:rgba(17,165,81,0.10);
+      color:var(--survey-green);
+      border-color:rgba(17,165,81,0.24);
+    }
+
+    .survey-progress {
+      width:100%;
+      height:10px;
+      background:#e8edf2;
+      border-radius:999px;
+      overflow:hidden;
+      margin-bottom:18px;
+    }
+
+    .survey-progress-fill {
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--survey-green), var(--survey-green-dark));
+      transition:width 0.2s ease;
+    }
+
+    .survey-step-meta {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:14px;
+      font-size:12px;
+      color:var(--survey-muted);
+      font-weight:700;
+    }
+
+    .survey-title {
+      font-size:clamp(1.5rem, 1.3rem + 1vw, 2rem);
+      line-height:1.1;
+      font-weight:900;
+      margin:0 0 10px;
+      color:var(--survey-text);
+    }
+
+    .survey-copy {
+      font-size:14px;
+      line-height:1.65;
+      color:var(--survey-muted);
+      margin:0 0 18px;
+      max-width:none;
+    }
+
+    .answer-stack {
+      display:grid;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .answer-btn {
+      width:100%;
+      text-align:left;
+      border:1px solid var(--survey-border);
+      background:#fff;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      color:var(--survey-text);
+      cursor:pointer;
+      transition:0.15s ease;
+      min-height:52px;
+    }
+    .answer-btn:hover,
+    .answer-btn.active {
+      border-color:rgba(17,165,81,0.35);
+      box-shadow:0 0 0 3px rgba(17,165,81,0.08);
+      background:var(--survey-soft);
+    }
+
+    .nps-grid {
+      display:grid;
+      grid-template-columns:repeat(6, 1fr);
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .nps-btn {
+      min-height:48px;
+      border-radius:14px;
+      border:1px solid var(--survey-border);
+      background:#fff;
+      font-size:14px;
+      font-weight:800;
+      color:var(--survey-text);
+      cursor:pointer;
+      transition:0.15s ease;
+    }
+    .nps-btn:hover,
+    .nps-btn.active {
+      border-color:rgba(17,165,81,0.35);
+      box-shadow:0 0 0 3px rgba(17,165,81,0.08);
+      background:var(--survey-soft);
+      color:var(--survey-green);
+    }
+
+    .text-input, .text-area {
+      width:100%;
+      border:1px solid var(--survey-border);
+      background:#fff;
+      color:var(--survey-text);
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .text-area {
+      min-height:120px;
+      resize:vertical;
+      margin-bottom:18px;
+    }
+
+    .helper-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:-4px;
+      margin-bottom:18px;
+      font-size:12px;
+      color:var(--survey-muted);
+    }
+
+    .survey-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+    }
+
+    .btn-primary, .btn-secondary {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:48px;
+      padding:0 16px;
+      border-radius:16px;
+      border:1px solid transparent;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+    }
+
+    .btn-primary {
+      background:linear-gradient(135deg, var(--survey-green), var(--survey-green-dark));
+      color:#fff;
+      flex:1;
+    }
+    .btn-secondary {
+      background:#fff;
+      color:var(--survey-muted);
+      border-color:var(--survey-border);
+    }
+
+    .party-shell {
+      display:grid;
+      gap:16px;
+    }
+
+    .party-card {
+      border-radius:24px;
+      padding:22px;
+      background:linear-gradient(135deg, #11a551 0%, #0d8742 50%, #0f766e 100%);
+      color:#fff;
+      box-shadow:0 16px 38px rgba(17,165,81,0.24);
+    }
+
+    .party-kicker {
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      opacity:0.82;
+      margin-bottom:10px;
+    }
+
+    .party-title {
+      font-size:clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+      line-height:1.1;
+      font-weight:900;
+      margin:0 0 10px;
+    }
+
+    .party-copy {
+      font-size:14px;
+      line-height:1.65;
+      opacity:0.92;
+      margin:0;
+      max-width:none;
+    }
+
+    .party-actions-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .party-action {
+      border:none;
+      border-radius:18px;
+      min-height:62px;
+      padding:14px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .party-action:hover {
+      transform:translateY(-1px);
+      box-shadow:0 10px 24px rgba(15,23,42,0.12);
+    }
+    .party-action.positive { background:#ecfdf5; color:#047857; }
+    .party-action.negative { background:var(--survey-red-soft); color:var(--survey-red); }
+    .party-action.neutral { background:#fff; color:#0f172a; }
+    .party-action.wide { grid-column:1 / -1; }
+
+    .party-swipe-hint {
+      border:1px dashed rgba(255,255,255,0.45);
+      border-radius:18px;
+      padding:14px;
+      font-size:13px;
+      line-height:1.6;
+      color:#f8fafc;
+    }
+
+    .thank-you {
+      text-align:center;
+      display:grid;
+      gap:16px;
+    }
+
+    .thank-icon {
+      width:72px;
+      height:72px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto;
+      background:rgba(17,165,81,0.10);
+      color:var(--survey-green);
+      font-size:28px;
+    }
+
+    .footer-note {
+      margin-top:16px;
+      text-align:center;
+      font-size:12px;
+      color:var(--survey-muted);
+    }
+
+    @media (max-width: 520px) {
+      .survey-shell { padding:12px; }
+      .survey-card { padding:16px; border-radius:22px; }
+      .nps-grid { grid-template-columns:repeat(4, 1fr); }
+      .party-actions-grid { grid-template-columns:1fr; }
+      .party-action.wide { grid-column:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="survey-shell">
+    <div class="survey-stage">
+      <div class="survey-card" id="survey-card"></div>
+      <div class="footer-note">Powered by GoNoGo</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const campaignId = params.get('campaign') || 'cmp-2026-001';
+    const modeFromUrl = params.get('mode') || 'standard';
+
+    const campaign = {
+      id: campaignId,
+      brandName: 'GoNoGo Demo Brand',
+      intro: 'Thanks for your recent experience. This short survey helps us improve quickly.',
+      mode: modeFromUrl === 'party' ? 'party' : 'standard'
+    };
+
+    const surveyDefinition = {
+      id: 'draft-survey-1',
+      name: 'New Customer Pulse',
+      questions: [
+        {
+          id:'q1',
+          type:'csat',
+          label:'How satisfied are you with your overall experience?',
+          help:'Choose the option that best matches your visit.',
+          options:['Very satisfied','Satisfied','Neutral','Dissatisfied']
+        },
+        {
+          id:'q2',
+          type:'thumbs',
+          label:'Did we solve your need today?',
+          help:'A quick yes or no helps a lot.',
+          options:['Yes','No']
+        },
+        {
+          id:'q3',
+          type:'text',
+          label:'What should we improve first?',
+          help:'Optional, but helpful.',
+          options:[]
+        }
+      ]
+    };
+
+    let currentIndex = 0;
+    let answers = {};
+
+    function renderSurvey() {
+      const card = document.getElementById('survey-card');
+
+      if (currentIndex >= surveyDefinition.questions.length) {
+        renderThankYou(card);
+        return;
+      }
+
+      const q = surveyDefinition.questions[currentIndex];
+      const progress = ((currentIndex + 1) / surveyDefinition.questions.length) * 100;
+
+      if (campaign.mode === 'party') {
+        renderPartyQuestion(card, q, progress);
+      } else {
+        renderStandardQuestion(card, q, progress);
+      }
+    }
+
+    function renderStandardQuestion(card, q, progress) {
+      card.innerHTML = `
+        <div class="survey-topbar">
+          <span class="brand-chip"><i class="fa-solid fa-shield-heart"></i> ${escapeHtml(campaign.brandName)}</span>
+          <span class="mode-chip"><i class="fa-solid fa-circle-check"></i> Standard</span>
+        </div>
+
+        <div class="survey-progress">
+          <div class="survey-progress-fill" style="width:${progress}%"></div>
+        </div>
+
+        <div class="survey-step-meta">
+          <span>Question ${currentIndex + 1} of ${surveyDefinition.questions.length}</span>
+          <span>${surveyDefinition.name}</span>
+        </div>
+
+        <h1 class="survey-title">${escapeHtml(q.label)}</h1>
+        <p class="survey-copy">${escapeHtml(q.help || campaign.intro)}</p>
+
+        <div id="answer-area"></div>
+
+        <div class="survey-actions">
+          <button class="btn-secondary" onclick="goBack()" ${currentIndex === 0 ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button class="btn-primary" onclick="goNext()">
+            Continue <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      `;
+
+      renderAnswerArea(q, document.getElementById('answer-area'), false);
+    }
+
+    function renderPartyQuestion(card, q, progress) {
+      card.innerHTML = `
+        <div class="survey-topbar">
+          <span class="brand-chip"><i class="fa-solid fa-shield-heart"></i> ${escapeHtml(campaign.brandName)}</span>
+          <span class="mode-chip party"><i class="fa-solid fa-bolt"></i> Party Mode</span>
+        </div>
+
+        <div class="survey-progress">
+          <div class="survey-progress-fill" style="width:${progress}%"></div>
+        </div>
+
+        <div class="survey-step-meta">
+          <span>Question ${currentIndex + 1} of ${surveyDefinition.questions.length}</span>
+          <span>Fast flow</span>
+        </div>
+
+        <div class="party-shell">
+          <div class="party-card">
+            <div class="party-kicker">Fast brilliant feedback</div>
+            <h1 class="party-title">${escapeHtml(q.label)}</h1>
+            <p class="party-copy">${escapeHtml(q.help || campaign.intro)}</p>
+          </div>
+
+          <div id="answer-area"></div>
+
+          <div class="party-swipe-hint">
+            Designed for phone-led answering. Swipe/tap styling can be enhanced later, but this already separates Party Mode from the normal flow.
+          </div>
+
+          <div class="survey-actions">
+            <button class="btn-secondary" onclick="goBack()" ${currentIndex === 0 ? 'disabled style="opacity:.5;cursor:not-allowed;"' : ''}>
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button class="btn-primary" onclick="goNext()">
+              Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      `;
+
+      renderAnswerArea(q, document.getElementById('answer-area'), true);
+    }
+
+    function renderAnswerArea(q, container, partyMode) {
+      const saved = answers[q.id];
+
+      if (q.type === 'text' || q.type === 'short-text') {
+        container.innerHTML = `
+          <textarea class="text-area" id="text-answer" placeholder="Type your answer here...">${saved ? escapeHtml(saved) : ''}</textarea>
+          <div class="helper-row">
+            <span>${q.type === 'text' ? 'Open comment' : 'Short response'}</span>
+            <span>Optional</span>
+          </div>
+        `;
+        return;
+      }
+
+      if (q.type === 'nps') {
+        container.innerHTML = `
+          <div class="nps-grid">
+            ${Array.from({ length: 11 }, (_, i) => `
+              <button type="button" class="nps-btn ${saved === String(i) ? 'active' : ''}" onclick="selectAnswer('${q.id}', '${i}')">${i}</button>
+            `).join('')}
+          </div>
+          <div class="helper-row">
+            <span>0 = Not likely</span>
+            <span>10 = Extremely likely</span>
+          </div>
+        `;
+        return;
+      }
+
+      if (q.type === 'thumbs' && partyMode) {
+        container.innerHTML = `
+          <div class="party-actions-grid">
+            <button type="button" class="party-action positive ${saved === 'Yes' ? 'active' : ''}" onclick="selectAnswer('${q.id}', 'Yes')">
+              <i class="fa-solid fa-thumbs-up"></i><br>Yes
+            </button>
+            <button type="button" class="party-action negative ${saved === 'No' ? 'active' : ''}" onclick="selectAnswer('${q.id}', 'No')">
+              <i class="fa-solid fa-thumbs-down"></i><br>No
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const options = q.options && q.options.length ? q.options : ['Option 1', 'Option 2'];
+      if (partyMode) {
+        container.innerHTML = `
+          <div class="party-actions-grid">
+            ${options.map((opt, idx) => `
+              <button type="button"
+                class="party-action ${idx === 0 ? 'positive' : idx === 1 ? 'neutral' : 'negative'} ${saved === opt ? 'active' : ''} ${options.length % 2 === 1 && idx === options.length - 1 ? 'wide' : ''}"
+                onclick="selectAnswer('${q.id}', '${escapeJs(opt)}')">
+                ${escapeHtml(opt)}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="answer-stack">
+            ${options.map(opt => `
+              <button type="button" class="answer-btn ${saved === opt ? 'active' : ''}" onclick="selectAnswer('${q.id}', '${escapeJs(opt)}')">
+                ${escapeHtml(opt)}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    function selectAnswer(questionId, value) {
+      answers[questionId] = value;
+      renderSurvey();
+    }
+
+    function goNext() {
+      const q = surveyDefinition.questions[currentIndex];
+
+      if (q.type === 'text' || q.type === 'short-text') {
+        const txt = document.getElementById('text-answer');
+        if (txt) answers[q.id] = txt.value.trim();
+      }
+
+      currentIndex += 1;
+      renderSurvey();
+    }
+
+    function goBack() {
+      if (currentIndex === 0) return;
+      const q = surveyDefinition.questions[currentIndex];
+      if (q && (q.type === 'text' || q.type === 'short-text')) {
+        const txt = document.getElementById('text-answer');
+        if (txt) answers[q.id] = txt.value.trim();
+      }
+      currentIndex -= 1;
+      renderSurvey();
+    }
+
+    function renderThankYou(card) {
+      const modeLabel = campaign.mode === 'party' ? 'Party Mode' : 'Standard';
+      card.innerHTML = `
+        <div class="thank-you">
+          <div class="thank-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div>
+            <h1 class="survey-title" style="margin-bottom:8px;">Thanks for your feedback</h1>
+            <p class="survey-copy" style="margin-bottom:0;">Your response has been captured successfully through ${modeLabel}. This is where your submit-to-Supabase call would run next.</p>
+          </div>
+          <div class="answer-stack" style="text-align:left;">
+            <div class="answer-btn" style="cursor:default;">
+              <strong>Campaign:</strong> ${escapeHtml(campaign.id)}
+            </div>
+            <div class="answer-btn" style="cursor:default;">
+              <strong>Answers captured:</strong> ${Object.keys(answers).length}
+            </div>
+          </div>
+          <button class="btn-primary" onclick="restartSurvey()">
+            <i class="fa-solid fa-rotate-right"></i> Start again
+          </button>
+        </div>
+      `;
+      console.log('Survey submit payload:', {
+        campaignId: campaign.id,
+        mode: campaign.mode,
+        surveyId: surveyDefinition.id,
+        answers
+      });
+    }
+
+    function restartSurvey() {
+      currentIndex = 0;
+      answers = {};
+      renderSurvey();
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJs(value) {
+      return String(value || '').replace(/'/g, "\\'");
+    }
+
+    renderSurvey();
+  </script>
+</body>
+</html>
