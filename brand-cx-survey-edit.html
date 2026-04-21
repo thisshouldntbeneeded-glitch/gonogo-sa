@@ -79,10 +79,16 @@
 .se-preview input[type="text"],.se-preview input[type="email"],.se-preview input[type="tel"],.se-preview textarea{width:100%;padding:8px 10px;border:1px solid var(--border-primary);background:var(--surface-2);border-radius:var(--radius-sm);font-size:13px;color:var(--text-primary);font-family:inherit}
 .se-preview textarea{min-height:60px;resize:vertical}
 
-/* ── Empty state ── */
-.se-empty{text-align:center;padding:var(--space-10) var(--space-5)}
-.se-empty i{font-size:40px;color:var(--text-muted);margin-bottom:var(--space-3)}
-.se-empty p{color:var(--text-muted);margin-bottom:var(--space-4);font-size:14px}
+/* ── Empty state / qtype picker ── */
+.se-empty{text-align:center;padding:var(--space-6) var(--space-4)}
+.se-empty .se-empty-icon{font-size:36px;color:var(--text-muted);margin-bottom:var(--space-3)}
+.se-empty h3{font-size:16px;font-weight:700;color:var(--text-primary);margin:0 0 4px}
+.se-empty p{color:var(--text-muted);margin-bottom:var(--space-4);font-size:13px}
+.se-qtype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--space-2);text-align:left;margin-top:var(--space-3)}
+.se-qtype-card{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);cursor:pointer;font-size:13px;color:var(--text-primary);transition:border-color .15s,background .15s;font-weight:500}
+.se-qtype-card:hover{border-color:var(--green);background:var(--surface-3)}
+.se-qtype-card i{color:var(--green);width:18px;text-align:center;font-size:14px}
+.se-qtype-card-title{flex:1}
 
 /* ── Share links ── */
 .se-link-row{display:flex;gap:var(--space-2);align-items:center;background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-sm);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-2);font-size:12px}
@@ -131,7 +137,6 @@
         <div id="q-list"></div>
         <div class="se-add-bar">
           <button class="btn btn-sm se-add-btn" id="btn-add-q"><i class="fa-solid fa-plus"></i> Add question</button>
-          <div class="se-qtype-picker" id="qtype-picker"></div>
         </div>
       </div>
 
@@ -199,7 +204,6 @@ async function init() {
   document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
 
   wireEvents();
-  buildQtypePicker();
   renderSettingsPanel();
 
   if (_surveyId) {
@@ -238,16 +242,12 @@ function wireEvents() {
   document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('published'); });
   document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
   document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
-  document.getElementById('btn-add-q').addEventListener('click', toggleQtypePicker);
-  document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
-
-  // Close picker on outside click
-  document.addEventListener('click', function(e){
-    var picker = document.getElementById('qtype-picker');
-    if (picker.classList.contains('show') && !picker.contains(e.target) && e.target.id !== 'btn-add-q' && !e.target.closest('#btn-add-q')) {
-      picker.classList.remove('show');
-    }
+  document.getElementById('btn-add-q').addEventListener('click', function(){
+    _selectedIdx = -1;
+    showTab('question');
+    renderQuestionPanel();
   });
+  document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
 
   // Dirty guard
   window.addEventListener('beforeunload', function(e){
@@ -266,22 +266,21 @@ function showTab(name) {
   if (name === 'question') renderQuestionPanel();
 }
 
-/* ── Qtype picker ── */
-function buildQtypePicker() {
-  var picker = document.getElementById('qtype-picker');
-  picker.innerHTML = QTYPES.map(function(t){
-    return '<div class="se-qtype-opt" data-qtype="' + t.v + '"><i class="fa-solid ' + t.icon + '"></i> ' + esc(t.l) + '</div>';
-  }).join('');
-  picker.querySelectorAll('.se-qtype-opt').forEach(function(el){
-    el.addEventListener('click', function(){
-      addQuestion(el.dataset.qtype);
-      picker.classList.remove('show');
-    });
+/* ── Qtype picker (rendered inline in right pane) ── */
+function qtypePickerHTML(titleHtml) {
+  var html = '<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>';
+  html += (titleHtml || '<h3>Choose a question type</h3><p>Pick the format that best fits what you want to learn.</p>');
+  html += '<div class="se-qtype-grid">';
+  QTYPES.forEach(function(t){
+    html += '<div class="se-qtype-card" data-qtype="' + t.v + '"><i class="fa-solid ' + t.icon + '"></i><span class="se-qtype-card-title">' + esc(t.l) + '</span></div>';
   });
+  html += '</div></div>';
+  return html;
 }
-function toggleQtypePicker(e) {
-  e.stopPropagation();
-  document.getElementById('qtype-picker').classList.toggle('show');
+function wireQtypePicker(root) {
+  root.querySelectorAll('.se-qtype-card').forEach(function(el){
+    el.addEventListener('click', function(){ addQuestion(el.dataset.qtype); });
+  });
 }
 
 /* ── Question management ── */
@@ -591,19 +590,14 @@ function renderPreview(q) {
   return html;
 }
 
-/* ── Empty state (no questions) ── */
+/* ── Empty state (no questions OR clicked Add question) ── */
 function renderEmptyState() {
   var panel = document.getElementById('panel-question');
-  var html = '<div class="se-empty"><i class="fa-solid fa-clipboard-list"></i><p>Add your first question to start building the survey</p>';
-  html += '<div style="display:inline-block;text-align:left">';
-  QTYPES.forEach(function(t){
-    html += '<div class="se-qtype-opt" data-qtype="' + t.v + '" style="padding:6px 12px"><i class="fa-solid ' + t.icon + '"></i> ' + esc(t.l) + '</div>';
-  });
-  html += '</div></div>';
-  panel.innerHTML = html;
-  panel.querySelectorAll('.se-qtype-opt').forEach(function(el){
-    el.addEventListener('click', function(){ addQuestion(el.dataset.qtype); });
-  });
+  var titleHtml = _questions.length === 0
+    ? '<h3>Add your first question</h3><p>Pick a question type to start building the survey.</p>'
+    : '<h3>Add a question</h3><p>Pick a question type to add to this survey.</p>';
+  panel.innerHTML = qtypePickerHTML(titleHtml);
+  wireQtypePicker(panel);
 }
 
 /* ── Survey settings panel ── */
