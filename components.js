@@ -133,6 +133,7 @@ const Components = {
       { href: 'admin-weights.html', label: 'Weight Analytics', icon: 'fa-sliders', id: 'weights' },
       { href: 'admin-api.html', label: 'API Portal', icon: 'fa-plug', id: 'api' },
       { href: 'admin-leads.html', label: 'Leads', icon: 'fa-paper-plane', id: 'leads' },
+      { href: 'admin-arcade.html', label: 'Arcade', icon: 'fa-gamepad', id: 'arcade' },
       { href: 'admin-settings.html', label: 'Settings', icon: 'fa-gear', id: 'settings' },
       { href: 'admin-scoring.html', label: 'Scoring Engine', icon: 'fa-scale-balanced', id: 'scoring' },
       { href: 'admin-blog.html', label: 'Blog', icon: 'fa-pen-nib', id: 'blog' },
@@ -382,6 +383,7 @@ const Components = {
               <a href="review-policy.html">Review Policy</a>
               <a href="blog.html">Blog</a>
               <a href="faq.html">FAQ</a>
+              <a href="gonogoarcade.html">Arcade</a>
               <a href="privacy.html">Privacy Policy</a>
               <a href="cookies.html">Cookie Policy</a>
               <a href="terms.html">Terms & Conditions</a>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GoNoGo SA — Arcade Analytics</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-container"></div>
+  <main class="admin-main" id="admin-content" style="display:none">
+    <div class="admin-header">
+      <div>
+        <h1 class="admin-title">Arcade Analytics</h1>
+        <p class="text-sm text-secondary">Player activity from GoNoGo Arcade</p>
+      </div>
+      <a href="gonogoarcade.html" target="_blank" class="btn btn-secondary btn-sm"><i class="fa-solid fa-gamepad"></i> Open game</a>
+    </div>
+
+    <div id="stat-cards" class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4);margin-bottom:var(--space-6)"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6)" id="brand-lists"></div>
+
+    <div class="card" style="padding:var(--space-6);margin-bottom:var(--space-6)">
+      <h3 class="text-sm font-semibold" style="margin-bottom:var(--space-4)"><i class="fa-solid fa-clock-rotate-left" style="color:var(--green);margin-right:var(--space-2)"></i> Recent sessions</h3>
+      <div id="recent-sessions" class="text-sm text-muted">Loading...</div>
+    </div>
+
+    <div style="padding:var(--space-6) 0;text-align:center"><p class="text-xs text-muted">&copy; 2026 GoNoGo South Africa</p></div>
+  </main>
+</div>
+
+<script src="data/helpers.js"></script>
+<script src="components.js"></script>
+<script src="api.js"></script>
+<script>
+document.getElementById('sidebar-container').innerHTML = Components.renderAdminSidebar('arcade');
+if (Components.checkAdminAuth()) initPage();
+
+async function initPage(){
+  document.getElementById('admin-content').style.display='';
+  try {
+    var auth = GoNoGoAPI._getCallerAuth();
+    var resp = await fetch(GoNoGoAPI._supabaseUrl + '/rest/v1/rpc/admin_arcade_stats', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':GoNoGoAPI._supabaseKey,'Authorization':'Bearer '+GoNoGoAPI._supabaseKey},
+      body: JSON.stringify(auth)
+    });
+    if (!resp.ok) throw new Error('load failed');
+    var d = await resp.json();
+    renderStats(d); renderBrands(d); renderSessions(d);
+  } catch(e){
+    document.getElementById('stat-cards').innerHTML = '<div class="card" style="padding:var(--space-4);color:var(--red-text);grid-column:1/-1">Could not load arcade data.</div>';
+  }
+}
+
+function statCard(label, value, icon){
+  return '<div class="card" style="padding:var(--space-4)"><div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2)"><i class="fa-solid '+icon+'" style="color:var(--green)"></i><span class="text-xs text-muted">'+label+'</span></div><div style="font-size:1.75rem;font-weight:800;letter-spacing:-.02em">'+value+'</div></div>';
+}
+
+function renderStats(d){
+  var ratioPct = d.avg_go_ratio != null ? Math.round(d.avg_go_ratio*100)+'%' : '–';
+  document.getElementById('stat-cards').innerHTML =
+    statCard('Total sessions', d.total_sessions||0, 'fa-play') +
+    statCard('Last 7 days', d.sessions_last_7d||0, 'fa-calendar-week') +
+    statCard('Total swipes', d.total_events||0, 'fa-hand-pointer') +
+    statCard('Avg GO ratio', ratioPct, 'fa-thumbs-up') +
+    statCard('Avg brands/session', d.avg_brands_seen||'–', 'fa-layer-group');
+}
+
+function renderBrands(d){
+  var topGo = (d.top_go_brands||[]).map(function(b){
+    return '<tr><td style="font-size:var(--text-sm);font-weight:600">'+Components.escapeHTML(b.brand_name)+'</td><td style="font-size:var(--text-sm);color:var(--green);text-align:right">'+b.go_count+'</td><td style="font-size:var(--text-xs);color:var(--text-muted);text-align:right">'+b.total+'</td></tr>';
+  }).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:var(--space-4)">No data yet</td></tr>';
+  var topNogo = (d.top_nogo_brands||[]).map(function(b){
+    return '<tr><td style="font-size:var(--text-sm);font-weight:600">'+Components.escapeHTML(b.brand_name)+'</td><td style="font-size:var(--text-sm);color:var(--red-text);text-align:right">'+b.nogo_count+'</td><td style="font-size:var(--text-xs);color:var(--text-muted);text-align:right">'+b.total+'</td></tr>';
+  }).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:var(--space-4)">No data yet</td></tr>';
+  document.getElementById('brand-lists').innerHTML =
+    '<div class="card" style="padding:var(--space-6)"><h3 class="text-sm font-semibold" style="margin-bottom:var(--space-4)"><i class="fa-solid fa-thumbs-up" style="color:var(--green);margin-right:var(--space-2)"></i> Most GO brands</h3><table class="data-table" style="width:100%"><thead><tr><th>Brand</th><th style="text-align:right">GOs</th><th style="text-align:right">Total</th></tr></thead><tbody>'+topGo+'</tbody></table></div>' +
+    '<div class="card" style="padding:var(--space-6)"><h3 class="text-sm font-semibold" style="margin-bottom:var(--space-4)"><i class="fa-solid fa-thumbs-down" style="color:var(--red-text);margin-right:var(--space-2)"></i> Most NO-GO brands</h3><table class="data-table" style="width:100%"><thead><tr><th>Brand</th><th style="text-align:right">NO-GOs</th><th style="text-align:right">Total</th></tr></thead><tbody>'+topNogo+'</tbody></table></div>';
+}
+
+function renderSessions(d){
+  var rows = (d.recent_sessions||[]).map(function(s){
+    var ratio = s.go_ratio != null ? Math.round(s.go_ratio*100)+'%' : '–';
+    var date = s.created_at ? new Date(s.created_at).toLocaleString() : '';
+    return '<tr><td style="font-size:var(--text-xs);color:var(--text-muted)">'+date+'</td><td style="font-size:var(--text-sm)">'+(s.region||'–').toUpperCase()+'</td><td style="font-size:var(--text-sm);text-align:right">'+(s.brands_seen||0)+'</td><td style="font-size:var(--text-sm);text-align:right;color:var(--green)">'+(s.go_count||0)+'</td><td style="font-size:var(--text-sm);text-align:right;color:var(--red-text)">'+(s.nogo_count||0)+'</td><td style="font-size:var(--text-sm);text-align:right">'+ratio+'</td></tr>';
+  }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-4)">No sessions yet</td></tr>';
+  document.getElementById('recent-sessions').innerHTML =
+    '<table class="data-table" style="width:100%"><thead><tr><th>When</th><th>Region</th><th style="text-align:right">Brands</th><th style="text-align:right">GO</th><th style="text-align:right">NO-GO</th><th style="text-align:right">Ratio</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+</script>
+</body>
+</html>
