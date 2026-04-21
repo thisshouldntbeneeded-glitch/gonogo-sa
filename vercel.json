@@ -26,7 +26,12 @@
     { "source": "/account", "destination": "/account.html" },
     { "source": "/auth/reset", "destination": "/auth/reset.html" },
     { "source": "/admin-scoring", "destination": "/admin-scoring.html" },
-    { "source": "/admin-users", "destination": "/admin-users.html" }
+    { "source": "/admin-users", "destination": "/admin-users.html" },
+    { "source": "/brand-cx", "destination": "/brand-cx.html" },
+    { "source": "/brand-cx-surveys", "destination": "/brand-cx-surveys.html" },
+    { "source": "/brand-cx-responses", "destination": "/brand-cx-responses.html" },
+    { "source": "/brand-cx-case", "destination": "/brand-cx-case.html" },
+    { "source": "/cx-survey", "destination": "/cx-survey.html" }
   ],
   "headers": [
     {

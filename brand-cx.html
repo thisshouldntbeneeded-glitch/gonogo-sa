@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GoNoGo — CX Overview</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.cx-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4);margin-bottom:var(--space-6)}
+.cx-kpi-card{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-5)}
+.cx-kpi-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:var(--space-2)}
+.cx-kpi-value{font-size:32px;font-weight:800;letter-spacing:-.02em;color:var(--text-primary);line-height:1}
+.cx-kpi-sub{font-size:12px;color:var(--text-muted);margin-top:var(--space-2)}
+.cx-nps-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-3);margin-top:var(--space-3)}
+.cx-nps-chip{padding:var(--space-3);border-radius:var(--radius-sm);text-align:center}
+.cx-nps-chip b{display:block;font-size:18px;font-weight:800}
+.cx-nps-chip span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.cx-prom{background:rgba(34,197,94,.14);color:#4ade80}
+.cx-pass{background:rgba(234,179,8,.14);color:#fbbf24}
+.cx-detr{background:rgba(239,68,68,.14);color:#fb7185}
+.cx-quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-3);margin-top:var(--space-4)}
+.cx-quick a{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-4);background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);color:var(--text-primary);text-decoration:none;transition:background .15s}
+.cx-quick a:hover{background:var(--surface-3)}
+.cx-quick i{font-size:22px;color:var(--green)}
+.cx-quick strong{display:block;font-weight:700;font-size:14px}
+.cx-quick small{display:block;color:var(--text-muted);font-size:12px;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-container"></div>
+  <main class="admin-main" id="brand-content" style="display:none;">
+    <div class="admin-header">
+      <div>
+        <h1 class="admin-title"><i class="fa-solid fa-heart-pulse" style="color:var(--green);margin-right:var(--space-2);"></i> CX Overview</h1>
+        <p class="text-sm text-secondary" id="cx-subtitle">Private customer feedback for your brand</p>
+      </div>
+      <div style="display:flex;gap:var(--space-2)">
+        <a href="brand-cx-surveys.html" class="btn btn-sm" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-plus"></i> New survey</a>
+      </div>
+    </div>
+
+    <div class="cx-kpi-grid" id="cx-kpis">
+      <div class="cx-kpi-card"><div class="cx-kpi-label">Loading…</div></div>
+    </div>
+
+    <div class="card" style="padding:var(--space-5);margin-bottom:var(--space-5)">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 var(--space-3)">NPS distribution</h3>
+      <div class="cx-nps-row" id="cx-nps-row">
+        <div class="cx-nps-chip cx-prom"><b id="k-prom">0</b><span>Promoters</span></div>
+        <div class="cx-nps-chip cx-pass"><b id="k-pass">0</b><span>Passives</span></div>
+        <div class="cx-nps-chip cx-detr"><b id="k-detr">0</b><span>Detractors</span></div>
+      </div>
+      <p class="text-xs text-muted" style="margin-top:var(--space-3)">Net Promoter Score is private to your brand. It is never shown on public pages.</p>
+    </div>
+
+    <div class="cx-quick">
+      <a href="brand-cx-surveys.html"><i class="fa-solid fa-clipboard-list"></i><div><strong>Surveys</strong><small>Create, edit, share links</small></div></a>
+      <a href="brand-cx-responses.html"><i class="fa-solid fa-inbox"></i><div><strong>Response inbox</strong><small>Triage &amp; resolve feedback</small></div></a>
+    </div>
+
+    <div style="padding:var(--space-6) 0;text-align:center;">
+      <p class="text-xs text-muted">&copy; 2026 GoNoGo &mdash; Brand Portal &middot; CX Suite (internal only)</p>
+    </div>
+  </main>
+</div>
+
+<script src="data/helpers.js"></script>
+<script src="components.js"></script>
+<script src="api.js"></script>
+<script>
+Components.initTheme();
+document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx');
+
+if (Components.checkBrandAuth()) init();
+
+async function init() {
+  var user = Components.getBrandUser();
+  if (!user) return;
+  document.getElementById('brand-content').style.display = '';
+  document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx');
+
+  try {
+    var k = await GoNoGoAPI.cx.getKpis();
+    renderKpis(k || {});
+  } catch (e) {
+    document.getElementById('cx-kpis').innerHTML = '<div class="cx-kpi-card"><div class="cx-kpi-label" style="color:var(--red)">Could not load KPIs</div><div class="cx-kpi-sub">' + (e.message || 'Unauthorized') + '</div></div>';
+  }
+}
+
+function fmt(n){ return (n === null || n === undefined) ? '—' : n; }
+
+function renderKpis(k) {
+  var grid = document.getElementById('cx-kpis');
+  grid.innerHTML =
+    card('Total responses', fmt(k.total_responses), 'All time') +
+    card('Last 7 days', fmt(k.responses_7d), 'New this week') +
+    card('Open', fmt(k.open_responses), 'Awaiting review') +
+    card('Avg rating', k.avg_rating ? k.avg_rating + ' / 5' : '—', 'Across rating questions') +
+    card('Avg NPS', k.avg_nps !== null && k.avg_nps !== undefined ? k.avg_nps : '—', 'Net Promoter (0–10)');
+  document.getElementById('k-prom').textContent = fmt(k.promoters);
+  document.getElementById('k-pass').textContent = fmt(k.passives);
+  document.getElementById('k-detr').textContent = fmt(k.detractors);
+}
+
+function card(label, value, sub) {
+  return '<div class="cx-kpi-card"><div class="cx-kpi-label">' + label + '</div><div class="cx-kpi-value">' + value + '</div><div class="cx-kpi-sub">' + sub + '</div></div>';
+}
+</script>
+</body>
+</html>

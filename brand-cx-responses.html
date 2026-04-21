@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GoNoGo — CX Responses</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+.cx-filters{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-4);align-items:center}
+.cx-filters select, .cx-filters input[type=date]{background:var(--surface-2);border:1px solid var(--border-primary);color:var(--text-primary);padding:8px 10px;border-radius:var(--radius-sm);font-size:13px}
+.cx-resp-card{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-3);display:grid;grid-template-columns:auto 1fr auto;gap:var(--space-4);cursor:pointer;transition:background .12s}
+.cx-resp-card:hover{background:var(--surface-3)}
+.cx-sent{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;text-align:center;line-height:1.05}
+.cx-sent-promoter{background:rgba(34,197,94,.18);color:#4ade80}
+.cx-sent-passive{background:rgba(234,179,8,.18);color:#fbbf24}
+.cx-sent-detractor{background:rgba(239,68,68,.18);color:#fb7185}
+.cx-sent-neutral{background:rgba(148,163,184,.18);color:#cbd5e1}
+.cx-resp-meta{display:flex;gap:var(--space-3);flex-wrap:wrap;font-size:12px;color:var(--text-muted);margin-top:var(--space-2)}
+.cx-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.cx-status-new{background:rgba(59,130,246,.18);color:#60a5fa}
+.cx-status-reviewed{background:rgba(148,163,184,.18);color:#cbd5e1}
+.cx-status-resolved{background:rgba(34,197,94,.18);color:#4ade80}
+.cx-status-archived{background:rgba(100,116,139,.18);color:#94a3b8}
+.cx-pri-low{background:rgba(100,116,139,.18);color:#94a3b8}
+.cx-pri-normal{background:rgba(59,130,246,.18);color:#60a5fa}
+.cx-pri-high{background:rgba(234,88,12,.2);color:#fb923c}
+.cx-pri-urgent{background:rgba(239,68,68,.22);color:#f87171}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-container"></div>
+  <main class="admin-main" id="brand-content" style="display:none;">
+    <div class="admin-header">
+      <div>
+        <h1 class="admin-title"><i class="fa-solid fa-inbox" style="color:var(--green);margin-right:var(--space-2);"></i> Response inbox</h1>
+        <p class="text-sm text-secondary">All private feedback submitted to your surveys. Never shown publicly.</p>
+      </div>
+    </div>
+
+    <div class="cx-filters">
+      <select id="f-survey"><option value="">All surveys</option></select>
+      <select id="f-status">
+        <option value="">All status</option>
+        <option value="new">New</option>
+        <option value="reviewed">Reviewed</option>
+        <option value="resolved">Resolved</option>
+        <option value="archived">Archived</option>
+      </select>
+      <select id="f-sentiment">
+        <option value="">All sentiment</option>
+        <option value="promoter">Promoters</option>
+        <option value="passive">Passives</option>
+        <option value="detractor">Detractors</option>
+      </select>
+      <input type="date" id="f-since">
+      <button class="btn btn-sm" id="btn-refresh" style="background:var(--surface-3)"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      <span id="count-label" class="text-xs text-muted" style="margin-left:auto"></span>
+    </div>
+
+    <div id="resp-list">
+      <div class="card" style="text-align:center;padding:var(--space-8)"><i class="fa-solid fa-spinner fa-spin"></i> <span class="text-sm text-muted">Loading…</span></div>
+    </div>
+
+    <div style="padding:var(--space-6) 0;text-align:center;">
+      <p class="text-xs text-muted">&copy; 2026 GoNoGo &mdash; CX Suite (internal only)</p>
+    </div>
+  </main>
+</div>
+
+<script src="data/helpers.js"></script>
+<script src="components.js"></script>
+<script src="api.js"></script>
+<script>
+Components.initTheme();
+document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-responses');
+var esc = Components.escapeHTML.bind(Components);
+
+if (Components.checkBrandAuth()) init();
+
+async function init() {
+  var user = Components.getBrandUser();
+  if (!user) return;
+  document.getElementById('brand-content').style.display = '';
+  document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-responses');
+  document.getElementById('btn-refresh').addEventListener('click', load);
+  ['f-survey','f-status','f-sentiment','f-since'].forEach(function(id){ document.getElementById(id).addEventListener('change', load); });
+  try {
+    var surveys = await GoNoGoAPI.cx.listSurveys();
+    var sel = document.getElementById('f-survey');
+    (surveys || []).forEach(function(s){ var o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o); });
+  } catch (e) {}
+  await load();
+}
+
+async function load() {
+  var container = document.getElementById('resp-list');
+  container.innerHTML = '<div class="card" style="text-align:center;padding:var(--space-6)"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+  var filters = {
+    survey_id: document.getElementById('f-survey').value,
+    status: document.getElementById('f-status').value,
+    sentiment: document.getElementById('f-sentiment').value,
+    since: document.getElementById('f-since').value
+  };
+  try {
+    var rows = await GoNoGoAPI.cx.listResponses(filters);
+    document.getElementById('count-label').textContent = (rows || []).length + ' response' + ((rows||[]).length === 1 ? '' : 's');
+    if (!rows || !rows.length) {
+      container.innerHTML = '<div class="card" style="text-align:center;padding:var(--space-8)"><i class="fa-solid fa-inbox" style="font-size:32px;color:var(--text-muted);margin-bottom:var(--space-3)"></i><p class="text-sm text-muted">No responses match these filters.</p></div>';
+      return;
+    }
+    container.innerHTML = rows.map(renderCard).join('');
+    container.querySelectorAll('[data-rid]').forEach(function(el){
+      el.addEventListener('click', function(){ window.location.href = 'brand-cx-case.html?r=' + el.dataset.rid; });
+    });
+  } catch (e) {
+    container.innerHTML = '<div class="card" style="padding:var(--space-5);color:var(--red)">Could not load responses: ' + esc(e.message || 'error') + '</div>';
+  }
+}
+
+function renderCard(r) {
+  var sent = r.sentiment || (r.nps_score >= 9 ? 'promoter' : r.nps_score >= 7 ? 'passive' : r.nps_score !== null && r.nps_score !== undefined ? 'detractor' : 'neutral');
+  var sentLabel = sent === 'promoter' ? 'Prom' : sent === 'passive' ? 'Pass' : sent === 'detractor' ? 'Detr' : '—';
+  var npsText = r.nps_score !== null && r.nps_score !== undefined ? 'NPS ' + r.nps_score : (r.rating_avg ? r.rating_avg + '/5' : '');
+  var contact = r.contact && (r.contact.name || r.contact.email || r.contact.phone) ? [r.contact.name, r.contact.email, r.contact.phone].filter(Boolean).join(' · ') : 'Anonymous';
+  var caseBadge = r.case_status ? '<span class="cx-badge cx-status-' + r.case_status.replace('_','-') + '" style="margin-left:4px">Case: ' + r.case_status + '</span>' : '';
+  var priBadge = r.case_priority && r.case_priority !== 'normal' ? '<span class="cx-badge cx-pri-' + r.case_priority + '" style="margin-left:4px">' + r.case_priority + '</span>' : '';
+  return '<div class="cx-resp-card" data-rid="' + r.response_id + '">' +
+    '<div class="cx-sent cx-sent-' + sent + '">' + sentLabel + '</div>' +
+    '<div><div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">' +
+      '<strong style="font-size:14px">' + esc(r.survey_name || 'Survey') + '</strong>' +
+      '<span class="cx-badge cx-status-' + (r.response_status || 'new') + '">' + (r.response_status || 'new') + '</span>' +
+      priBadge + caseBadge +
+    '</div>' +
+    '<div style="margin-top:var(--space-2);font-size:13px;color:var(--text-primary);line-height:1.4">' + esc((r.preview_text || '').slice(0, 220) || '(No comment)') + '</div>' +
+    '<div class="cx-resp-meta"><span><i class="fa-regular fa-user"></i> ' + esc(contact) + '</span>' +
+      (npsText ? '<span>' + esc(npsText) + '</span>' : '') +
+      '<span><i class="fa-regular fa-clock"></i> ' + fmtDate(r.submitted_at) + '</span></div>' +
+    '</div>' +
+    '<div style="align-self:center;color:var(--text-muted)"><i class="fa-solid fa-chevron-right"></i></div>' +
+    '</div>';
+}
+
+function fmtDate(s){ if(!s) return ''; var d = new Date(s); var now = new Date(); var diff = (now - d)/1000; if (diff < 60) return 'just now'; if (diff < 3600) return Math.floor(diff/60) + 'm ago'; if (diff < 86400) return Math.floor(diff/3600) + 'h ago'; return d.toLocaleDateString(); }
+</script>
+</body>
+</html>

@@ -572,10 +572,12 @@ var GoNoGoAPI = (function () {
       });
     },
 
-    // Helper: get caller auth from stored admin session
+    // Helper: get caller auth from stored admin session, falling back to brand user
     _getCallerAuth: function () {
       var stored = GoNoGoStorage.get('adminUser');
       if (stored && stored.id && stored._ah) return { p_caller_id: stored.id, p_caller_hash: stored._ah };
+      var brand = GoNoGoStorage.get('brandUser');
+      if (brand && brand.id && brand._ah) return { p_caller_id: brand.id, p_caller_hash: brand._ah };
       return { p_caller_id: null, p_caller_hash: null };
     },
 
@@ -716,8 +718,10 @@ var GoNoGoAPI = (function () {
             p_hash: hash
           }
         }).then(function (rows) {
-          if (rows && rows.length > 0) return rows[0];
-          if (rows && rows.id) return rows;
+          var user = null;
+          if (rows && rows.length > 0) user = rows[0];
+          else if (rows && rows.id) user = rows;
+          if (user) { user._ah = hash; return user; }
 
           return supabaseRequest('rpc/admin_login', {
             method: 'POST',
@@ -726,31 +730,12 @@ var GoNoGoAPI = (function () {
               p_hash: hash
             }
           }).then(function (adminRows) {
-            if (adminRows && adminRows.length > 0) {
-              var admin = adminRows[0];
-              return {
-                id: admin.id,
-                email: admin.email,
-                display_name: admin.display_name,
-                role: 'admin',
-                brand_slug: '__admin__',
-                region: SITE_REGION
-              };
-            }
-            if (adminRows && adminRows.id) {
-              return {
-                id: adminRows.id,
-                email: adminRows.email,
-                display_name: adminRows.display_name,
-                role: 'admin',
-                brand_slug: '__admin__',
-                region: SITE_REGION
-              };
+            var admin = (adminRows && adminRows.length > 0) ? adminRows[0] : ((adminRows && adminRows.id) ? adminRows : null);
+            if (admin) {
+              return { id: admin.id, email: admin.email, display_name: admin.display_name, role: 'admin', brand_slug: '__admin__', region: SITE_REGION, _ah: hash };
             }
             return null;
-          }).catch(function () {
-            return null;
-          });
+          }).catch(function () { return null; });
         }).catch(function () {
           return supabaseRequest('rpc/admin_login', {
             method: 'POST',
@@ -759,31 +744,12 @@ var GoNoGoAPI = (function () {
               p_hash: hash
             }
           }).then(function (adminRows) {
-            if (adminRows && adminRows.length > 0) {
-              var admin = adminRows[0];
-              return {
-                id: admin.id,
-                email: admin.email,
-                display_name: admin.display_name,
-                role: 'admin',
-                brand_slug: '__admin__',
-                region: SITE_REGION
-              };
-            }
-            if (adminRows && adminRows.id) {
-              return {
-                id: adminRows.id,
-                email: adminRows.email,
-                display_name: adminRows.display_name,
-                role: 'admin',
-                brand_slug: '__admin__',
-                region: SITE_REGION
-              };
+            var admin = (adminRows && adminRows.length > 0) ? adminRows[0] : ((adminRows && adminRows.id) ? adminRows : null);
+            if (admin) {
+              return { id: admin.id, email: admin.email, display_name: admin.display_name, role: 'admin', brand_slug: '__admin__', region: SITE_REGION, _ah: hash };
             }
             return null;
-          }).catch(function () {
-            return null;
-          });
+          }).catch(function () { return null; });
         });
       });
     },
@@ -1404,6 +1370,53 @@ var GoNoGoAPI = (function () {
     // Direct Supabase request (for admin pages)
     supabaseRequest: function (path, options) {
       return supabaseRequest(path, options);
+    },
+
+    // ==========================================
+    // CX SUITE (internal customer feedback)
+    // ==========================================
+    cx: {
+      _brandCtx: function () {
+        var brand = GoNoGoStorage.get('brandUser') || {};
+        return {
+          brand_slug: brand.brand_slug || '',
+          market_code: (brand.region || SITE_REGION || 'za').toLowerCase()
+        };
+      },
+      _call: function (fn, body) {
+        var auth = GoNoGoAPI._getCallerAuth();
+        return supabaseRequest('rpc/' + fn, { method: 'POST', body: Object.assign({}, body, auth) });
+      },
+      listSurveys: function () {
+        var c = this._brandCtx();
+        return this._call('cx_list_surveys', { p_brand_slug: c.brand_slug, p_market_code: c.market_code });
+      },
+      getSurvey: function (id) { return this._call('cx_get_survey', { p_survey_id: id }); },
+      upsertSurvey: function (payload) {
+        var c = this._brandCtx();
+        return this._call('cx_upsert_survey', { p_brand_slug: c.brand_slug, p_market_code: c.market_code, p_payload: payload });
+      },
+      setSurveyStatus: function (id, status) { return this._call('cx_set_survey_status', { p_survey_id: id, p_status: status }); },
+      createLink: function (surveyId, label) { return this._call('cx_create_link', { p_survey_id: surveyId, p_label: label || null }); },
+      revokeLink: function (linkId) { return this._call('cx_revoke_link', { p_link_id: linkId }); },
+      getKpis: function () {
+        var c = this._brandCtx();
+        return this._call('cx_get_kpis', { p_brand_slug: c.brand_slug, p_market_code: c.market_code });
+      },
+      listResponses: function (filters) {
+        var c = this._brandCtx();
+        return this._call('cx_list_responses', { p_brand_slug: c.brand_slug, p_market_code: c.market_code, p_filters: filters || {} });
+      },
+      getResponse: function (id) { return this._call('cx_get_response', { p_response_id: id }); },
+      updateCase: function (responseId, payload) { return this._call('cx_update_case', { p_response_id: responseId, p_payload: payload }); },
+      addCaseNote: function (caseId, body) { return this._call('cx_add_case_note', { p_case_id: caseId, p_body: body }); },
+      // Public (anon) calls
+      publicGetSurvey: function (token) {
+        return supabaseRequest('rpc/get_cx_survey_by_token', { method: 'POST', body: { p_token: token } });
+      },
+      publicSubmit: function (token, answers, contact, metadata) {
+        return supabaseRequest('rpc/submit_cx_response', { method: 'POST', body: { p_token: token, p_answers: answers, p_contact: contact || {}, p_metadata: metadata || {} } });
+      }
     }
   };
 })();

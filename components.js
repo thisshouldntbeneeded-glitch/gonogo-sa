@@ -1579,6 +1579,9 @@ const Components = {
     const allLinks = [
       { href: 'brand-dashboard.html', label: 'Dashboard', icon: 'fa-gauge', id: 'dashboard', fullOnly: true },
       { href: 'brand-reviews.html', label: 'Reviews', icon: 'fa-comments', id: 'reviews', fullOnly: false },
+      { href: 'brand-cx.html', label: 'CX Overview', icon: 'fa-heart-pulse', id: 'cx', fullOnly: true, section: 'cx' },
+      { href: 'brand-cx-surveys.html', label: 'Surveys', icon: 'fa-clipboard-list', id: 'cx-surveys', fullOnly: true, section: 'cx' },
+      { href: 'brand-cx-responses.html', label: 'Responses', icon: 'fa-inbox', id: 'cx-responses', fullOnly: true, section: 'cx' },
       { href: 'brand-badge.html', label: 'Score Badge', icon: 'fa-code', id: 'badge', fullOnly: true },
       { href: 'brand-qr.html', label: 'Review QR', icon: 'fa-qrcode', id: 'qr', fullOnly: true }
     ];
@@ -1596,11 +1599,14 @@ const Components = {
           <i class="fa-solid fa-building" style="color:var(--green);margin-right:6px;"></i> ${brandName}
         </div>
         <nav class="admin-sidebar-nav">
-          ${links.map(l => `
-            <a href="${l.href}" class="admin-sidebar-link ${activePage === l.id ? 'active' : ''}">
-              <i class="fa-solid ${l.icon}"></i> ${l.label}
-            </a>
-          `).join('')}
+          ${links.map((l, i) => {
+            const prev = links[i-1];
+            const sectionStart = l.section === 'cx' && (!prev || prev.section !== 'cx');
+            const sectionEnd = l.section !== 'cx' && prev && prev.section === 'cx';
+            const label = sectionStart ? '<div style="padding:10px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary);opacity:.7">Customer Experience</div>' : '';
+            const divider = sectionEnd ? '<div style="height:1px;background:rgba(148,163,184,.15);margin:6px 16px"></div>' : '';
+            return divider + label + `<a href="${l.href}" class="admin-sidebar-link ${activePage === l.id ? 'active' : ''}"><i class="fa-solid ${l.icon}"></i> ${l.label}</a>`;
+          }).join('')}
           <div style="flex:1"></div>
           <a href="index.html" class="admin-sidebar-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Site
