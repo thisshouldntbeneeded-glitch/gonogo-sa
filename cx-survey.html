@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Survey</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { background: var(--surface-2, #f8fafc); }
+  .survey-wrap { max-width: 680px; margin: 40px auto; padding: 24px; }
+  .survey-card { background: var(--surface-1, #fff); border:1px solid var(--border-primary, #e5e7eb); border-radius: 12px; padding: 32px; }
+  .q-block { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-primary, #e5e7eb); }
+  .q-block:last-of-type { border-bottom: 0; }
+  .q-prompt { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--text-primary, #111827); }
+  .q-prompt .req { color: #dc2626; }
+  .q-help { font-size: 13px; color: var(--text-muted, #6b7280); margin-bottom: 10px; }
+  .q-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-primary, #d1d5db); border-radius: 6px; font-size: 14px; font-family: inherit; box-sizing: border-box; }
+  textarea.q-input { min-height: 90px; resize: vertical; }
+  .opt-row { display:flex; align-items:center; padding:8px 0; cursor:pointer; }
+  .opt-row input { margin-right: 10px; }
+  .scale-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
+  .scale-btn { padding: 10px 0; border: 1px solid var(--border-primary, #d1d5db); background: var(--surface-1, #fff); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .scale-btn.active { background: #11a551; color: #fff; border-color: #11a551; }
+  .submit-btn { background: #11a551; color: #fff; border: 0; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .error-text { color: #dc2626; font-size: 13px; margin-top: 4px; }
+  .thank-wrap { text-align: center; padding: 40px 20px; }
+  .thank-wrap h2 { color: #11a551; }
+  .brand-mark { text-align: center; font-size: 12px; color: var(--text-muted, #6b7280); margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="survey-wrap" id="root">
+  <div class="survey-card"><p>Loading...</p></div>
+</div>
+<script src="api.js"></script>
+<script>
+var token = new URLSearchParams(location.search).get('t');
+var state = { survey: null, questions: [], values: {} };
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+async function load() {
+  if (!token) { showError('Missing survey token.'); return; }
+  try {
+    var res = await GoNoGoAPI.cx.publicGetSurvey(token);
+    if (!res || !res.ok) { showError((res && res.error) || 'Survey not available.'); return; }
+    state.survey = res.survey;
+    state.questions = res.questions || [];
+    render();
+  } catch(e) {
+    showError(e.message || 'Failed to load survey.');
+  }
+}
+
+function showError(msg) {
+  document.getElementById('root').innerHTML = '<div class="survey-card"><h2>Unavailable</h2><p>' + esc(msg) + '</p></div>';
+}
+
+function render() {
+  var s = state.survey;
+  var html = '<div class="survey-card">';
+  if (s.intro_title) html += '<h1 style="margin-top:0;">' + esc(s.intro_title) + '</h1>';
+  if (s.intro_text) html += '<p style="color:#555;">' + esc(s.intro_text) + '</p>';
+  html += '<form id="survey-form" onsubmit="return false;">';
+  state.questions.forEach(function(q, idx) {
+    html += '<div class="q-block" data-qid="' + esc(q.id) + '">';
+    html += '<div class="q-prompt">' + esc(q.prompt) + (q.required ? ' <span class="req">*</span>' : '') + '</div>';
+    if (q.help_text) html += '<div class="q-help">' + esc(q.help_text) + '</div>';
+    html += renderInput(q, idx);
+    html += '<div class="error-text" id="err-' + idx + '" style="display:none;"></div>';
+    html += '</div>';
+  });
+  html += '<button type="button" class="submit-btn" id="submit-btn">Submit</button>';
+  html += '</form></div>';
+  html += '<div class="brand-mark">Powered by GoNoGo</div>';
+  document.getElementById('root').innerHTML = html;
+
+  // Wire inputs
+  state.questions.forEach(function(q, idx) { wireQuestion(q, idx); });
+  document.getElementById('submit-btn').onclick = submit;
+}
+
+function renderInput(q, idx) {
+  var t = q.qtype;
+  var name = 'q' + idx;
+  if (t === 'short_text' || t === 'name') return '<input class="q-input" type="text" id="' + name + '">';
+  if (t === 'email') return '<input class="q-input" type="email" id="' + name + '">';
+  if (t === 'phone') return '<input class="q-input" type="tel" id="' + name + '">';
+  if (t === 'long_text') return '<textarea class="q-input" id="' + name + '"></textarea>';
+  if (t === 'single_select' || t === 'yes_no' || t === 'consent') {
+    var opts = (t === 'yes_no') ? ['Yes','No'] : (t === 'consent' ? ['I agree'] : (q.options || []));
+    return opts.map(function(o, i){
+      return '<label class="opt-row"><input type="radio" name="' + name + '" value="' + esc(o) + '"> ' + esc(o) + '</label>';
+    }).join('');
+  }
+  if (t === 'multi_select') {
+    return (q.options || []).map(function(o){
+      return '<label class="opt-row"><input type="checkbox" name="' + name + '" value="' + esc(o) + '"> ' + esc(o) + '</label>';
+    }).join('');
+  }
+  if (t === 'rating_1_5') {
+    var html = '<div class="scale-grid" id="' + name + '">';
+    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">' + i + '</button>';
+    html += '</div>';
+    return html;
+  }
+  if (t === 'nps_0_10') {
+    var html = '<div class="scale-grid" id="' + name + '">';
+    for (var i=0; i<=10; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">' + i + '</button>';
+    html += '</div>';
+    return html;
+  }
+  return '<input class="q-input" type="text" id="' + name + '">';
+}
+
+function wireQuestion(q, idx) {
+  var name = 'q' + idx;
+  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
+    var container = document.getElementById(name);
+    if (!container) return;
+    container.querySelectorAll('.scale-btn').forEach(function(btn){
+      btn.onclick = function() {
+        container.querySelectorAll('.scale-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
+      };
+    });
+  }
+}
+
+function collectAnswer(q, idx) {
+  var name = 'q' + idx;
+  var t = q.qtype;
+  if (t === 'short_text' || t === 'name' || t === 'email' || t === 'phone' || t === 'long_text') {
+    var el = document.getElementById(name);
+    var v = el ? el.value.trim() : '';
+    return v ? { value_text: v } : null;
+  }
+  if (t === 'single_select' || t === 'yes_no' || t === 'consent') {
+    var sel = document.querySelector('input[name="' + name + '"]:checked');
+    return sel ? { value_text: sel.value } : null;
+  }
+  if (t === 'multi_select') {
+    var vals = Array.prototype.slice.call(document.querySelectorAll('input[name="' + name + '"]:checked')).map(function(el){ return el.value; });
+    return vals.length ? { value_json: vals } : null;
+  }
+  if (t === 'rating_1_5' || t === 'nps_0_10') {
+    return state.values[q.id] || null;
+  }
+  return null;
+}
+
+async function submit() {
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  var answers = [];
+  var hasError = false;
+  var contact = {};
+
+  state.questions.forEach(function(q, idx) {
+    document.getElementById('err-' + idx).style.display = 'none';
+    var a = collectAnswer(q, idx);
+    if (q.required && !a) {
+      var err = document.getElementById('err-' + idx);
+      err.textContent = 'This question is required.';
+      err.style.display = 'block';
+      hasError = true;
+      return;
+    }
+    if (a) {
+      var entry = { question_id: q.id };
+      if (a.value_text !== undefined) entry.value_text = a.value_text;
+      if (a.value_number !== undefined) entry.value_number = a.value_number;
+      if (a.value_json !== undefined) entry.value_json = a.value_json;
+      answers.push(entry);
+
+      if (state.survey.allow_contact_capture && a.value_text) {
+        if (q.qtype === 'email') contact.email = a.value_text;
+        if (q.qtype === 'phone') contact.phone = a.value_text;
+        if (q.qtype === 'name') contact.name = a.value_text;
+      }
+    }
+  });
+
+  if (hasError) {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    return;
+  }
+
+  try {
+    var res = await GoNoGoAPI.cx.publicSubmit(token, answers, contact, {
+      user_agent: navigator.userAgent,
+      referrer: document.referrer
+    });
+    if (!res || !res.ok) throw new Error((res && res.error) || 'Submission failed.');
+    renderThankYou();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    alert('Error: ' + (e.message || String(e)));
+  }
+}
+
+function renderThankYou() {
+  var s = state.survey;
+  var html = '<div class="survey-card thank-wrap">';
+  html += '<h2>' + esc(s.thank_you_title || 'Thank you') + '</h2>';
+  html += '<p>' + esc(s.thank_you_text || 'Your response has been recorded.') + '</p>';
+  html += '</div><div class="brand-mark">Powered by GoNoGo</div>';
+  document.getElementById('root').innerHTML = html;
+}
+
+load();
+</script>
+</body>
+</html>
