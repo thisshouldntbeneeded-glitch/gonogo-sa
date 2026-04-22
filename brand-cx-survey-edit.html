@@ -841,6 +841,7 @@ function renderLinks() {
         '<input readonly value="' + base + esc(l.token) + '">' +
         '<span class="se-link-status ' + statusCls + '">' + statusText + '</span>' +
         '<button class="btn btn-sm" data-copy="' + base + esc(l.token) + '" title="Copy URL"><i class="fa-solid fa-copy"></i></button>' +
+        (l.revoked ? '' : '<button class="btn btn-sm" data-qr="' + base + esc(l.token) + '" data-qr-label="' + esc(l.label || 'Link') + '" title="QR code"><i class="fa-solid fa-qrcode"></i></button>') +
         (l.revoked ? '' : '<button class="btn btn-sm" data-revoke="' + l.id + '" title="Revoke" style="color:var(--red)"><i class="fa-solid fa-ban"></i></button>') +
         '</div>';
     });
@@ -861,6 +862,9 @@ function renderLinks() {
       setTimeout(function(){ b.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 1200);
     });
   });
+  panel.querySelectorAll('[data-qr]').forEach(function(b){
+    b.addEventListener('click', function(){ showQrModal(b.dataset.qr, b.dataset.qrLabel); });
+  });
   panel.querySelectorAll('[data-revoke]').forEach(function(b){
     b.addEventListener('click', async function(){
       if (!confirm('Revoke this link? Respondents will no longer be able to submit.')) return;
@@ -875,6 +879,27 @@ function renderLinks() {
   });
   var newLinkBtn = document.getElementById('btn-new-link');
   if (newLinkBtn) newLinkBtn.addEventListener('click', createLink);
+}
+
+function showQrModal(url, label) {
+  var existing = document.getElementById('qr-modal'); if (existing) existing.remove();
+  var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=' + encodeURIComponent(url);
+  var dlSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=800x800&margin=20&format=png&download=1&data=' + encodeURIComponent(url);
+  var m = document.createElement('div');
+  m.id = 'qr-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  m.innerHTML = '<div style="background:var(--surface-0,#0b1220);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:24px;max-width:440px;width:100%;text-align:center">' +
+    '<h3 style="margin:0 0 4px;font-size:16px">QR code</h3>' +
+    '<p class="text-xs text-muted" style="margin:0 0 16px">' + esc(label) + '</p>' +
+    '<div style="background:#fff;padding:12px;border-radius:8px;display:inline-block"><img src="' + qrSrc + '" alt="QR code" width="320" height="320" style="display:block"></div>' +
+    '<p class="text-xs text-muted" style="margin:12px 0 4px;word-break:break-all">' + esc(url) + '</p>' +
+    '<div style="display:flex;gap:8px;justify-content:center;margin-top:16px">' +
+      '<a class="btn btn-sm" href="' + dlSrc + '" download="survey-qr.png" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-download"></i> Download PNG</a>' +
+      '<button class="btn btn-sm" id="qr-close">Close</button>' +
+    '</div></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click', function(e){ if (e.target === m) m.remove(); });
+  document.getElementById('qr-close').addEventListener('click', function(){ m.remove(); });
 }
 
 async function createLink() {
