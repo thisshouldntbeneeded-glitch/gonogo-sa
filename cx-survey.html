@@ -45,7 +45,8 @@
 
   /* Card */
   .s-card { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 18px; padding: 28px 24px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
-  .s-prompt { font-size: 22px; line-height: 1.25; font-weight: 700; color: var(--s-ink); margin: 0 0 6px; }
+  .s-prompt { font-size: 20px; line-height: 1.45; font-weight: 600; color: var(--s-ink); margin: 0 0 14px; white-space: pre-line; }
+  .s-prompt.s-prompt-long { font-size: 17px; font-weight: 500; line-height: 1.55; }
   .s-prompt .req { color: var(--s-danger); margin-left: 4px; }
   .s-help { font-size: 14px; color: var(--s-muted); margin: 0 0 20px; line-height: 1.45; }
   .s-intro-title { font-size: 26px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.01em; }
@@ -105,7 +106,8 @@
   body.party-mode .s-progress > span { background: linear-gradient(90deg,#22c55e,#a855f7,#f59e0b); }
   body.party-mode .s-progress-text { color: rgba(255,255,255,.78); }
   body.party-mode .s-card { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); backdrop-filter: blur(16px); box-shadow: 0 24px 80px rgba(0,0,0,.35); border-radius: 28px; }
-  body.party-mode .s-prompt, body.party-mode .s-intro-title { color: #fff; font-size: 26px; }
+  body.party-mode .s-prompt, body.party-mode .s-intro-title { color: #fff; font-size: 24px; }
+  body.party-mode .s-prompt.s-prompt-long { font-size: 19px; }
   body.party-mode .s-help, body.party-mode .s-intro-text { color: rgba(255,255,255,.82); }
   body.party-mode .s-choice { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #fff; }
   body.party-mode .s-choice:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
@@ -220,7 +222,8 @@ function renderQuestion() {
     html += '<div class="s-progress"><span style="width:' + pct + '%"></span></div>';
   }
   html += '<div class="s-card">';
-  html += '<h2 class="s-prompt">' + esc(q.prompt) + (q.required ? '<span class="req">*</span>' : '') + '</h2>';
+  var _longPrompt = (q.prompt || '').length > 140;
+  html += '<h2 class="s-prompt' + (_longPrompt ? ' s-prompt-long' : '') + '">' + esc(q.prompt) + (q.required ? '<span class="req">*</span>' : '') + '</h2>';
   if (q.help_text) html += '<p class="s-help">' + esc(q.help_text) + '</p>';
   html += '<div id="q-answer">' + renderInput(q, state.currentIdx) + '</div>';
   html += '<div class="s-error" id="q-error"></div>';

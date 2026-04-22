@@ -406,7 +406,7 @@ function renderQuestionPanel() {
   html += '</select></div>';
 
   // Prompt
-  html += '<div class="se-field"><label class="se-label">Prompt *</label><input class="se-input" id="ed-prompt" value="' + esc(q.prompt) + '" placeholder="Question text"></div>';
+  html += '<div class="se-field"><label class="se-label">Prompt *</label><textarea class="se-textarea" id="ed-prompt" rows="3" placeholder="Question text. Press Enter for a new line." style="min-height:80px;resize:vertical">' + esc(q.prompt) + '</textarea></div>';
 
   // Help text
   html += '<div class="se-field"><label class="se-label">Help text</label><textarea class="se-textarea" id="ed-help" placeholder="Optional guidance for the respondent">' + esc(q.help_text) + '</textarea></div>';
