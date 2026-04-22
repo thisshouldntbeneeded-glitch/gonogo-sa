@@ -1403,6 +1403,9 @@ var GoNoGoAPI = (function () {
         var c = this._brandCtx();
         return this._call('cx_get_kpis', { p_brand_slug: c.brand_slug, p_market_code: c.market_code });
       },
+      getSurveyDashboard: function (surveyId, rangeDays) {
+        return this._call('cx_get_survey_dashboard', { p_survey_id: surveyId, p_range_days: (rangeDays === 0 || rangeDays) ? rangeDays : 30 });
+      },
       listResponses: function (filters) {
         var c = this._brandCtx();
         return this._call('cx_list_responses', { p_brand_slug: c.brand_slug, p_market_code: c.market_code, p_filters: filters || {} });
