@@ -7,54 +7,142 @@
 <title>Survey</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body { background: var(--surface-2, #f8fafc); }
-  .survey-wrap { max-width: 680px; margin: 40px auto; padding: 24px; }
-  .survey-card { background: var(--surface-1, #fff); border:1px solid var(--border-primary, #e5e7eb); border-radius: 12px; padding: 32px; }
-  .q-block { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-primary, #e5e7eb); }
-  .q-block:last-of-type { border-bottom: 0; }
-  .q-prompt { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--text-primary, #111827); }
-  .q-prompt .req { color: #dc2626; }
-  .q-help { font-size: 13px; color: var(--text-muted, #6b7280); margin-bottom: 10px; }
-  .q-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-primary, #d1d5db); border-radius: 6px; font-size: 14px; font-family: inherit; box-sizing: border-box; }
-  textarea.q-input { min-height: 90px; resize: vertical; }
-  .opt-row { display:flex; align-items:center; padding:8px 0; cursor:pointer; }
-  .opt-row input { margin-right: 10px; }
-  .scale-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
-  .scale-btn { padding: 10px 0; border: 1px solid var(--border-primary, #d1d5db); background: var(--surface-1, #fff); border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background .12s, border-color .12s; }
-  .scale-btn:hover { background: rgba(17,165,81,.08); }
-  .scale-btn.active { background: #11a551; color: #fff; border-color: #11a551; }
-  /* Rating 1-5: bigger buttons with star icon */
-  .rating-grid .scale-btn { padding: 14px 0; font-size: 16px; min-height: 48px; }
-  /* NPS color bands */
-  .nps-grid .scale-btn.nps-red { background: rgba(231,76,60,.08); border-color: rgba(231,76,60,.25); }
-  .nps-grid .scale-btn.nps-amber { background: rgba(234,179,8,.08); border-color: rgba(234,179,8,.25); }
-  .nps-grid .scale-btn.nps-green { background: rgba(17,165,81,.08); border-color: rgba(17,165,81,.25); }
-  .nps-grid .scale-btn.active.nps-red { background: #dc2626; border-color: #dc2626; color: #fff; }
-  .nps-grid .scale-btn.active.nps-amber { background: #d97706; border-color: #d97706; color: #fff; }
-  .nps-grid .scale-btn.active.nps-green { background: #11a551; border-color: #11a551; color: #fff; }
-  .nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted, #6b7280); margin-top: 4px; }
-  .submit-btn { background: #11a551; color: #fff; border: 0; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; }
-  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  .mode-btn{appearance:none;border:0;background:#fff;color:#111827;padding:8px 12px;border-radius:999px;font-weight:700;cursor:pointer}
-  .mode-btn.active{background:#111827;color:#fff}
-  .error-text { color: #dc2626; font-size: 13px; margin-top: 4px; }
-  .thank-wrap { text-align: center; padding: 40px 20px; }
-  .thank-wrap h2 { color: #11a551; }
-  .brand-mark { text-align: center; font-size: 12px; color: var(--text-muted, #6b7280); margin-top: 20px; }
-  /* Focus ring */
-  *:focus-visible { outline: 2px solid #11a551; outline-offset: 2px; }
+  :root {
+    --s-primary: #11a551;
+    --s-accent: #0ea5e9;
+    --s-ink: #0f172a;
+    --s-ink-soft: #475569;
+    --s-muted: #64748b;
+    --s-bg: #f8fafc;
+    --s-card: #ffffff;
+    --s-border: #e2e8f0;
+    --s-border-strong: #cbd5e1;
+    --s-danger: #dc2626;
+  }
+  html, body { margin: 0; padding: 0; background: var(--s-bg); color: var(--s-ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+
+  /* Confetti must never block clicks */
+  canvas { pointer-events: none !important; }
+
+  /* ── Shared shell ── */
+  .s-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px; }
+  .s-shell { width: 100%; max-width: 640px; }
+
+  /* Header with brand logo + mode toggle */
+  .s-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; min-height: 40px; }
+  .s-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .s-brand img { max-height: 40px; max-width: 160px; object-fit: contain; }
+  .s-brand-name { font-weight: 700; font-size: 15px; color: var(--s-ink); }
+  .s-mode-toggle { display: inline-flex; gap: 4px; background: var(--s-card); border: 1px solid var(--s-border); padding: 4px; border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .s-mode-btn { appearance: none; border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--s-ink-soft); cursor: pointer; }
+  .s-mode-btn.active { background: var(--s-ink); color: #fff; }
+
+  /* Progress */
+  .s-progress { height: 6px; background: var(--s-border); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
+  .s-progress > span { display: block; height: 100%; background: var(--s-primary); transition: width .25s ease; }
+  .s-progress-text { font-size: 12px; color: var(--s-muted); margin-bottom: 14px; font-weight: 600; }
+
+  /* Card */
+  .s-card { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 18px; padding: 28px 24px; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
+  .s-prompt { font-size: 22px; line-height: 1.25; font-weight: 700; color: var(--s-ink); margin: 0 0 6px; }
+  .s-prompt .req { color: var(--s-danger); margin-left: 4px; }
+  .s-help { font-size: 14px; color: var(--s-muted); margin: 0 0 20px; line-height: 1.45; }
+  .s-intro-title { font-size: 26px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .s-intro-text { font-size: 15px; color: var(--s-ink-soft); margin: 0 0 20px; line-height: 1.5; }
+
+  /* Big button inputs (shared by both modes in classic light theme) */
+  .s-choice-grid { display: grid; gap: 10px; }
+  .s-choice-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .s-choice-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .s-choice-grid.cols-11 { grid-template-columns: repeat(11, 1fr); }
+  @media (max-width: 520px) { .s-choice-grid.cols-11 { grid-template-columns: repeat(6, 1fr); } }
+
+  .s-choice { appearance: none; border: 1.5px solid var(--s-border-strong); background: var(--s-card); color: var(--s-ink); padding: 18px 14px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center; transition: all .12s ease; font-family: inherit; line-height: 1.2; min-height: 56px; display: flex; align-items: center; justify-content: center; }
+  .s-choice:hover { border-color: var(--s-primary); background: rgba(17,165,81,.04); }
+  .s-choice.active { background: var(--s-primary); border-color: var(--s-primary); color: #fff; }
+  .s-choice.left-align { text-align: left; justify-content: flex-start; padding: 16px 18px; font-size: 15px; }
+  .s-choice.big-emoji { font-size: 30px; padding: 14px 0; }
+  .s-choice.star { font-size: 24px; padding: 16px 0; }
+  .s-choice.star.active { background: #f59e0b; border-color: #f59e0b; }
+  .s-choice.nps-red.active { background: var(--s-danger); border-color: var(--s-danger); }
+  .s-choice.nps-amber.active { background: #d97706; border-color: #d97706; }
+  .s-nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--s-muted); margin-top: 6px; font-weight: 600; }
+
+  /* Text inputs */
+  .s-text-input { width: 100%; padding: 16px 14px; border: 1.5px solid var(--s-border-strong); border-radius: 14px; font-size: 16px; font-family: inherit; background: var(--s-card); color: var(--s-ink); }
+  .s-text-input:focus { outline: none; border-color: var(--s-primary); box-shadow: 0 0 0 3px rgba(17,165,81,.15); }
+  textarea.s-text-input { min-height: 120px; resize: vertical; }
+
+  /* Nav buttons */
+  .s-nav { display: flex; gap: 10px; margin-top: 24px; }
+  .s-btn { flex: 1; appearance: none; border: 0; padding: 16px 20px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity .12s, background .12s; min-height: 52px; }
+  .s-btn-prev { background: var(--s-border); color: var(--s-ink-soft); }
+  .s-btn-prev:hover { background: var(--s-border-strong); }
+  .s-btn-prev:disabled { opacity: .45; cursor: not-allowed; }
+  .s-btn-next { background: var(--s-primary); color: #fff; }
+  .s-btn-next:hover { background: #0e8e45; }
+  .s-btn-next:disabled { opacity: .6; cursor: not-allowed; }
+
+  .s-error { color: var(--s-danger); font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
+  .s-affirm { color: var(--s-primary); font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
+
+  .s-foot { text-align: center; font-size: 11px; color: var(--s-muted); margin-top: 20px; letter-spacing: .04em; }
+  .s-foot a { color: var(--s-muted); text-decoration: none; }
+
+  .s-thank { text-align: center; padding: 48px 24px; }
+  .s-thank h2 { color: var(--s-primary); font-size: 26px; margin: 0 0 8px; }
+  .s-thank p { color: var(--s-ink-soft); margin: 0; }
+
+  /* ── Party mode overrides (dark gradient) ── */
+  body.party-mode { background: linear-gradient(180deg, #0b1020 0%, #111827 100%); }
+  body.party-mode .s-wrap { background: radial-gradient(circle at top left, rgba(17,165,81,.18), transparent 28%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%); min-height: 100vh; }
+  body.party-mode .s-brand-name { color: #fff; }
+  body.party-mode .s-mode-toggle { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
+  body.party-mode .s-mode-btn { color: rgba(255,255,255,.78); }
+  body.party-mode .s-mode-btn.active { background: #fff; color: #111; }
+  body.party-mode .s-progress { background: rgba(255,255,255,.15); }
+  body.party-mode .s-progress > span { background: linear-gradient(90deg,#22c55e,#a855f7,#f59e0b); }
+  body.party-mode .s-progress-text { color: rgba(255,255,255,.78); }
+  body.party-mode .s-card { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); backdrop-filter: blur(16px); box-shadow: 0 24px 80px rgba(0,0,0,.35); border-radius: 28px; }
+  body.party-mode .s-prompt, body.party-mode .s-intro-title { color: #fff; font-size: 26px; }
+  body.party-mode .s-help, body.party-mode .s-intro-text { color: rgba(255,255,255,.82); }
+  body.party-mode .s-choice { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #fff; }
+  body.party-mode .s-choice:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+  body.party-mode .s-choice.active { background: rgba(34,197,94,.28); border-color: rgba(34,197,94,.6); color: #fff; }
+  body.party-mode .s-choice.star.active { background: rgba(245,158,11,.28); border-color: rgba(245,158,11,.6); color: #ffd54f; }
+  body.party-mode .s-choice.nps-red.active { background: rgba(239,68,68,.3); border-color: rgba(239,68,68,.6); }
+  body.party-mode .s-choice.nps-amber.active { background: rgba(217,119,6,.3); border-color: rgba(217,119,6,.6); }
+  body.party-mode .s-text-input { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); color: #fff; }
+  body.party-mode .s-text-input::placeholder { color: rgba(255,255,255,.5); }
+  body.party-mode .s-btn-prev { background: rgba(255,255,255,.1); color: #fff; }
+  body.party-mode .s-btn-prev:hover { background: rgba(255,255,255,.18); }
+  body.party-mode .s-btn-next { background: linear-gradient(135deg,#22c55e,#16a34a); }
+  body.party-mode .s-nps-labels { color: rgba(255,255,255,.7); }
+  body.party-mode .s-streak { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.12); font-size: 12px; font-weight: 700; color: #fff; }
+  body.party-mode .s-affirm { color: #a7f3d0; }
+  body.party-mode .s-foot { color: rgba(255,255,255,.6); }
+
+  *:focus-visible { outline: 2px solid var(--s-primary); outline-offset: 2px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-<div class="survey-wrap" id="root">
-  <div class="survey-card"><p>Loading...</p></div>
+<div class="s-wrap" id="root">
+  <div class="s-shell"><div class="s-card"><p>Loading…</p></div></div>
 </div>
-<script src="api.js"></script>
+<script src="api.js?v=20260422b"></script>
 <script>
 var token = new URLSearchParams(location.search).get('t');
-var state = { survey: null, questions: [], values: {} };
-var state = { survey: null, questions: [], values: {}, mode: 'classic', currentIdx: 0, streak: 0, answeredCount: 0 };
+var state = {
+  survey: null,
+  questions: [],
+  values: {},
+  mode: 'classic',
+  currentIdx: -1, // -1 = intro screen
+  streak: 0,
+  started: false
+};
 
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
@@ -65,68 +153,99 @@ async function load() {
     if (!res || !res.ok) { showError((res && res.error) || 'Survey not available.'); return; }
     state.survey = res.survey;
     state.questions = res.questions || [];
-    state.mode = res && res.survey && res.survey.party_mode_default ? 'party' : 'classic';
-    state.currentIdx = 0;
+    state.mode = res.survey && res.survey.party_mode_default ? 'party' : 'classic';
+    applyModeClass();
     render();
   } catch(e) {
     showError(e.message || 'Failed to load survey.');
   }
 }
 
-function showError(msg) {
-  document.getElementById('root').innerHTML = '<div class="survey-card"><h2>Unavailable</h2><p>' + esc(msg) + '</p></div>';
+function applyModeClass() {
+  document.body.classList.toggle('party-mode', state.mode === 'party');
 }
 
+function showError(msg) {
+  document.getElementById('root').innerHTML = '<div class="s-shell"><div class="s-card"><h2 style="margin:0 0 8px">Unavailable</h2><p style="color:var(--s-ink-soft);margin:0">' + esc(msg) + '</p></div></div>';
+}
 
 function render() {
-  if (state.mode === 'party') { renderParty(); return; }
-  renderClassic();
+  applyModeClass();
+  var total = state.questions.length;
+  if (state.currentIdx === -1) { renderIntro(); return; }
+  if (state.currentIdx >= total) return; // should have submitted
+  renderQuestion();
 }
 
-function renderClassic() {
-  var s = state.survey;
-  var html = '<div class="survey-card">';
-  html += renderModeToggle();
-  if (s.intro_title) html += '<h1 style="margin-top:0;">' + esc(s.intro_title) + '</h1>';
-  if (s.intro_text) html += '<p style="color:#555;">' + esc(s.intro_text) + '</p>';
-  html += '<form id="survey-form" onsubmit="return false;">';
-  state.questions.forEach(function(q, idx) {
-    html += '<div class="q-block" data-qid="' + esc(q.id) + '">';
-    html += '<div class="q-prompt">' + esc(q.prompt) + (q.required ? ' <span class="req">*</span>' : '') + '</div>';
-    if (q.help_text) html += '<div class="q-help">' + esc(q.help_text) + '</div>';
-    html += renderInput(q, idx);
-    html += '<div class="error-text" id="err-' + idx + '" style="display:none;"></div>';
-    html += '</div>';
-  });
-  html += '<button type="button" class="submit-btn" id="submit-btn">Submit</button>';
-  html += '</form></div>';
-  html += '<div class="brand-mark">Powered by GoNoGo</div>';
+function renderBrandHeader() {
+  var s = state.survey || {};
+  var logo = s.brand_logo_url ? '<img src="' + esc(s.brand_logo_url) + '" alt="Brand logo">' : '';
+  var brandLine = logo || '<span class="s-brand-name">' + esc(s.brand_display_name || s.brand_slug || 'GoNoGo') + '</span>';
+  var streak = (state.mode === 'party' && state.streak > 0) ? '<span class="s-streak">🔥 ' + state.streak + '</span>' : '';
+  var toggle = '<div class="s-mode-toggle">' +
+    '<button type="button" class="s-mode-btn' + (state.mode === 'classic' ? ' active' : '') + '" data-mode="classic">Classic</button>' +
+    '<button type="button" class="s-mode-btn' + (state.mode === 'party' ? ' active' : '') + '" data-mode="party">Party</button>' +
+    '</div>';
+  return '<div class="s-top"><div class="s-brand">' + brandLine + '</div><div style="display:flex;gap:10px;align-items:center">' + streak + toggle + '</div></div>';
+}
+
+function renderIntro() {
+  var s = state.survey || {};
+  var html = '<div class="s-shell">';
+  html += renderBrandHeader();
+  html += '<div class="s-card">';
+  if (s.intro_title) html += '<h1 class="s-intro-title">' + esc(s.intro_title) + '</h1>';
+  if (s.intro_text) html += '<p class="s-intro-text">' + esc(s.intro_text) + '</p>';
+  if (!s.intro_title && !s.intro_text) html += '<h1 class="s-intro-title">Share your feedback</h1><p class="s-intro-text">A few quick questions — your answers go straight to the brand.</p>';
+  html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">Start</button>';
+  html += '</div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '</div>';
+  document.getElementById('root').innerHTML = html;
+  document.getElementById('start-btn').onclick = function(){ state.currentIdx = 0; state.started = true; render(); };
+  bindModeToggle();
+}
+
+function renderQuestion() {
+  var q = state.questions[state.currentIdx];
+  var total = state.questions.length;
+  var pct = Math.round(((state.currentIdx) / total) * 100);
+  var s = state.survey || {};
+  var showProgress = s.show_progress_bar !== false;
+
+  var html = '<div class="s-shell">';
+  html += renderBrandHeader();
+  if (showProgress) {
+    html += '<div class="s-progress-text">Question ' + (state.currentIdx + 1) + ' of ' + total + '</div>';
+    html += '<div class="s-progress"><span style="width:' + pct + '%"></span></div>';
+  }
+  html += '<div class="s-card">';
+  html += '<h2 class="s-prompt">' + esc(q.prompt) + (q.required ? '<span class="req">*</span>' : '') + '</h2>';
+  if (q.help_text) html += '<p class="s-help">' + esc(q.help_text) + '</p>';
+  html += '<div id="q-answer">' + renderInput(q, state.currentIdx) + '</div>';
+  html += '<div class="s-error" id="q-error"></div>';
+  html += '<div class="s-affirm" id="q-affirm"></div>';
+  html += '<div class="s-nav">';
+  html += '<button type="button" class="s-btn s-btn-prev" id="btn-prev"' + (state.currentIdx === 0 ? ' disabled' : '') + '>Back</button>';
+  html += '<button type="button" class="s-btn s-btn-next" id="btn-next">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
+  html += '</div></div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '</div>';
   document.getElementById('root').innerHTML = html;
 
-  // Wire inputs
-  state.questions.forEach(function(q, idx) { wireQuestion(q, idx); });
-  document.getElementById('submit-btn').onclick = submit;
+  wireQuestion(q, state.currentIdx);
   bindModeToggle();
-
-  // Enter key submits when focused on last required question's input
-  document.getElementById('survey-form').addEventListener('keydown', function(e){
-    if (e.key !== 'Enter') return;
-    var tag = e.target.tagName;
-    if (tag === 'TEXTAREA') return; // allow newlines in textarea
-    if (tag === 'TEXTAREA') return;
-    if (tag === 'INPUT' || tag === 'BUTTON') {
-      e.preventDefault();
-      submit();
-    }
-  });
-}
-
-function renderModeToggle() {
-  return '<div style="display:flex;justify-content:flex-end;margin:0 0 16px">' +
-    '<div style="display:inline-flex;gap:8px;background:#f3f4f6;border:1px solid #e5e7eb;padding:6px;border-radius:999px">' +
-    '<button type="button" class="mode-btn' + (state.mode === 'classic' ? ' active' : '') + '" data-mode="classic">Classic</button>' +
-    '<button type="button" class="mode-btn' + (state.mode === 'party' ? ' active' : '') + '" data-mode="party">Party</button>' +
-    '</div></div>';
+  document.getElementById('btn-prev').onclick = function(){
+    if (state.currentIdx > 0) { syncTextInput(q, state.currentIdx); state.currentIdx--; render(); }
+  };
+  document.getElementById('btn-next').onclick = async function(){
+    syncTextInput(q, state.currentIdx);
+    if (!validateCurrent(q)) return;
+    if (state.currentIdx === total - 1) { await submit(); return; }
+    celebrateStep();
+    state.currentIdx++;
+    render();
+  };
 }
 
 function bindModeToggle() {
@@ -138,414 +257,241 @@ function bindModeToggle() {
   });
 }
 
-function renderParty() {
-  var s = state.survey || {};
-  var q = state.questions[state.currentIdx];
-  var total = state.questions.length || 1;
-  var pct = Math.round((state.currentIdx / total) * 100);
-  var html = '';
-  html += '<div style="min-height:100vh;background:radial-gradient(circle at top left, rgba(17,165,81,.18), transparent 28%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%), linear-gradient(180deg,#0b1020 0%,#111827 100%);padding:16px;color:#fff">';
-  html += '<div style="max-width:640px;margin:0 auto">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px">';
-  html += '<div><div style="font-size:12px;opacity:.78">Party mode</div><div style="font-size:18px;font-weight:800">' + esc(s.intro_title || 'Quick feedback') + '</div></div>';
-  html += '<div style="display:flex;gap:8px;align-items:center">';
-  html += '<span style="padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;font-weight:700">🔥 ' + state.streak + '</span>';
-  html += '<button type="button" class="mode-btn active" data-mode="classic" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff">Classic</button>';
-  html += '</div></div>';
-  html += '<div style="background:rgba(255,255,255,.1);height:10px;border-radius:999px;overflow:hidden;margin-bottom:16px"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#22c55e,#a855f7,#f59e0b)"></div></div>';
-  html += '<div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px);border-radius:28px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.35)">';
-  html += '<div style="font-size:12px;opacity:.76;margin-bottom:8px">Question ' + (state.currentIdx + 1) + ' of ' + total + '</div>';
-  html += '<div style="font-size:28px;line-height:1.15;font-weight:800;margin-bottom:10px">' + esc(q.prompt) + (q.required ? ' *' : '') + '</div>';
-  if (q.help_text) html += '<div style="opacity:.82;margin-bottom:18px">' + esc(q.help_text) + '</div>';
-  html += '<div id="party-answer">' + renderPartyInput(q, state.currentIdx) + '</div>';
-  html += '<div id="party-affirm" style="margin-top:14px;font-size:13px;color:#a7f3d0;min-height:18px"></div>';
-  html += '<div style="display:flex;gap:10px;margin-top:20px">';
-  html += '<button type="button" id="party-prev" style="flex:1;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-weight:700">Back</button>';
-  html += '<button type="button" id="party-next" style="flex:1;padding:14px 16px;border-radius:16px;border:0;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:800">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
-  html += '</div></div>';
-  html += '<div style="text-align:center;color:rgba(255,255,255,.72);font-size:12px;margin-top:14px">Fast, mobile-first feedback. Switch back to Classic any time.</div>';
-  html += '</div></div>';
-  document.getElementById('root').innerHTML = html;
-  wireQuestion(q, state.currentIdx);
-  bindModeToggle();
-  var prev = document.getElementById('party-prev');
-  if (prev) prev.disabled = state.currentIdx === 0;
-  if (prev) prev.style.opacity = state.currentIdx === 0 ? '.45' : '1';
-  if (prev) prev.onclick = function(){ if (state.currentIdx > 0) { state.currentIdx--; renderParty(); } };
-  document.getElementById('party-next').onclick = async function(){
-    if (!validatePartyQuestion(q, state.currentIdx)) return;
-    celebrateStep();
-    if (state.currentIdx === total - 1) return submit();
-    state.currentIdx++;
-    renderParty();
-  };
-}
-
-function renderPartyInput(q, idx) {
-  var val = state.values[q.id];
-  if (q.qtype === 'yes_no') {
-    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
-      '<button type="button" class="party-choice" data-party-val="Yes" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='Yes'?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👍 Yes</button>' +
-      '<button type="button" class="party-choice" data-party-val="No" style="padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.14);background:' + (val==='No'?'rgba(244,63,94,.24)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:20px;font-weight:800">👎 No</button>' +
-      '</div>';
-  }
-  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
-    var opts = q.qtype === 'rating_1_5' ? ['1','2','3','4','5'] : ['0','1','2','3','4','5','6','7','8','9','10'];
-    return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:10px">' + opts.map(function(o){ return '<button type="button" class="party-choice" data-party-val="'+o+'" style="padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (String(val && val.value_number)===o || String(val)===o?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:18px;font-weight:800">'+o+'</button>'; }).join('') + '</div>';
-  }
-  if (q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'consent') {
-    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
-    var selected = Array.isArray(val) ? val : [val && val.value_text ? val.value_text : val].filter(Boolean);
-    return '<div style="display:grid;gap:10px">' + opts.map(function(o){ var on = selected.indexOf(o) !== -1; return '<button type="button" class="party-choice" data-party-val="'+esc(o)+'" style="text-align:left;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (on?'rgba(34,197,94,.22)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:16px;font-weight:700">'+esc(o)+'</button>'; }).join('') + '</div>';
-  }
-  if (q.qtype === 'long_text') return '<textarea class="party-text-input" id="input-'+idx+'" style="width:100%;min-height:140px;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="Tell us more...">' + esc(val && val.value_text ? val.value_text : '') + '</textarea>';
-  if (q.qtype === 'star_rating') {
-    var sv = (val && val.value_number) || 0;
-    var html = '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">';
-    for (var s=1; s<=5; s++) {
-      var on = sv >= s;
-      html += '<button type="button" class="party-choice" data-party-val="'+s+'" style="padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:'+(on?'rgba(234,179,8,.28)':'rgba(255,255,255,.08)')+';color:'+(on?'#ffd54f':'#fff')+';font-size:22px;font-weight:800">★</button>';
-    }
-    return html + '</div>';
-  }
-  if (q.qtype === 'csat_smiley') {
-    var cv = (val && val.value_number) || 0;
-    var faces = ['😠','😕','😐','🙂','😍'];
-    return '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">' + faces.map(function(f,i){
-      var on = cv === (i+1);
-      return '<button type="button" class="party-choice" data-party-val="'+(i+1)+'" style="padding:16px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:'+(on?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)')+';font-size:28px">'+f+'</button>';
-    }).join('') + '</div>';
-  }
-  if (q.qtype === 'dropdown') {
-    var dv = val && val.value_text ? val.value_text : '';
-    var opts = (q.options || []).map(function(o){ return '<option value="'+esc(o)+'"'+(o===dv?' selected':'')+'>'+esc(o)+'</option>'; }).join('');
-    return '<select class="party-text-input" id="input-'+idx+'" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px"><option value="">Select...</option>'+opts+'</select>';
-  }
-  if (q.qtype === 'date') {
-    return '<input class="party-text-input" id="input-'+idx+'" type="date" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px" value="'+esc(val && val.value_text ? val.value_text : '')+'">';
-  }
-  if (q.qtype === 'number') {
-    var minA = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? ' min="'+esc(q.options[0])+'"' : '';
-    var maxA = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? ' max="'+esc(q.options[1])+'"' : '';
-    var nv = (val && val.value_number !== undefined) ? val.value_number : '';
-    return '<input class="party-text-input" id="input-'+idx+'" type="number"'+minA+maxA+' style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px" placeholder="Enter a number" value="'+esc(String(nv))+'">';
-  }
-  var type = q.qtype === 'email' ? 'email' : (q.qtype === 'phone' ? 'tel' : 'text');
-  var placeholder = q.qtype === 'name' ? 'Your name' : (q.qtype === 'email' ? 'Your email' : (q.qtype === 'phone' ? 'Your phone number' : 'Type your answer'));
-  return '<input class="party-text-input" id="input-'+idx+'" type="'+type+'" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="'+placeholder+'" value="' + esc(val && val.value_text ? val.value_text : '') + '">';
-}
-
-function validatePartyQuestion(q, idx) {
-  syncPartyInput(q, idx);
-  var v = state.values[q.id];
-  var ok = true;
-  if (q.required) {
-    if (Array.isArray(v)) ok = v.length > 0;
-    else if (v && typeof v === 'object') ok = !!(v.value_text || v.value_number || v.value_json);
-    else ok = !(v == null || v === '');
-  }
-  if (!ok) {
-    var affirm = document.getElementById('party-affirm');
-    if (affirm) affirm.textContent = 'Answer this one first to keep the streak going.';
-    return false;
-  }
-  return true;
-}
-
-function syncPartyInput(q, idx) {
-  var el = document.getElementById('input-' + idx);
-  if (!el) return;
-  var v = (el.value || '').trim();
-  if (!v) { delete state.values[q.id]; return; }
-  if (q.qtype === 'email' || q.qtype === 'phone' || q.qtype === 'name' || q.qtype === 'short_text' || q.qtype === 'long_text') {
-    state.values[q.id] = { value_text: v };
-  } else if (q.qtype === 'dropdown' || q.qtype === 'date') {
-    state.values[q.id] = { value_text: v };
-  } else if (q.qtype === 'number') {
-    var n = parseFloat(v);
-    if (!isNaN(n)) state.values[q.id] = { value_number: n };
-    else delete state.values[q.id];
-  }
-}
-
-function celebrateStep() {
-  state.answeredCount += 1;
-  state.streak += 1;
-  var affirm = document.getElementById('party-affirm');
-  var msgs = ['Nice one.', 'That helps.', 'Great — keep going.', 'Fast feedback unlocked.', 'You are flying through this.'];
-  if (affirm) affirm.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-  if (navigator.vibrate) navigator.vibrate(18);
-  if (window.confetti) {
-    window.confetti({ particleCount: 28, spread: 60, origin: { y: 0.7 } });
-  }
-}
-
+/* ────────── Input rendering (unified) ────────── */
 function renderInput(q, idx) {
   var t = q.qtype;
-  var name = 'q' + idx;
-  if (t === 'short_text' || t === 'name') return '<input class="q-input" type="text" id="' + name + '">';
-  if (t === 'email') return '<input class="q-input" type="email" id="' + name + '">';
-  if (t === 'phone') return '<input class="q-input" type="tel" id="' + name + '">';
-  if (t === 'long_text') return '<textarea class="q-input" id="' + name + '"></textarea>';
-  if (t === 'single_select' || t === 'yes_no' || t === 'consent') {
-    var opts = (t === 'yes_no') ? ['Yes','No'] : (t === 'consent' ? ['I agree'] : (q.options || []));
-    return opts.map(function(o, i){
-      return '<label class="opt-row"><input type="radio" name="' + name + '" value="' + esc(o) + '"> ' + esc(o) + '</label>';
-    }).join('');
+  var val = state.values[q.id];
+
+  if (t === 'yes_no') {
+    return btnGrid(['Yes','No'], val && val.value_text, 'cols-2', function(o){
+      return (o === 'Yes' ? '👍 ' : '👎 ') + o;
+    });
+  }
+  if (t === 'single_select' || t === 'consent') {
+    var opts = t === 'consent' ? ['I agree'] : (q.options || []);
+    return btnGrid(opts, val && val.value_text, '', null, 'left-align');
   }
   if (t === 'multi_select') {
-    return (q.options || []).map(function(o){
-      return '<label class="opt-row"><input type="checkbox" name="' + name + '" value="' + esc(o) + '"> ' + esc(o) + '</label>';
-    }).join('');
+    var opts = q.options || [];
+    var sel = Array.isArray(val) ? val : [];
+    return '<div class="s-choice-grid">' + opts.map(function(o){
+      var on = sel.indexOf(o) !== -1;
+      return '<button type="button" class="s-choice left-align' + (on ? ' active' : '') + '" data-val="' + esc(o) + '">' + esc(o) + '</button>';
+    }).join('') + '</div>';
   }
   if (t === 'rating_1_5') {
-    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
-    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '">&#9733; ' + i + '</button>';
-    html += '</div>';
-    return html;
-  }
-  if (t === 'nps_0_10') {
-    var html = '<div class="scale-grid nps-grid" id="' + name + '" style="grid-template-columns:repeat(11,1fr)">';
-    for (var i=0; i<=10; i++) {
-      var cls = i <= 6 ? 'nps-red' : (i <= 8 ? 'nps-amber' : 'nps-green');
-      html += '<button type="button" class="scale-btn ' + cls + '" data-val="' + i + '">' + i + '</button>';
-    }
-    html += '</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
-    return html;
+    return scaleGrid(1, 5, 'cols-5', val && val.value_number, function(i){ return '★ ' + i; });
   }
   if (t === 'star_rating') {
-    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
-    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '" aria-label="'+i+' star">&#9733;</button>';
-    html += '</div>';
-    return html;
+    var sv = (val && val.value_number) || 0;
+    return '<div class="s-choice-grid cols-5">' + [1,2,3,4,5].map(function(i){
+      var on = sv >= i;
+      return '<button type="button" class="s-choice star' + (on ? ' active' : '') + '" data-val="' + i + '" aria-label="' + i + ' stars">★</button>';
+    }).join('') + '</div>';
   }
   if (t === 'csat_smiley') {
-    var faces = ['&#128544;','&#128533;','&#128528;','&#128578;','&#128525;'];
-    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
-    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '" style="font-size:22px" aria-label="Rating ' + i + '">' + faces[i-1] + '</button>';
-    html += '</div>';
+    var faces = ['😠','😕','😐','🙂','😍'];
+    var cv = val && val.value_number;
+    return '<div class="s-choice-grid cols-5">' + faces.map(function(f, i){
+      var n = i + 1;
+      return '<button type="button" class="s-choice big-emoji' + (cv === n ? ' active' : '') + '" data-val="' + n + '" aria-label="Rating ' + n + '">' + f + '</button>';
+    }).join('') + '</div>';
+  }
+  if (t === 'nps_0_10') {
+    var cv = val && val.value_number;
+    var html = '<div class="s-choice-grid cols-11">';
+    for (var i = 0; i <= 10; i++) {
+      var cls = i <= 6 ? 'nps-red' : (i <= 8 ? 'nps-amber' : '');
+      html += '<button type="button" class="s-choice ' + cls + (cv === i ? ' active' : '') + '" data-val="' + i + '">' + i + '</button>';
+    }
+    html += '</div><div class="s-nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
     return html;
   }
   if (t === 'dropdown') {
-    var opts = (q.options || []).map(function(o){ return '<option value="' + esc(o) + '">' + esc(o) + '</option>'; }).join('');
-    return '<select class="q-input" id="' + name + '"><option value="">Select...</option>' + opts + '</select>';
+    var dv = val && val.value_text ? val.value_text : '';
+    var opts = (q.options || []).map(function(o){ return '<option value="' + esc(o) + '"' + (o === dv ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('');
+    return '<select class="s-text-input" id="input-' + idx + '"><option value="">Select…</option>' + opts + '</select>';
   }
   if (t === 'date') {
-    return '<input class="q-input" type="date" id="' + name + '">';
+    return '<input class="s-text-input" type="date" id="input-' + idx + '" value="' + esc(val && val.value_text ? val.value_text : '') + '">';
   }
   if (t === 'number') {
     var minA = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? ' min="' + esc(q.options[0]) + '"' : '';
     var maxA = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? ' max="' + esc(q.options[1]) + '"' : '';
-    return '<input class="q-input" type="number"' + minA + maxA + ' id="' + name + '">';
+    var nv = val && val.value_number !== undefined ? val.value_number : '';
+    return '<input class="s-text-input" type="number"' + minA + maxA + ' id="input-' + idx + '" placeholder="Enter a number" value="' + esc(String(nv)) + '">';
   }
-  return '<input class="q-input" type="text" id="' + name + '">';
+  if (t === 'long_text') {
+    return '<textarea class="s-text-input" id="input-' + idx + '" placeholder="Tell us more…">' + esc(val && val.value_text ? val.value_text : '') + '</textarea>';
+  }
+  var type = t === 'email' ? 'email' : (t === 'phone' ? 'tel' : 'text');
+  var placeholder = t === 'name' ? 'Your name' : (t === 'email' ? 'you@example.com' : (t === 'phone' ? '+27 …' : 'Type your answer'));
+  return '<input class="s-text-input" type="' + type + '" id="input-' + idx + '" placeholder="' + placeholder + '" value="' + esc(val && val.value_text ? val.value_text : '') + '">';
 }
 
-function wireQuestion(q, idx) {
-  var name = 'q' + idx;
-  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
-    var container = document.getElementById(name);
-    if (!container) return;
-    var btns = container.querySelectorAll('.scale-btn');
-    btns.forEach(function(btn){
-      btn.onclick = function() {
-        btns.forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
-      };
-    });
-    // Arrow key navigation within scale buttons
-    container.addEventListener('keydown', function(e){
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      var arr = Array.prototype.slice.call(btns);
-      var cur = arr.indexOf(document.activeElement);
-      if (cur < 0) return;
-      e.preventDefault();
-      var next = e.key === 'ArrowRight' ? Math.min(cur+1, arr.length-1) : Math.max(cur-1, 0);
-      arr[next].focus();
-    });
-    if (container) {
-      var btns = container.querySelectorAll('.scale-btn');
-      btns.forEach(function(btn){
-        btn.onclick = function() {
-          btns.forEach(function(b){ b.classList.remove('active'); });
-          btn.classList.add('active');
-          state.values[q.id] = { value_number: parseInt(btn.getAttribute('data-val'), 10) };
-        };
-      });
-      container.addEventListener('keydown', function(e){
-        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-        var arr = Array.prototype.slice.call(btns);
-        var cur = arr.indexOf(document.activeElement);
-        if (cur < 0) return;
-        e.preventDefault();
-        var next = e.key === 'ArrowRight' ? Math.min(cur+1, arr.length-1) : Math.max(cur-1, 0);
-        arr[next].focus();
-      });
-    }
-  }
+function btnGrid(opts, currentValue, extraClass, labelFn, btnExtra) {
+  return '<div class="s-choice-grid ' + (extraClass || '') + '">' + opts.map(function(o){
+    var on = currentValue === o;
+    var lbl = labelFn ? labelFn(o) : esc(o);
+    return '<button type="button" class="s-choice ' + (btnExtra || '') + (on ? ' active' : '') + '" data-val="' + esc(o) + '">' + (labelFn ? lbl : esc(o)) + '</button>';
+  }).join('') + '</div>';
+}
 
-  document.querySelectorAll('.party-choice').forEach(function(btn){
+function scaleGrid(from, to, cols, currentValue, labelFn) {
+  var html = '<div class="s-choice-grid ' + cols + '">';
+  for (var i = from; i <= to; i++) {
+    var on = currentValue === i;
+    html += '<button type="button" class="s-choice' + (on ? ' active' : '') + '" data-val="' + i + '">' + (labelFn ? labelFn(i) : i) + '</button>';
+  }
+  return html + '</div>';
+}
+
+/* ────────── Wiring ────────── */
+function wireQuestion(q, idx) {
+  // Click handlers on any .s-choice button in current question
+  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){
     btn.onclick = function(){
-      var pv = btn.getAttribute('data-party-val');
+      var raw = btn.getAttribute('data-val');
+      var numVal = parseInt(raw, 10);
       if (q.qtype === 'multi_select') {
         var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : [];
-        var i = curr.indexOf(pv);
-        if (i === -1) curr.push(pv); else curr.splice(i,1);
+        var i = curr.indexOf(raw);
+        if (i === -1) curr.push(raw); else curr.splice(i, 1);
         state.values[q.id] = curr;
       } else if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
-        state.values[q.id] = { value_number: parseInt(pv, 10) };
+        state.values[q.id] = { value_number: numVal };
       } else {
-        state.values[q.id] = { value_text: pv };
+        state.values[q.id] = { value_text: raw };
       }
-      if (state.mode === 'party') renderParty();
+      rerenderAnswer(q, idx);
     };
   });
-
-  var textInput = document.getElementById('input-' + idx);
-  if (textInput) {
-    textInput.addEventListener('input', function(){ syncPartyInput(q, idx); });
-    textInput.addEventListener('change', function(){ syncPartyInput(q, idx); });
+  // Text/select inputs
+  var el = document.getElementById('input-' + idx);
+  if (el) {
+    var sync = function(){ syncTextInput(q, idx); };
+    el.addEventListener('input', sync);
+    el.addEventListener('change', sync);
   }
 }
 
-function collectAnswer(q, idx) {
-  var name = 'q' + idx;
-  var t = q.qtype;
-  if (state.mode === 'party') syncPartyInput(q, idx);
-  if (t === 'short_text' || t === 'name' || t === 'email' || t === 'phone' || t === 'long_text') {
-    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
-    var el = document.getElementById(name);
-    var v = el ? el.value.trim() : '';
-    return v ? { value_text: v } : null;
-  }
-  if (t === 'single_select' || t === 'yes_no' || t === 'consent') {
-    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
-    var sel = document.querySelector('input[name="' + name + '"]:checked');
-    return sel ? { value_text: sel.value } : null;
-  }
-  if (t === 'multi_select') {
-    if (Array.isArray(state.values[q.id])) return state.values[q.id].length ? { value_json: state.values[q.id] } : null;
-    var vals = Array.prototype.slice.call(document.querySelectorAll('input[name="' + name + '"]:checked')).map(function(el){ return el.value; });
-    return vals.length ? { value_json: vals } : null;
-  }
-  if (t === 'rating_1_5' || t === 'nps_0_10' || t === 'star_rating' || t === 'csat_smiley') {
-    return state.values[q.id] || null;
-  }
-  if (t === 'dropdown' || t === 'date') {
-    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
-    var el = document.getElementById(name);
-    var v = el ? (el.value || '').trim() : '';
-    return v ? { value_text: v } : null;
-  }
-  if (t === 'number') {
-    if (state.values[q.id] && state.values[q.id].value_number !== undefined) return { value_number: state.values[q.id].value_number };
-    var el = document.getElementById(name);
-    var v = el ? (el.value || '').trim() : '';
-    if (v === '') return null;
+// Re-render just the answer area (preserves buttons highlight after click)
+function rerenderAnswer(q, idx) {
+  var wrap = document.getElementById('q-answer');
+  if (!wrap) return;
+  wrap.innerHTML = renderInput(q, idx);
+  wireQuestion(q, idx);
+}
+
+function syncTextInput(q, idx) {
+  var el = document.getElementById('input-' + idx);
+  if (!el) return;
+  var v = (el.value || '').trim();
+  if (!v) { delete state.values[q.id]; return; }
+  if (q.qtype === 'number') {
     var n = parseFloat(v);
-    return isNaN(n) ? null : { value_number: n };
+    if (!isNaN(n)) state.values[q.id] = { value_number: n }; else delete state.values[q.id];
+  } else {
+    state.values[q.id] = { value_text: v };
   }
-  return null;
 }
 
+/* ────────── Validation / progression ────────── */
+function validateCurrent(q) {
+  var errEl = document.getElementById('q-error');
+  if (errEl) errEl.textContent = '';
+  var v = state.values[q.id];
+
+  if (q.required) {
+    var empty = false;
+    if (Array.isArray(v)) empty = v.length === 0;
+    else if (v && typeof v === 'object') empty = !(v.value_text || v.value_number !== undefined || v.value_json);
+    else empty = v == null || v === '';
+    if (empty) { if (errEl) errEl.textContent = 'This question is required.'; return false; }
+  }
+  if (!v) return true; // optional + empty
+
+  if (q.qtype === 'email' && v.value_text && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.value_text)) {
+    if (errEl) errEl.textContent = 'Please enter a valid email address.'; return false;
+  }
+  if (q.qtype === 'phone' && v.value_text && !/^[+\d][\d\s\-()]{6,}$/.test(v.value_text)) {
+    if (errEl) errEl.textContent = 'Please enter a valid phone number.'; return false;
+  }
+  if (q.qtype === 'number' && v.value_number !== undefined) {
+    var minV = (q.options && q.options[0] !== '' && q.options[0] !== undefined) ? parseFloat(q.options[0]) : null;
+    var maxV = (q.options && q.options[1] !== '' && q.options[1] !== undefined) ? parseFloat(q.options[1]) : null;
+    if ((minV !== null && !isNaN(minV) && v.value_number < minV) || (maxV !== null && !isNaN(maxV) && v.value_number > maxV)) {
+      var msg = 'Please enter a number';
+      if (minV !== null && maxV !== null) msg += ' between ' + minV + ' and ' + maxV + '.';
+      else if (minV !== null) msg += ' ≥ ' + minV + '.';
+      else if (maxV !== null) msg += ' ≤ ' + maxV + '.';
+      if (errEl) errEl.textContent = msg;
+      return false;
+    }
+  }
+  return true;
+}
+
+function celebrateStep() {
+  state.streak += 1;
+  if (navigator.vibrate) navigator.vibrate(15);
+  if (state.mode === 'party' && window.confetti) {
+    window.confetti({ particleCount: 24, spread: 55, origin: { y: 0.7 }, disableForReducedMotion: true });
+  }
+}
+
+/* ────────── Submit ────────── */
 async function submit() {
-  var btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Submitting...';
+  var nextBtn = document.getElementById('btn-next');
+  if (nextBtn) { nextBtn.disabled = true; nextBtn.textContent = 'Submitting…'; }
 
   var answers = [];
-  var hasError = false;
   var contact = {};
-
-  state.questions.forEach(function(q, idx) {
-    document.getElementById('err-' + idx).style.display = 'none';
-    var a = collectAnswer(q, idx);
-    if (q.required && !a) {
-      var err = document.getElementById('err-' + idx);
-      err.textContent = 'This question is required.';
-      err.style.display = 'block';
-      hasError = true;
-      return;
+  for (var i = 0; i < state.questions.length; i++) {
+    var q = state.questions[i];
+    var v = state.values[q.id];
+    if (!v) continue;
+    var entry = { question_id: q.id };
+    if (Array.isArray(v)) entry.value_json = v;
+    else {
+      if (v.value_text !== undefined) entry.value_text = v.value_text;
+      if (v.value_number !== undefined) entry.value_number = v.value_number;
+      if (v.value_json !== undefined) entry.value_json = v.value_json;
     }
-    // Email validation
-    if (a && q.qtype === 'email' && a.value_text) {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.value_text)) {
-        var err = document.getElementById('err-' + idx);
-        err.textContent = 'Please enter a valid email address.';
-        err.style.display = 'block';
-        hasError = true;
-        return;
-      }
+    answers.push(entry);
+    if (state.survey.allow_contact_capture && v.value_text) {
+      if (q.qtype === 'email') contact.email = v.value_text;
+      else if (q.qtype === 'phone') contact.phone = v.value_text;
+      else if (q.qtype === 'name') contact.name = v.value_text;
     }
-    // Phone validation
-    if (a && q.qtype === 'phone' && a.value_text) {
-      if (!/^[+\d][\d\s\-()]{6,}$/.test(a.value_text)) {
-        var err = document.getElementById('err-' + idx);
-        err.textContent = 'Please enter a valid phone number.';
-        err.style.display = 'block';
-        hasError = true;
-        return;
-      }
-    }
-    // Number min/max validation
-    if (a && q.qtype === 'number' && a.value_number !== undefined) {
-      var minV = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? parseFloat(q.options[0]) : null;
-      var maxV = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? parseFloat(q.options[1]) : null;
-      if ((minV !== null && !isNaN(minV) && a.value_number < minV) || (maxV !== null && !isNaN(maxV) && a.value_number > maxV)) {
-        var err = document.getElementById('err-' + idx);
-        var msg = 'Please enter a number';
-        if (minV !== null && maxV !== null) msg += ' between ' + minV + ' and ' + maxV + '.';
-        else if (minV !== null) msg += ' ≥ ' + minV + '.';
-        else if (maxV !== null) msg += ' ≤ ' + maxV + '.';
-        err.textContent = msg;
-        err.style.display = 'block';
-        hasError = true;
-        return;
-      }
-    }
-    if (a) {
-      var entry = { question_id: q.id };
-      if (a.value_text !== undefined) entry.value_text = a.value_text;
-      if (a.value_number !== undefined) entry.value_number = a.value_number;
-      if (a.value_json !== undefined) entry.value_json = a.value_json;
-      answers.push(entry);
-
-      if (state.survey.allow_contact_capture && a.value_text) {
-        if (q.qtype === 'email') contact.email = a.value_text;
-        if (q.qtype === 'phone') contact.phone = a.value_text;
-        if (q.qtype === 'name') contact.name = a.value_text;
-      }
-    }
-  });
-
-  if (hasError) {
-    btn.disabled = false;
-    btn.textContent = 'Submit';
-    return;
   }
 
   try {
-    var res = await GoNoGoAPI.cx.publicSubmit(token, answers, contact, {
-      user_agent: navigator.userAgent,
-      referrer: document.referrer
-    });
-    if (!res || !res.ok) throw new Error((res && res.error) || 'Submission failed.');
+    var meta = { mode_used: state.mode, device_type: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop' };
+    var res = await GoNoGoAPI.cx.publicSubmit(token, answers, contact, meta);
+    if (!res || !res.ok) throw new Error((res && res.error) || 'Submit failed');
     renderThankYou();
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Submit';
-    alert('Error: ' + (e.message || String(e)));
+  } catch (e) {
+    if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = 'Submit'; }
+    var errEl = document.getElementById('q-error');
+    if (errEl) errEl.textContent = e.message || 'Submit failed. Try again.';
   }
 }
 
 function renderThankYou() {
-  var s = state.survey;
-  var html = '<div class="survey-card thank-wrap">';
-  html += '<h2>' + esc(s.thank_you_title || 'Thank you') + '</h2>';
-  html += '<p>' + esc(s.thank_you_text || 'Your response has been recorded.') + '</p>';
-  html += '</div><div class="brand-mark">Powered by GoNoGo</div>';
+  var s = state.survey || {};
+  var html = '<div class="s-shell">';
+  html += renderBrandHeader();
+  html += '<div class="s-card s-thank">';
+  html += '<h2>' + esc(s.thank_you_title || 'Thank you.') + '</h2>';
+  html += '<p>' + esc(s.thank_you_text || 'Your feedback has been shared with the brand.') + '</p>';
+  html += '</div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '</div>';
   document.getElementById('root').innerHTML = html;
+  if (state.mode === 'party' && window.confetti) {
+    window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, disableForReducedMotion: true });
+  }
 }
 
 load();
