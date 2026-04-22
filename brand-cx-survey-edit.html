@@ -48,6 +48,7 @@
 
 /* ── Form controls (reuse existing patterns) ── */
 .se-label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-1);text-transform:uppercase;letter-spacing:.05em}
+.se-section-h{font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:.06em;margin:0 0 var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--border-primary)}
 .se-input,.se-select,.se-textarea{width:100%;background:var(--surface-1);border:1px solid var(--border-primary);color:var(--text-primary);padding:8px 10px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit}
 .se-textarea{resize:vertical;min-height:60px}
 .se-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3)}
@@ -615,6 +616,45 @@ function renderSettingsPanel() {
   html += '<label class="se-toggle"><input type="checkbox" id="s-party-default"> Default to Party mode</label></div>';
   html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response. Party mode starts respondents in a faster, swipe-friendly mobile flow, but they can switch back to Classic mode any time.</div>';
 
+  // ── Branding ──
+  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Branding</h4>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Template</label>' +
+          '<select class="se-input" id="s-template-key">' +
+            '<option value="">(none)</option>' +
+            '<option value="nps_short">Short NPS</option>' +
+            '<option value="csat_quick">Quick CSAT</option>' +
+            '<option value="post_visit">Post-visit feedback</option>' +
+            '<option value="post_purchase">Post-purchase</option>' +
+            '<option value="support_followup">Support follow-up</option>' +
+          '</select></div>' +
+          '<div class="se-field"><label class="se-label">Brand logo URL</label><input class="se-input" id="s-brand-logo" placeholder="https://..."></div></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Primary colour</label><input class="se-input" id="s-brand-primary" type="text" placeholder="#11a551"></div>' +
+          '<div class="se-field"><label class="se-label">Accent colour</label><input class="se-input" id="s-brand-accent" type="text" placeholder="#0b7a3b"></div></div>';
+
+  // ── Experience ──
+  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Experience</h4>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Theme variant</label>' +
+          '<select class="se-input" id="s-theme-variant">' +
+            '<option value="classic">Classic</option>' +
+            '<option value="party">Party</option>' +
+          '</select></div>' +
+          '<div class="se-field"><label class="se-label">Progress style</label>' +
+          '<select class="se-input" id="s-progress-style">' +
+            '<option value="bar">Bar</option>' +
+            '<option value="steps">Steps</option>' +
+            '<option value="none">None</option>' +
+          '</select></div></div>';
+  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3);flex-wrap:wrap">';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-show-progress" checked> Show progress</label>';
+  html += '<label class="se-toggle"><input type="checkbox" id="s-party-default"> Party mode default</label></div>';
+
+  // ── Privacy & consent ──
+  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Privacy & consent</h4>';
+  html += '<div class="se-field"><label class="se-label">Privacy notice</label><textarea class="se-textarea" id="s-privacy-notice" placeholder="Shown before contact fields. Explain how their data will be used."></textarea></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Marketing consent label</label><input class="se-input" id="s-marketing-label" placeholder="Keep me updated about offers"></div>' +
+          '<div class="se-field"><label class="se-label">Contact retention (days)</label><input class="se-input" id="s-contact-retention" type="number" min="0" placeholder="e.g. 365"></div></div>';
+  html += '<div style="margin-top:var(--space-2)"><label class="se-toggle"><input type="checkbox" id="s-marketing-consent"> Enable marketing consent checkbox</label></div>';
+
   document.getElementById('panel-settings').innerHTML = html;
 
   // Auto-generate slug from name
@@ -630,11 +670,16 @@ function renderSettingsPanel() {
     this.value = this.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
     markDirty();
   });
-  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text'].forEach(function(id){
-    document.getElementById(id).addEventListener('input', markDirty);
+  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text',
+   's-brand-logo','s-brand-primary','s-brand-accent',
+   's-privacy-notice','s-marketing-label','s-contact-retention'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', markDirty);
   });
-  ['s-anon','s-contact','s-party-default'].forEach(function(id){
-    document.getElementById(id).addEventListener('change', markDirty);
+  ['s-anon','s-contact','s-template-key','s-theme-variant','s-progress-style',
+   's-show-progress','s-party-default','s-marketing-consent'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', markDirty);
   });
 }
 
@@ -649,10 +694,25 @@ function populateSettings() {
   document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
   document.getElementById('s-anon').checked = !!s.is_anonymous;
   document.getElementById('s-contact').checked = !!s.allow_contact_capture;
-  var partyToggle = document.getElementById('s-party-default');
-  if (partyToggle) partyToggle.checked = !!s.party_mode_default;
   var _sLabels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
   document.getElementById('s-status').value = _sLabels[s.status] || s.status || 'Draft';
+  // Branding
+  var _setIfExists = function(id, val){ var el = document.getElementById(id); if (el) el.value = val; };
+  var _checkIfExists = function(id, val){ var el = document.getElementById(id); if (el) el.checked = val; };
+  _setIfExists('s-template-key', s.template_key || '');
+  _setIfExists('s-brand-logo', s.brand_logo_url || '');
+  _setIfExists('s-brand-primary', s.brand_primary_color || '');
+  _setIfExists('s-brand-accent', s.brand_accent_color || '');
+  // Experience
+  _setIfExists('s-theme-variant', s.theme_variant || 'classic');
+  _setIfExists('s-progress-style', s.progress_style || 'bar');
+  _checkIfExists('s-show-progress', s.show_progress_bar !== false);
+  _checkIfExists('s-party-default', !!s.party_mode_default);
+  // Privacy & consent
+  _setIfExists('s-privacy-notice', s.privacy_notice_text || '');
+  _checkIfExists('s-marketing-consent', !!s.marketing_consent_enabled);
+  _setIfExists('s-marketing-label', s.marketing_consent_label || '');
+  _setIfExists('s-contact-retention', (s.contact_retention_days === null || s.contact_retention_days === undefined) ? '' : s.contact_retention_days);
 }
 
 function populateSettingsDefaults() {
@@ -664,9 +724,22 @@ function populateSettingsDefaults() {
   document.getElementById('s-ty-text').value = 'Your feedback has been received.';
   document.getElementById('s-anon').checked = true;
   document.getElementById('s-contact').checked = true;
-  var partyToggle = document.getElementById('s-party-default');
-  if (partyToggle) partyToggle.checked = false;
   document.getElementById('s-status').value = 'Draft';
+  // Branding
+  document.getElementById('s-template-key').value = '';
+  document.getElementById('s-brand-logo').value = '';
+  document.getElementById('s-brand-primary').value = '';
+  document.getElementById('s-brand-accent').value = '';
+  // Experience
+  document.getElementById('s-theme-variant').value = 'classic';
+  document.getElementById('s-progress-style').value = 'bar';
+  document.getElementById('s-show-progress').checked = true;
+  document.getElementById('s-party-default').checked = false;
+  // Privacy & consent
+  document.getElementById('s-privacy-notice').value = '';
+  document.getElementById('s-marketing-consent').checked = false;
+  document.getElementById('s-marketing-label').value = '';
+  document.getElementById('s-contact-retention').value = '';
 }
 
 /* ── Status UI ── */
@@ -795,6 +868,7 @@ async function save() {
   _saving = true;
 
   try {
+    var retentionVal = document.getElementById('s-contact-retention').value.trim();
     var payload = {
       id: _survey ? _survey.id : null,
       name: name,
@@ -805,11 +879,25 @@ async function save() {
       thank_you_text: document.getElementById('s-ty-text').value.trim(),
       is_anonymous: document.getElementById('s-anon').checked,
       allow_contact_capture: document.getElementById('s-contact').checked,
-      party_mode_default: !!document.getElementById('s-party-default').checked,
       status: (function(){
         var v = _survey ? _survey.status : 'draft';
         return ['draft','active','paused','archived'].indexOf(v) !== -1 ? v : 'draft';
       })(),
+      // Branding
+      template_key: document.getElementById('s-template-key').value || null,
+      brand_logo_url: document.getElementById('s-brand-logo').value.trim() || null,
+      brand_primary_color: document.getElementById('s-brand-primary').value.trim() || null,
+      brand_accent_color: document.getElementById('s-brand-accent').value.trim() || null,
+      // Experience
+      theme_variant: document.getElementById('s-theme-variant').value || 'classic',
+      progress_style: document.getElementById('s-progress-style').value || 'bar',
+      show_progress_bar: document.getElementById('s-show-progress').checked,
+      party_mode_default: !!document.getElementById('s-party-default').checked,
+      // Privacy & consent
+      privacy_notice_text: document.getElementById('s-privacy-notice').value.trim() || null,
+      marketing_consent_enabled: document.getElementById('s-marketing-consent').checked,
+      marketing_consent_label: document.getElementById('s-marketing-label').value.trim() || null,
+      contact_retention_days: retentionVal === '' ? null : parseInt(retentionVal, 10),
       questions: _questions.map(function(q){
         return {
           qtype: q.qtype,
