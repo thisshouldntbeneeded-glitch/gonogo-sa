@@ -164,14 +164,12 @@
 
 <script src="data/helpers.js"></script>
 <script src="components.js"></script>
-<script src="api.js"></script>
+<script src="api.js?v=20260422b"></script>
 <script>
 Components.initTheme();
 document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
 
-if (Components.checkBrandAuth()) init();
-
-/* ── State ── */
+/* ── State (declare BEFORE init so async init sees populated values) ── */
 var _surveyId = new URLSearchParams(location.search).get('id');
 var _survey = null;
 var _questions = [];
@@ -180,6 +178,8 @@ var _selectedIdx = -1;
 var _dirty = false;
 var _saving = false;
 var esc = Components.escapeHTML.bind(Components);
+
+if (Components.checkBrandAuth()) init();
 
 var QTYPES = [
   {v:'short_text',   l:'Short text',       icon:'fa-font'},
