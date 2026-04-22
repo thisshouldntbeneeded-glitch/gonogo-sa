@@ -138,7 +138,7 @@
           <div class="form-group"><label class="form-label">Email</label><input type="email" id="bu-email" required placeholder="brand@example.co.za"></div>
           <div class="form-group"><label class="form-label">Password</label><input type="password" id="bu-password" required placeholder="Set a password" minlength="6"></div>
           <div class="form-group"><label class="form-label">Display Name</label><input type="text" id="bu-name" placeholder="e.g. FNB Team"></div>
-          <div class="form-group"><label class="form-label">Brand</label><select id="bu-brand" required><option value="">Loading brands...</option></select></div>
+          <div class="form-group"><label class="form-label">Brand</label><select id="bu-brand" required onchange="document.getElementById('bu-brand-custom-wrap').style.display=(this.value==='__custom__'?'block':'none')"><option value="">Loading brands...</option></select><div id="bu-brand-custom-wrap" style="display:none;margin-top:var(--space-2)"><input type="text" id="bu-brand-custom" placeholder="brand-slug (lowercase, dashes)" pattern="[a-z0-9-]+" title="Lowercase letters, numbers and dashes only"><small class="text-xs text-muted">Used as the brand identifier. Not shown publicly.</small></div></div>
           <div class="form-group"><label class="form-label">Tier</label><select id="bu-tier"><option value="basic">Basic — Reviews only</option><option value="full">Full — All tabs</option><option value="cx_only">CX Survey only — Survey platform + dashboard</option></select></div>
         </div>
         <button type="submit" class="btn btn-primary btn-sm" style="margin-top:var(--space-3)" id="bu-btn"><i class="fa-solid fa-user-plus"></i> Create Account</button>
@@ -316,6 +316,7 @@
       brands.forEach(function(b) {
         select.innerHTML += '<option value="' + b.slug + '">' + Components.escapeHTML(b.name) + ' (' + b.gonogo_score + '/100)</option>';
       });
+      select.innerHTML += '<option value="__custom__">➕ Other — enter brand manually (not on site)</option>';
     } catch(e) {}
   }
 
@@ -366,6 +367,12 @@
     var brandSlug = document.getElementById('bu-brand').value;
     var tier = document.getElementById('bu-tier').value;
 
+    if (brandSlug === '__custom__') {
+      brandSlug = (document.getElementById('bu-brand-custom').value || '').trim().toLowerCase();
+      if (!/^[a-z0-9-]+$/.test(brandSlug)) {
+        throw new Error('Enter a valid brand slug (lowercase letters, numbers, dashes)');
+      }
+    }
     if (!brandSlug) {
       throw new Error('Please select a brand');
     }
