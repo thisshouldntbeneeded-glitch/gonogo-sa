@@ -199,6 +199,37 @@ function renderPartyInput(q, idx) {
     return '<div style="display:grid;gap:10px">' + opts.map(function(o){ var on = selected.indexOf(o) !== -1; return '<button type="button" class="party-choice" data-party-val="'+esc(o)+'" style="text-align:left;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:' + (on?'rgba(34,197,94,.22)':'rgba(255,255,255,.08)') + ';color:#fff;font-size:16px;font-weight:700">'+esc(o)+'</button>'; }).join('') + '</div>';
   }
   if (q.qtype === 'long_text') return '<textarea class="party-text-input" id="input-'+idx+'" style="width:100%;min-height:140px;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="Tell us more...">' + esc(val && val.value_text ? val.value_text : '') + '</textarea>';
+  if (q.qtype === 'star_rating') {
+    var sv = (val && val.value_number) || 0;
+    var html = '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">';
+    for (var s=1; s<=5; s++) {
+      var on = sv >= s;
+      html += '<button type="button" class="party-choice" data-party-val="'+s+'" style="padding:18px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:'+(on?'rgba(234,179,8,.28)':'rgba(255,255,255,.08)')+';color:'+(on?'#ffd54f':'#fff')+';font-size:22px;font-weight:800">★</button>';
+    }
+    return html + '</div>';
+  }
+  if (q.qtype === 'csat_smiley') {
+    var cv = (val && val.value_number) || 0;
+    var faces = ['😠','😕','😐','🙂','😍'];
+    return '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">' + faces.map(function(f,i){
+      var on = cv === (i+1);
+      return '<button type="button" class="party-choice" data-party-val="'+(i+1)+'" style="padding:16px 0;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:'+(on?'rgba(34,197,94,.28)':'rgba(255,255,255,.08)')+';font-size:28px">'+f+'</button>';
+    }).join('') + '</div>';
+  }
+  if (q.qtype === 'dropdown') {
+    var dv = val && val.value_text ? val.value_text : '';
+    var opts = (q.options || []).map(function(o){ return '<option value="'+esc(o)+'"'+(o===dv?' selected':'')+'>'+esc(o)+'</option>'; }).join('');
+    return '<select class="party-text-input" id="input-'+idx+'" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px"><option value="">Select...</option>'+opts+'</select>';
+  }
+  if (q.qtype === 'date') {
+    return '<input class="party-text-input" id="input-'+idx+'" type="date" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px" value="'+esc(val && val.value_text ? val.value_text : '')+'">';
+  }
+  if (q.qtype === 'number') {
+    var minA = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? ' min="'+esc(q.options[0])+'"' : '';
+    var maxA = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? ' max="'+esc(q.options[1])+'"' : '';
+    var nv = (val && val.value_number !== undefined) ? val.value_number : '';
+    return '<input class="party-text-input" id="input-'+idx+'" type="number"'+minA+maxA+' style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px" placeholder="Enter a number" value="'+esc(String(nv))+'">';
+  }
   var type = q.qtype === 'email' ? 'email' : (q.qtype === 'phone' ? 'tel' : 'text');
   var placeholder = q.qtype === 'name' ? 'Your name' : (q.qtype === 'email' ? 'Your email' : (q.qtype === 'phone' ? 'Your phone number' : 'Type your answer'));
   return '<input class="party-text-input" id="input-'+idx+'" type="'+type+'" style="width:100%;padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff" placeholder="'+placeholder+'" value="' + esc(val && val.value_text ? val.value_text : '') + '">';
@@ -228,6 +259,12 @@ function syncPartyInput(q, idx) {
   if (!v) { delete state.values[q.id]; return; }
   if (q.qtype === 'email' || q.qtype === 'phone' || q.qtype === 'name' || q.qtype === 'short_text' || q.qtype === 'long_text') {
     state.values[q.id] = { value_text: v };
+  } else if (q.qtype === 'dropdown' || q.qtype === 'date') {
+    state.values[q.id] = { value_text: v };
+  } else if (q.qtype === 'number') {
+    var n = parseFloat(v);
+    if (!isNaN(n)) state.values[q.id] = { value_number: n };
+    else delete state.values[q.id];
   }
 }
 
@@ -276,12 +313,37 @@ function renderInput(q, idx) {
     html += '</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
     return html;
   }
+  if (t === 'star_rating') {
+    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
+    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '" aria-label="'+i+' star">&#9733;</button>';
+    html += '</div>';
+    return html;
+  }
+  if (t === 'csat_smiley') {
+    var faces = ['&#128544;','&#128533;','&#128528;','&#128578;','&#128525;'];
+    var html = '<div class="scale-grid rating-grid" id="' + name + '" style="grid-template-columns:repeat(5,1fr)">';
+    for (var i=1; i<=5; i++) html += '<button type="button" class="scale-btn" data-val="' + i + '" style="font-size:22px" aria-label="Rating ' + i + '">' + faces[i-1] + '</button>';
+    html += '</div>';
+    return html;
+  }
+  if (t === 'dropdown') {
+    var opts = (q.options || []).map(function(o){ return '<option value="' + esc(o) + '">' + esc(o) + '</option>'; }).join('');
+    return '<select class="q-input" id="' + name + '"><option value="">Select...</option>' + opts + '</select>';
+  }
+  if (t === 'date') {
+    return '<input class="q-input" type="date" id="' + name + '">';
+  }
+  if (t === 'number') {
+    var minA = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? ' min="' + esc(q.options[0]) + '"' : '';
+    var maxA = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? ' max="' + esc(q.options[1]) + '"' : '';
+    return '<input class="q-input" type="number"' + minA + maxA + ' id="' + name + '">';
+  }
   return '<input class="q-input" type="text" id="' + name + '">';
 }
 
 function wireQuestion(q, idx) {
   var name = 'q' + idx;
-  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
+  if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
     var container = document.getElementById(name);
     if (!container) return;
     var btns = container.querySelectorAll('.scale-btn');
@@ -331,7 +393,7 @@ function wireQuestion(q, idx) {
         var i = curr.indexOf(pv);
         if (i === -1) curr.push(pv); else curr.splice(i,1);
         state.values[q.id] = curr;
-      } else if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10') {
+      } else if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
         state.values[q.id] = { value_number: parseInt(pv, 10) };
       } else {
         state.values[q.id] = { value_text: pv };
@@ -343,6 +405,7 @@ function wireQuestion(q, idx) {
   var textInput = document.getElementById('input-' + idx);
   if (textInput) {
     textInput.addEventListener('input', function(){ syncPartyInput(q, idx); });
+    textInput.addEventListener('change', function(){ syncPartyInput(q, idx); });
   }
 }
 
@@ -366,8 +429,22 @@ function collectAnswer(q, idx) {
     var vals = Array.prototype.slice.call(document.querySelectorAll('input[name="' + name + '"]:checked')).map(function(el){ return el.value; });
     return vals.length ? { value_json: vals } : null;
   }
-  if (t === 'rating_1_5' || t === 'nps_0_10') {
+  if (t === 'rating_1_5' || t === 'nps_0_10' || t === 'star_rating' || t === 'csat_smiley') {
     return state.values[q.id] || null;
+  }
+  if (t === 'dropdown' || t === 'date') {
+    if (state.values[q.id] && state.values[q.id].value_text) return { value_text: state.values[q.id].value_text };
+    var el = document.getElementById(name);
+    var v = el ? (el.value || '').trim() : '';
+    return v ? { value_text: v } : null;
+  }
+  if (t === 'number') {
+    if (state.values[q.id] && state.values[q.id].value_number !== undefined) return { value_number: state.values[q.id].value_number };
+    var el = document.getElementById(name);
+    var v = el ? (el.value || '').trim() : '';
+    if (v === '') return null;
+    var n = parseFloat(v);
+    return isNaN(n) ? null : { value_number: n };
   }
   return null;
 }
@@ -406,6 +483,22 @@ async function submit() {
       if (!/^[+\d][\d\s\-()]{6,}$/.test(a.value_text)) {
         var err = document.getElementById('err-' + idx);
         err.textContent = 'Please enter a valid phone number.';
+        err.style.display = 'block';
+        hasError = true;
+        return;
+      }
+    }
+    // Number min/max validation
+    if (a && q.qtype === 'number' && a.value_number !== undefined) {
+      var minV = (q.options && q.options[0] !== undefined && q.options[0] !== '') ? parseFloat(q.options[0]) : null;
+      var maxV = (q.options && q.options[1] !== undefined && q.options[1] !== '') ? parseFloat(q.options[1]) : null;
+      if ((minV !== null && !isNaN(minV) && a.value_number < minV) || (maxV !== null && !isNaN(maxV) && a.value_number > maxV)) {
+        var err = document.getElementById('err-' + idx);
+        var msg = 'Please enter a number';
+        if (minV !== null && maxV !== null) msg += ' between ' + minV + ' and ' + maxV + '.';
+        else if (minV !== null) msg += ' ≥ ' + minV + '.';
+        else if (maxV !== null) msg += ' ≤ ' + maxV + '.';
+        err.textContent = msg;
         err.style.display = 'block';
         hasError = true;
         return;

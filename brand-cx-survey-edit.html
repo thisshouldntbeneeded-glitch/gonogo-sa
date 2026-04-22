@@ -187,8 +187,13 @@ var QTYPES = [
   {v:'single_select',l:'Single select',    icon:'fa-circle-dot'},
   {v:'multi_select', l:'Multi select',     icon:'fa-square-check'},
   {v:'rating_1_5',   l:'Rating 1\u20135',  icon:'fa-star'},
+  {v:'star_rating',  l:'Star rating',      icon:'fa-star-half-stroke'},
+  {v:'csat_smiley',  l:'CSAT smiley',      icon:'fa-face-smile'},
   {v:'nps_0_10',     l:'NPS 0\u201310',    icon:'fa-gauge-high'},
   {v:'yes_no',       l:'Yes / No',         icon:'fa-toggle-on'},
+  {v:'dropdown',     l:'Dropdown',         icon:'fa-caret-down'},
+  {v:'date',         l:'Date',             icon:'fa-calendar-day'},
+  {v:'number',       l:'Number',           icon:'fa-hashtag'},
   {v:'email',        l:'Email',            icon:'fa-envelope'},
   {v:'phone',        l:'Phone',            icon:'fa-phone'},
   {v:'name',         l:'Name',             icon:'fa-user'},
@@ -391,7 +396,7 @@ function renderQuestionPanel() {
     return;
   }
   var q = _questions[_selectedIdx];
-  var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select';
+  var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown';
 
   var html = '';
 
@@ -425,6 +430,13 @@ function renderQuestionPanel() {
     html += '<div class="se-field"><label class="se-label">Placeholder text</label><input class="se-input" id="ed-placeholder" value="' + esc(placeholder) + '" placeholder="Optional placeholder"></div>';
   }
 
+  if (q.qtype === 'number') {
+    var nmin = (q.options && q.options[0] != null) ? q.options[0] : '';
+    var nmax = (q.options && q.options[1] != null) ? q.options[1] : '';
+    html += '<div class="se-row"><div class="se-field"><label class="se-label">Min</label><input class="se-input" id="ed-num-min" type="number" value="' + esc(nmin) + '" placeholder="(no min)"></div>' +
+            '<div class="se-field"><label class="se-label">Max</label><input class="se-input" id="ed-num-max" type="number" value="' + esc(nmax) + '" placeholder="(no max)"></div></div>';
+  }
+
   // Live preview
   html += '<div class="se-preview"><div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q) + '</div>';
 
@@ -438,9 +450,12 @@ function wireQuestionEditor() {
 
   document.getElementById('ed-qtype').addEventListener('change', function(){
     q.qtype = this.value;
-    // Reset options when switching to select
-    if ((q.qtype === 'single_select' || q.qtype === 'multi_select') && (!q.options || !q.options.length)) {
+    // Reset options when switching to select / dropdown
+    if ((q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown') && (!q.options || !q.options.length)) {
       q.options = ['Option 1', 'Option 2'];
+    }
+    if (q.qtype === 'number' && (!q.options || q.options.length < 2)) {
+      q.options = ['', ''];
     }
     markDirty(); renderRail(); renderQuestionPanel();
   });
@@ -448,12 +463,23 @@ function wireQuestionEditor() {
   document.getElementById('ed-help').addEventListener('input', function(){ q.help_text = this.value; markDirty(); updatePreview(); });
   document.getElementById('ed-required').addEventListener('change', function(){ q.required = this.checked; markDirty(); renderRail(); });
 
-  if (q.qtype === 'single_select' || q.qtype === 'multi_select') {
+  if (q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown') {
     renderOptionsEditor();
     document.getElementById('btn-add-opt').addEventListener('click', function(){
       q.options.push('');
       markDirty(); renderOptionsEditor(); updatePreview();
     });
+  }
+
+  if (q.qtype === 'number') {
+    var minEl = document.getElementById('ed-num-min');
+    var maxEl = document.getElementById('ed-num-max');
+    var syncNum = function(){
+      q.options = [minEl.value, maxEl.value];
+      markDirty(); updatePreview();
+    };
+    minEl.addEventListener('input', syncNum);
+    maxEl.addEventListener('input', syncNum);
   }
 
   if (q.qtype === 'consent') {
@@ -585,6 +611,30 @@ function renderPreview(q) {
     case 'consent':
       var label = (q.options && q.options[0]) || 'I agree to the terms';
       html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(label) + '</div>';
+      break;
+    case 'star_rating':
+      html += '<div style="display:flex;gap:6px;font-size:24px;color:var(--green)">';
+      for(var i=0;i<5;i++) html += '<i class="fa-regular fa-star"></i>';
+      html += '</div><div class="se-hint">Respondents click to rate (1\u20135 stars)</div>';
+      break;
+    case 'csat_smiley':
+      var faces = ['\uD83D\uDE20','\uD83D\uDE41','\uD83D\uDE10','\uD83D\uDE42','\uD83D\uDE0D'];
+      html += '<div style="display:flex;gap:10px;font-size:28px">' + faces.map(function(f){return '<span>'+f+'</span>';}).join('') + '</div>';
+      html += '<div class="nps-labels"><span>Very unhappy</span><span>Very happy</span></div>';
+      break;
+    case 'dropdown':
+      html += '<select disabled><option>\u2014 Select an option \u2014</option>';
+      (q.options||[]).forEach(function(o){ html += '<option>' + esc(o||'Option') + '</option>'; });
+      html += '</select>';
+      break;
+    case 'date':
+      html += '<input type="date" disabled>';
+      break;
+    case 'number':
+      var min = (q.options && q.options[0]) || '';
+      var max = (q.options && q.options[1]) || '';
+      html += '<input type="number" disabled placeholder="Enter a number">';
+      if (min !== '' || max !== '') html += '<div class="se-hint">Allowed range: ' + esc(min||'\u2013\u221e') + ' to ' + esc(max||'\u221e') + '</div>';
       break;
   }
   return html;
@@ -856,7 +906,7 @@ async function save() {
       _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
       return;
     }
-    if ((_questions[i].qtype === 'single_select' || _questions[i].qtype === 'multi_select') && (!_questions[i].options || _questions[i].options.filter(Boolean).length < 2)) {
+    if ((_questions[i].qtype === 'single_select' || _questions[i].qtype === 'multi_select' || _questions[i].qtype === 'dropdown') && (!_questions[i].options || _questions[i].options.filter(Boolean).length < 2)) {
       toast('Question ' + (i+1) + ' needs at least 2 options', 'error');
       _selectedIdx = i; renderRail(); renderQuestionPanel(); showTab('question');
       return;
