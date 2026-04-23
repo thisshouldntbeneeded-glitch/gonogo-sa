@@ -301,6 +301,16 @@
 .se-preview-step:last-child{border-bottom:none}
 @media(max-width:1280px){.se-question-shell{grid-template-columns:1fr}.se-flow-row{grid-template-columns:1fr}}
 
+
+.se-rich-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+.se-rich-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;border:1px solid var(--border-primary);background:var(--surface-2);font-size:12px;font-weight:700;color:var(--text-secondary);cursor:pointer}
+.se-rich-btn:hover{border-color:rgba(17,165,81,.3);color:var(--green);background:rgba(17,165,81,.06)}
+.se-embed-box{margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-embed-code{width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--border-primary);border-radius:12px;background:var(--surface-1);font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-primary);resize:vertical}
+.se-embed-grid{display:grid;gap:10px;margin-top:12px}
+.se-embed-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-format-note{font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.45}
+
 </style>
 </head>
 <body>
@@ -426,6 +436,7 @@ function questionDefaults(qtype){
   if(['single_select','multi_select','dropdown'].includes(q.qtype)) q.options = ['Option 1','Option 2','Option 3'];
   if(q.qtype === 'consent') q.options = ['I agree'];
   if(['short_text','long_text','email','phone','name','number','date'].includes(q.qtype)) q.options = [''];
+  q.formatting = { prompt_html:'', help_html:'' };
   return q;
 }
 
@@ -446,6 +457,34 @@ function questionPreviewHTML(){
     return m ? m.name : l.code;
   }).join(', ');
   return '<div class="se-preview-phone"><div class="se-preview-screen"><span class="se-preview-kicker">Step by step preview</span><div style="font-size:18px;font-weight:800;margin-bottom:6px">'+esc(title)+'</div><div style="font-size:12px;color:#64748b;line-height:1.5;margin-bottom:10px">'+esc(copy)+'</div><div style="font-size:11px;color:#0f766e;font-weight:700;margin-bottom:10px">Languages: '+esc(langs || 'None selected')+'</div>'+(_questions.length?_questions.slice(0,5).map(function(q,idx){return '<div class="se-preview-step"><div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">Step '+(idx+1)+'</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">'+esc(q.prompt || qtypeLabel(q.qtype))+'</div><div style="font-size:12px;color:#6b7280">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div></div>';}).join(''):'<div style="font-size:12px;color:#64748b">Add a question block to start the survey flow.</div>')+'</div></div>';
+}
+
+
+function ensureRichTextFields(q){
+  if(!q.formatting) q.formatting = {};
+  if(typeof q.formatting.prompt_html !== 'string') q.formatting.prompt_html = '';
+  if(typeof q.formatting.help_html !== 'string') q.formatting.help_html = '';
+}
+function applyMarkupToField(idx, field, mode){
+  var q = _questions[idx];
+  if(!q) return;
+  ensureRichTextFields(q);
+  var current = q[field] || '';
+  var wrapped = current;
+  if(mode === 'bold') wrapped = '**' + current + '**';
+  if(mode === 'italic') wrapped = '*' + current + '*';
+  if(mode === 'link') wrapped = current ? '[' + current + '](https://example.com)' : '[Link text](https://example.com)';
+  q[field] = wrapped;
+  if(field === 'prompt') q.formatting.prompt_html = wrapped;
+  if(field === 'help_text') q.formatting.help_html = wrapped;
+  markDirty();
+  renderRail();
+  renderQuestionPanel();
+}
+function buildEmbedCode(){
+  var brand = (_survey && (_survey.brand_slug || _survey.brand_id || 'brand')) || 'brand';
+  var surveyId = (_survey && (_survey.id || _survey.survey_id || 'survey-id')) || 'survey-id';
+  return '<div id="gonogo-survey-'+surveyId+'"></div>\n<script src="https://cdn.gonogo.co.za/cx/embed.js" defer></script>\n<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light" });</script>';
 }
 
 var TEMPLATES = {
@@ -780,8 +819,8 @@ function renderQuestionPanel() {
         '<div class="se-flow-editor">' +
           '<div class="se-flow-stack">' +
             '<div><label class="se-label">Question type</label><select class="se-select" data-field="qtype" data-idx="'+i+'">'+QTYPES.map(function(t){ return '<option value="'+t.v+'"'+(q.qtype===t.v?' selected':'')+'>'+esc(t.l)+'</option>'; }).join('')+'</select></div>' +
-            '<div><label class="se-label">Prompt</label><textarea class="se-textarea" data-field="prompt" data-idx="'+i+'" placeholder="Question text">'+esc(q.prompt || '')+'</textarea></div>' +
-            '<div><label class="se-label">Help text</label><textarea class="se-textarea" data-field="help_text" data-idx="'+i+'" placeholder="Optional guidance">'+esc(q.help_text || '')+'</textarea></div>' +
+            '<div><label class="se-label">Prompt</label><div class="se-rich-toolbar"><button type="button" class="se-rich-btn" data-format="bold" data-format-field="prompt" data-idx="'+i+'"><i class="fa-solid fa-bold"></i> Bold</button><button type="button" class="se-rich-btn" data-format="italic" data-format-field="prompt" data-idx="'+i+'"><i class="fa-solid fa-italic"></i> Italic</button><button type="button" class="se-rich-btn" data-format="link" data-format-field="prompt" data-idx="'+i+'"><i class="fa-solid fa-link"></i> Hyperlink</button></div><textarea class="se-textarea" data-field="prompt" data-idx="'+i+'" placeholder="Question text">'+esc(q.prompt || '')+'</textarea><div class="se-format-note">Quick formatting inserts markdown-style text so the runtime survey can render bold, italic and links.</div></div>' +
+            '<div><label class="se-label">Help text</label><div class="se-rich-toolbar"><button type="button" class="se-rich-btn" data-format="bold" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-bold"></i> Bold</button><button type="button" class="se-rich-btn" data-format="italic" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-italic"></i> Italic</button><button type="button" class="se-rich-btn" data-format="link" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-link"></i> Hyperlink</button></div><textarea class="se-textarea" data-field="help_text" data-idx="'+i+'" placeholder="Optional guidance">'+esc(q.help_text || '')+'</textarea></div>' +
             '<div class="se-flow-row"><div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div><div>'+(isTextLike?'<label class="se-label">Placeholder</label><input class="se-input" data-field="placeholder" data-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">':'')+'</div></div>' +
             choiceHtml +
           '</div>' +
@@ -806,6 +845,10 @@ function renderQuestionPanel() {
 
   html += '</div>';
   panel.innerHTML = html;
+  var embedCode = document.getElementById('embed-code');
+  if (embedCode) embedCode.value = buildEmbedCode();
+  var copyEmbed = document.getElementById('copy-embed-code');
+  if (copyEmbed) copyEmbed.addEventListener('click', function(){ if (embedCode) { embedCode.select(); document.execCommand('copy'); copyEmbed.innerHTML = '<i class="fa-solid fa-check"></i> Copied'; setTimeout(function(){ copyEmbed.innerHTML = '<i class="fa-regular fa-copy"></i> Copy code'; }, 1400); } });
 
   panel.querySelectorAll('[data-add-qtype]').forEach(function(el){
     el.addEventListener('click', function(){ addQuestionBlock(el.dataset.addQtype); });
@@ -838,6 +881,10 @@ function renderQuestionPanel() {
         deleteQuestion(idx);
       }
     });
+  });
+
+  panel.querySelectorAll('[data-format]').forEach(function(btn){
+    btn.addEventListener('click', function(){ applyMarkupToField(Number(btn.dataset.idx), btn.dataset.formatField, btn.dataset.format); });
   });
 
   panel.querySelectorAll('[data-field]').forEach(function(input){
