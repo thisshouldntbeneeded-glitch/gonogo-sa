@@ -264,24 +264,27 @@
 .cx-b-active{background:rgba(34,197,94,.18);color:#4ade80}
 .cx-b-paused{background:rgba(234,179,8,.18);color:#fbbf24}
 
-/* Focused question-flow builder upgrade */
-.se-builder-grid{grid-template-columns:320px minmax(0,1fr)}
-.se-library-wrap{display:grid;gap:var(--space-3)}
-.se-library-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.se-library-head .se-rail-title{margin-bottom:0}
-.se-library-copy{font-size:12px;color:var(--text-muted);line-height:1.45}
-.se-library-grid{display:grid;gap:10px}
-.se-library-card{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border-primary);border-radius:14px;background:var(--surface-1);cursor:grab;transition:border-color .16s,background .16s,transform .16s}
-.se-library-card:hover{border-color:rgba(17,165,81,.3);background:rgba(17,165,81,.05);transform:translateY(-1px)}
+/* Question builder rebuild */
+.se-grid.se-builder-grid{grid-template-columns:340px minmax(0,1fr)}
+.se-library-stack{display:grid;gap:var(--space-4)}
+.se-library-panel,.se-launch-panel{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:14px}
+.se-library-copy,.se-launch-copy{font-size:12px;color:var(--text-muted);line-height:1.45;margin-top:6px}
+.se-library-grid{display:grid;gap:10px;margin-top:12px}
+.se-library-card{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border-primary);border-radius:14px;background:var(--surface-2);cursor:grab;transition:border-color .16s,background .16s,transform .16s}
+.se-library-card:hover{border-color:rgba(17,165,81,.28);background:rgba(17,165,81,.05);transform:translateY(-1px)}
 .se-library-icon,.se-flow-icon{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,165,81,.12);color:var(--green);flex-shrink:0}
 .se-library-name{font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
 .se-library-text{font-size:12px;color:var(--text-muted);line-height:1.45}
-.se-flow-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--space-4);align-items:start}
-.se-flow-column,.se-preview-column{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:var(--space-4)}
-.se-preview-column{position:sticky;top:20px}
+.se-launch-grid{display:grid;gap:10px;margin-top:12px}
+.se-lang-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--border-primary);border-radius:12px;background:var(--surface-2)}
+.se-lang-meta strong{display:block;font-size:13px;color:var(--text-primary)}
+.se-lang-meta span{display:block;font-size:11px;color:var(--text-muted);margin-top:2px}
+.se-flow-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:var(--space-4);align-items:start}
+.se-flow-main,.se-flow-preview{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:var(--space-4)}
+.se-flow-preview{position:sticky;top:20px}
 .se-flow-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:var(--space-4)}
-.se-flow-header h2,.se-preview-column h3{margin:0;font-size:16px}
-.se-flow-header p,.se-preview-column p{margin:4px 0 0;font-size:12px;color:var(--text-muted)}
+.se-flow-header h2,.se-flow-preview h3{margin:0;font-size:16px}
+.se-flow-header p,.se-flow-preview p{margin:4px 0 0;font-size:12px;color:var(--text-muted)}
 .se-flow-dropzone{border:1px dashed var(--border-primary);border-radius:16px;background:linear-gradient(180deg,var(--surface-1),var(--surface-2));padding:16px;text-align:center;color:var(--text-muted);font-size:12px;margin-bottom:var(--space-4)}
 .se-flow-dropzone.dragover{border-color:rgba(17,165,81,.35);background:rgba(17,165,81,.06);color:var(--green)}
 .se-flow-list{display:grid;gap:12px}
@@ -298,13 +301,17 @@
 .se-flow-card.active .se-inline-editor{display:block}
 .se-inline-stack{display:grid;gap:12px}
 .se-inline-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.se-phone-shell{border:1px solid var(--border-primary);border-radius:24px;background:#111827;padding:12px}
+.se-choice-list{display:grid;gap:8px}
+.se-choice-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.se-choice-row .se-input{min-width:0}
+.se-choice-add{margin-top:6px}
+.se-phone-shell{border:1px solid var(--border-primary);border-radius:24px;background:#0f172a;padding:12px}
 .se-phone-screen{background:#fff;border-radius:16px;padding:14px;min-height:420px;color:#111827}
 .se-phone-kicker{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eef2f7;font-size:10px;font-weight:700;color:#475569;margin-bottom:10px}
 .se-phone-step{padding:10px 0;border-bottom:1px solid #e5e7eb}
 .se-phone-step:last-child{border-bottom:none}
-@media(max-width:1240px){.se-flow-layout{grid-template-columns:1fr}.se-preview-column{position:static}}
-@media(max-width:980px){.se-builder-grid{grid-template-columns:1fr}.se-inline-row{grid-template-columns:1fr}}
+@media(max-width:1260px){.se-flow-layout{grid-template-columns:1fr}.se-flow-preview{position:static}}
+@media(max-width:980px){.se-grid.se-builder-grid{grid-template-columns:1fr}.se-inline-row{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -326,34 +333,37 @@
 
     <div class="se-grid se-builder-grid">
       <div class="se-rail" id="rail">
-        <div class="se-template-card">
-          <div class="se-rail-title" style="margin-bottom:8px">Survey template</div>
-          <label class="se-label" for="s-template-key">Template selection</label>
-          <select class="se-select" id="s-template-key">
-            <option value="">None</option>
-            <option value="nps_short">Short NPS</option>
-            <option value="csat_quick">Quick CSAT</option>
-            <option value="post_visit">Post-visit feedback</option>
-            <option value="post_purchase">Post-purchase</option>
-            <option value="support_followup">Support follow-up</option>
-          </select>
-          <div class="se-template-actions">
-            <button class="se-btn-primary" id="btn-apply-template" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply template</button>
-            <button class="se-btn-secondary" id="btn-clear-template" type="button"><i class="fa-solid fa-eraser"></i> Clear template</button>
-          </div>
-          <div class="se-template-chip"><i class="fa-solid fa-layer-group"></i> Templates update the question list instantly</div>
-          <div class="se-template-note">Choose a template, apply it, then fine-tune the questions below.</div>
-        </div>
-
-        <div class="se-library-wrap">
-          <div class="se-library-head">
-            <div>
-              <div class="se-rail-title" style="margin-bottom:6px">Question blocks</div>
-              <div class="se-library-copy">Drag or click a block to add it to the survey flow.</div>
+        <div class="se-library-stack">
+          <div class="se-template-card">
+            <div class="se-rail-title" style="margin-bottom:8px">Survey template</div>
+            <label class="se-label" for="s-template-key">Template selection</label>
+            <select class="se-select" id="s-template-key">
+              <option value="">None</option>
+              <option value="nps_short">Short NPS</option>
+              <option value="csat_quick">Quick CSAT</option>
+              <option value="post_visit">Post-visit feedback</option>
+              <option value="post_purchase">Post-purchase</option>
+              <option value="support_followup">Support follow-up</option>
+            </select>
+            <div class="se-template-actions">
+              <button class="se-btn-primary" id="btn-apply-template" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply template</button>
+              <button class="se-btn-secondary" id="btn-clear-template" type="button"><i class="fa-solid fa-eraser"></i> Clear template</button>
             </div>
-            <button class="se-btn-secondary" id="btn-add-q" type="button"><i class="fa-solid fa-plus"></i> Add</button>
+            <div class="se-template-chip"><i class="fa-solid fa-layer-group"></i> Templates update the question list instantly</div>
+            <div class="se-template-note">Choose a template, apply it, then fine-tune the questions below.</div>
           </div>
-          <div id="q-library" class="se-library-grid"></div>
+
+          <div class="se-library-panel">
+            <div class="se-rail-title">Question blocks</div>
+            <div class="se-library-copy">Drag or click a block to add it to the survey flow.</div>
+            <div id="q-library" class="se-library-grid"></div>
+          </div>
+
+          <div class="se-launch-panel">
+            <div class="se-rail-title">Launch languages</div>
+            <div class="se-launch-copy">Go live in South Africa with first-class language coverage from day one.</div>
+            <div class="se-launch-grid" id="launch-language-grid"></div>
+          </div>
         </div>
       </div>
 
@@ -417,9 +427,37 @@ var QTYPES = [
 ];
 
 
+var SA_LANGUAGES = [
+  { code:'en-ZA', name:'English', native:'English', enabled:true },
+  { code:'af-ZA', name:'Afrikaans', native:'Afrikaans', enabled:true },
+  { code:'zu-ZA', name:'Zulu', native:'isiZulu', enabled:true },
+  { code:'xh-ZA', name:'Xhosa', native:'isiXhosa', enabled:true }
+];
+
+function ensureSurveyMeta(){
+  if(!_survey) _survey = {};
+  if(!_survey.languages || !Array.isArray(_survey.languages) || !_survey.languages.length){
+    _survey.languages = SA_LANGUAGES.map(function(l){ return { code:l.code, enabled:l.enabled }; });
+  }
+}
+
+function defaultQuestionForType(qtype){
+  var base = { qtype:qtype || 'short_text', prompt:'', help_text:'', required:false, options:[], logic:[] };
+  if(qtype === 'single_select' || qtype === 'multi_select' || qtype === 'dropdown') base.options = ['Option 1','Option 2','Option 3'];
+  if(qtype === 'consent') base.options = ['I agree'];
+  if(qtype === 'short_text') base.options = ['Type your answer'];
+  if(qtype === 'long_text') base.options = ['Share more detail'];
+  if(qtype === 'email') base.options = ['name@example.com'];
+  if(qtype === 'phone') base.options = ['e.g. 082 000 0000'];
+  if(qtype === 'name') base.options = ['Your name'];
+  if(qtype === 'number') base.options = ['0'];
+  if(qtype === 'date') base.options = [''];
+  return base;
+}
+
 function renderQuestionLibrary(){
   var el = document.getElementById('q-library');
-  if (!el) return;
+  if(!el) return;
   el.innerHTML = QTYPES.map(function(t){
     return '<div class="se-library-card" draggable="true" data-qtype="'+t.v+'">' +
       '<span class="se-library-icon"><i class="fa-solid '+t.icon+'"></i></span>' +
@@ -427,14 +465,61 @@ function renderQuestionLibrary(){
     '</div>';
   }).join('');
   el.querySelectorAll('[data-qtype]').forEach(function(card){
-    card.addEventListener('click', function(){ addQuestion(card.dataset.qtype); });
+    card.addEventListener('click', function(){ addQuestionFromLibrary(card.dataset.qtype); });
     card.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', card.dataset.qtype); });
   });
 }
+
+function renderLaunchLanguages(){
+  ensureSurveyMeta();
+  var el = document.getElementById('launch-language-grid');
+  if(!el) return;
+  el.innerHTML = SA_LANGUAGES.map(function(lang){
+    var current = (_survey.languages || []).find(function(l){ return l.code === lang.code; }) || { enabled:false };
+    return '<label class="se-lang-row">' +
+      '<span class="se-lang-meta"><strong>'+esc(lang.name)+'</strong><span>'+esc(lang.native)+' · '+esc(lang.code)+'</span></span>' +
+      '<input type="checkbox" data-lang-code="'+lang.code+'" '+(current.enabled ? 'checked' : '')+' />' +
+    '</label>';
+  }).join('');
+  el.querySelectorAll('[data-lang-code]').forEach(function(input){
+    input.addEventListener('change', function(){
+      ensureSurveyMeta();
+      _survey.languages = SA_LANGUAGES.map(function(lang){
+        var existing = (_survey.languages || []).find(function(l){ return l.code === lang.code; });
+        var checked = lang.code === input.dataset.langCode ? !!input.checked : !!(existing && existing.enabled);
+        return { code:lang.code, enabled:checked };
+      });
+      markDirty();
+      renderQuestionPanel();
+    });
+  });
+}
+
+function addQuestionFromLibrary(qtype){
+  addQuestion(qtype);
+  renderQuestionLibrary();
+}
+
 function phonePreviewHTML(){
+  ensureSurveyMeta();
   var title = (_survey && (_survey.intro_title || _survey.name)) || 'Survey preview';
   var copy = (_survey && _survey.intro_text) || 'This is how the current survey flow will feel to a respondent.';
-  return '<div class="se-phone-shell"><div class="se-phone-screen"><span class="se-phone-kicker">Step by step preview</span><div style="font-size:18px;font-weight:800;margin-bottom:6px">'+esc(title)+'</div><div style="font-size:12px;color:#64748b;line-height:1.5;margin-bottom:12px">'+esc(copy)+'</div>' + (_questions.length ? _questions.slice(0,5).map(function(q, idx){ return '<div class="se-phone-step"><div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">Step '+(idx+1)+'</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">'+esc(q.prompt || qtypeLabel(q.qtype))+'</div><div style="font-size:12px;color:#6b7280">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div></div>'; }).join('') : '<div style="font-size:12px;color:#64748b">Add a question block to start the flow.</div>') + '</div></div>';
+  var enabled = (_survey.languages || []).filter(function(l){ return l.enabled; }).map(function(l){
+    var meta = SA_LANGUAGES.find(function(x){ return x.code === l.code; });
+    return meta ? meta.name : l.code;
+  });
+  var langText = enabled.length ? enabled.join(', ') : 'No languages selected';
+  return '<div class="se-phone-shell"><div class="se-phone-screen"><span class="se-phone-kicker">Step by step preview</span><div style="font-size:18px;font-weight:800;margin-bottom:6px">'+esc(title)+'</div><div style="font-size:12px;color:#64748b;line-height:1.5;margin-bottom:10px">'+esc(copy)+'</div><div style="font-size:11px;color:#0f766e;font-weight:700;margin-bottom:10px">Launch languages: '+esc(langText)+'</div>' + (_questions.length ? _questions.slice(0,5).map(function(q, idx){ return '<div class="se-phone-step"><div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">Step '+(idx+1)+'</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">'+esc(q.prompt || qtypeLabel(q.qtype))+'</div><div style="font-size:12px;color:#6b7280">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div></div>'; }).join('') : '<div style="font-size:12px;color:#64748b">Add a question block to start the flow.</div>') + '</div></div>';
+}
+
+function choiceRowsHTML(options, idx){
+  var rows = (options && options.length ? options : ['Option 1']).map(function(opt, optIdx){
+    return '<div class="se-choice-row">' +
+      '<input class="se-input" data-choice-input="'+idx+'" data-choice-index="'+optIdx+'" value="'+esc(opt || '')+'" placeholder="Choice label" />' +
+      '<button type="button" class="se-flow-btn" data-choice-remove="'+idx+'" data-choice-index="'+optIdx+'"><i class="fa-solid fa-trash"></i></button>' +
+    '</div>';
+  }).join('');
+  return '<div class="se-choice-list">'+rows+'</div><div class="se-choice-add"><button type="button" class="se-flow-btn" data-choice-add="'+idx+'"><i class="fa-solid fa-plus"></i> Add choice</button></div>';
 }
 
 var TEMPLATES = {
@@ -514,6 +599,9 @@ async function init() {
       document.getElementById('title-text').textContent = 'Edit: ' + (_survey.name || 'Survey');
       document.getElementById('tab-links').style.display = '';
       populateSettings();
+      ensureSurveyMeta();
+      renderQuestionLibrary();
+      renderLaunchLanguages();
       updateStatusUI();
       renderLinks();
     } catch(e) {
@@ -526,7 +614,6 @@ async function init() {
   }
 
   if (_questions.length > 0) _selectedIdx = 0;
-  renderQuestionLibrary();
   renderRail();
   renderQuestionPanel();
 }
@@ -618,14 +705,7 @@ function wireQtypePicker(root) {
 }
 
 function addQuestion(qtype) {
-  _questions.push({
-    qtype:qtype || 'short_text',
-    prompt:'',
-    help_text:'',
-    required:false,
-    options:[],
-    logic:[]
-  });
+  _questions.push(defaultQuestionForType(qtype));
   _selectedIdx = _questions.length - 1;
   markDirty();
   renderRail();
@@ -675,6 +755,8 @@ function renderRail() {
       if (e.target.closest('.del-btn')) return;
       _selectedIdx = parseInt(el.dataset.idx, 10);
       renderRail();
+      renderQuestionLibrary();
+      renderLaunchLanguages();
       renderQuestionPanel();
       showTab('question');
     });
@@ -718,6 +800,8 @@ function wireRailDragDrop(list) {
       else if (dragIdx > _selectedIdx && toIdx <= _selectedIdx) _selectedIdx++;
       markDirty();
       renderRail();
+      renderQuestionLibrary();
+      renderLaunchLanguages();
       renderQuestionPanel();
     });
   });
@@ -726,11 +810,12 @@ function wireRailDragDrop(list) {
 function renderQuestionPanel() {
   var panel = document.getElementById('panel-question');
   if (!panel) return;
+  ensureSurveyMeta();
 
   var html = '';
   html += '<div class="se-flow-layout">';
-  html += '<div class="se-flow-column">';
-  html += '<div class="se-flow-header"><div><h2>Survey flow</h2><p>Build the question journey in the middle, with inline editing inside each question card.</p></div></div>';
+  html += '<div class="se-flow-main">';
+  html += '<div class="se-flow-header"><div><h2>Survey flow</h2><p>Build the question journey in the middle, edit inside each card, and keep the preview visible.</p></div></div>';
   html += '<div class="se-flow-dropzone" id="flow-dropzone"><i class="fa-solid fa-arrow-down"></i> Drop a question block here to add it to the survey flow</div>';
   html += '<div class="se-flow-list">';
 
@@ -769,7 +854,7 @@ function renderQuestionPanel() {
               '<div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div>' +
               '<div>' + (isTextLike ? '<label class="se-label">Placeholder text</label><input class="se-input" data-field="placeholder" data-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">' : '') + '</div>' +
             '</div>' +
-            (isSelect ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('\n'))+'</textarea></div>' : '') +
+            (isSelect ? '<div><label class="se-label">Choices</label>'+choiceRowsHTML(q.options || [], i)+'</div>' : '') +
           '</div>' +
         '</div>' +
       '</div>';
@@ -778,7 +863,7 @@ function renderQuestionPanel() {
 
   html += '</div>';
   html += '</div>';
-  html += '<aside class="se-preview-column"><h3>Live preview</h3><p>The preview stays visible while you build the flow.</p>'+phonePreviewHTML()+'</aside>';
+  html += '<aside class="se-flow-preview"><h3>Live preview</h3><p>The preview stays visible while you build the flow.</p>'+phonePreviewHTML()+'</aside>';
   html += '</div>';
 
   panel.innerHTML = html;
@@ -787,7 +872,7 @@ function renderQuestionPanel() {
   if (drop) {
     ['dragenter','dragover'].forEach(function(evt){ drop.addEventListener(evt, function(e){ e.preventDefault(); drop.classList.add('dragover'); }); });
     ['dragleave','drop'].forEach(function(evt){ drop.addEventListener(evt, function(e){ e.preventDefault(); drop.classList.remove('dragover'); }); });
-    drop.addEventListener('drop', function(e){ var qtype = e.dataTransfer.getData('text/plain'); if (qtype) addQuestion(qtype); });
+    drop.addEventListener('drop', function(e){ var qtype = e.dataTransfer.getData('text/plain'); if (qtype) addQuestionFromLibrary(qtype); });
   }
 
   panel.querySelectorAll('.se-flow-card').forEach(function(card){
@@ -808,6 +893,7 @@ function renderQuestionPanel() {
         _selectedIdx = idx + 1;
         markDirty();
         renderRail();
+        renderQuestionLibrary();
         renderQuestionPanel();
       } else if (btn.dataset.act === 'del') {
         deleteQuestion(idx);
@@ -821,9 +907,48 @@ function renderQuestionPanel() {
       var q = _questions[idx];
       if (!q) return;
       if (input.dataset.field === 'required') q.required = !!input.checked;
-      else if (input.dataset.field === 'options_text') q.options = input.value.split(/\r?\n+/).map(function(v){ return v.trim(); }).filter(Boolean);
       else if (input.dataset.field === 'placeholder') q.options = [input.value || ''];
-      else q[input.dataset.field] = input.value;
+      else if (input.dataset.field === 'qtype') {
+        var next = defaultQuestionForType(input.value);
+        q.qtype = next.qtype;
+        if (!q.options || !q.options.length) q.options = next.options;
+      } else q[input.dataset.field] = input.value;
+      markDirty();
+      renderRail();
+      renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-choice-add]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var idx = Number(btn.dataset.choiceAdd);
+      _questions[idx].options = _questions[idx].options || [];
+      _questions[idx].options.push('New choice');
+      markDirty();
+      renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-choice-remove]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var idx = Number(btn.dataset.choiceRemove);
+      var optIdx = Number(btn.dataset.choiceIndex);
+      _questions[idx].options = (_questions[idx].options || []).filter(function(_, i){ return i !== optIdx; });
+      if (!_questions[idx].options.length) _questions[idx].options = ['Option 1'];
+      markDirty();
+      renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-choice-input]').forEach(function(input){
+    input.addEventListener('input', function(e){
+      e.stopPropagation();
+      var idx = Number(input.dataset.choiceInput);
+      var optIdx = Number(input.dataset.choiceIndex);
+      _questions[idx].options = _questions[idx].options || [];
+      _questions[idx].options[optIdx] = input.value;
       markDirty();
       renderRail();
       renderQuestionPanel();
@@ -1231,6 +1356,8 @@ async function save() {
       toast('Question ' + (i + 1) + ' needs a prompt', 'error');
       _selectedIdx = i;
       renderRail();
+      renderQuestionLibrary();
+      renderLaunchLanguages();
       renderQuestionPanel();
       showTab('question');
       return;
@@ -1243,6 +1370,8 @@ async function save() {
       toast('Question ' + (i + 1) + ' needs at least 2 options', 'error');
       _selectedIdx = i;
       renderRail();
+      renderQuestionLibrary();
+      renderLaunchLanguages();
       renderQuestionPanel();
       showTab('question');
       return;
