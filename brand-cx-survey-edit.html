@@ -769,8 +769,7 @@ function renderQuestionPanel() {
               '<div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div>' +
               '<div>' + (isTextLike ? '<label class="se-label">Placeholder text</label><input class="se-input" data-field="placeholder" data-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">' : '') + '</div>' +
             '</div>' +
-            (isSelect ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('
-'))+'</textarea></div>' : '') +
+            (isSelect ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('\n'))+'</textarea></div>' : '') +
           '</div>' +
         '</div>' +
       '</div>';
