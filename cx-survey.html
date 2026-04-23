@@ -125,6 +125,42 @@
   body.party-mode .s-affirm { color: #a7f3d0; }
   body.party-mode .s-foot { color: rgba(255,255,255,.6); }
 
+
+  .s-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(17,165,81,.08);color:var(--s-primary);font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;margin-bottom:14px}
+  .s-party-wrap{display:grid;gap:16px}
+  .s-party-hero{display:grid;gap:14px}
+  .s-party-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .s-stats{display:flex;gap:10px;flex-wrap:wrap}
+  .s-stat-pill{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.12)}
+  .s-party-stage{position:relative;min-height:420px;perspective:1200px}
+  .s-swipe-card{position:relative;overflow:hidden;border-radius:30px;padding:26px 22px 18px;background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(0,0,0,.28)}
+  .s-swipe-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top left, rgba(34,197,94,.18), transparent 34%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%), radial-gradient(circle at bottom, rgba(245,158,11,.12), transparent 30%);pointer-events:none}
+  .s-swipe-deck{position:relative;min-height:360px}
+  .s-swipe-shadow{position:absolute;inset:16px 14px -6px 14px;border-radius:28px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);transform:scale(.97) translateY(10px)}
+  .s-swipe-inner{position:relative;z-index:2;touch-action:pan-y;user-select:none;transition:transform .18s ease, opacity .18s ease;cursor:grab}
+  .s-swipe-inner.dragging{transition:none;cursor:grabbing}
+  .s-party-icon{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;font-size:28px;border:1px solid rgba(255,255,255,.15);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .s-party-prompt{font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.02em;color:#fff;margin:0}
+  .s-party-help{font-size:15px;line-height:1.55;color:rgba(255,255,255,.82);margin:0}
+  .s-swipe-hint{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;color:rgba(255,255,255,.72);font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+  .s-swipe-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12)}
+  .s-party-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .s-party-choice{appearance:none;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;padding:14px 14px;border-radius:18px;font-size:14px;font-weight:800;min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .s-party-choice.is-pos{box-shadow:inset 0 0 0 1px rgba(74,222,128,.16)}
+  .s-party-choice.is-neg{box-shadow:inset 0 0 0 1px rgba(248,113,113,.16)}
+  .s-party-choice:active{transform:scale(.98)}
+  .s-party-energy{height:10px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+  .s-party-energy > span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#a855f7,#f59e0b);border-radius:999px;transition:width .28s ease}
+  .s-party-copy{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .s-party-copy small{color:rgba(255,255,255,.75);font-size:12px;font-weight:700}
+  .s-cheer{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-weight:700}
+  .s-party-sparkles{display:flex;gap:8px;flex-wrap:wrap}
+  .s-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.03em}
+  .s-party-final{display:grid;gap:14px;text-align:center}
+  .s-party-final h2{margin:0;color:#fff;font-size:30px;letter-spacing:-.02em}
+  .s-party-final p{margin:0;color:rgba(255,255,255,.8);font-size:15px;line-height:1.55}
+  @media (max-width:640px){.s-swipe-card{padding:22px 18px 16px}.s-party-prompt{font-size:24px}.s-party-choices{grid-template-columns:1fr}.s-party-stage{min-height:390px}}
+
   *:focus-visible { outline: 2px solid var(--s-primary); outline-offset: 2px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -148,6 +184,26 @@ var state = {
 
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
+function isPartyQuickQuestion(q){
+  return ['yes_no','single_select','multi_select','rating_1_5','star_rating','csat_smiley','nps_0_10','consent'].indexOf(q.qtype) !== -1;
+}
+function partyIconForQuestion(q){
+  var map = { yes_no:'🎯', single_select:'🎉', multi_select:'✨', rating_1_5:'⭐', star_rating:'🌟', csat_smiley:'😎', nps_0_10:'🚀', consent:'🙌' };
+  return map[q.qtype] || '🎈';
+}
+function haptic(ms){ try { if (navigator.vibrate) navigator.vibrate(ms || 16); } catch(e){} }
+function partyCheer(){
+  var cheers = ['Nice one ✨','You are flying 🚀','Looking good 🔥','That was smooth 😎','Love the energy 🎉','Quick and easy 🙌'];
+  return cheers[(state.streak || 0) % cheers.length];
+}
+function partyEnergy(total){
+  if (!total) return 8;
+  return Math.max(8, Math.min(100, Math.round(((state.currentIdx + 1) / total) * 100)));
+}
+function canUsePartyMode(){
+  return state.questions.every(function(q){ return isPartyQuickQuestion(q); });
+}
+
 async function load() {
   if (!token) { showError('Missing survey token.'); return; }
   try {
@@ -155,7 +211,7 @@ async function load() {
     if (!res || !res.ok) { showError((res && res.error) || 'Survey not available.'); return; }
     state.survey = res.survey;
     state.questions = res.questions || [];
-    state.mode = res.survey && res.survey.party_mode_default ? 'party' : 'classic';
+    state.mode = (res.survey && res.survey.party_mode_default && canUsePartyMode()) ? 'party' : 'classic';
     applyModeClass();
     render();
   } catch(e) {
@@ -176,7 +232,7 @@ function render() {
   var total = state.questions.length;
   if (state.currentIdx === -1) { renderIntro(); return; }
   if (state.currentIdx >= total) return; // should have submitted
-  renderQuestion();
+  if (state.mode === 'party' && isPartyQuickQuestion(state.questions[state.currentIdx])) renderPartyQuestion(); else renderQuestion();
 }
 
 function renderBrandHeader() {
@@ -184,10 +240,10 @@ function renderBrandHeader() {
   var logo = s.brand_logo_url ? '<img src="' + esc(s.brand_logo_url) + '" alt="Brand logo">' : '';
   var brandLine = logo || '<span class="s-brand-name">' + esc(s.brand_display_name || s.brand_slug || 'GoNoGo') + '</span>';
   var streak = (state.mode === 'party' && state.streak > 0) ? '<span class="s-streak">🔥 ' + state.streak + '</span>' : '';
-  var toggle = '<div class="s-mode-toggle">' +
+  var toggle = canUsePartyMode() ? ('<div class="s-mode-toggle">' +
     '<button type="button" class="s-mode-btn' + (state.mode === 'classic' ? ' active' : '') + '" data-mode="classic">Classic</button>' +
     '<button type="button" class="s-mode-btn' + (state.mode === 'party' ? ' active' : '') + '" data-mode="party">Party</button>' +
-    '</div>';
+    '</div>') : ''; 
   return '<div class="s-top"><div class="s-brand">' + brandLine + '</div><div style="display:flex;gap:10px;align-items:center">' + streak + toggle + '</div></div>';
 }
 
@@ -199,7 +255,8 @@ function renderIntro() {
   if (s.intro_title) html += '<h1 class="s-intro-title">' + esc(s.intro_title) + '</h1>';
   if (s.intro_text) html += '<p class="s-intro-text">' + esc(s.intro_text) + '</p>';
   if (!s.intro_title && !s.intro_text) html += '<h1 class="s-intro-title">Share your feedback</h1><p class="s-intro-text">A few quick questions — your answers go straight to the brand.</p>';
-  html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">Start</button>';
+  if (state.mode === 'party') html += '<div class="s-kicker">🎉 Swipe-first party mode</div><p class="s-intro-text">Fast taps, swipe cards, streaks, haptics, and a more playful experience.</p>';
+  html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">' + (state.mode === 'party' ? 'Let's go' : 'Start') + '</button>'; 
   html += '</div>';
   html += '<div class="s-foot">Powered by GoNoGo</div>';
   html += '</div>';
@@ -251,10 +308,97 @@ function renderQuestion() {
   };
 }
 
+
+function renderPartyQuestion() {
+  var q = state.questions[state.currentIdx];
+  var total = state.questions.length;
+  var pct = Math.round(((state.currentIdx) / total) * 100);
+  var html = '<div class="s-shell">';
+  html += renderBrandHeader();
+  html += '<div class="s-party-wrap">';
+  html += '<div class="s-party-meta"><div class="s-kicker">'+partyIconForQuestion(q)+' Quick swipe question</div><div class="s-stats"><span class="s-stat-pill">Question '+(state.currentIdx + 1)+' / '+total+'</span>' + (state.streak ? '<span class="s-stat-pill">🔥 Streak '+state.streak+'</span>' : '<span class="s-stat-pill">🎮 Keep the streak going</span>') + '</div></div>';
+  html += '<div class="s-party-copy"><small>Party energy</small><small>'+partyEnergy(total)+'%</small></div><div class="s-party-energy"><span style="width:'+partyEnergy(total)+'%"></span></div>';
+  html += '<div class="s-party-stage"><div class="s-swipe-card"><div class="s-swipe-deck"><div class="s-swipe-shadow"></div><div class="s-swipe-inner" id="party-swipe-card">';
+  html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt">'+esc(q.prompt)+'</h2>' + (q.help_text ? '<p class="s-party-help">'+esc(q.help_text)+'</p>' : '<p class="s-party-help">Go with your instinct. Quick answers keep the vibe alive.</p>') + '</div>';
+  html += '<div id="q-answer">'+renderPartyInput(q, state.currentIdx)+'</div>';
+  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">⬅️ Quick no / lower</span><span class="s-swipe-pill">➡️ Quick yes / higher</span></div>';
+  html += '</div></div></div></div>';
+  html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
+  html += '<div class="s-error" id="q-error"></div>';
+  html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
+  html += '</div><div class="s-foot">Powered by GoNoGo</div></div>';
+  document.getElementById('root').innerHTML = html;
+  wirePartyQuestion(q, state.currentIdx);
+  bindModeToggle();
+  document.getElementById('btn-prev').onclick = function(){ if (state.currentIdx > 0) { state.currentIdx--; render(); } };
+  document.getElementById('btn-next').onclick = async function(){ if (!validateCurrent(q)) return; if (state.currentIdx === total - 1) { await submit(); return; } celebrateStep(); state.currentIdx++; render(); };
+}
+function renderPartyInput(q, idx){
+  var val = state.values[q.id];
+  if (q.qtype === 'yes_no') {
+    return '<div class="s-party-choices"><button type="button" class="s-party-choice is-neg" data-party-val="No">👎 No</button><button type="button" class="s-party-choice is-pos" data-party-val="Yes">👍 Yes</button></div>';
+  }
+  if (q.qtype === 'single_select' || q.qtype === 'consent') {
+    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0, 6);
+    return '<div class="s-party-sparkles">' + opts.map(function(o){ return '<button type="button" class="s-badge" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div><div class="s-party-choices">' + opts.slice(0,2).map(function(o, i){ return '<button type="button" class="s-party-choice '+(i===0?'is-neg':'is-pos')+'" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div>';
+  }
+  if (q.qtype === 'multi_select') {
+    var sel = Array.isArray(val) ? val : [];
+    return '<div class="s-choice-grid">' + (q.options || []).map(function(o){ var on = sel.indexOf(o)!==-1; return '<button type="button" class="s-choice left-align'+(on?' active':'')+'" data-val="'+esc(o)+'">'+(on?'✅ ':'⬜ ')+esc(o)+'</button>'; }).join('') + '</div>';
+  }
+  if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
+    var faces = q.qtype === 'csat_smiley' ? ['😠','😕','😐','🙂','😍'] : ['1','2','3','4','5'];
+    return '<div class="s-party-choices">' + faces.map(function(label, i){ var n=i+1; return '<button type="button" class="s-party-choice '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div>';
+  }
+  if (q.qtype === 'nps_0_10') {
+    return '<div class="s-party-help">Swipe right for stronger advocacy, left for lower likelihood, or tap a score below.</div><div class="s-choice-grid cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-choice'+(((state.values[q.id]&&state.values[q.id].value_number)===i)?' active':'')+'" data-val="'+i+'">'+i+'</button>'; }).join('') + '</div>';
+  }
+  return renderInput(q, idx);
+}
+function wirePartyQuestion(q, idx){
+  var card = document.getElementById('party-swipe-card');
+  var startX = 0, currentX = 0, dragging = false;
+  function setTransform(x){ if(card){ card.style.transform = 'translateX('+x+'px) rotate('+(x/18)+'deg)'; card.style.opacity = String(Math.max(.72, 1 - Math.abs(x)/260)); } }
+  function handleQuick(direction){
+    var value = null;
+    if (q.qtype === 'yes_no') value = direction === 'right' ? 'Yes' : 'No';
+    else if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') value = direction === 'right' ? 5 : 2;
+    else if (q.qtype === 'nps_0_10') value = direction === 'right' ? 10 : 6;
+    else if (q.qtype === 'single_select' || q.qtype === 'consent') {
+      var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
+      value = direction === 'right' ? opts[Math.min(1, opts.length-1)] : opts[0];
+    }
+    if (value == null) return;
+    if (typeof value === 'number') state.values[q.id] = { value_number:value }; else state.values[q.id] = { value_text:value };
+    haptic(direction === 'right' ? 22 : 14);
+    celebrateStep(direction === 'right');
+    if (card) {
+      card.style.transition = 'transform .18s ease, opacity .18s ease';
+      setTransform(direction === 'right' ? 220 : -220);
+      setTimeout(function(){ if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }, 170);
+    }
+  }
+  if (card && (q.qtype === 'yes_no' || q.qtype === 'single_select' || q.qtype === 'consent' || q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley' || q.qtype === 'nps_0_10')) {
+    card.addEventListener('pointerdown', function(e){ dragging = true; startX = e.clientX; currentX = 0; card.classList.add('dragging'); });
+    window.addEventListener('pointermove', function(e){ if(!dragging) return; currentX = e.clientX - startX; setTransform(currentX); });
+    window.addEventListener('pointerup', function(){ if(!dragging) return; dragging = false; card.classList.remove('dragging'); if (currentX > 90) return handleQuick('right'); if (currentX < -90) return handleQuick('left'); card.style.transition = 'transform .18s ease, opacity .18s ease'; setTransform(0); setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } }, 180); });
+  }
+  document.querySelectorAll('[data-party-val]').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-party-val'); var n = parseInt(raw,10); if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(18); celebrateStep(true); if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }); });
+  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-val'); if (q.qtype === 'multi_select') { var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : []; var i = curr.indexOf(raw); if (i === -1) curr.push(raw); else curr.splice(i, 1); state.values[q.id] = curr; haptic(10); rerenderPartyAnswer(q, idx); } else { var n = parseInt(raw,10); if (!isNaN(n) && String(n)===raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(16); celebrateStep(true); if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } } }); });
+}
+function rerenderPartyAnswer(q, idx){
+  var wrap = document.getElementById('q-answer');
+  if (!wrap) return;
+  wrap.innerHTML = renderPartyInput(q, idx);
+  wirePartyQuestion(q, idx);
+}
+
 function bindModeToggle() {
   document.querySelectorAll('[data-mode]').forEach(function(btn){
     btn.addEventListener('click', function(){
-      state.mode = btn.getAttribute('data-mode');
+      var nextMode = btn.getAttribute('data-mode');
+      if (nextMode === 'party' && !canUsePartyMode()) return;
+      state.mode = nextMode;
       render();
     });
   });
@@ -435,7 +579,7 @@ function validateCurrent(q) {
   return true;
 }
 
-function celebrateStep() {
+function celebrateStep(successBias) {
   state.streak += 1;
   if (navigator.vibrate) navigator.vibrate(15);
   if (state.mode === 'party' && window.confetti) {
