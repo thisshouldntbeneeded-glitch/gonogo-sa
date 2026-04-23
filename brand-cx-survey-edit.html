@@ -311,6 +311,15 @@
 .se-embed-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
 .se-format-note{font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.45}
 
+
+.se-logic-box{margin-top:12px;padding:12px;border:1px solid var(--border-primary);border-radius:14px;background:var(--surface-1)}
+.se-logic-list{display:grid;gap:10px}
+.se-logic-row{display:grid;grid-template-columns:1.1fr .9fr .9fr auto;gap:8px;align-items:end;padding:10px;border:1px solid var(--border-primary);border-radius:12px;background:var(--surface-2)}
+.se-logic-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.se-dist-mode-grid{display:grid;gap:10px;margin-top:12px}
+.se-dist-mode-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-inline-note{font-size:11px;color:var(--text-muted);line-height:1.45;margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -482,11 +491,56 @@ function applyMarkupToField(idx, field, mode){
   renderQuestionPanel();
 }
 function buildEmbedCode(){
+  ensureDistributionDefaults();
   var brand = (_survey && (_survey.brand_slug || _survey.brand_id || 'brand')) || 'brand';
   var surveyId = (_survey && (_survey.id || _survey.survey_id || 'survey-id')) || 'survey-id';
-  return '<div id="gonogo-survey-'+surveyId+'"></div>' + '\n' + '<script src="https://cdn.gonogo.co.za/cx/embed.js" defer><\/script>' + '\n' + '<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light" });<\/script>';
+  var mode = _survey.embed_mode || 'inline';
+  var position = _survey.intercept_position || 'bottom-right';
+  var trigger = _survey.intercept_trigger || 'always';
+  var label = _survey.feedback_button_label || 'Give feedback';
+  return '<div id="gonogo-survey-'+surveyId+'"></div>' + '
+' + '<script src="https://cdn.gonogo.co.za/cx/embed.js" defer><\/script>' + '
+' + '<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light", mode: "'+mode+'", buttonLabel: "'+label.replace(/"/g,'\"')+'", position: "'+position+'", trigger: "'+trigger+'" });<\/script>';
 }
 
+
+
+
+function ensureLogicArray(q){ if(!Array.isArray(q.logic)) q.logic = []; }
+function updateQuestionFieldLive(idx, field, value){
+  var q = _questions[idx]; if(!q) return;
+  ensureRichTextFields(q); ensureLogicArray(q);
+  if(field === 'placeholder') q.options = [value || ''];
+  else if(field === 'required') q.required = !!value;
+  else q[field] = value;
+  if(field === 'prompt') q.formatting.prompt_html = q.prompt || '';
+  if(field === 'help_text') q.formatting.help_html = q.help_text || '';
+  markDirty();
+  renderRail();
+  var titleEl = document.querySelector('.se-flow-card[data-idx="'+idx+'"] .se-flow-title');
+  if(titleEl) titleEl.textContent = q.prompt || 'Untitled question';
+  var copyEl = document.querySelector('.se-flow-card[data-idx="'+idx+'"] .se-flow-copy');
+  if(copyEl) copyEl.textContent = q.help_text || qtypeLabel(q.qtype);
+  var previewWrap = document.querySelector('.se-question-column .se-preview-phone');
+  if(previewWrap) previewWrap.outerHTML = questionPreviewHTML();
+}
+function ensureDistributionDefaults(){
+  if(!_survey) _survey = {};
+  if(!_survey.embed_mode) _survey.embed_mode = 'inline';
+  if(!_survey.intercept_position) _survey.intercept_position = 'bottom-right';
+  if(!_survey.intercept_trigger) _survey.intercept_trigger = 'always';
+  if(!_survey.feedback_button_label) _survey.feedback_button_label = 'Give feedback';
+}
+function buildLogicRowHTML(q, idx, rule, ridx){
+  ensureLogicArray(q);
+  var targetOptions = '<option value="end"'+((rule.action_target||'')==='end'?' selected':'')+'>End survey</option>' + _questions.map(function(item, qIdx){ return '<option value="'+qIdx+'"'+(String(rule.action_target)===String(qIdx)?' selected':'')+'>Go to question '+(qIdx+1)+'</option>'; }).join('');
+  return '<div class="se-logic-row">'
+    + '<div><label class="se-label">Operator</label><select class="se-select" data-logic-field="operator" data-idx="'+idx+'" data-rule-idx="'+ridx+'"><option value="equals"'+(rule.operator==='equals'?' selected':'')+'>Equals</option><option value="not_equals"'+(rule.operator==='not_equals'?' selected':'')+'>Does not equal</option><option value="contains"'+(rule.operator==='contains'?' selected':'')+'>Contains</option><option value="gt"'+(rule.operator==='gt'?' selected':'')+'>Greater than</option><option value="lt"'+(rule.operator==='lt'?' selected':'')+'>Less than</option><option value="answered"'+(rule.operator==='answered'?' selected':'')+'>Answered</option><option value="not_answered"'+(rule.operator==='not_answered'?' selected':'')+'>Not answered</option></select></div>'
+    + '<div><label class="se-label">Value</label><input class="se-input" data-logic-field="value" data-idx="'+idx+'" data-rule-idx="'+ridx+'" value="'+esc(rule.value || '')+'" placeholder="Condition value"></div>'
+    + '<div><label class="se-label">Action</label><select class="se-select" data-logic-field="action_target" data-idx="'+idx+'" data-rule-idx="'+ridx+'">'+targetOptions+'</select></div>'
+    + '<div><button type="button" class="se-flow-btn" data-logic-remove="'+idx+'" data-rule-idx="'+ridx+'"><i class="fa-solid fa-trash"></i></button></div>'
+    + '</div>';
+}
 
 var TEMPLATES = {
   nps_short: {
@@ -814,7 +868,7 @@ function renderQuestionPanel() {
             '<div class="se-flow-title">'+esc(q.prompt || 'Untitled question')+'</div>' +
             '<div class="se-flow-copy">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div>' +
             '<div class="se-q-meta"><span class="se-q-pill">'+esc(qtypeLabel(q.qtype))+'</span>'+(q.required?'<span class="se-q-pill">Required</span>':'')+'</div>' +
-            '<div class="se-flow-actions"><button type="button" class="se-flow-btn" data-act="dup" data-idx="'+i+'"><i class="fa-solid fa-copy"></i> Duplicate</button><button type="button" class="se-flow-btn" data-act="del" data-idx="'+i+'"><i class="fa-solid fa-trash"></i> Delete</button></div>' +
+            '<div class="se-flow-actions"><button type="button" class="se-flow-btn" data-act="dup" data-idx="'+i+'"><i class="fa-solid fa-copy"></i> Duplicate</button><button type="button" class="se-flow-btn" data-act="logic" data-idx="'+i+'"><i class="fa-solid fa-diagram-project"></i> Logic'+((q.logic&&q.logic.length)?' ('+q.logic.length+')':'')+'</button><button type="button" class="se-flow-btn" data-act="del" data-idx="'+i+'"><i class="fa-solid fa-trash"></i> Delete</button></div>' +
           '</div>' +
         '</div>' +
         '<div class="se-flow-editor">' +
@@ -824,6 +878,7 @@ function renderQuestionPanel() {
             '<div><label class="se-label">Help text</label><div class="se-rich-toolbar"><button type="button" class="se-rich-btn" data-format="bold" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-bold"></i> Bold</button><button type="button" class="se-rich-btn" data-format="italic" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-italic"></i> Italic</button><button type="button" class="se-rich-btn" data-format="link" data-format-field="help_text" data-idx="'+i+'"><i class="fa-solid fa-link"></i> Hyperlink</button></div><textarea class="se-textarea" data-field="help_text" data-idx="'+i+'" placeholder="Optional guidance">'+esc(q.help_text || '')+'</textarea></div>' +
             '<div class="se-flow-row"><div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div><div>'+(isTextLike?'<label class="se-label">Placeholder</label><input class="se-input" data-field="placeholder" data-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">':'')+'</div></div>' +
             choiceHtml +
+            '<div class="se-logic-box"><div class="se-logic-head"><label class="se-label" style="margin:0">Branching and routing</label><button type="button" class="se-flow-btn" data-logic-add="'+i+'"><i class="fa-solid fa-plus"></i> Add rule</button></div><div class="se-inline-note">Add routing rules for any question type. Use End survey or jump to another question.</div><div class="se-logic-list">'+((q.logic&&q.logic.length)?q.logic.map(function(rule,ridx){ return buildLogicRowHTML(q,i,rule,ridx); }).join(''):'<div class="se-inline-note">No rules yet for this question.</div>')+'</div></div>' +
           '</div>' +
         '</div>' +
       '</article>';
@@ -850,6 +905,10 @@ function renderQuestionPanel() {
   if (embedCode) embedCode.value = buildEmbedCode();
   var copyEmbed = document.getElementById('copy-embed-code');
   if (copyEmbed) copyEmbed.addEventListener('click', function(){ if (embedCode) { embedCode.select(); document.execCommand('copy'); copyEmbed.innerHTML = '<i class="fa-solid fa-check"></i> Copied'; setTimeout(function(){ copyEmbed.innerHTML = '<i class="fa-regular fa-copy"></i> Copy code'; }, 1400); } });
+  document.querySelectorAll('input[name="embed-mode"]').forEach(function(input){ input.addEventListener('change', function(){ ensureDistributionDefaults(); _survey.embed_mode = input.value; markDirty(); renderLinksPanel(); }); });
+  var btnLabel = document.getElementById('feedback-button-label'); if (btnLabel) btnLabel.addEventListener('input', function(){ ensureDistributionDefaults(); _survey.feedback_button_label = btnLabel.value; markDirty(); if (embedCode) embedCode.value = buildEmbedCode(); });
+  var pos = document.getElementById('intercept-position'); if (pos) pos.addEventListener('change', function(){ ensureDistributionDefaults(); _survey.intercept_position = pos.value; markDirty(); if (embedCode) embedCode.value = buildEmbedCode(); });
+  var trig = document.getElementById('intercept-trigger'); if (trig) trig.addEventListener('change', function(){ ensureDistributionDefaults(); _survey.intercept_trigger = trig.value; markDirty(); if (embedCode) embedCode.value = buildEmbedCode(); });
 
   panel.querySelectorAll('[data-add-qtype]').forEach(function(el){
     el.addEventListener('click', function(){ addQuestionBlock(el.dataset.addQtype); });
@@ -871,7 +930,10 @@ function renderQuestionPanel() {
     btn.addEventListener('click', function(e){
       e.stopPropagation();
       var idx = Number(btn.dataset.idx);
-      if (btn.dataset.act === 'dup') {
+      if (btn.dataset.act === 'logic') {
+        _selectedIdx = idx;
+        renderQuestionPanel();
+      } else if (btn.dataset.act === 'dup') {
         var clone = JSON.parse(JSON.stringify(_questions[idx]));
         _questions.splice(idx + 1, 0, clone);
         _selectedIdx = idx + 1;
@@ -924,6 +986,38 @@ function renderQuestionPanel() {
       if (!_questions[idx].options.length) _questions[idx].options = ['Option 1'];
       markDirty();
       renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-logic-add]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = Number(btn.dataset.logicAdd);
+      ensureLogicArray(_questions[idx]);
+      _questions[idx].logic.push({ operator:'equals', value:'', action_target:'end' });
+      markDirty();
+      renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-logic-remove]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = Number(btn.dataset.logicRemove);
+      var ridx = Number(btn.dataset.ruleIdx);
+      ensureLogicArray(_questions[idx]);
+      _questions[idx].logic = _questions[idx].logic.filter(function(_, i){ return i !== ridx; });
+      markDirty();
+      renderQuestionPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-logic-field]').forEach(function(input){
+    var idx = Number(input.dataset.idx);
+    var ridx = Number(input.dataset.ruleIdx);
+    input.addEventListener(input.tagName === 'SELECT' ? 'change' : 'input', function(){
+      ensureLogicArray(_questions[idx]);
+      if(!_questions[idx].logic[ridx]) _questions[idx].logic[ridx] = { operator:'equals', value:'', action_target:'end' };
+      _questions[idx].logic[ridx][input.dataset.logicField] = input.value;
+      markDirty();
     });
   });
 
