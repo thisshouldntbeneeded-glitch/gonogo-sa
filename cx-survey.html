@@ -240,10 +240,10 @@ function renderBrandHeader() {
   var logo = s.brand_logo_url ? '<img src="' + esc(s.brand_logo_url) + '" alt="Brand logo">' : '';
   var brandLine = logo || '<span class="s-brand-name">' + esc(s.brand_display_name || s.brand_slug || 'GoNoGo') + '</span>';
   var streak = (state.mode === 'party' && state.streak > 0) ? '<span class="s-streak">🔥 ' + state.streak + '</span>' : '';
-  var toggle = canUsePartyMode() ? ('<div class="s-mode-toggle">' +
+  var toggle = '<div class="s-mode-toggle">' +
     '<button type="button" class="s-mode-btn' + (state.mode === 'classic' ? ' active' : '') + '" data-mode="classic">Classic</button>' +
     '<button type="button" class="s-mode-btn' + (state.mode === 'party' ? ' active' : '') + '" data-mode="party">Party</button>' +
-    '</div>') : ''; 
+    '</div>'; 
   return '<div class="s-top"><div class="s-brand">' + brandLine + '</div><div style="display:flex;gap:10px;align-items:center">' + streak + toggle + '</div></div>';
 }
 
@@ -397,7 +397,6 @@ function bindModeToggle() {
   document.querySelectorAll('[data-mode]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var nextMode = btn.getAttribute('data-mode');
-      if (nextMode === 'party' && !canUsePartyMode()) return;
       state.mode = nextMode;
       render();
     });
