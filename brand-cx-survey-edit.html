@@ -271,9 +271,23 @@ function wireEvents() {
     showTab('question');
     renderQuestionPanel();
   });
+  var templateSelect = document.getElementById('s-template-key');
+  if (templateSelect) templateSelect.addEventListener('change', function(){ markDirty(); if (_survey) _survey.template_key = this.value || null; });
+  var applyTplBtn = document.getElementById('btn-apply-template');
+  if (applyTplBtn) applyTplBtn.addEventListener('click', function(){
+    var key = document.getElementById('s-template-key').value;
+    if (!key) { toast('Select a template first', 'error'); return; }
+    applyTemplate(key, false);
+  });
+  var clearTplBtn = document.getElementById('btn-clear-template');
+  if (clearTplBtn) clearTplBtn.addEventListener('click', function(){
+    document.getElementById('s-template-key').value = '';
+    if (_survey) _survey.template_key = null;
+    markDirty();
+    toast('Template selection cleared', 'success');
+  });
   document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
 
-  // Dirty guard
   window.addEventListener('beforeunload', function(e){
     if (_dirty && !_saving) { e.preventDefault(); e.returnValue = ''; }
   });
@@ -794,6 +808,7 @@ function populateSettingsDefaults() {
   document.getElementById('s-anon').checked = true;
   document.getElementById('s-contact').checked = true;
   document.getElementById('s-status').value = 'Draft';
+  syncTemplateSelector((_survey && _survey.template_key) || '');
   // Branding
   document.getElementById('s-template-key').value = '';
   document.getElementById('s-brand-logo').value = '';
