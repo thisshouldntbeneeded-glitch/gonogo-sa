@@ -154,7 +154,7 @@
   .s-party-copy{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
   .s-party-copy small{color:rgba(255,255,255,.75);font-size:12px;font-weight:700}
   .s-cheer{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-weight:700}
-  .s-party-sparkles{display:flex;gap:8px;flex-wrap:wrap}
+  .s-party-sparkles{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.s-party-sparkles[hidden]{display:none}.s-party-grid-compact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}.s-party-grid-compact.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.s-party-grid-compact.cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.s-party-grid-compact.cols-11{grid-template-columns:repeat(6,minmax(0,1fr))}.s-party-grid-compact .s-party-choice{min-height:56px;padding:12px 10px;font-size:13px}.s-party-grid-compact .s-party-choice.big{min-height:64px;font-size:18px}.s-party-grid-compact .s-party-choice.score{font-variant-numeric:tabular-nums}.s-party-answer-wrap{display:grid;gap:12px;margin-top:18px}.s-party-tipline{font-size:12px;color:rgba(255,255,255,.72);font-weight:700}.s-party-multi-note{font-size:12px;color:rgba(255,255,255,.72);margin-top:2px}@media (max-width:640px){.s-party-grid-compact.cols-5{grid-template-columns:repeat(3,minmax(0,1fr))}.s-party-grid-compact.cols-11{grid-template-columns:repeat(4,minmax(0,1fr))}}
   .s-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.03em}
   .s-party-final{display:grid;gap:14px;text-align:center}
   .s-party-final h2{margin:0;color:#fff;font-size:30px;letter-spacing:-.02em}
@@ -336,24 +336,29 @@ function renderPartyQuestion() {
 function renderPartyInput(q, idx){
   var val = state.values[q.id];
   if (q.qtype === 'yes_no') {
-    return '<div class="s-party-choices"><button type="button" class="s-party-choice is-neg" data-party-val="No">👎 No</button><button type="button" class="s-party-choice is-pos" data-party-val="Yes">👍 Yes</button></div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-choices"><button type="button" class="s-party-choice is-neg" data-party-val="No">👎 No</button><button type="button" class="s-party-choice is-pos" data-party-val="Yes">👍 Yes</button></div></div>';
   }
   if (q.qtype === 'single_select' || q.qtype === 'consent') {
-    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0, 6);
-    return '<div class="s-party-sparkles">' + opts.map(function(o){ return '<button type="button" class="s-badge" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div><div class="s-party-choices">' + opts.slice(0,2).map(function(o, i){ return '<button type="button" class="s-party-choice '+(i===0?'is-neg':'is-pos')+'" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div>';
+    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0, 4);
+    return '<div class="s-party-answer-wrap">'
+      + '<div class="s-party-grid-compact '+(opts.length >= 3 ? 'cols-3' : '')+'">'
+      + opts.map(function(o, i){ return '<button type="button" class="s-party-choice '+(i === 0 ? 'is-neg' : (i === opts.length - 1 ? 'is-pos' : ''))+'" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('')
+      + '</div>'
+      + ((q.options || []).length > 4 ? '<div class="s-party-sparkles"><span class="s-party-tipline">More options: tap in Classic mode for the full list.</span></div>' : '')
+      + '</div>';
   }
   if (q.qtype === 'multi_select') {
     var sel = Array.isArray(val) ? val : [];
-    return '<div class="s-choice-grid">' + (q.options || []).map(function(o){ var on = sel.indexOf(o)!==-1; return '<button type="button" class="s-choice left-align'+(on?' active':'')+'" data-val="'+esc(o)+'">'+(on?'✅ ':'⬜ ')+esc(o)+'</button>'; }).join('') + '</div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-multi-note">Tap all that apply, then hit Next vibe.</div><div class="s-choice-grid">' + (q.options || []).map(function(o){ var on = sel.indexOf(o)!==-1; return '<button type="button" class="s-choice left-align'+(on?' active':'')+'" data-val="'+esc(o)+'">'+(on?'✅ ':'⬜ ')+esc(o)+'</button>'; }).join('') + '</div></div>';
   }
   if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
     var faces = q.qtype === 'csat_smiley' ? ['😠','😕','😐','🙂','😍'] : ['1','2','3','4','5'];
-    return '<div class="s-party-choices">' + faces.map(function(label, i){ var n=i+1; return '<button type="button" class="s-party-choice '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-grid-compact cols-5">' + faces.map(function(label, i){ var n=i+1; return '<button type="button" class="s-party-choice big '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div></div>';
   }
   if (q.qtype === 'nps_0_10') {
-    return '<div class="s-party-help">Swipe right for stronger advocacy, left for lower likelihood, or tap a score below.</div><div class="s-choice-grid cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-choice'+(((state.values[q.id]&&state.values[q.id].value_number)===i)?' active':'')+'" data-val="'+i+'">'+i+'</button>'; }).join('') + '</div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe for a fast low/high score, or tap an exact score below.</div><div class="s-party-grid-compact cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-party-choice score'+(((state.values[q.id]&&state.values[q.id].value_number)===i)?' active':'')+'" data-party-val="'+i+'">'+i+'</button>'; }).join('') + '</div></div>';
   }
-  return renderInput(q, idx);
+  return '<div class="s-party-answer-wrap">'+renderInput(q, idx)+'</div>';
 }
 function wirePartyQuestion(q, idx){
   var card = document.getElementById('party-swipe-card');
