@@ -83,6 +83,26 @@
 .se-help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3)}
 @media(max-width:980px){.se-help-grid,.se-row{grid-template-columns:1fr}}
 .se-input:focus,.se-select:focus,.se-textarea:focus{outline:none;border-color:rgba(17,165,81,.45);box-shadow:0 0 0 4px rgba(17,165,81,.10)}
+.se-settings-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--space-4)}
+.se-settings-subtab{padding:9px 12px;border-radius:999px;border:1px solid var(--border-primary);background:var(--surface-1);color:var(--text-secondary);font-size:12px;font-weight:700;letter-spacing:.02em;cursor:pointer}
+.se-settings-subtab.active{background:rgba(17,165,81,.1);border-color:rgba(17,165,81,.3);color:var(--text-primary)}
+.se-settings-section{display:none}
+.se-settings-section.active{display:block}
+.se-toggle-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid var(--border-primary);background:var(--surface-1);border-radius:14px;margin-bottom:12px}
+.se-toggle-copy{min-width:0}
+.se-toggle-title{font-size:13px;font-weight:700;color:var(--text-primary);margin:0 0 2px}
+.se-toggle-desc{font-size:12px;color:var(--text-muted);line-height:1.4;margin:0}
+.se-switch{position:relative;display:inline-flex;align-items:center;width:48px;height:28px;flex-shrink:0}
+.se-switch input{position:absolute;opacity:0;pointer-events:none}
+.se-switch-ui{position:relative;width:48px;height:28px;border-radius:999px;background:#cbd5e1;transition:background .18s ease,box-shadow .18s ease;box-shadow:inset 0 0 0 1px rgba(15,23,42,.08)}
+.se-switch-ui::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.18);transition:transform .18s ease}
+.se-switch input:checked + .se-switch-ui{background:linear-gradient(180deg,#18b35a,#11994d)}
+.se-switch input:checked + .se-switch-ui::after{transform:translateX(20px)}
+.se-switch input:focus-visible + .se-switch-ui{box-shadow:0 0 0 4px rgba(17,165,81,.14)}
+.se-template-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.se-template-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(17,165,81,.1);color:var(--green);font-size:11px;font-weight:700;margin-top:10px}
+.se-privacy-banner{padding:14px 16px;border-radius:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.16);color:var(--text-primary);font-size:12px;line-height:1.5;margin-bottom:var(--space-4)}
+.se-mini-note{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.45}
 .se-field{margin-bottom:var(--space-3)}
 .se-toggle{display:flex;align-items:center;gap:var(--space-2);font-size:13px;cursor:pointer}
 .se-hint{font-size:12px;color:var(--text-muted);margin-top:2px}
@@ -281,6 +301,21 @@ function wireEvents() {
   document.getElementById('btn-add-q').addEventListener('click', function(){
     showTab('question');
     renderEmptyState('add');
+  });
+  var templateSelect = document.getElementById('s-template-key');
+  if (templateSelect) templateSelect.addEventListener('change', function(){ markDirty(); if (_survey) _survey.template_key = this.value || null; });
+  var applyTplBtn = document.getElementById('btn-apply-template');
+  if (applyTplBtn) applyTplBtn.addEventListener('click', function(){
+    var key = document.getElementById('s-template-key').value;
+    if (!key) { toast('Select a template first', 'error'); return; }
+    applyTemplate(key, false);
+  });
+  var clearTplBtn = document.getElementById('btn-clear-template');
+  if (clearTplBtn) clearTplBtn.addEventListener('click', function(){
+    document.getElementById('s-template-key').value = '';
+    if (_survey) _survey.template_key = null;
+    markDirty();
+    toast('Template selection cleared', 'success');
   });
   document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
 
@@ -747,84 +782,75 @@ function renderEmptyState(mode) {
 /* ── Survey settings panel ── */
 function renderSettingsPanel() {
   var html = '';
-  html += '<div class="se-panel-intro"><div><h2>Survey settings</h2><p>Control the survey intro, response experience, branding, privacy and completion message from one place.</p></div></div>'; 
+  html += '<div class="se-panel-intro"><div><h2>Survey settings</h2><p>Split into setup, branding, experience, and privacy so the page is easier to manage.</p></div></div>';
+  html += '<div class="se-settings-subtabs">' +
+    '<button class="se-settings-subtab active" type="button" data-settings-tab="setup">Survey setup</button>' +
+    '<button class="se-settings-subtab" type="button" data-settings-tab="branding">Branding</button>' +
+    '<button class="se-settings-subtab" type="button" data-settings-tab="experience">Survey experience</button>' +
+    '<button class="se-settings-subtab" type="button" data-settings-tab="privacy">Privacy & consent</button>' +
+  '</div>';
+
+  html += '<div class="se-settings-section active" data-settings-section="setup">';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Survey name *</label><input class="se-input" id="s-name" placeholder="e.g. Post-visit feedback"></div>';
   html += '<div class="se-field"><label class="se-label">Slug</label><input class="se-input" id="s-slug" placeholder="auto from name"></div></div>';
-  html += '<div class="se-row"><div class="se-field"><label class="se-label">Intro title</label><input class="se-input" id="s-intro-title" placeholder="We\'d love your feedback"></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Intro title</label><input class="se-input" id="s-intro-title" placeholder="We'd love your feedback"></div>';
   html += '<div class="se-field"><label class="se-label">Status</label><input class="se-input" id="s-status" readonly style="opacity:.6"></div></div>';
   html += '<div class="se-field"><label class="se-label">Intro text</label><textarea class="se-textarea" id="s-intro-text" placeholder="Shown above the first question"></textarea></div>';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Thank-you title</label><input class="se-input" id="s-ty-title" value="Thank you"></div>';
   html += '<div class="se-field"><label class="se-label">Thank-you text</label><input class="se-input" id="s-ty-text" value="Your feedback has been received."></div></div>';
-  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3);flex-wrap:wrap">';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-anon" checked> Anonymous responses</label>';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-contact" checked> Allow contact capture</label>';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-party-default"> Default to Party mode</label></div>';
-  html += '<div class="se-hint" style="margin-top:var(--space-2)">When contact capture is enabled, email/phone/name answers are stored as contact info alongside the response. Party mode starts respondents in a faster, swipe-friendly mobile flow, but they can switch back to Classic mode any time.</div>';
+  html += '<div class="se-toggle-card"><div class="se-toggle-copy"><div class="se-toggle-title">Anonymous responses</div><p class="se-toggle-desc">Hide respondent identity unless contact capture is explicitly enabled elsewhere.</p></div><label class="se-switch"><input type="checkbox" id="s-anon" checked><span class="se-switch-ui"></span></label></div>';
+  html += '<div class="se-toggle-card"><div class="se-toggle-copy"><div class="se-toggle-title">Allow contact capture</div><p class="se-toggle-desc">Store email, phone, or name fields alongside survey responses for follow-up.</p></div><label class="se-switch"><input type="checkbox" id="s-contact" checked><span class="se-switch-ui"></span></label></div>';
+  html += '</div>';
 
-  // ── Branding ──
-  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Branding</h4>';
-  html += '<div class="se-row"><div class="se-field"><label class="se-label">Template</label>' +
-          '<select class="se-input" id="s-template-key">' +
-            '<option value="">(none)</option>' +
-            '<option value="nps_short">Short NPS</option>' +
-            '<option value="csat_quick">Quick CSAT</option>' +
-            '<option value="post_visit">Post-visit feedback</option>' +
-            '<option value="post_purchase">Post-purchase</option>' +
-            '<option value="support_followup">Support follow-up</option>' +
-          '</select></div>' +
-          '<div class="se-field"><label class="se-label">Brand logo URL</label><input class="se-input" id="s-brand-logo" placeholder="https://..."></div></div>';
-  html += '<div class="se-row"><div class="se-field"><label class="se-label">Primary colour</label><input class="se-input" id="s-brand-primary" type="text" placeholder="#11a551"></div>' +
-          '<div class="se-field"><label class="se-label">Accent colour</label><input class="se-input" id="s-brand-accent" type="text" placeholder="#0b7a3b"></div></div>';
+  html += '<div class="se-settings-section" data-settings-section="branding">';
+  html += '<h4 class="se-section-h" style="margin-top:0">Branding</h4>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Brand logo URL</label><input class="se-input" id="s-brand-logo" placeholder="https://..."></div>' +
+          '<div class="se-field"><label class="se-label">Primary colour</label><input class="se-input" id="s-brand-primary" type="text" placeholder="#11a551"></div></div>';
+  html += '<div class="se-row"><div class="se-field"><label class="se-label">Accent colour</label><input class="se-input" id="s-brand-accent" type="text" placeholder="#0b7a3b"></div>' +
+          '<div class="se-field"><label class="se-label">Template selection</label><input class="se-input" value="Moved to the left rail above question order" readonly style="opacity:.68"></div></div>';
+  html += '<div class="se-mini-note">Templates now belong to the survey structure area so they can shape the question list immediately.</div>';
+  html += '</div>';
 
-  // ── Experience ──
-  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Experience</h4>';
+  html += '<div class="se-settings-section" data-settings-section="experience">';
+  html += '<h4 class="se-section-h" style="margin-top:0">Survey experience</h4>';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Theme variant</label>' +
-          '<select class="se-input" id="s-theme-variant">' +
-            '<option value="classic">Classic</option>' +
-            '<option value="party">Party</option>' +
-          '</select></div>' +
+          '<select class="se-input" id="s-theme-variant"><option value="classic">Classic</option><option value="party">Party</option></select></div>' +
           '<div class="se-field"><label class="se-label">Progress style</label>' +
-          '<select class="se-input" id="s-progress-style">' +
-            '<option value="bar">Bar</option>' +
-            '<option value="steps">Steps</option>' +
-            '<option value="none">None</option>' +
-          '</select></div></div>';
-  html += '<div style="display:flex;gap:var(--space-5);margin-top:var(--space-3);flex-wrap:wrap">';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-show-progress" checked> Show progress</label>';
-  html += '<label class="se-toggle"><input type="checkbox" id="s-party-default"> Party mode default</label></div>';
+          '<select class="se-input" id="s-progress-style"><option value="bar">Bar</option><option value="steps">Steps</option><option value="none">None</option></select></div></div>';
+  html += '<div class="se-toggle-card"><div class="se-toggle-copy"><div class="se-toggle-title">Show progress</div><p class="se-toggle-desc">Display visible progress to help respondents understand how far they are through the survey.</p></div><label class="se-switch"><input type="checkbox" id="s-show-progress" checked><span class="se-switch-ui"></span></label></div>';
+  html += '<div class="se-toggle-card"><div class="se-toggle-copy"><div class="se-toggle-title">Party mode default</div><p class="se-toggle-desc">Start respondents in the faster, swipe-friendly mode while still allowing them to switch back.</p></div><label class="se-switch"><input type="checkbox" id="s-party-default"><span class="se-switch-ui"></span></label></div>';
+  html += '</div>';
 
-  // ── Privacy & consent ──
-  html += '<h4 class="se-section-h" style="margin-top:var(--space-5)">Privacy & consent</h4>';
+  html += '<div class="se-settings-section" data-settings-section="privacy">';
+  html += '<h4 class="se-section-h" style="margin-top:0">Privacy & consent</h4>';
+  html += '<div class="se-privacy-banner"><strong>Important:</strong> This editor saves <code>privacy_notice_text</code> into the survey payload. If the message is missing in the live survey, the respondent-facing survey page likely is not rendering that field yet, even though it is being saved here.</div>';
   html += '<div class="se-field"><label class="se-label">Privacy notice</label><textarea class="se-textarea" id="s-privacy-notice" placeholder="Shown before contact fields. Explain how their data will be used."></textarea></div>';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Marketing consent label</label><input class="se-input" id="s-marketing-label" placeholder="Keep me updated about offers"></div>' +
-          '<div class="se-field"><label class="se-label">Contact retention (days)</label><input class="se-input" id="s-contact-retention" type="number" min="0" placeholder="e.g. 365"></div></div>';
-  html += '<div style="margin-top:var(--space-2)"><label class="se-toggle"><input type="checkbox" id="s-marketing-consent"> Enable marketing consent checkbox</label></div>';
+          '<div class="se-field"><label class="se-label">Contact retention days</label><input class="se-input" id="s-contact-retention" type="number" min="0" placeholder="e.g. 365"></div></div>';
+  html += '<div class="se-toggle-card"><div class="se-toggle-copy"><div class="se-toggle-title">Enable marketing consent checkbox</div><p class="se-toggle-desc">Show an extra opt-in checkbox when you want permission for future promotions or follow-up marketing.</p></div><label class="se-switch"><input type="checkbox" id="s-marketing-consent"><span class="se-switch-ui"></span></label></div>';
+  html += '</div>';
 
   document.getElementById('panel-settings').innerHTML = html;
 
-  // Auto-generate slug from name
+  document.querySelectorAll('.se-settings-subtab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var name = btn.dataset.settingsTab;
+      document.querySelectorAll('.se-settings-subtab').forEach(function(el){ el.classList.toggle('active', el === btn); });
+      document.querySelectorAll('.se-settings-section').forEach(function(section){ section.classList.toggle('active', section.dataset.settingsSection === name); });
+    });
+  });
+
   document.getElementById('s-name').addEventListener('input', function(){
     var slug = document.getElementById('s-slug');
-    if (!slug.dataset.manual) {
-      slug.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    }
+    if (!slug.dataset.manual) slug.value = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     markDirty();
   });
-  document.getElementById('s-slug').addEventListener('input', function(){
-    this.dataset.manual = '1';
-    this.value = this.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
-    markDirty();
+  document.getElementById('s-slug').addEventListener('input', function(){ this.dataset.manual = '1'; this.value = this.value.toLowerCase().replace(/[^a-z0-9-]/g, ''); markDirty(); });
+  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text','s-brand-logo','s-brand-primary','s-brand-accent','s-privacy-notice','s-marketing-label','s-contact-retention'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.addEventListener('input', markDirty);
   });
-  ['s-intro-title','s-intro-text','s-ty-title','s-ty-text',
-   's-brand-logo','s-brand-primary','s-brand-accent',
-   's-privacy-notice','s-marketing-label','s-contact-retention'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('input', markDirty);
-  });
-  ['s-anon','s-contact','s-template-key','s-theme-variant','s-progress-style',
-   's-show-progress','s-party-default','s-marketing-consent'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('change', markDirty);
+  ['s-anon','s-contact','s-template-key','s-theme-variant','s-progress-style','s-show-progress','s-party-default','s-marketing-consent'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.addEventListener('change', markDirty);
   });
 }
 
@@ -837,7 +863,7 @@ function populateSettings() {
   document.getElementById('s-intro-text').value = s.intro_text || '';
   document.getElementById('s-ty-title').value = s.thank_you_title || 'Thank you';
   document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
-  var templateEl = document.getElementById('s-template-key'); if (templateEl) templateEl.value = s.template_key || '';
+  syncTemplateSelector(s.template_key || '');
   document.getElementById('s-anon').checked = !!s.is_anonymous;
   document.getElementById('s-contact').checked = !!s.allow_contact_capture;
   var _sLabels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
@@ -872,7 +898,7 @@ function populateSettingsDefaults() {
   document.getElementById('s-contact').checked = true;
   document.getElementById('s-status').value = 'Draft';
   // Branding
-  document.getElementById('s-template-key').value = '';
+  syncTemplateSelector('');
   document.getElementById('s-brand-logo').value = '';
   document.getElementById('s-brand-primary').value = '';
   document.getElementById('s-brand-accent').value = '';
