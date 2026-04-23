@@ -484,8 +484,13 @@ function applyMarkupToField(idx, field, mode){
 function buildEmbedCode(){
   var brand = (_survey && (_survey.brand_slug || _survey.brand_id || 'brand')) || 'brand';
   var surveyId = (_survey && (_survey.id || _survey.survey_id || 'survey-id')) || 'survey-id';
-  return '<div id="gonogo-survey-'+surveyId+'"></div>\n<script src="https://cdn.gonogo.co.za/cx/embed.js" defer></script>\n<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light" });</script>';
+  return '<div id="gonogo-survey-'+surveyId+'"></div>
+'
+    + '<script src="https://cdn.gonogo.co.za/cx/embed.js" defer><\/script>
+'
+    + '<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light" });<\/script>';
 }
+
 
 var TEMPLATES = {
   nps_short: {
