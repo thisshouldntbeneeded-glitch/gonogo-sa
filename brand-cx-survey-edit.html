@@ -821,9 +821,7 @@ function renderQuestionPanel() {
       var q = _questions[idx];
       if (!q) return;
       if (input.dataset.field === 'required') q.required = !!input.checked;
-      else if (input.dataset.field === 'options_text') q.options = input.value.split(/
-?
-+/).map(function(v){ return v.trim(); }).filter(Boolean);
+      else if (input.dataset.field === 'options_text') q.options = input.value.split(/\r?\n+/).map(function(v){ return v.trim(); }).filter(Boolean);
       else if (input.dataset.field === 'placeholder') q.options = [input.value || ''];
       else q[input.dataset.field] = input.value;
       markDirty();
