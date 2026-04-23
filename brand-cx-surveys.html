@@ -32,6 +32,39 @@
 .cx-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-primary);margin-bottom:var(--space-4)}
 .cx-tab{padding:var(--space-3) var(--space-4);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;background:none;border-left:none;border-right:none;border-top:none}
 .cx-tab.active{color:var(--text-primary);border-bottom-color:var(--green)}
+
+.cx-page-grid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:var(--space-4);align-items:start}
+@media(max-width:980px){.cx-page-grid{grid-template-columns:1fr}}
+.cx-side-panel,.cx-main-panel{min-width:0}
+.cx-filter-card,.cx-toolbar-card{margin-bottom:var(--space-4)}
+.cx-filter-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);flex-wrap:wrap}
+.cx-folder-list{display:grid;gap:8px}
+.cx-folder-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border-primary);background:var(--surface-2);cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
+.cx-folder-item:hover{background:var(--surface-3);transform:translateY(-1px)}
+.cx-folder-item.active{background:rgba(17,165,81,.08);border-color:rgba(17,165,81,.28)}
+.cx-folder-meta{display:flex;align-items:center;gap:10px;min-width:0}
+.cx-folder-meta i{color:var(--green)}
+.cx-folder-meta strong{display:block;font-size:13px;color:var(--text-primary)}
+.cx-folder-meta span{display:block;font-size:11px;color:var(--text-muted)}
+.cx-folder-count{font-size:11px;font-weight:700;color:var(--text-secondary);background:var(--surface-1);border:1px solid var(--border-primary);padding:3px 8px;border-radius:999px}
+.cx-quick-filters{display:flex;gap:8px;flex-wrap:wrap}
+.cx-chip{padding:8px 11px;border-radius:999px;border:1px solid var(--border-primary);background:var(--surface-2);font-size:12px;font-weight:700;color:var(--text-secondary);cursor:pointer}
+.cx-chip.active{background:rgba(17,165,81,.1);border-color:rgba(17,165,81,.25);color:var(--text-primary)}
+.cx-mini-note{font-size:12px;color:var(--text-muted);line-height:1.45;margin-top:12px}
+.cx-toolbar{display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;flex-wrap:wrap}
+.cx-toolbar-search{display:flex;align-items:center;gap:10px;min-width:280px;flex:1;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:12px;padding:10px 12px}
+.cx-toolbar-search i{color:var(--text-muted)}
+.cx-toolbar-search input{width:100%;background:transparent;border:none;outline:none;color:var(--text-primary);font:inherit}
+.cx-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cx-table .cx-actions-cell{width:1%;white-space:nowrap;text-align:right}
+.cx-row-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.cx-row-actions .btn{display:inline-flex;align-items:center;gap:6px}
+.cx-soft-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(15,23,42,.06);font-size:11px;font-weight:700;color:var(--text-secondary)}
+.cx-empty-state{display:grid;place-items:center;text-align:center;padding:var(--space-8)}
+.cx-empty-state i{font-size:34px;color:var(--text-muted);margin-bottom:var(--space-3)}
+.cx-empty-state h3{margin:0 0 6px;font-size:18px}
+.cx-empty-state p{margin:0;color:var(--text-muted);max-width:48ch}
+
 </style>
 </head>
 <body>
@@ -133,6 +166,10 @@ document.getElementById('sidebar-container').innerHTML = Components.renderBrandS
 var _editing = null; // survey object when editing
 var _questions = [];
 var _links = [];
+var _allRows = [];
+var _folderFilter = 'all';
+var _statusFilter = 'all';
+var _searchTerm = '';
 var esc = Components.escapeHTML.bind(Components);
 
 if (Components.checkBrandAuth()) init();
@@ -147,6 +184,20 @@ async function init() {
   document.getElementById('builder-save').addEventListener('click', save);
   document.getElementById('btn-add-q').addEventListener('click', function(){ addQuestion(); renderQuestions(); });
   document.getElementById('btn-new-link').addEventListener('click', createLink);
+  document.getElementById('btn-new-folder').addEventListener('click', function(){
+    alert('Folders are currently a UI layer suggestion. If you want, I can wire real folder persistence next.');
+  });
+  document.getElementById('survey-search').addEventListener('input', function(){
+    _searchTerm = this.value.trim().toLowerCase();
+    renderList();
+  });
+  document.querySelectorAll('[data-status-filter]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _statusFilter = btn.dataset.statusFilter;
+      document.querySelectorAll('[data-status-filter]').forEach(function(el){ el.classList.toggle('active', el === btn); });
+      renderList();
+    });
+  });
   document.querySelectorAll('.cx-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
   await loadList();
 }
@@ -154,29 +205,149 @@ async function init() {
 async function loadList() {
   var container = document.getElementById('surveys-container');
   try {
-    var rows = await GoNoGoAPI.cx.listSurveys();
-    if (!rows || !rows.length) {
-      container.innerHTML = '<div class="card" style="text-align:center;padding:var(--space-8)"><i class="fa-solid fa-clipboard-list" style="font-size:32px;color:var(--text-muted);margin-bottom:var(--space-3)"></i><p class="text-sm text-muted">No surveys yet. Create your first one to start collecting private feedback.</p></div>';
-      container.innerHTML = '<div class="card" style="text-align:center;padding:var(--space-8)">' +
-        '<i class="fa-solid fa-clipboard-list" style="font-size:32px;color:var(--text-muted);margin-bottom:var(--space-3)"></i>' +
-        '<p class="text-sm text-muted">No surveys yet. Create your first one to start collecting private feedback.</p>' +
-        '<a href="brand-cx-survey-edit.html" class="btn btn-sm" style="background:var(--green);color:#fff;border:none;margin-top:var(--space-3)"><i class="fa-solid fa-plus"></i> New survey</a></div>';
-      return;
-    }
-    var html = '<table class="cx-table"><thead><tr><th>Name</th><th>Status</th><th>Responses</th><th>Links</th><th>Updated</th><th></th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      html += '<tr><td><strong>' + esc(r.name) + '</strong><div class="text-xs text-muted">/' + esc(r.slug) + '</div></td>' +
-        '<td><span class="cx-badge cx-b-' + r.status + '">' + r.status + '</span></td>' +
-        '<td><span class="cx-badge cx-b-' + r.status + '">' + esc(r.status) + '</span></td>' +
-        '<td>' + (r.response_count || 0) + '</td>' +
-        '<td>' + (r.link_count || 0) + '</td>' +
-        '<td class="text-xs text-muted">' + fmtDate(r.updated_at) + '</td>' +
-        '<td style="text-align:right"><a href="brand-cx-survey-edit.html?id=' + encodeURIComponent(r.id) + '" class="btn btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</a></td></tr>';
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
+    _allRows = await GoNoGoAPI.cx.listSurveys();
+    renderFolders();
+    renderList();
   } catch (e) {
     container.innerHTML = '<div class="card" style="padding:var(--space-5);color:var(--red)">Could not load surveys: ' + esc(e.message || 'error') + '</div>';
+  }
+}
+
+function deriveFolder(row) {
+  if (row.archived_at || row.status === 'archived') return 'Archived';
+  if (row.status === 'draft') return 'Drafts';
+  if (row.status === 'active') return 'Live';
+  if (row.status === 'paused') return 'Paused';
+  return 'Unfiled';
+}
+
+function getFilteredRows() {
+  return (_allRows || []).filter(function(r){
+    var folder = deriveFolder(r).toLowerCase();
+    var matchesFolder = _folderFilter === 'all' ? true : folder === _folderFilter;
+    var matchesStatus = _statusFilter === 'all' ? true : (String(r.status || '').toLowerCase() === _statusFilter);
+    var hay = ((r.name || '') + ' ' + (r.slug || '')).toLowerCase();
+    var matchesSearch = !_searchTerm || hay.indexOf(_searchTerm) !== -1;
+    return matchesFolder && matchesStatus && matchesSearch;
+  });
+}
+
+function renderFolders() {
+  var el = document.getElementById('folder-list');
+  if (!el) return;
+  var rows = _allRows || [];
+  var folders = [
+    {key:'all', label:'All surveys', icon:'fa-layer-group', count:rows.length},
+    {key:'drafts', label:'Drafts', icon:'fa-file-pen', count:rows.filter(function(r){ return deriveFolder(r)==='Drafts'; }).length},
+    {key:'live', label:'Live', icon:'fa-bolt', count:rows.filter(function(r){ return deriveFolder(r)==='Live'; }).length},
+    {key:'paused', label:'Paused', icon:'fa-pause', count:rows.filter(function(r){ return deriveFolder(r)==='Paused'; }).length},
+    {key:'archived', label:'Archived', icon:'fa-box-archive', count:rows.filter(function(r){ return deriveFolder(r)==='Archived'; }).length}
+  ];
+  el.innerHTML = folders.map(function(f){
+    return '<button class="cx-folder-item' + (_folderFilter === f.key ? ' active' : '') + '" data-folder="' + f.key + '" type="button">' +
+      '<span class="cx-folder-meta"><i class="fa-solid ' + f.icon + '"></i><span><strong>' + esc(f.label) + '</strong><span>Organisation shortcut</span></span></span>' +
+      '<span class="cx-folder-count">' + f.count + '</span></button>';
+  }).join('');
+  el.querySelectorAll('[data-folder]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _folderFilter = btn.dataset.folder;
+      renderFolders();
+      renderList();
+    });
+  });
+}
+
+function renderList() {
+  var container = document.getElementById('surveys-container');
+  var rows = getFilteredRows();
+  if (!rows.length) {
+    container.innerHTML = '<div class="card cx-empty-state"><div><i class="fa-solid fa-folder-open"></i><h3>No surveys found</h3><p>Try another search or filter, or create a new survey in the full editor.</p><a href="brand-cx-survey-edit.html" class="btn btn-sm" style="background:var(--green);color:#fff;border:none;margin-top:var(--space-3)"><i class="fa-solid fa-plus"></i> New survey</a></div></div>';
+    return;
+  }
+  var html = '<table class="cx-table"><thead><tr><th>Name</th><th>Status</th><th>Folder</th><th>Responses</th><th>Links</th><th>Updated</th><th></th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var folder = deriveFolder(r);
+    html += '<tr>' +
+      '<td><strong>' + esc(r.name) + '</strong><div class="text-xs text-muted">/' + esc(r.slug || '') + '</div></td>' +
+      '<td><span class="cx-badge cx-b-' + esc(String(r.status || 'draft')) + '">' + esc(String(r.status || 'draft')) + '</span></td>' +
+      '<td><span class="cx-soft-badge"><i class="fa-solid fa-folder"></i> ' + esc(folder) + '</span></td>' +
+      '<td>' + (r.response_count || 0) + '</td>' +
+      '<td>' + (r.link_count || 0) + '</td>' +
+      '<td class="text-xs text-muted">' + fmtDate(r.updated_at) + '</td>' +
+      '<td class="cx-actions-cell"><div class="cx-row-actions">' +
+        '<a href="brand-cx-survey-edit.html?id=' + encodeURIComponent(r.id) + '" class="btn btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</a>' +
+        '<button class="btn btn-sm" data-duplicate="' + r.id + '"><i class="fa-solid fa-copy"></i> Duplicate</button>' +
+        '<button class="btn btn-sm" data-archive="' + r.id + '"><i class="fa-solid fa-box-archive"></i> ' + (String(r.status) === 'archived' ? 'Restore' : 'Archive') + '</button>' +
+      '</div></td>' +
+    '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  container.querySelectorAll('[data-duplicate]').forEach(function(btn){
+    btn.addEventListener('click', function(){ duplicateSurvey(btn.dataset.duplicate); });
+  });
+  container.querySelectorAll('[data-archive]').forEach(function(btn){
+    btn.addEventListener('click', function(){ toggleArchive(btn.dataset.archive); });
+  });
+}
+
+
+async function duplicateSurvey(id) {
+  try {
+    var data = await GoNoGoAPI.cx.getSurvey(id);
+    var s = data.survey || {};
+    var questions = (data.questions || []).map(function(q){
+      return {
+        qtype: q.qtype,
+        prompt: q.prompt || '',
+        help_text: q.help_text || q.helptext || '',
+        required: !!q.required,
+        options: Array.isArray(q.options) ? q.options : [],
+        logic: Array.isArray(q.logic) ? q.logic : []
+      };
+    });
+    var name = 'Copy of ' + (s.name || 'Survey');
+    var slugBase = String((s.slug || name).toLowerCase()).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    var slug = (slugBase ? slugBase : 'survey-copy') + '-copy';
+    var payload = {
+      name: name,
+      slug: slug,
+      intro_title: s.intro_title || '',
+      intro_text: s.intro_text || '',
+      thank_you_title: s.thank_you_title || 'Thank you',
+      thank_you_text: s.thank_you_text || 'Your feedback has been received.',
+      is_anonymous: !!s.is_anonymous,
+      allow_contact_capture: !!s.allow_contact_capture,
+      status: 'draft',
+      template_key: s.template_key || null,
+      brand_logo_url: s.brand_logo_url || null,
+      brand_primary_color: s.brand_primary_color || null,
+      brand_accent_color: s.brand_accent_color || null,
+      theme_variant: s.theme_variant || 'classic',
+      progress_style: s.progress_style || 'bar',
+      show_progress_bar: s.show_progress_bar !== false,
+      party_mode_default: !!s.party_mode_default,
+      privacy_notice_text: s.privacy_notice_text || null,
+      marketing_consent_enabled: !!s.marketing_consent_enabled,
+      marketing_consent_label: s.marketing_consent_label || null,
+      contact_retention_days: s.contact_retention_days || null,
+      questions: questions
+    };
+    var newId = await GoNoGoAPI.cx.upsertSurvey(payload);
+    window.location.href = 'brand-cx-survey-edit.html?id=' + encodeURIComponent(newId);
+  } catch (e) {
+    alert('Could not duplicate survey: ' + (e.message || 'error'));
+  }
+}
+
+async function toggleArchive(id) {
+  try {
+    var row = (_allRows || []).find(function(r){ return String(r.id) === String(id); });
+    var nextStatus = row && String(row.status) === 'archived' ? 'draft' : 'archived';
+    await GoNoGoAPI.cx.setSurveyStatus(id, nextStatus);
+    await loadList();
+  } catch (e) {
+    alert('Could not update survey status: ' + (e.message || 'error'));
   }
 }
 
