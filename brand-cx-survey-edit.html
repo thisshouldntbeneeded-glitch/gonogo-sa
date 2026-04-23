@@ -498,14 +498,10 @@ function buildEmbedCode(){
   var position = _survey.intercept_position || 'bottom-right';
   var trigger = _survey.intercept_trigger || 'always';
   var label = (_survey.feedback_button_label || 'Give feedback').replace(/"/g, '\"');
-  return '<div id="gonogo-survey-'+surveyId+'"></div>' + '
-'
-    + '<script src="https://cdn.gonogo.co.za/cx/embed.js" defer><\/script>' + '
-'
-    + '<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "'+brand+'", surveyId: "'+surveyId+'", target: "#gonogo-survey-'+surveyId+'", locale: "en-ZA", theme: "light", mode: "'+mode+'", buttonLabel: "'+label+'", position: "'+position+'", trigger: "'+trigger+'" });<\/script>';
+  return '<div id="gonogo-survey-' + surveyId + '"></div>
+<script src="https://cdn.gonogo.co.za/cx/embed.js" defer><\/script>
+<script>window.GoNoGoSurveyEmbed && window.GoNoGoSurveyEmbed.mount({ brand: "' + brand + '", surveyId: "' + surveyId + '", target: "#gonogo-survey-' + surveyId + '", locale: "en-ZA", theme: "light", mode: "' + mode + '", buttonLabel: "' + label + '", position: "' + position + '", trigger: "' + trigger + '" });<\/script>';
 }
-
-
 
 
 function ensureLogicArray(q){ if(!Array.isArray(q.logic)) q.logic = []; }
