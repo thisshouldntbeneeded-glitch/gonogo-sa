@@ -619,14 +619,19 @@ async function init() {
 }
 
 function wireEvents() {
-  document.getElementById('btn-save').addEventListener('click', save);
-  document.getElementById('btn-publish').addEventListener('click', function(){ setStatus('active'); });
-  document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
-  document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
+  var btnSave = document.getElementById('btn-save');
+  var btnPublish = document.getElementById('btn-publish');
+  var btnPause = document.getElementById('btn-pause');
+  var btnUnpublish = document.getElementById('btn-unpublish');
+  var btnAddQ = document.getElementById('btn-add-q');
+  if (btnSave) btnSave.addEventListener('click', save);
+  if (btnPublish) btnPublish.addEventListener('click', function(){ setStatus('active'); });
+  if (btnPause) btnPause.addEventListener('click', function(){ setStatus('paused'); });
+  if (btnUnpublish) btnUnpublish.addEventListener('click', function(){ setStatus('draft'); });
 
-  document.getElementById('btn-add-q').addEventListener('click', function(){
+  if (btnAddQ) btnAddQ.addEventListener('click', function(){
     showTab('question');
-    renderEmptyState('add');
+    addQuestionFromLibrary('short_text');
   });
 
   var templateSelect = document.getElementById('s-template-key');
