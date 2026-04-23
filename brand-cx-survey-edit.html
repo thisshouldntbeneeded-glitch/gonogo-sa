@@ -263,35 +263,43 @@
 .cx-b-active{background:rgba(34,197,94,.18);color:#4ade80}
 .cx-b-paused{background:rgba(234,179,8,.18);color:#fbbf24}
 
-/* Questions tab upgrade */
-.se-rail-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-.se-library-launch{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--border-primary);font-size:11px;font-weight:800;color:var(--text-secondary);cursor:pointer}
-.se-library-launch:hover{background:rgba(17,165,81,.08);color:var(--green);border-color:rgba(17,165,81,.25)}
-.se-question-empty{border:1px dashed var(--border-primary);background:linear-gradient(180deg,var(--surface-1),var(--surface-2));border-radius:16px;padding:18px;text-align:center;color:var(--text-muted);font-size:12px}
-.se-question-list{display:grid;gap:10px}
-.se-q-item{padding:12px 12px 12px 10px;border-radius:14px;transition:border-color .16s,background .16s,box-shadow .16s}
-.se-q-item.active{border-color:rgba(17,165,81,.32);background:linear-gradient(180deg,rgba(17,165,81,.08),var(--surface-1));box-shadow:0 0 0 3px rgba(17,165,81,.08)}
-.se-q-item-top{display:flex;align-items:flex-start;gap:10px}
-.se-q-icon{width:30px;height:30px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,165,81,.12);color:var(--green);flex-shrink:0}
-.se-q-main{flex:1;min-width:0}
-.se-q-title{font-size:13px;font-weight:800;color:var(--text-primary);line-height:1.35;margin-bottom:4px}
-.se-q-sub{font-size:12px;color:var(--text-muted);line-height:1.45}
-.se-q-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.se-q-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;border:1px solid var(--border-primary);background:var(--surface-3);font-size:11px;font-weight:700;color:var(--text-secondary);cursor:pointer}
-.se-q-btn:hover{background:rgba(17,165,81,.08);color:var(--green);border-color:rgba(17,165,81,.25)}
-.se-library-overlay{position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
-.se-library-overlay.show{display:flex}
-.se-library-modal{width:min(920px,100%);max-height:85vh;overflow:auto;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:20px;padding:20px;box-shadow:0 28px 60px rgba(15,23,42,.28)}
-.se-library-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
-.se-library-head h3{margin:0;font-size:20px}
-.se-library-head p{margin:6px 0 0;font-size:13px;color:var(--text-muted)}
-.se-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.se-library-card{border:1px solid var(--border-primary);border-radius:16px;background:var(--surface-1);padding:14px;cursor:pointer;transition:border-color .16s,transform .16s,background .16s}
-.se-library-card:hover{border-color:rgba(17,165,81,.28);background:rgba(17,165,81,.05);transform:translateY(-1px)}
-.se-library-card h4{margin:0 0 4px;font-size:14px}
-.se-library-card p{margin:0;font-size:12px;color:var(--text-muted);line-height:1.45}
-.se-library-meta{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:4px 8px;border-radius:999px;background:var(--surface-3);border:1px solid var(--border-primary);font-size:10px;font-weight:700;color:var(--text-secondary)}
-@media(max-width:820px){.se-library-grid{grid-template-columns:1fr}}
+.se-builder-grid{grid-template-columns:300px minmax(0,1fr)}
+.se-builder-panel{margin-top:var(--space-4)}
+.se-builder-copy{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:var(--space-3)}
+.se-block-library{display:grid;gap:10px}
+.se-block-card{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border-primary);border-radius:14px;background:var(--surface-1);cursor:grab;transition:border-color .16s,background .16s,transform .16s}
+.se-block-card:hover{border-color:rgba(17,165,81,.3);background:rgba(17,165,81,.05);transform:translateY(-1px)}
+.se-block-icon{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,165,81,.12);color:var(--green);flex-shrink:0}
+.se-block-name{font-size:13px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
+.se-block-copy{font-size:12px;color:var(--text-muted);line-height:1.45}
+.se-flow-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:var(--space-4);align-items:start}
+.se-flow-main,.se-flow-preview{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:var(--space-4)}
+.se-flow-preview{position:sticky;top:20px}
+.se-flow-head{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;margin-bottom:var(--space-4)}
+.se-flow-head h3,.se-flow-preview h3{margin:0;font-size:15px}
+.se-flow-head p,.se-flow-preview p{margin:4px 0 0;font-size:12px;color:var(--text-muted)}
+.se-flow-drop{border:1px dashed var(--border-primary);border-radius:16px;background:linear-gradient(180deg,var(--surface-1),var(--surface-2));padding:16px;text-align:center;color:var(--text-muted);font-size:12px;margin-bottom:var(--space-4)}
+.se-flow-drop.dragover{border-color:rgba(17,165,81,.35);background:rgba(17,165,81,.06);color:var(--green)}
+.se-flow-list{display:grid;gap:12px}
+.se-flow-card{border:1px solid var(--border-primary);border-radius:16px;background:var(--surface-2);padding:14px;cursor:pointer;transition:border-color .16s,box-shadow .16s,background .16s}
+.se-flow-card.active{border-color:rgba(17,165,81,.35);box-shadow:0 0 0 3px rgba(17,165,81,.08);background:linear-gradient(180deg,rgba(17,165,81,.05),var(--surface-2))}
+.se-flow-top{display:flex;gap:12px;align-items:flex-start}
+.se-flow-maintext{flex:1;min-width:0}
+.se-flow-title{font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
+.se-flow-sub{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:10px}
+.se-flow-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.se-flow-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;border:1px solid var(--border-primary);background:var(--surface-3);font-size:11px;font-weight:700;color:var(--text-secondary);cursor:pointer}
+.se-flow-btn:hover{background:rgba(17,165,81,.08);color:var(--green);border-color:rgba(17,165,81,.25)}
+.se-flow-editor{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-primary);display:none}
+.se-flow-card.active .se-flow-editor{display:block}
+.se-inline-grid{display:grid;gap:12px}
+.se-preview-phone{border:1px solid var(--border-primary);border-radius:24px;background:#111827;padding:12px}
+.se-preview-screen{background:#fff;border-radius:16px;padding:14px;min-height:420px;color:#111827}
+.se-preview-kicker{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eef2f7;font-size:10px;font-weight:700;color:#475569;margin-bottom:10px}
+.se-preview-step{padding:10px 0;border-bottom:1px solid #e5e7eb}
+.se-preview-step:last-child{border-bottom:none}
+@media(max-width:1200px){.se-flow-wrap{grid-template-columns:1fr}.se-flow-preview{position:static}}
+@media(max-width:980px){.se-builder-grid{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -311,7 +319,7 @@
       </div>
     </div>
 
-    <div class="se-grid">
+    <div class="se-grid se-builder-grid">
       <div class="se-rail" id="rail">
         <div class="se-template-card">
           <div class="se-rail-title" style="margin-bottom:8px">Survey template</div>
@@ -332,16 +340,16 @@
           <div class="se-template-note">Choose a template, apply it, then fine-tune the questions below.</div>
         </div>
 
-        <div class="se-rail-title">Questions</div>
-        <div id="q-list"></div>
-        <div class="se-add-bar">
-          <button class="se-btn-primary se-add-btn" id="btn-add-q" type="button"><i class="fa-solid fa-plus"></i> Add question</button>
+        <div class="se-builder-panel">
+          <div class="se-rail-title" style="margin-bottom:8px">Question blocks</div>
+          <div class="se-builder-copy">Drag or click a block to add it to the survey flow.</div>
+          <div id="q-library" class="se-block-library"></div>
         </div>
       </div>
 
       <div class="se-pane" id="right-pane">
         <div class="se-tabs" id="pane-tabs">
-          <button class="se-tab active" data-tab="question">Question</button>
+          <button class="se-tab active" data-tab="question">Question flow</button>
           <button class="se-tab" data-tab="settings">Survey settings</button>
           <button class="se-tab" data-tab="preview">Preview</button>
           <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Distribution</button>
@@ -357,20 +365,6 @@
       <p class="text-xs text-muted">&copy; 2026 GoNoGo &mdash; CX Suite (internal only)</p>
     </div>
   </main>
-</div>
-
-
-<div class="se-library-overlay" id="q-library-overlay" aria-hidden="true">
-  <div class="se-library-modal">
-    <div class="se-library-head">
-      <div>
-        <h3>Question library</h3>
-        <p>Choose the format that best matches what you want to learn, then refine it in the question editor.</p>
-      </div>
-      <button type="button" class="se-btn-secondary" id="btn-close-library"><i class="fa-solid fa-xmark"></i> Close</button>
-    </div>
-    <div class="se-library-grid" id="q-library-grid"></div>
-  </div>
 </div>
 
 <div class="se-toast" id="toast"></div>
@@ -413,23 +407,22 @@ var QTYPES = [
 ];
 
 
-function safeQtypes(){ return Array.isArray(QTYPES) ? QTYPES : []; }
 function renderQuestionLibrary(){
-  var grid = document.getElementById('q-library-grid');
-  if (!grid) return;
-  grid.innerHTML = safeQtypes().map(function(t){
-    return '<div class="se-library-card" data-qtype="'+t.v+'"><div style="display:flex;gap:10px;align-items:flex-start"><span class="se-q-icon"><i class="fa-solid '+t.icon+'"></i></span><div><h4>'+esc(t.l)+'</h4><p>Add a '+esc(t.l.toLowerCase())+' question to your survey.</p><span class="se-library-meta">Question block</span></div></div></div>';
+  var el=document.getElementById('q-library');
+  if(!el) return;
+  el.innerHTML=(QTYPES||[]).map(function(t){
+    return '<div class="se-block-card" draggable="true" data-qtype="'+t.v+'"><span class="se-block-icon"><i class="fa-solid '+t.icon+'"></i></span><div><div class="se-block-name">'+esc(t.l)+'</div><div class="se-block-copy">Add a '+esc(t.l.toLowerCase())+' question to the survey flow.</div></div></div>';
   }).join('');
-  grid.querySelectorAll('[data-qtype]').forEach(function(card){
-    card.addEventListener('click', function(){ addQuestion(card.dataset.qtype); closeQuestionLibrary(); });
+  el.querySelectorAll('[data-qtype]').forEach(function(card){
+    card.addEventListener('click', function(){ addQuestion(card.dataset.qtype); });
+    card.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', card.dataset.qtype); });
   });
 }
-function openQuestionLibrary(){ var o=document.getElementById('q-library-overlay'); if(o){ o.classList.add('show'); o.setAttribute('aria-hidden','false'); } }
-function closeQuestionLibrary(){ var o=document.getElementById('q-library-overlay'); if(o){ o.classList.remove('show'); o.setAttribute('aria-hidden','true'); } }
-function bindQuestionLibrary(){
-  var openBtn=document.getElementById('btn-open-library'); if(openBtn) openBtn.onclick=openQuestionLibrary;
-  var closeBtn=document.getElementById('btn-close-library'); if(closeBtn) closeBtn.onclick=closeQuestionLibrary;
-  var overlay=document.getElementById('q-library-overlay'); if(overlay) overlay.addEventListener('click', function(e){ if(e.target===overlay) closeQuestionLibrary(); });
+
+function flowPreviewHTML(){
+  var introTitle = (_survey && (_survey.intro_title || _survey.name)) || 'Survey preview';
+  var introText = (_survey && _survey.intro_text) || 'This is how the current flow will feel to a respondent.';
+  return '<div class="se-preview-phone"><div class="se-preview-screen"><span class="se-preview-kicker">Step by step preview</span><div style="font-size:18px;font-weight:800;margin-bottom:6px">'+esc(introTitle)+'</div><div style="font-size:12px;color:#64748b;line-height:1.5;margin-bottom:12px">'+esc(introText)+'</div>'+(_questions||[]).slice(0,5).map(function(q,idx){ return '<div class="se-preview-step"><div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">Step '+(idx+1)+'</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">'+esc(q.prompt || qtypeLabel(q.qtype))+'</div><div style="font-size:12px;color:#6b7280">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div></div>'; }).join('')+'</div></div>';
 }
 
 var TEMPLATES = {
@@ -522,7 +515,6 @@ async function init() {
 
   if (_questions.length > 0) _selectedIdx = 0;
   renderQuestionLibrary();
-  bindQuestionLibrary();
   renderRail();
   renderQuestionPanel();
 }
@@ -640,426 +632,165 @@ function deleteQuestion(idx) {
 
 function renderRail() {
   var list = document.getElementById('q-list');
-  if (!list) return;
   if (!_questions.length) {
-    list.innerHTML = '<div class="se-question-empty"><div style="font-size:24px;margin-bottom:8px"><i class="fa-solid fa-clipboard-list"></i></div><strong style="display:block;font-size:13px;color:var(--text-primary);margin-bottom:6px">No questions yet</strong><span>Start with a question type from the library, then fine-tune the details in the editor.</span></div>';
+    list.innerHTML = '';
+    renderEmptyState();
     return;
   }
 
-  list.innerHTML = '<div class="se-question-list">' + _questions.map(function(q, i){
+  list.innerHTML = _questions.map(function(q, i){
     var active = i === _selectedIdx ? ' active' : '';
     var icon = qtypeIcon(q.qtype);
-    var label = q.prompt ? esc(q.prompt) : 'Untitled question';
-    var help = q.help_text ? esc(q.help_text) : qtypeLabel(q.qtype);
+    var label = q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>';
     var logicCount = Array.isArray(q.logic) ? q.logic.length : 0;
+
     return '<div class="se-q-item' + active + '" data-idx="' + i + '" draggable="true">' +
-      '<div class="se-q-item-top">' +
-        '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
-        '<span class="se-q-icon"><i class="fa-solid ' + icon + '"></i></span>' +
-        '<div class="se-q-main">' +
-          '<div class="se-q-title">' + label + '</div>' +
-          '<div class="se-q-sub">' + help + '</div>' +
-          '<div class="se-q-meta">' +
-            '<span class="se-q-pill">' + esc(qtypeLabel(q.qtype)) + '</span>' +
-            (q.required ? '<span class="se-q-pill">Required</span>' : '') +
-            (logicCount ? '<span class="se-q-pill logic"><i class="fa-solid fa-diagram-project"></i> ' + logicCount + ' logic</span>' : '') +
-          '</div>' +
-          '<div class="se-q-actions">' +
-            '<button type="button" class="se-q-btn" data-act="edit" data-idx="' + i + '"><i class="fa-solid fa-pen"></i>Edit</button>' +
-            '<button type="button" class="se-q-btn" data-act="dup" data-idx="' + i + '"><i class="fa-solid fa-copy"></i>Duplicate</button>' +
-            '<button type="button" class="se-q-btn" data-act="del" data-idx="' + i + '"><i class="fa-solid fa-trash"></i>Delete</button>' +
-          '</div>' +
+      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+      '<span class="qicon"><i class="fa-solid ' + icon + '"></i></span>' +
+      '<span class="qlabel">' + label +
+        '<div class="se-q-meta">' +
+          '<span class="se-q-pill">' + esc(qtypeLabel(q.qtype)) + '</span>' +
+          (logicCount ? '<span class="se-q-pill logic"><i class="fa-solid fa-code-branch"></i> ' + logicCount + ' rule' + (logicCount === 1 ? '' : 's') + '</span>' : '') +
         '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('') + '</div>';
+      '</span>' +
+      (q.required ? '<span class="req-dot"><i class="fa-solid fa-asterisk"></i></span>' : '') +
+      '<button class="del-btn" data-delidx="' + i + '" title="Delete"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>';
+  }).join('');
 
   list.querySelectorAll('.se-q-item').forEach(function(el){
     el.addEventListener('click', function(e){
-      if (e.target.closest('button')) return;
-      _selectedIdx = Number(el.dataset.idx);
+      if (e.target.closest('.del-btn')) return;
+      _selectedIdx = parseInt(el.dataset.idx, 10);
       renderRail();
       renderQuestionPanel();
       showTab('question');
     });
   });
 
-  list.querySelectorAll('[data-act]').forEach(function(btn){
-    btn.addEventListener('click', function(e){
+  list.querySelectorAll('.del-btn').forEach(function(b){
+    b.addEventListener('click', function(e){
       e.stopPropagation();
-      var idx = Number(btn.dataset.idx);
-      var act = btn.dataset.act;
-      if (act === 'edit') {
-        _selectedIdx = idx;
-        renderRail();
-        renderQuestionPanel();
-        showTab('question');
-      } else if (act === 'dup') {
-        var clone = JSON.parse(JSON.stringify(_questions[idx]));
-        _questions.splice(idx + 1, 0, clone);
-        _selectedIdx = idx + 1;
-        markDirty();
-        renderRail();
-        renderQuestionPanel();
-      } else if (act === 'del') {
-        deleteQuestion(idx);
-      }
+      deleteQuestion(parseInt(b.dataset.delidx, 10));
     });
   });
 
-  wireDragSort();
+  wireRailDragDrop(list);
 }
 
-function renderQuestionPanel() {
-  var panel = document.getElementById('panel-question');
-  if (_selectedIdx < 0 || _selectedIdx >= _questions.length) {
-    renderEmptyState();
-    return;
-  }
-
-  var q = _questions[_selectedIdx];
-  var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown';
-
-  var html = '';
-  html += '<div class="se-panel-intro"><div><h2>Question editor</h2><p>Refine the prompt, add guidance, preview the answer format and define simple skip logic for this question.</p></div></div>';
-
-  html += '<div class="se-field"><label class="se-label">Question type</label><select class="se-select" id="ed-qtype">';
-  QTYPES.forEach(function(t){
-    html += '<option value="' + t.v + '"' + (t.v === q.qtype ? ' selected' : '') + '>' + esc(t.l) + '</option>';
-  });
-  html += '</select></div>';
-
-  html += '<div class="se-field"><label class="se-label">Prompt *</label><textarea class="se-textarea" id="ed-prompt" rows="3" placeholder="Question text. Press Enter for a new line." style="min-height:80px;resize:vertical">' + esc(q.prompt || '') + '</textarea></div>';
-  html += '<div class="se-field"><label class="se-label">Help text</label><textarea class="se-textarea" id="ed-help" placeholder="Optional guidance for the respondent">' + esc(q.help_text || '') + '</textarea></div>';
-  html += '<div class="se-field"><label class="se-toggle"><input type="checkbox" id="ed-required"' + (q.required ? ' checked' : '') + '> Required</label></div>';
-
-  if (isSelect) {
-    html += '<div class="se-card"><h4 class="se-section-h" style="margin-top:0">Answer options</h4><div id="ed-options"></div><button class="se-btn-secondary" id="btn-add-opt" type="button" style="margin-top:12px"><i class="fa-solid fa-plus"></i> Add option</button></div>';
-  }
-
-  if (q.qtype === 'consent') {
-    var consentLabel = (q.options && q.options[0]) || 'I agree to the terms';
-    html += '<div class="se-field"><label class="se-label">Consent label</label><input class="se-input" id="ed-consent-label" value="' + esc(consentLabel) + '"></div>';
-  }
-
-  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
-    var placeholder = (q.options && q.options[0]) || '';
-    html += '<div class="se-field"><label class="se-label">Placeholder text</label><input class="se-input" id="ed-placeholder" value="' + esc(placeholder) + '" placeholder="Optional placeholder"></div>';
-  }
-
-  if (q.qtype === 'number') {
-    var nmin = q.options && q.options[0] != null ? q.options[0] : '';
-    var nmax = q.options && q.options[1] != null ? q.options[1] : '';
-    html += '<div class="se-row"><div class="se-field"><label class="se-label">Min</label><input class="se-input" id="ed-num-min" type="number" value="' + esc(String(nmin)) + '" placeholder="no min"></div><div class="se-field"><label class="se-label">Max</label><input class="se-input" id="ed-num-max" type="number" value="' + esc(String(nmax)) + '" placeholder="no max"></div></div>';
-  }
-
-  html += '<div class="se-card"><h4 class="se-section-h" style="margin-top:0">Branching &amp; skip logic</h4><div class="se-hint">First-pass logic rules can be defined here and saved with the question object. Backend execution will still need matching support.</div><div id="ed-logic"></div><button class="se-btn-secondary" id="btn-add-logic" type="button" style="margin-top:12px"><i class="fa-solid fa-code-branch"></i> Add logic rule</button></div>';
-
-  html += '<div class="se-preview"><div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q) + '</div>';
-
-  panel.innerHTML = html;
-  wireQuestionEditor();
-}
-
-function wireQuestionEditor() {
-  var q = _questions[_selectedIdx];
-  if (!q) return;
-
-  document.getElementById('ed-qtype').addEventListener('change', function(){
-    q.qtype = this.value;
-    if ((q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown') && (!q.options || !q.options.length)) q.options = ['Option 1', 'Option 2'];
-    if (q.qtype === 'number' && (!q.options || q.options.length < 2)) q.options = ['', ''];
-    markDirty();
-    renderRail();
-    renderQuestionPanel();
-  });
-
-  document.getElementById('ed-prompt').addEventListener('input', function(){
-    q.prompt = this.value;
-    markDirty();
-    updateRailLabel();
-    updatePreview();
-  });
-
-  document.getElementById('ed-help').addEventListener('input', function(){
-    q.help_text = this.value;
-    markDirty();
-    updatePreview();
-  });
-
-  document.getElementById('ed-required').addEventListener('change', function(){
-    q.required = this.checked;
-    markDirty();
-    renderRail();
-  });
-
-  if (q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown') {
-    renderOptionsEditor();
-    document.getElementById('btn-add-opt').addEventListener('click', function(){
-      q.options.push('');
-      markDirty();
-      renderOptionsEditor();
-      updatePreview();
-    });
-  }
-
-  if (q.qtype === 'number') {
-    var minEl = document.getElementById('ed-num-min');
-    var maxEl = document.getElementById('ed-num-max');
-    var syncNum = function(){
-      q.options = [minEl.value, maxEl.value];
-      markDirty();
-      updatePreview();
-    };
-    minEl.addEventListener('input', syncNum);
-    maxEl.addEventListener('input', syncNum);
-  }
-
-  if (q.qtype === 'consent') {
-    document.getElementById('ed-consent-label').addEventListener('input', function(){
-      q.options = [this.value];
-      markDirty();
-      updatePreview();
-    });
-  }
-
-  if (q.qtype === 'short_text' || q.qtype === 'long_text') {
-    var phEl = document.getElementById('ed-placeholder');
-    if (phEl) phEl.addEventListener('input', function(){
-      q.options = this.value ? [this.value] : [];
-      markDirty();
-      updatePreview();
-    });
-  }
-
-  renderLogicEditor();
-  document.getElementById('btn-add-logic').addEventListener('click', function(){
-    if (!Array.isArray(q.logic)) q.logic = [];
-    q.logic.push({ match:'equals', value:'', action:'next' });
-    markDirty();
-    renderLogicEditor();
-    renderRail();
-  });
-}
-
-function updateRailLabel() {
-  var el = document.querySelector('.se-q-item[data-idx="' + _selectedIdx + '"] .qlabel');
-  if (el) {
-    var q = _questions[_selectedIdx];
-    var logicCount = Array.isArray(q.logic) ? q.logic.length : 0;
-    el.innerHTML = (q.prompt ? esc(q.prompt) : '<em style="color:var(--text-muted)">Untitled</em>') +
-      '<div class="se-q-meta"><span class="se-q-pill">' + esc(qtypeLabel(q.qtype)) + '</span>' +
-      (logicCount ? '<span class="se-q-pill logic"><i class="fa-solid fa-code-branch"></i> ' + logicCount + ' rule' + (logicCount === 1 ? '' : 's') + '</span>' : '') +
-      '</div>';
-  }
-}
-
-function updatePreview() {
-  var q = _questions[_selectedIdx];
-  if (!q) return;
-  var container = document.querySelector('.se-preview');
-  if (container) container.innerHTML = '<div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q);
-}
-
-function getQuestionTargetOptions(currentIdx) {
-  var html = '<option value="next">Next question</option><option value="end">End survey</option>';
-  _questions.forEach(function(item, idx){
-    if (idx === currentIdx) return;
-    var label = item.prompt && item.prompt.trim() ? item.prompt.trim() : ('Untitled question ' + (idx + 1));
-    html += '<option value="' + idx + '">Jump to Q' + (idx + 1) + ': ' + esc(label) + '</option>';
-  });
-  return html;
-}
-
-function renderLogicEditor() {
-  var q = _questions[_selectedIdx];
-  var container = document.getElementById('ed-logic');
-  if (!container || !q) return;
-  if (!Array.isArray(q.logic)) q.logic = [];
-
-  if (!q.logic.length) {
-    container.innerHTML = '<div class="se-logic-empty">No logic rules yet. Add a rule to branch on a selected answer, low score, or explicit value.</div>';
-    return;
-  }
-
-  var targetOpts = getQuestionTargetOptions(_selectedIdx);
-  container.innerHTML = '<div class="se-logic-list">' + q.logic.map(function(rule, idx){
-    return '<div class="se-logic-row" data-lidx="' + idx + '">' +
-      '<div><label class="se-label">When answer</label><select class="se-select" data-role="match" data-lidx="' + idx + '">' +
-        '<option value="equals"' + (rule.match === 'equals' ? ' selected' : '') + '>Equals</option>' +
-        '<option value="contains"' + (rule.match === 'contains' ? ' selected' : '') + '>Contains</option>' +
-        '<option value="lt"' + (rule.match === 'lt' ? ' selected' : '') + '>Less than</option>' +
-        '<option value="lte"' + (rule.match === 'lte' ? ' selected' : '') + '>Less than or equal</option>' +
-        '<option value="gte"' + (rule.match === 'gte' ? ' selected' : '') + '>Greater than or equal</option>' +
-        '<option value="answered"' + (rule.match === 'answered' ? ' selected' : '') + '>Is answered</option>' +
-      '</select></div>' +
-      '<div><label class="se-label">Value</label><input class="se-input" data-role="value" data-lidx="' + idx + '" value="' + esc(rule.value || '') + '" placeholder="e.g. 0-6, Yes, unhappy"></div>' +
-      '<div><label class="se-label">Then go to</label><select class="se-select" data-role="action" data-lidx="' + idx + '">' + targetOpts + '</select></div>' +
-      '<button class="del-btn" type="button" data-role="delete" data-lidx="' + idx + '" title="Delete rule"><i class="fa-solid fa-trash"></i></button>' +
-      '</div>';
-  }).join('') + '</div>';
-
-  container.querySelectorAll('[data-role="action"]').forEach(function(el){
-    var idx = parseInt(el.dataset.lidx, 10);
-    el.value = String(q.logic[idx].action || 'next');
-  });
-
-  container.querySelectorAll('select[data-role], input[data-role]').forEach(function(el){
-    el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', function(){
-      var idx = parseInt(this.dataset.lidx, 10);
-      var role = this.dataset.role;
-      if (role === 'delete') return;
-      if (!q.logic[idx]) return;
-      q.logic[idx][role === 'action' ? 'action' : role] = this.value;
-      markDirty();
-      renderRail();
-    });
-  });
-
-  container.querySelectorAll('[data-role="delete"]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      q.logic.splice(parseInt(this.dataset.lidx, 10), 1);
-      markDirty();
-      renderLogicEditor();
-      renderRail();
-    });
-  });
-}
-
-function renderOptionsEditor() {
-  var q = _questions[_selectedIdx];
-  var container = document.getElementById('ed-options');
-  if (!container) return;
-
-  container.innerHTML = (q.options || []).map(function(opt, i){
-    return '<div class="se-opt-row" data-oidx="' + i + '" draggable="true">' +
-      '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
-      '<input class="se-input" value="' + esc(opt || '') + '" data-oidx="' + i + '" placeholder="Option ' + (i + 1) + '">' +
-      '<button class="del-btn" data-delidx="' + i + '" type="button"><i class="fa-solid fa-trash"></i></button>' +
-      '</div>';
-  }).join('');
-
-  container.querySelectorAll('.se-opt-row input').forEach(function(el){
-    el.addEventListener('input', function(){
-      q.options[parseInt(el.dataset.oidx, 10)] = el.value;
-      markDirty();
-      updatePreview();
-    });
-  });
-
-  container.querySelectorAll('.se-opt-row .del-btn').forEach(function(b){
-    b.addEventListener('click', function(){
-      q.options.splice(parseInt(b.dataset.delidx, 10), 1);
-      markDirty();
-      renderOptionsEditor();
-      updatePreview();
-    });
-  });
-
+function wireRailDragDrop(list) {
   var dragIdx = null;
-  container.querySelectorAll('.se-opt-row').forEach(function(el){
+  list.querySelectorAll('.se-q-item').forEach(function(el){
     el.addEventListener('dragstart', function(e){
-      dragIdx = parseInt(el.dataset.oidx, 10);
+      dragIdx = parseInt(el.dataset.idx, 10);
       el.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', dragIdx);
     });
     el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
-    el.addEventListener('dragover', function(e){ e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragover', function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drag-over');
+    });
     el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
     el.addEventListener('drop', function(e){
       e.preventDefault();
       el.classList.remove('drag-over');
-      var toIdx = parseInt(el.dataset.oidx, 10);
+      var toIdx = parseInt(el.dataset.idx, 10);
       if (dragIdx === null || dragIdx === toIdx) return;
-      var moved = q.options.splice(dragIdx, 1)[0];
-      q.options.splice(toIdx, 0, moved);
+      var moved = _questions.splice(dragIdx, 1)[0];
+      _questions.splice(toIdx, 0, moved);
+      if (_selectedIdx === dragIdx) _selectedIdx = toIdx;
+      else if (dragIdx < _selectedIdx && toIdx >= _selectedIdx) _selectedIdx--;
+      else if (dragIdx > _selectedIdx && toIdx <= _selectedIdx) _selectedIdx++;
       markDirty();
-      renderOptionsEditor();
-      updatePreview();
+      renderRail();
+      renderQuestionPanel();
     });
   });
 }
 
-function renderPreview(q) {
-  var html = '<div class="q-prompt">' + esc(q.prompt || 'Question prompt') + (q.required ? ' <span style="color:var(--red)">*</span>' : '') + '</div>';
-  if (q.help_text) html += '<div class="q-help">' + esc(q.help_text) + '</div>';
+function renderQuestionPanel() {
+  var panel = document.getElementById('panel-question');
+  if (!panel) return;
+  panel.innerHTML = '<div class="se-flow-wrap">' +
+    '<div class="se-flow-main">' +
+      '<div class="se-flow-head"><div><h3>Survey flow</h3><p>Build the actual question flow here. Drag blocks from the left, then edit each question inline.</p></div><button class="se-btn-primary" id="btn-add-q-inline" type="button"><i class="fa-solid fa-plus"></i> Add question</button></div>' +
+      '<div class="se-flow-drop" id="se-flow-drop"><i class="fa-solid fa-arrow-down"></i> Drop a question block here to add it to the flow</div>' +
+      '<div class="se-flow-list">' + (_questions.length ? _questions.map(function(q, i){
+        var active = i === _selectedIdx ? ' active' : '';
+        var logicCount = Array.isArray(q.logic) ? q.logic.length : 0;
+        return '<div class="se-flow-card'+active+'" data-flow-idx="'+i+'">' +
+          '<div class="se-flow-top">' +
+            '<span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>' +
+            '<span class="se-block-icon"><i class="fa-solid '+qtypeIcon(q.qtype)+'"></i></span>' +
+            '<div class="se-flow-maintext">' +
+              '<div class="se-flow-title">'+esc(q.prompt || 'Untitled question')+'</div>' +
+              '<div class="se-flow-sub">'+esc(q.help_text || qtypeLabel(q.qtype))+'</div>' +
+              '<div class="se-q-meta"><span class="se-q-pill">'+esc(qtypeLabel(q.qtype))+'</span>' + (q.required ? '<span class="se-q-pill">Required</span>' : '') + (logicCount ? '<span class="se-q-pill logic"><i class="fa-solid fa-diagram-project"></i> '+logicCount+' logic</span>' : '') + '</div>' +
+              '<div class="se-flow-actions">' +
+                '<button type="button" class="se-flow-btn" data-act="dup" data-flow-idx="'+i+'"><i class="fa-solid fa-copy"></i>Duplicate</button>' +
+                '<button type="button" class="se-flow-btn" data-act="del" data-flow-idx="'+i+'"><i class="fa-solid fa-trash"></i>Delete</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="se-flow-editor">' +
+            '<div class="se-inline-grid">' +
+              '<div><label class="se-label">Question type</label><select class="se-select" data-field="qtype" data-flow-idx="'+i+'">' + QTYPES.map(function(t){ return '<option value="'+t.v+'"'+(q.qtype===t.v?' selected':'')+'>'+esc(t.l)+'</option>'; }).join('') + '</select></div>' +
+              '<div><label class="se-label">Prompt</label><textarea class="se-textarea" data-field="prompt" data-flow-idx="'+i+'" placeholder="Question text. Press Enter for a new line.">'+esc(q.prompt || '')+'</textarea></div>' +
+              '<div><label class="se-label">Help text</label><textarea class="se-textarea" data-field="help_text" data-flow-idx="'+i+'" placeholder="Optional guidance for the respondent">'+esc(q.help_text || '')+'</textarea></div>' +
+              '<div class="se-row"><div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-flow-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div>' +
+              '<div>' + ((q.qtype==='short_text'||q.qtype==='long_text'||q.qtype==='email'||q.qtype==='phone'||q.qtype==='name'||q.qtype==='number'||q.qtype==='date') ? '<label class="se-label">Placeholder text</label><input class="se-input" data-field="placeholder" data-flow-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">' : '') + '</div></div>' +
+              + ((q.qtype==='single_select'||q.qtype==='multi_select'||q.qtype==='dropdown') ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-flow-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('
+'))+'</textarea></div>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') : '<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div><h3>Start building the survey flow</h3><p>Drag a question block from the left, or add one manually to begin.</p></div>') + '</div>' +
+    '</div>' +
+    '<div class="se-flow-preview"><h3>Live preview</h3><p>The preview stays visible while you shape the flow.</p>' + flowPreviewHTML() + '</div>' +
+  '</div>';
 
-  switch(q.qtype) {
-    case 'short_text':
-    case 'name':
-      html += '<input type="text" disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer...') + '">';
-      if (q.qtype === 'name') html += '<div class="se-hint">Respondent name validated on submit</div>';
-      break;
-    case 'long_text':
-      html += '<textarea disabled placeholder="' + esc((q.options && q.options[0]) || 'Type your answer...') + '"></textarea>';
-      break;
-    case 'email':
-      html += '<input type="email" disabled placeholder="name@example.com"><div class="se-hint">Email format validated on submit</div>';
-      break;
-    case 'phone':
-      html += '<input type="tel" disabled placeholder="+27 xx xxx xxxx"><div class="se-hint">Phone format validated on submit</div>';
-      break;
-    case 'single_select':
-      (q.options || []).forEach(function(o){ html += '<div class="radio-row"><input type="radio" disabled> ' + esc(o || 'Option') + '</div>'; });
-      break;
-    case 'multi_select':
-      (q.options || []).forEach(function(o){ html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(o || 'Option') + '</div>'; });
-      break;
-    case 'rating_1_5':
-      html += '<div class="scale-grid" style="grid-template-columns:repeat(5,1fr)">';
-      for (var i=1;i<=5;i++) html += '<div class="scale-btn"><i class="fa-solid fa-star" style="margin-right:4px;font-size:11px;color:var(--green)"></i>' + i + '</div>';
-      html += '</div>';
-      break;
-    case 'nps_0_10':
-      html += '<div class="scale-grid" style="grid-template-columns:repeat(11,1fr)">';
-      for (var j=0;j<=10;j++) {
-        var cls = j <= 6 ? 'nps-red' : (j <= 8 ? 'nps-amber' : 'nps-green');
-        html += '<div class="scale-btn ' + cls + '">' + j + '</div>';
-      }
-      html += '</div><div class="nps-labels"><span>Not at all likely</span><span>Extremely likely</span></div>';
-      break;
-    case 'yes_no':
-      html += '<div class="radio-row"><input type="radio" disabled> Yes</div><div class="radio-row"><input type="radio" disabled> No</div>';
-      break;
-    case 'consent':
-      var label = (q.options && q.options[0]) || 'I agree to the terms';
-      html += '<div class="radio-row"><input type="checkbox" disabled> ' + esc(label) + '</div>';
-      break;
-    case 'star_rating':
-      html += '<div style="display:flex;gap:6px;font-size:24px;color:var(--green)">';
-      for (var s=0;s<5;s++) html += '<i class="fa-regular fa-star"></i>';
-      html += '</div><div class="se-hint">Respondents click to rate 1–5 stars</div>';
-      break;
-    case 'csat_smiley':
-      html += '<div style="display:flex;gap:10px;font-size:28px">😠 😕 😐 🙂 😍</div><div class="nps-labels"><span>Very unhappy</span><span>Very happy</span></div>';
-      break;
-    case 'dropdown':
-      html += '<select disabled><option>— Select an option —</option>';
-      (q.options || []).forEach(function(o){ html += '<option>' + esc(o || 'Option') + '</option>'; });
-      html += '</select>';
-      break;
-    case 'date':
-      html += '<input type="date" disabled>';
-      break;
-    case 'number':
-      var min = q.options && q.options[0];
-      var max = q.options && q.options[1];
-      html += '<input type="number" disabled placeholder="Enter a number">';
-      if (min || max) html += '<div class="se-hint">Allowed range ' + esc(min || '−∞') + ' to ' + esc(max || '∞') + '</div>';
-      break;
+  document.getElementById('btn-add-q-inline')?.addEventListener('click', function(){ document.getElementById('btn-add-q') && document.getElementById('btn-add-q').click(); });
+
+  var drop = document.getElementById('se-flow-drop');
+  if (drop) {
+    ['dragenter','dragover'].forEach(function(evt){ drop.addEventListener(evt, function(e){ e.preventDefault(); drop.classList.add('dragover'); }); });
+    ['dragleave','drop'].forEach(function(evt){ drop.addEventListener(evt, function(e){ e.preventDefault(); drop.classList.remove('dragover'); }); });
+    drop.addEventListener('drop', function(e){ var qtype=e.dataTransfer.getData('text/plain'); if(qtype) addQuestion(qtype); });
   }
 
-  return html;
-}
+  panel.querySelectorAll('.se-flow-card').forEach(function(card){
+    card.addEventListener('click', function(e){ if(e.target.closest('button, input, textarea, select, label')) return; _selectedIdx=Number(card.dataset.flowIdx); renderQuestionPanel(); });
+  });
 
-function renderEmptyState(mode) {
-  var panel = document.getElementById('panel-question');
-  var titleHtml = !_questions.length
-    ? '<h3>Add your first question</h3><p>Pick a question type to start building the survey.</p>'
-    : '<h3>Add a question</h3><p>Pick a question type to add to this survey.</p>';
-  if (mode === 'add') titleHtml = '<h3>Add a question</h3><p>Choose the kind of question you want to insert next.</p>';
-  panel.innerHTML = qtypePickerHTML(titleHtml);
+  panel.querySelectorAll('[data-act]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var idx=Number(btn.dataset.flowIdx);
+      if(btn.dataset.act==='dup'){ var clone=JSON.parse(JSON.stringify(_questions[idx])); _questions.splice(idx+1,0,clone); _selectedIdx=idx+1; markDirty(); renderRail(); renderQuestionPanel(); }
+      if(btn.dataset.act==='del'){ deleteQuestion(idx); }
+    });
+  });
+
+  panel.querySelectorAll('[data-field]').forEach(function(input){
+    var idx=Number(input.dataset.flowIdx);
+    input.addEventListener(input.type==='checkbox' ? 'change' : 'input', function(){
+      var q=_questions[idx]; if(!q) return;
+      if(input.dataset.field==='required'){ q.required=!!input.checked; }
+      else if(input.dataset.field==='options_text'){ q.options=input.value.split(/
++/).map(function(v){ return v.trim(); }).filter(Boolean); }
+      else if(input.dataset.field==='placeholder'){ q.options=[input.value || '']; }
+      else { q[input.dataset.field]=input.value; }
+      markDirty();
+      renderRail();
+      renderQuestionPanel();
+    });
+  });
+
   wireQtypePicker(panel);
+  wireDragSort();
 }
 
 function renderSettingsPanel() {
