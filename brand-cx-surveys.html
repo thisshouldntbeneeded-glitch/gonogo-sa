@@ -18,7 +18,7 @@
 .cx-b-published{background:rgba(34,197,94,.18);color:#4ade80}
 .cx-b-paused{background:rgba(234,179,8,.18);color:#fbbf24}
 .cx-b-archived{background:rgba(100,116,139,.18);color:#94a3b8}
-.cx-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;padding:var(--space-4)}
+.cx-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none!important;align-items:center;justify-content:center;z-index:100;padding:var(--space-4)}
 .cx-modal.show{display:flex}
 .cx-modal-card{width:min(100%,820px);max-height:90vh;overflow-y:auto;background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-lg);padding:var(--space-5)}
 .cx-q-row{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-2);display:grid;grid-template-columns:auto 150px 1fr auto auto;gap:var(--space-2);align-items:center}
@@ -44,12 +44,13 @@
         <p class="text-sm text-secondary">Internal customer-feedback surveys. Responses stay private to your brand.</p>
       </div>
       <div style="display:flex;gap:var(--space-2)">
-        <button class="btn btn-sm" id="btn-new" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-plus"></i> New survey</button>
-        <a href="brand-cx-survey-edit.html" class="btn btn-sm" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-plus"></i> New survey</a>
+        <a href="brand-cx-survey-edit.html" class="btn btn-sm" id="btn-new" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-plus"></i> New survey</a>
       </div>
     </div>
 
-    <div id="surveys-container">
+    <div class="card" style="margin-bottom:var(--space-4);background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary)"><div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:center;flex-wrap:wrap"><div><div class="text-xs text-secondary" style="text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px">Survey management</div><div class="text-sm text-muted">All create and edit actions now open the newer full-page survey editor for a more consistent workflow.</div></div><a href="brand-cx-survey-edit.html" class="btn btn-sm" style="background:var(--surface-3)"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open full editor</a></div></div>
+
+<div id="surveys-container">
       <div class="card" style="text-align:center;padding:var(--space-8)"><i class="fa-solid fa-spinner fa-spin"></i> <span class="text-sm text-muted">Loading…</span></div>
     </div>
 
@@ -141,7 +142,6 @@ async function init() {
   if (!user) return;
   document.getElementById('brand-content').style.display = '';
   document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx-surveys');
-  document.getElementById('btn-new').addEventListener('click', openNew);
   document.getElementById('builder-close').addEventListener('click', closeBuilder);
   document.getElementById('builder-cancel').addEventListener('click', closeBuilder);
   document.getElementById('builder-save').addEventListener('click', save);
@@ -171,14 +171,10 @@ async function loadList() {
         '<td>' + (r.response_count || 0) + '</td>' +
         '<td>' + (r.link_count || 0) + '</td>' +
         '<td class="text-xs text-muted">' + fmtDate(r.updated_at) + '</td>' +
-        '<td style="text-align:right"><button class="btn btn-sm" data-edit="' + r.id + '">Edit</button></td></tr>';
-        '<td style="text-align:right"><a href="brand-cx-survey-edit.html?id=' + encodeURIComponent(r.id) + '" class="btn btn-sm">Edit</a></td></tr>';
+        '<td style="text-align:right"><a href="brand-cx-survey-edit.html?id=' + encodeURIComponent(r.id) + '" class="btn btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</a></td></tr>';
     });
     html += '</tbody></table>';
     container.innerHTML = html;
-    container.querySelectorAll('[data-edit]').forEach(function(b){
-      b.addEventListener('click', function(){ openEdit(b.dataset.edit); });
-    });
   } catch (e) {
     container.innerHTML = '<div class="card" style="padding:var(--space-5);color:var(--red)">Could not load surveys: ' + esc(e.message || 'error') + '</div>';
   }
