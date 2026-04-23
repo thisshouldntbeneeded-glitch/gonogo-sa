@@ -159,6 +159,25 @@
 .se-link-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:999px}
 .se-link-active{background:rgba(34,197,94,.18);color:#4ade80}
 .se-link-revoked{background:rgba(100,116,139,.18);color:#94a3b8}
+.se-dist-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--space-4);align-items:start}
+@media(max-width:1100px){.se-dist-grid{grid-template-columns:1fr}}
+.se-dist-stack{display:grid;gap:var(--space-4)}
+.se-dist-card{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:var(--space-4)}
+.se-dist-card h3{margin:0 0 6px;font-size:16px;color:var(--text-primary)}
+.se-dist-card p{margin:0 0 var(--space-3);font-size:13px;color:var(--text-muted);line-height:1.5}
+.se-dist-icon{width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,165,81,.1);color:var(--green);margin-bottom:10px;font-size:14px}
+.se-dist-list{display:grid;gap:10px;margin-top:var(--space-3)}
+.se-dist-item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-dist-item strong{display:block;font-size:13px;color:var(--text-primary);margin-bottom:2px}
+.se-dist-item span{display:block;font-size:12px;color:var(--text-muted);line-height:1.45}
+.se-dist-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:var(--space-3)}
+.se-dist-note{padding:12px 14px;border-radius:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.16);font-size:12px;color:var(--text-primary);line-height:1.5;margin-top:var(--space-3)}
+.se-mini-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:var(--space-3)}
+@media(max-width:720px){.se-mini-kpi{grid-template-columns:1fr}}
+.se-mini-kpi .k{padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-mini-kpi .k b{display:block;font-size:18px;color:var(--text-primary);margin-bottom:4px}
+.se-mini-kpi .k span{font-size:12px;color:var(--text-muted)}
+.se-channel-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(17,165,81,.1);color:var(--green);font-size:11px;font-weight:700;margin-left:auto;white-space:nowrap}
 
 /* ── Toast ── */
 .se-toast{position:fixed;bottom:var(--space-5);right:var(--space-5);padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);font-size:13px;font-weight:600;z-index:200;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none}
@@ -226,7 +245,7 @@
           <button class="se-tab active" data-tab="question">Question</button>
           <button class="se-tab" data-tab="settings">Survey settings</button>
           <button class="se-tab" data-tab="preview">Preview</button>
-          <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Share links</button>
+          <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Distribution</button>
         </div>
         <div id="panel-question"></div>
         <div id="panel-settings" style="display:none"></div>
@@ -986,7 +1005,7 @@ async function setStatus(status) {
 function renderLinks() {
   var panel = document.getElementById('panel-links');
   var base = window.location.origin + '/cx-survey?t=';
-  var html = '<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Share links let customers respond without logging in. Revoke any time.</p>';
+  var html = '<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Distribution lets you collect responses through direct links, QR codes, WhatsApp and web intercept.</p>';
 
   if (_links.length) {
     _links.forEach(function(l){
