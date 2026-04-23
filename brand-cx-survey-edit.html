@@ -346,11 +346,38 @@
           <label class="se-label" for="s-template-key">Template selection</label>
           <select class="se-select" id="s-template-key">
             <option value="">None</option>
-            <option value="nps_short">Short NPS</option>
-            <option value="csat_quick">Quick CSAT</option>
-            <option value="post_visit">Post-visit feedback</option>
-            <option value="post_purchase">Post-purchase</option>
-            <option value="support_followup">Support follow-up</option>
+            <optgroup label="Core templates">
+              <option value="nps_short">Short NPS</option>
+              <option value="csat_quick">Quick CSAT</option>
+              <option value="post_visit">Post-visit feedback</option>
+              <option value="post_purchase">Post-purchase</option>
+              <option value="support_followup">Support follow-up</option>
+            </optgroup>
+            <optgroup label="Retail & eCommerce">
+              <option value="retail_store_visit">Retail store visit</option>
+              <option value="ecommerce_delivery">eCommerce delivery</option>
+              <option value="ecommerce_checkout">eCommerce checkout</option>
+            </optgroup>
+            <optgroup label="Restaurants & Hospitality">
+              <option value="restaurant_dining">Restaurant dining</option>
+              <option value="hotel_checkout">Hotel checkout</option>
+            </optgroup>
+            <optgroup label="Healthcare">
+              <option value="clinic_visit">Clinic visit</option>
+              <option value="pharmacy_service">Pharmacy service</option>
+            </optgroup>
+            <optgroup label="Financial services">
+              <option value="bank_branch">Bank branch visit</option>
+              <option value="insurance_claim">Insurance claim follow-up</option>
+            </optgroup>
+            <optgroup label="Telecom & utilities">
+              <option value="telecom_support">Telecom support</option>
+              <option value="utility_service">Utility service interaction</option>
+            </optgroup>
+            <optgroup label="Education & events">
+              <option value="training_event">Training or event feedback</option>
+              <option value="student_support">Student support</option>
+            </optgroup>
           </select>
           <div class="se-template-actions">
             <button class="se-btn-primary" id="btn-apply-template" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply template</button>
@@ -481,6 +508,27 @@ function buildLogicRowHTML(q, idx, rule, ridx){
     + '</div>';
 }
 
+
+function updateQuestionFieldLive(idx, field, value){
+  var q = _questions[idx];
+  if(!q) return;
+  ensureRichTextFields(q);
+  ensureLogicArray(q);
+  if(field === 'required') q.required = !!value;
+  else if(field === 'placeholder') q.options = [value || ''];
+  else q[field] = value;
+  if(field === 'prompt') q.formatting.prompt_html = q.prompt || '';
+  if(field === 'help_text') q.formatting.help_html = q.help_text || '';
+  markDirty();
+  renderRail();
+  var titleEl = document.querySelector('.se-flow-card[data-idx="'+idx+'"] .se-flow-title');
+  if(titleEl) titleEl.textContent = q.prompt || 'Untitled question';
+  var copyEl = document.querySelector('.se-flow-card[data-idx="'+idx+'"] .se-flow-copy');
+  if(copyEl) copyEl.textContent = q.help_text || qtypeLabel(q.qtype);
+  var previewWrap = document.querySelector('.se-question-column .se-preview-phone');
+  if(previewWrap) previewWrap.outerHTML = questionPreviewHTML();
+}
+
 var TEMPLATES = {
   nps_short: {
     intro_title: 'We value your feedback',
@@ -514,6 +562,124 @@ var TEMPLATES = {
       {qtype:'rating_1_5', prompt:'How would you rate your purchase experience?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
       {qtype:'yes_no', prompt:'Did you find what you were looking for?', help_text:'', required:true, options:[], logic:[]},
       {qtype:'long_text', prompt:'Anything else you want to share?', help_text:'Optional', required:false, options:['Your feedback'], logic:[]}
+    ]
+  },
+
+  retail_store_visit: {
+    intro_title: 'Tell us about your store visit',
+    intro_text: 'A few quick questions about your in-store experience.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How satisfied were you with your store visit today?', help_text:'Choose the face that best fits your visit.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What stood out most?', help_text:'Pick the biggest factor.', required:false, options:['Friendly staff','Product availability','Checkout speed','Store cleanliness'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend this store?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  ecommerce_delivery: {
+    intro_title: 'How was your delivery?',
+    intro_text: 'Help us improve delivery speed, communication, and packaging.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate your delivery experience?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What matters most to you in delivery?', help_text:'Choose one.', required:false, options:['Speed','Updates','Packaging','Courier professionalism'], logic:[]},
+      {qtype:'yes_no', prompt:'Did your order arrive on time?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
+    ]
+  },
+  ecommerce_checkout: {
+    intro_title: 'Checkout feedback',
+    intro_text: 'We want to make online checkout fast and frictionless.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How easy was checkout?', help_text:'1 is difficult, 5 is effortless.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'Where did you feel the most friction?', help_text:'Choose the biggest issue.', required:false, options:['Shipping costs','Payment options','Login / account','Promo code','None'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to buy from us again?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  restaurant_dining: {
+    intro_title: 'Rate your dining experience',
+    intro_text: 'Your feedback helps us improve food, service, and atmosphere.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How was your overall dining experience?', help_text:'Choose the face that fits best.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What impressed you most?', help_text:'Pick one area.', required:false, options:['Food quality','Service','Atmosphere','Speed'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  hotel_checkout: {
+    intro_title: 'Tell us about your stay',
+    intro_text: 'A short survey to improve the guest experience.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate your stay overall?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What most influenced your rating?', help_text:'Pick one.', required:false, options:['Room comfort','Cleanliness','Staff service','Facilities','Check-in / check-out'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to stay with us again?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  clinic_visit: {
+    intro_title: 'How was your clinic visit?',
+    intro_text: 'Help us improve service, waiting time, and communication.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How satisfied were you with your visit?', help_text:'Choose the face that best reflects your experience.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'Which area matters most to improve?', help_text:'Choose one.', required:false, options:['Waiting time','Staff communication','Doctor consultation','Reception process'], logic:[]},
+      {qtype:'yes_no', prompt:'Did you get the help you needed?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
+    ]
+  },
+  pharmacy_service: {
+    intro_title: 'Pharmacy service feedback',
+    intro_text: 'Help us improve speed, advice, and product availability.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate today’s pharmacy service?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What was most important today?', help_text:'Choose the main reason.', required:false, options:['Prescription fulfilment','Advice from staff','Product availability','Queue speed'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to return?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  bank_branch: {
+    intro_title: 'How was your branch visit?',
+    intro_text: 'We use your feedback to improve service and wait times.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate your branch experience?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What most influenced your visit?', help_text:'Choose one.', required:false, options:['Staff helpfulness','Queue time','Issue resolution','Branch environment'], logic:[]},
+      {qtype:'yes_no', prompt:'Was your issue resolved today?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
+    ]
+  },
+  insurance_claim: {
+    intro_title: 'Claims feedback',
+    intro_text: 'Help us improve the speed and clarity of our claims process.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How satisfied are you with the claims process so far?', help_text:'Choose the face that best fits your experience.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What needs the most attention?', help_text:'Choose one area.', required:false, options:['Communication','Speed','Fairness','Ease of process'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend our insurance brand?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  telecom_support: {
+    intro_title: 'Support interaction feedback',
+    intro_text: 'Your feedback helps us improve support speed and resolution quality.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate this support interaction?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What mattered most today?', help_text:'Choose one.', required:false, options:['Speed of response','Knowledge of agent','Issue resolution','Friendliness'], logic:[]},
+      {qtype:'yes_no', prompt:'Was your issue resolved?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
+    ]
+  },
+  utility_service: {
+    intro_title: 'Service interaction feedback',
+    intro_text: 'Help us improve utility service communication and response.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How satisfied were you with this service interaction?', help_text:'Choose the face that best reflects your experience.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What most influenced your score?', help_text:'Choose one.', required:false, options:['Response time','Clarity of communication','Issue resolution','Professionalism'], logic:[]},
+      {qtype:'yes_no', prompt:'Did we solve the issue?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
+    ]
+  },
+  training_event: {
+    intro_title: 'Event feedback',
+    intro_text: 'Tell us how the session went so we can improve future events.',
+    questions: [
+      {qtype:'rating_1_5', prompt:'How would you rate the event overall?', help_text:'1 is poor, 5 is excellent.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What was most valuable?', help_text:'Choose one.', required:false, options:['Speaker quality','Practical insights','Venue / online setup','Content relevance'], logic:[]},
+      {qtype:'nps_0_10', prompt:'How likely are you to attend another event?', help_text:'0 means not likely, 10 means extremely likely.', required:true, options:[], logic:[]}
+    ]
+  },
+  student_support: {
+    intro_title: 'Student support feedback',
+    intro_text: 'Your feedback helps us improve guidance and turnaround times.',
+    questions: [
+      {qtype:'csat_smiley', prompt:'How satisfied were you with the support you received?', help_text:'Choose the face that best fits your experience.', required:true, options:[], logic:[]},
+      {qtype:'single_select', prompt:'What mattered most?', help_text:'Choose one.', required:false, options:['Clarity','Friendliness','Speed','Outcome'], logic:[]},
+      {qtype:'yes_no', prompt:'Did you get the support you needed?', help_text:'A simple yes or no is enough.', required:true, options:[], logic:[]}
     ]
   },
   support_followup: {
@@ -880,16 +1046,16 @@ function renderQuestionPanel() {
     input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', function(){
       var q = _questions[idx];
       if (!q) return;
-      if (input.dataset.field === 'required') q.required = !!input.checked;
-      else if (input.dataset.field === 'placeholder') q.options = [input.value || ''];
-      else if (input.dataset.field === 'qtype') {
+      if (input.dataset.field === 'qtype') {
         var next = questionDefaults(input.value);
         q.qtype = next.qtype;
         q.options = next.options;
-      } else q[input.dataset.field] = input.value;
-      markDirty();
-      renderRail();
-      renderQuestionPanel();
+        markDirty();
+        renderRail();
+        renderQuestionPanel();
+      } else {
+        updateQuestionFieldLive(idx, input.dataset.field, input.type === 'checkbox' ? !!input.checked : input.value);
+      }
     });
   });
 
