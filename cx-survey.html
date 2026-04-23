@@ -159,6 +159,32 @@
   .s-party-final{display:grid;gap:14px;text-align:center}
   .s-party-final h2{margin:0;color:#fff;font-size:30px;letter-spacing:-.02em}
   .s-party-final p{margin:0;color:rgba(255,255,255,.8);font-size:15px;line-height:1.55}
+
+  .s-party-stage{position:relative;min-height:360px;perspective:1200px}
+  .s-swipe-card{position:relative;overflow:hidden;border-radius:28px;padding:26px 22px 20px;background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(0,0,0,.28)}
+  .s-swipe-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top left, rgba(34,197,94,.14), transparent 34%), radial-gradient(circle at top right, rgba(168,85,247,.12), transparent 30%), radial-gradient(circle at bottom, rgba(245,158,11,.10), transparent 30%);pointer-events:none}
+  .s-swipe-deck{position:relative;min-height:auto}
+  .s-swipe-shadow{display:none}
+  .s-swipe-inner{position:relative;z-index:2;touch-action:pan-y;user-select:none;transition:transform .18s ease, opacity .18s ease;cursor:grab;padding:0}
+  .s-party-hero{display:grid;gap:12px;margin-bottom:6px}
+  .s-party-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.10);color:#fff;font-size:26px;border:1px solid rgba(255,255,255,.12)}
+  .s-party-prompt{font-size:28px;line-height:1.16;font-weight:800;letter-spacing:-.025em;color:#fff;margin:0;max-width:15ch}
+  .s-party-help{font-size:15px;line-height:1.5;color:rgba(255,255,255,.8);margin:0;max-width:42ch}
+  .s-swipe-hint{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;color:rgba(255,255,255,.62);font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+  .s-swipe-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+  .s-cheer{padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#fff;font-size:13px;font-weight:700}
+  .s-party-answer-wrap{display:grid;gap:12px;margin-top:20px}
+  .s-party-choice{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff;padding:14px 14px;border-radius:16px;font-size:14px;font-weight:800;min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .s-party-choice.active{background:rgba(34,197,94,.22);border-color:rgba(74,222,128,.42)}
+  .s-party-mascot{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(24px) scale(.88);width:min(320px,88vw);padding:16px 18px;border-radius:22px;background:linear-gradient(180deg, rgba(18,24,38,.94), rgba(18,24,38,.86));border:1px solid rgba(255,255,255,.12);box-shadow:0 28px 60px rgba(0,0,0,.36);display:flex;align-items:center;gap:14px;z-index:60;opacity:0;pointer-events:none}
+  .s-party-mascot.show{animation:s-mascot-pop 1.9s ease forwards}
+  .s-party-mascot-blob{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%, #7dd3fc, #22c55e 55%, #0f172a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+  .s-party-mascot-blob span{font-size:32px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.2))}
+  .s-party-mascot-copy strong{display:block;color:#fff;font-size:16px;line-height:1.2}
+  .s-party-mascot-copy p{margin:4px 0 0;color:rgba(255,255,255,.76);font-size:13px;line-height:1.4}
+  @keyframes s-mascot-pop{0%{opacity:0;transform:translateX(-50%) translateY(30px) scale(.82)}12%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.02)}24%{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1)}78%{opacity:1;transform:translateX(-50%) translateY(-2px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-18px) scale(.94)}}
+  @media (max-width:640px){.s-party-prompt{font-size:24px}.s-party-mascot{bottom:72px;padding:14px 16px}.s-party-mascot-blob{width:56px;height:56px}}
+
   @media (max-width:640px){.s-swipe-card{padding:22px 18px 16px}.s-party-prompt{font-size:24px}.s-party-choices{grid-template-columns:1fr}.s-party-stage{min-height:390px}}
 
   *:focus-visible { outline: 2px solid var(--s-primary); outline-offset: 2px; }
@@ -199,6 +225,17 @@ function partyCheer(){
 function partyEnergy(total){
   if (!total) return 8;
   return Math.max(8, Math.min(100, Math.round(((state.currentIdx + 1) / total) * 100)));
+}
+function shouldShowPartyMascot(){ return state.mode === 'party' && !state.partyMascotShown && state.currentIdx === 2; }
+function showPartyMascot(){
+  state.partyMascotShown = true;
+  var node = document.getElementById('party-mascot');
+  if(!node) return;
+  node.classList.remove('show');
+  void node.offsetWidth;
+  node.classList.add('show');
+  haptic(26);
+  setTimeout(function(){ node.classList.remove('show'); }, 1900);
 }
 function canUsePartyMode(){
   return state.questions.every(function(q){ return isPartyQuickQuestion(q); });
@@ -318,18 +355,19 @@ function renderPartyQuestion() {
   html += '<div class="s-party-wrap">';
   html += '<div class="s-party-meta"><div class="s-kicker">'+partyIconForQuestion(q)+' Quick swipe question</div><div class="s-stats"><span class="s-stat-pill">Question '+(state.currentIdx + 1)+' / '+total+'</span>' + (state.streak ? '<span class="s-stat-pill">🔥 Streak '+state.streak+'</span>' : '<span class="s-stat-pill">🎮 Keep the streak going</span>') + '</div></div>';
   html += '<div class="s-party-copy"><small>Party energy</small><small>'+partyEnergy(total)+'%</small></div><div class="s-party-energy"><span style="width:'+partyEnergy(total)+'%"></span></div>';
-  html += '<div class="s-party-stage"><div class="s-swipe-card"><div class="s-swipe-deck"><div class="s-swipe-shadow"></div><div class="s-swipe-inner" id="party-swipe-card">';
+  html += '<div class="s-party-stage"><div class="s-swipe-card"><div class="s-swipe-deck"><div class="s-swipe-inner" id="party-swipe-card">';
   html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt">'+esc(q.prompt)+'</h2>' + (q.help_text ? '<p class="s-party-help">'+esc(q.help_text)+'</p>' : '<p class="s-party-help">Go with your instinct. Quick answers keep the vibe alive.</p>') + '</div>';
   html += '<div id="q-answer">'+renderPartyInput(q, state.currentIdx)+'</div>';
   html += '<div class="s-swipe-hint"><span class="s-swipe-pill">⬅️ Quick no / lower</span><span class="s-swipe-pill">➡️ Quick yes / higher</span></div>';
-  html += '</div></div></div></div>';
+  html += '</div></div></div>';
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
   html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div class="s-foot">Powered by GoNoGo</div></div>';
+  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Streak creature unlocked</strong><p>You are flying. Keep the party going.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
+  if (shouldShowPartyMascot()) setTimeout(showPartyMascot, 180);
   document.getElementById('btn-prev').onclick = function(){ if (state.currentIdx > 0) { state.currentIdx--; render(); } };
   document.getElementById('btn-next').onclick = async function(){ if (!validateCurrent(q)) return; if (state.currentIdx === total - 1) { await submit(); return; } celebrateStep(); state.currentIdx++; render(); };
 }
