@@ -337,10 +337,14 @@ function markDirty(){ _dirty = true; }
 /* ── Tabs ── */
 function showTab(name) {
   document.querySelectorAll('.se-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
-  document.getElementById('panel-question').style.display = name === 'question' ? '' : 'none';
-  document.getElementById('panel-settings').style.display = name === 'settings' ? '' : 'none';
-  document.getElementById('panel-preview').style.display = name === 'preview' ? '' : 'none';
-  document.getElementById('panel-links').style.display = name === 'links' ? '' : 'none';
+  var pq = document.getElementById('panel-question');
+  var ps = document.getElementById('panel-settings');
+  var pp = document.getElementById('panel-preview');
+  var pl = document.getElementById('panel-links');
+  if (pq) pq.style.display = name === 'question' ? '' : 'none';
+  if (ps) ps.style.display = name === 'settings' ? '' : 'none';
+  if (pp) pp.style.display = name === 'preview' ? '' : 'none';
+  if (pl) pl.style.display = name === 'links' ? '' : 'none';
   if (name === 'question') renderQuestionPanel();
   if (name === 'preview') renderSurveyPreview();
 }
