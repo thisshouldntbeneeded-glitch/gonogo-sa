@@ -103,6 +103,16 @@
 .se-template-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(17,165,81,.1);color:var(--green);font-size:11px;font-weight:700;margin-top:10px}
 .se-privacy-banner{padding:14px 16px;border-radius:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.16);color:var(--text-primary);font-size:12px;line-height:1.5;margin-bottom:var(--space-4)}
 .se-mini-note{font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.45}
+.se-survey-preview-shell{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;overflow:hidden;max-width:760px}
+.se-preview-banner{padding:14px 16px;background:rgba(59,130,246,.08);border-bottom:1px solid rgba(59,130,246,.14);font-size:12px;line-height:1.5;color:var(--text-primary)}
+.se-preview-hero{padding:22px 20px 14px;border-bottom:1px solid var(--border-primary)}
+.se-preview-hero h3{margin:0 0 6px;font-size:20px;color:var(--text-primary)}
+.se-preview-hero p{margin:0;color:var(--text-muted);font-size:13px;line-height:1.55;max-width:60ch}
+.se-preview-body{padding:18px 20px 20px;display:grid;gap:16px}
+.se-preview-card{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:14px;padding:16px}
+.se-preview-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.se-preview-progress{height:8px;background:rgba(15,23,42,.08);border-radius:999px;overflow:hidden;flex:1}
+.se-preview-progress > span{display:block;height:100%;background:linear-gradient(90deg,#18b35a,#11994d);width:35%}
 .se-field{margin-bottom:var(--space-3)}
 .se-toggle{display:flex;align-items:center;gap:var(--space-2);font-size:13px;cursor:pointer}
 .se-hint{font-size:12px;color:var(--text-muted);margin-top:2px}
@@ -278,11 +288,8 @@ async function init() {
       return;
     }
   } else {
-    // New survey defaults
-    _questions = [
-      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', required:true, options:[], help_text:'', logic:[]},
-      {qtype:'long_text', prompt:'Tell us more about your experience', required:false, options:[], help_text:'', logic:[]}
-    ];
+    // New survey starts empty
+    _questions = [];
     populateSettingsDefaults();
   }
 
@@ -332,8 +339,10 @@ function showTab(name) {
   document.querySelectorAll('.se-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab === name); });
   document.getElementById('panel-question').style.display = name === 'question' ? '' : 'none';
   document.getElementById('panel-settings').style.display = name === 'settings' ? '' : 'none';
+  document.getElementById('panel-preview').style.display = name === 'preview' ? '' : 'none';
   document.getElementById('panel-links').style.display = name === 'links' ? '' : 'none';
   if (name === 'question') renderQuestionPanel();
+  if (name === 'preview') renderSurveyPreview();
 }
 
 /* ── Qtype picker (rendered inline in right pane) ── */
@@ -1039,6 +1048,29 @@ async function createLink() {
     renderLinks();
     toast('Link created', 'success');
   } catch(e) { toast('Could not create link: ' + (e.message||'error'), 'error'); }
+}
+
+/* ── Survey preview ── */
+function renderSurveyPreview() {
+  var panel = document.getElementById('panel-preview');
+  if (!panel) return;
+  var introTitle = (document.getElementById('s-intro-title') && document.getElementById('s-intro-title').value.trim()) || 'Survey preview';
+  var introText = (document.getElementById('s-intro-text') && document.getElementById('s-intro-text').value.trim()) || 'This is how the survey will look before a respondent starts.';
+  var privacyText = (document.getElementById('s-privacy-notice') && document.getElementById('s-privacy-notice').value.trim()) || 'No privacy notice set yet.';
+  var firstQ = _questions.length ? _questions[0] : null;
+  var html = '<div class="se-panel-intro"><div><h2>Survey preview</h2><p>Preview the opening state, always-visible privacy notice, and the first survey question.</p></div></div>';
+  html += '<div class="se-survey-preview-shell">';
+  html += '<div class="se-preview-banner"><strong>Privacy notice</strong><br>' + esc(privacyText) + '</div>';
+  html += '<div class="se-preview-hero"><h3>' + esc(introTitle) + '</h3><p>' + esc(introText) + '</p></div>';
+  html += '<div class="se-preview-body">';
+  html += '<div class="se-preview-topbar"><div style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em">Respondent view</div><div class="se-preview-progress"><span></span></div></div>';
+  if (firstQ) {
+    html += '<div class="se-preview-card">' + renderPreview(firstQ) + '</div>';
+  } else {
+    html += '<div class="se-preview-card"><div class="se-hint">No questions yet. Apply a template or add your first question.</div></div>';
+  }
+  html += '</div></div>';
+  panel.innerHTML = html;
 }
 
 /* ── Save ── */
