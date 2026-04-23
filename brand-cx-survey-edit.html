@@ -9,20 +9,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 /* ── Top header bar ── */
-.se-header{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-5)}
+.se-header{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-5)}
 .se-header h1{font-size:18px;font-weight:700;margin:0;flex:1;min-width:200px}
 .se-header .cx-badge{font-size:11px}
-.se-actions{display:flex;gap:var(--space-2);flex-wrap:wrap}
+.se-actions{display:flex;gap:var(--space-2);flex-wrap:wrap;align-items:center}
 
 /* ── Two-column layout ── */
-.se-grid{display:grid;grid-template-columns:320px 1fr;gap:var(--space-5);align-items:start}
+.se-grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:var(--space-5);align-items:start}
 @media(max-width:860px){.se-grid{grid-template-columns:1fr}}
 
 /* ── Left rail (question list) ── */
-.se-rail{position:sticky;top:var(--space-4);background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-3);max-height:calc(100vh - 120px);overflow-y:auto}
-.se-q-item{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;border-left:3px solid transparent;margin-bottom:2px;background:var(--surface-1);transition:background .12s}
-.se-q-item:hover{background:var(--surface-3)}
-.se-q-item.active{border-left-color:var(--green);background:var(--surface-3)}
+.se-rail{position:sticky;top:var(--space-4);background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary);border-radius:calc(var(--radius-md) + 2px);padding:var(--space-4);max-height:calc(100vh - 120px);overflow-y:auto;box-shadow:0 10px 28px rgba(2,8,23,.08)}
+.se-q-item{display:flex;align-items:center;gap:var(--space-2);padding:12px 14px;border-radius:12px;cursor:pointer;font-size:13px;border:1px solid transparent;margin-bottom:8px;background:var(--surface-1);transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}
+.se-q-item:hover{background:var(--surface-3);border-color:rgba(17,165,81,.18);transform:translateY(-1px)}
+.se-q-item.active{border-color:rgba(17,165,81,.35);background:rgba(17,165,81,.08);box-shadow:0 8px 18px rgba(17,165,81,.10)}
 .se-q-item .handle{color:var(--text-muted);cursor:grab;font-size:13px;flex-shrink:0}
 .se-q-item .handle:active{cursor:grabbing}
 .se-q-item .qicon{color:var(--green);width:18px;text-align:center;flex-shrink:0;font-size:12px}
@@ -32,8 +32,8 @@
 .se-q-item .del-btn:hover{color:var(--red);background:var(--red-dim)}
 .se-q-item.dragging{opacity:.4}
 .se-q-item.drag-over{border-top:2px solid var(--green)}
-.se-add-bar{margin-top:var(--space-3);position:relative}
-.se-add-btn{width:100%;text-align:left}
+.se-add-bar{margin-top:var(--space-4);position:relative}
+.se-add-btn{width:100%;text-align:left;justify-content:center}
 .se-qtype-picker{position:absolute;left:0;right:0;bottom:100%;margin-bottom:4px;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-2);z-index:10;box-shadow:var(--shadow-md);display:none;max-height:280px;overflow-y:auto}
 .se-qtype-picker.show{display:block}
 .se-qtype-opt{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text-primary)}
@@ -41,17 +41,48 @@
 .se-qtype-opt i{color:var(--green);width:18px;text-align:center}
 
 /* ── Right pane ── */
-.se-pane{background:var(--surface-2);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-5);min-height:400px}
-.se-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border-primary);margin-bottom:var(--space-4)}
-.se-tab{padding:var(--space-3) var(--space-4);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent}
-.se-tab.active{color:var(--text-primary);border-bottom-color:var(--green)}
+.se-pane{background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary);border-radius:calc(var(--radius-md) + 2px);padding:var(--space-5);min-height:460px;box-shadow:0 14px 34px rgba(15,23,42,.06)}
+.se-tabs{display:flex;gap:6px;border-bottom:1px solid var(--border-primary);margin-bottom:var(--space-5);padding-bottom:2px}
+.se-tab{padding:10px 14px;font-size:13px;font-weight:700;color:var(--text-secondary);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;border-radius:10px 10px 0 0}
+.se-tab.active{color:var(--text-primary);border-bottom-color:var(--green);background:rgba(17,165,81,.06)}
 
 /* ── Form controls (reuse existing patterns) ── */
-.se-label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:var(--space-1);text-transform:uppercase;letter-spacing:.05em}
+.se-label{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
 .se-section-h{font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:.06em;margin:0 0 var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--border-primary)}
-.se-input,.se-select,.se-textarea{width:100%;background:var(--surface-1);border:1px solid var(--border-primary);color:var(--text-primary);padding:8px 10px;border-radius:var(--radius-sm);font-size:13px;font-family:inherit}
-.se-textarea{resize:vertical;min-height:60px}
+.se-input,.se-select,.se-textarea{width:100%;background:var(--surface-1);border:1px solid var(--border-primary);color:var(--text-primary);padding:11px 12px;border-radius:12px;font-size:13px;font-family:inherit;transition:border-color .16s,box-shadow .16s,background .16s}
+.se-textarea{resize:vertical;min-height:60px;line-height:1.45}
 .se-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3)}
+.se-row-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3);margin-bottom:var(--space-3)}
+@media(max-width:980px){.se-row-3{grid-template-columns:1fr}}
+.se-card{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:14px;padding:var(--space-4);margin-bottom:var(--space-4)}
+.se-rail-section{margin-bottom:var(--space-4)}
+.se-rail-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--text-secondary);margin-bottom:10px}
+.se-template-card{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:14px;padding:14px;margin-bottom:var(--space-4)}
+.se-template-card .se-label{margin-bottom:8px}
+.se-template-note{font-size:12px;color:var(--text-muted);line-height:1.45;margin-top:8px}
+.se-q-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);margin-top:6px}
+.se-q-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;background:rgba(15,23,42,.06);font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.se-q-pill.logic{background:rgba(17,165,81,.12);color:var(--green)}
+.se-btn-primary,.se-btn-secondary,.se-btn-danger{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:700;font-size:13px;border:1px solid transparent;text-decoration:none;transition:transform .16s,box-shadow .16s,background .16s,border-color .16s,color .16s}
+.se-btn-primary{background:linear-gradient(180deg,#18b35a,#11994d);color:#fff;box-shadow:0 10px 20px rgba(17,165,81,.18)}
+.se-btn-primary:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(17,165,81,.22)}
+.se-btn-secondary{background:var(--surface-1);border-color:var(--border-primary);color:var(--text-primary)}
+.se-btn-secondary:hover{background:var(--surface-3);border-color:rgba(17,165,81,.2)}
+.se-btn-danger{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.18)}
+.se-btn-danger:hover{background:rgba(239,68,68,.14)}
+.se-actions .btn{display:none!important}
+.se-top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.se-panel-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-4)}
+.se-panel-intro h2{font-size:17px;margin:0;color:var(--text-primary)}
+.se-panel-intro p{margin:4px 0 0;color:var(--text-muted);font-size:13px;max-width:60ch}
+.se-inline-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border-primary);background:var(--surface-1);border-radius:12px}
+.se-logic-list{display:grid;gap:10px;margin-top:10px}
+.se-logic-row{display:grid;grid-template-columns:1.1fr .9fr 1fr auto;gap:10px;align-items:end;background:var(--surface-1);border:1px solid var(--border-primary);padding:12px;border-radius:14px}
+.se-logic-row .del-btn{height:42px;width:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(239,68,68,.08)}
+.se-logic-empty{font-size:12px;color:var(--text-muted);padding:12px;border:1px dashed var(--border-primary);border-radius:12px;background:var(--surface-1)}
+.se-help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3)}
+@media(max-width:980px){.se-help-grid,.se-row{grid-template-columns:1fr}}
+.se-input:focus,.se-select:focus,.se-textarea:focus{outline:none;border-color:rgba(17,165,81,.45);box-shadow:0 0 0 4px rgba(17,165,81,.10)}
 .se-field{margin-bottom:var(--space-3)}
 .se-toggle{display:flex;align-items:center;gap:var(--space-2);font-size:13px;cursor:pointer}
 .se-hint{font-size:12px;color:var(--text-muted);margin-top:2px}
@@ -215,7 +246,7 @@ async function init() {
     try {
       var data = await GoNoGoAPI.cx.getSurvey(_surveyId);
       _survey = data.survey;
-      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[],logic:q.logic||[]}; });
       _links = data.links || [];
       document.getElementById('title-text').textContent = 'Edit: ' + _survey.name;
       document.getElementById('tab-links').style.display = '';
@@ -229,8 +260,8 @@ async function init() {
   } else {
     // New survey defaults
     _questions = [
-      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', required:true, options:[], help_text:''},
-      {qtype:'long_text', prompt:'Tell us more about your experience', required:false, options:[], help_text:''}
+      {qtype:'nps_0_10', prompt:'How likely are you to recommend us?', required:true, options:[], help_text:'', logic:[]},
+      {qtype:'long_text', prompt:'Tell us more about your experience', required:false, options:[], help_text:'', logic:[]}
     ];
     populateSettingsDefaults();
   }
@@ -248,9 +279,8 @@ function wireEvents() {
   document.getElementById('btn-pause').addEventListener('click', function(){ setStatus('paused'); });
   document.getElementById('btn-unpublish').addEventListener('click', function(){ setStatus('draft'); });
   document.getElementById('btn-add-q').addEventListener('click', function(){
-    _selectedIdx = -1;
     showTab('question');
-    renderQuestionPanel();
+    renderEmptyState('add');
   });
   document.querySelectorAll('.se-tab').forEach(function(t){ t.addEventListener('click', function(){ showTab(t.dataset.tab); }); });
 
@@ -290,7 +320,7 @@ function wireQtypePicker(root) {
 
 /* ── Question management ── */
 function addQuestion(qtype) {
-  _questions.push({qtype:qtype||'short_text', prompt:'', help_text:'', required:false, options:[]});
+  _questions.push({qtype:qtype||'short_text', prompt:'', help_text:'', required:false, options:[], logic:[]});
   _selectedIdx = _questions.length - 1;
   markDirty();
   renderRail();
@@ -399,6 +429,7 @@ function renderQuestionPanel() {
   var isSelect = q.qtype === 'single_select' || q.qtype === 'multi_select' || q.qtype === 'dropdown';
 
   var html = '';
+  html += '<div class="se-panel-intro"><div><h2>Question editor</h2><p>Refine the prompt, add guidance, preview the answer format and define simple skip logic for this question.</p></div></div>';
 
   // Qtype selector
   html += '<div class="se-field"><label class="se-label">Question type</label><select class="se-select" id="ed-qtype">';
@@ -436,6 +467,8 @@ function renderQuestionPanel() {
     html += '<div class="se-row"><div class="se-field"><label class="se-label">Min</label><input class="se-input" id="ed-num-min" type="number" value="' + esc(nmin) + '" placeholder="(no min)"></div>' +
             '<div class="se-field"><label class="se-label">Max</label><input class="se-input" id="ed-num-max" type="number" value="' + esc(nmax) + '" placeholder="(no max)"></div></div>';
   }
+
+  html += '<div class="se-card"><h4 class="se-section-h" style="margin-top:0">Branching &amp; skip logic</h4><div class="se-hint">First-pass logic rules can be defined here and saved with the question object. Backend execution will still need matching support.</div><div id="ed-logic"></div><button class="se-btn-secondary" id="btn-add-logic" type="button" style="margin-top:12px"><i class="fa-solid fa-code-branch"></i> Add logic rule</button></div>';
 
   // Live preview
   html += '<div class="se-preview"><div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q) + '</div>';
@@ -513,6 +546,66 @@ function updatePreview() {
   if (container) {
     container.innerHTML = '<div class="se-preview-title"><i class="fa-solid fa-eye"></i> Respondent preview</div>' + renderPreview(q);
   }
+}
+
+function getQuestionTargetOptions(currentIdx) {
+  var html = '<option value="next">Next question</option><option value="end">End survey</option>';
+  _questions.forEach(function(item, idx){
+    if (idx === currentIdx) return;
+    var label = (item.prompt && item.prompt.trim()) ? item.prompt.trim() : ('Untitled question ' + (idx + 1));
+    html += '<option value="' + idx + '">Jump to Q' + (idx + 1) + ' — ' + esc(label) + '</option>';
+  });
+  return html;
+}
+
+function renderLogicEditor() {
+  var q = _questions[_selectedIdx];
+  var container = document.getElementById('ed-logic');
+  if (!container || !q) return;
+  if (!Array.isArray(q.logic)) q.logic = [];
+  if (!q.logic.length) {
+    container.innerHTML = '<div class="se-logic-empty">No logic rules yet. Add a rule to branch on a selected answer, low score, or explicit value.</div>';
+    return;
+  }
+  var targetOpts = getQuestionTargetOptions(_selectedIdx);
+  container.innerHTML = '<div class="se-logic-list">' + q.logic.map(function(rule, idx){
+    return '<div class="se-logic-row" data-lidx="' + idx + '">' +
+      '<div><label class="se-label">When answer</label><select class="se-select" data-role="match" data-lidx="' + idx + '">' +
+        '<option value="equals"' + (rule.match === 'equals' ? ' selected' : '') + '>Equals</option>' +
+        '<option value="contains"' + (rule.match === 'contains' ? ' selected' : '') + '>Contains</option>' +
+        '<option value="lt"' + (rule.match === 'lt' ? ' selected' : '') + '>Less than</option>' +
+        '<option value="lte"' + (rule.match === 'lte' ? ' selected' : '') + '>Less than or equal</option>' +
+        '<option value="gte"' + (rule.match === 'gte' ? ' selected' : '') + '>Greater than or equal</option>' +
+        '<option value="answered"' + (rule.match === 'answered' ? ' selected' : '') + '>Is answered</option>' +
+      '</select></div>' +
+      '<div><label class="se-label">Value</label><input class="se-input" data-role="value" data-lidx="' + idx + '" value="' + esc(rule.value || '') + '" placeholder="e.g. 0-6, Yes, unhappy"></div>' +
+      '<div><label class="se-label">Then go to</label><select class="se-select" data-role="action" data-lidx="' + idx + '">' + targetOpts + '</select></div>' +
+      '<button class="del-btn" type="button" data-role="delete" data-lidx="' + idx + '" title="Delete rule"><i class="fa-solid fa-trash"></i></button>' +
+    '</div>';
+  }).join('') + '</div>';
+  container.querySelectorAll('[data-role="action"]').forEach(function(el){
+    var idx = parseInt(el.dataset.lidx, 10);
+    el.value = String(q.logic[idx].action || 'next');
+  });
+  container.querySelectorAll('select[data-role], input[data-role]').forEach(function(el){
+    el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', function(){
+      var idx = parseInt(this.dataset.lidx, 10);
+      var role = this.dataset.role;
+      if (role === 'delete') return;
+      if (!q.logic[idx]) return;
+      q.logic[idx][role === 'action' ? 'action' : role] = this.value;
+      markDirty();
+      renderRail();
+    });
+  });
+  container.querySelectorAll('[data-role="delete"]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      q.logic.splice(parseInt(this.dataset.lidx, 10), 1);
+      markDirty();
+      renderLogicEditor();
+      renderRail();
+    });
+  });
 }
 
 /* ── Options editor for select types ── */
@@ -641,11 +734,12 @@ function renderPreview(q) {
 }
 
 /* ── Empty state (no questions OR clicked Add question) ── */
-function renderEmptyState() {
+function renderEmptyState(mode) {
   var panel = document.getElementById('panel-question');
   var titleHtml = _questions.length === 0
     ? '<h3>Add your first question</h3><p>Pick a question type to start building the survey.</p>'
     : '<h3>Add a question</h3><p>Pick a question type to add to this survey.</p>';
+  if (mode === 'add') titleHtml = '<h3>Add a question</h3><p>Choose the kind of question you want to insert next.</p>';
   panel.innerHTML = qtypePickerHTML(titleHtml);
   wireQtypePicker(panel);
 }
@@ -653,6 +747,7 @@ function renderEmptyState() {
 /* ── Survey settings panel ── */
 function renderSettingsPanel() {
   var html = '';
+  html += '<div class="se-panel-intro"><div><h2>Survey settings</h2><p>Control the survey intro, response experience, branding, privacy and completion message from one place.</p></div></div>'; 
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Survey name *</label><input class="se-input" id="s-name" placeholder="e.g. Post-visit feedback"></div>';
   html += '<div class="se-field"><label class="se-label">Slug</label><input class="se-input" id="s-slug" placeholder="auto from name"></div></div>';
   html += '<div class="se-row"><div class="se-field"><label class="se-label">Intro title</label><input class="se-input" id="s-intro-title" placeholder="We\'d love your feedback"></div>';
@@ -742,6 +837,7 @@ function populateSettings() {
   document.getElementById('s-intro-text').value = s.intro_text || '';
   document.getElementById('s-ty-title').value = s.thank_you_title || 'Thank you';
   document.getElementById('s-ty-text').value = s.thank_you_text || 'Your feedback has been received.';
+  var templateEl = document.getElementById('s-template-key'); if (templateEl) templateEl.value = s.template_key || '';
   document.getElementById('s-anon').checked = !!s.is_anonymous;
   document.getElementById('s-contact').checked = !!s.allow_contact_capture;
   var _sLabels = { draft: 'Draft', active: 'Published', paused: 'Paused', archived: 'Archived' };
@@ -979,7 +1075,8 @@ async function save() {
           prompt: q.prompt.trim(),
           help_text: (q.help_text || '').trim(),
           required: !!q.required,
-          options: q.options || []
+          options: q.options || [],
+          logic: q.logic || []
         };
       }).filter(function(q){ return q.prompt; })
     };
@@ -992,7 +1089,7 @@ async function save() {
       var data = await GoNoGoAPI.cx.getSurvey(id);
       _survey = data.survey;
       _surveyId = _survey.id;
-      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[]}; });
+      _questions = (data.questions || []).map(function(q){ return {qtype:q.qtype,prompt:q.prompt||'',help_text:q.help_text||'',required:!!q.required,options:q.options||[],logic:q.logic||[]}; });
       _links = data.links || [];
 
       // Update URL without reload
@@ -1015,7 +1112,7 @@ async function save() {
   } finally {
     _saving = false;
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save';
+    btn.innerHTML = '<i class="fa-solid fa-save"></i> Save survey';
   }
 }
 
