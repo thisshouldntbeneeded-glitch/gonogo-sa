@@ -184,13 +184,19 @@ async function init() {
   document.getElementById('builder-save').addEventListener('click', save);
   document.getElementById('btn-add-q').addEventListener('click', function(){ addQuestion(); renderQuestions(); });
   document.getElementById('btn-new-link').addEventListener('click', createLink);
-  document.getElementById('btn-new-folder').addEventListener('click', function(){
-    alert('Folders are currently a UI layer suggestion. If you want, I can wire real folder persistence next.');
-  });
-  document.getElementById('survey-search').addEventListener('input', function(){
-    _searchTerm = this.value.trim().toLowerCase();
-    renderList();
-  });
+  var newFolderBtn = document.getElementById('btn-new-folder');
+  if (newFolderBtn) {
+    newFolderBtn.addEventListener('click', function(){
+      alert('Folders are currently a UI layer suggestion. If you want, I can wire real folder persistence next.');
+    });
+  }
+  var surveySearch = document.getElementById('survey-search');
+  if (surveySearch) {
+    surveySearch.addEventListener('input', function(){
+      _searchTerm = this.value.trim().toLowerCase();
+      renderList();
+    });
+  }
   document.querySelectorAll('[data-status-filter]').forEach(function(btn){
     btn.addEventListener('click', function(){
       _statusFilter = btn.dataset.statusFilter;
