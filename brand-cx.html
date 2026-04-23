@@ -69,6 +69,35 @@
 .cx-spark-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-2)}
 .cx-spark-head h3{font-size:14px;font-weight:700;margin:0}
 .cx-spark-head span{font-size:11px;color:var(--text-muted);font-weight:600}
+
+.cx-hero{padding:var(--space-5);margin-bottom:var(--space-5);background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary)}
+.cx-overline{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px}
+.cx-hero-main{display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--space-5)}
+.cx-hero-title{font-size:30px;line-height:1.05;letter-spacing:-.03em;margin:0 0 10px;color:var(--text-primary);max-width:14ch}
+.cx-hero-copy{margin:0;color:var(--text-muted);font-size:14px;max-width:68ch}
+.cx-hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.cx-hero-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--space-4);align-items:stretch}
+@media(max-width:1080px){.cx-hero-grid{grid-template-columns:1fr}}
+.cx-hero-panel{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4)}
+.cx-hero-panel-accent{background:linear-gradient(180deg,rgba(17,165,81,.08),var(--surface-1))}
+.cx-panel-head{display:flex;justify-content:space-between;gap:var(--space-3);align-items:center;margin-bottom:var(--space-3)}
+.cx-panel-head span{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-secondary)}
+.cx-panel-head strong{font-size:12px;color:var(--text-muted)}
+.cx-nps-meter{height:12px;border-radius:999px;background:var(--surface-3);overflow:hidden;border:1px solid var(--border-primary);margin-top:var(--space-4)}
+.cx-nps-meter-fill{height:100%;width:0%;background:linear-gradient(90deg,#ef4444 0%,#eab308 50%,#22c55e 100%);transition:width .3s ease}
+.cx-story-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-4);margin-bottom:var(--space-5)}
+@media(max-width:1080px){.cx-story-grid{grid-template-columns:1fr}}
+.cx-story-card{padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-4)}
+.cx-story-head{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap}
+.cx-story-head h3{margin:4px 0 0;font-size:18px}
+.cx-story-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(17,165,81,.1);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--green)}
+.cx-insight-list{display:grid;gap:10px}
+.cx-insight-item{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-primary);border-radius:12px}
+.cx-insight-item strong{display:block;font-size:13px;color:var(--text-primary)}
+.cx-insight-item span{display:block;font-size:12px;color:var(--text-muted);max-width:48ch}
+.cx-insight-item i{color:var(--green);margin-top:2px}
+.cx-dash-grid{margin-top:0}
+
 </style>
 </head>
 <body>
@@ -85,23 +114,59 @@
       </div>
     </div>
 
-    <!-- Brand-wide KPI strip -->
-    <div class="cx-kpi-grid" id="cx-kpis">
-      <div class="cx-kpi-card"><div class="cx-kpi-label">Loading…</div></div>
-    </div>
-
-    <div class="card" style="padding:var(--space-5);margin-bottom:var(--space-5)">
-      <h3 style="font-size:14px;font-weight:700;margin:0 0 var(--space-3)">NPS distribution (brand-wide)</h3>
-      <div class="cx-nps-row">
-        <div class="cx-nps-chip cx-prom"><b id="k-prom">0</b><span>Promoters</span></div>
-        <div class="cx-nps-chip cx-pass"><b id="k-pass">0</b><span>Passives</span></div>
-        <div class="cx-nps-chip cx-detr"><b id="k-detr">0</b><span>Detractors</span></div>
+    <section class="cx-hero card">
+      <div class="cx-hero-main">
+        <div>
+          <div class="cx-overline">Customer experience intelligence</div>
+          <h2 class="cx-hero-title">A clearer story for your private feedback data</h2>
+          <p class="cx-hero-copy">This dashboard should help you spot momentum, risk, and operational priorities at a glance rather than forcing you to read through tables.</p>
+        </div>
+        <div class="cx-hero-actions">
+          <a href="brand-cx-surveys.html" class="btn btn-sm" style="background:var(--surface-3)"><i class="fa-solid fa-folder-tree"></i> Manage surveys</a>
+          <a href="brand-cx-survey-edit.html" class="btn btn-sm" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-plus"></i> New survey</a>
+        </div>
       </div>
-      <p class="text-xs text-muted" style="margin-top:var(--space-3)">Net Promoter Score is private to your brand. It is never shown on public pages.</p>
-    </div>
+      <div class="cx-hero-grid">
+        <div class="cx-hero-panel">
+          <div class="cx-panel-head"><span>Portfolio snapshot</span><strong id="cx-summary-pill">Live view</strong></div>
+          <div class="cx-kpi-grid" id="cx-kpis">
+            <div class="cx-kpi-card"><div class="cx-kpi-label">Loading…</div></div>
+          </div>
+        </div>
+        <div class="cx-hero-panel cx-hero-panel-accent">
+          <div class="cx-panel-head"><span>NPS mix</span><strong>Brand-wide</strong></div>
+          <div class="cx-nps-row">
+            <div class="cx-nps-chip cx-prom"><b id="k-prom">0</b><span>Promoters</span></div>
+            <div class="cx-nps-chip cx-pass"><b id="k-pass">0</b><span>Passives</span></div>
+            <div class="cx-nps-chip cx-detr"><b id="k-detr">0</b><span>Detractors</span></div>
+          </div>
+          <div class="cx-nps-meter">
+            <div class="cx-nps-meter-fill" id="cx-nps-meter-fill"></div>
+          </div>
+          <p class="text-xs text-muted" style="margin-top:var(--space-3)">Net Promoter Score is private to your brand and gives a fast read on advocacy versus friction.</p>
+        </div>
+      </div>
+      <div class="cx-quick">
+        <a href="brand-cx-surveys.html"><i class="fa-solid fa-clipboard-list"></i><span><strong>Survey library</strong><small>Review live, draft, paused and archived surveys</small></span></a>
+        <a href="brand-cx-responses.html"><i class="fa-solid fa-inbox"></i><span><strong>Responses</strong><small>Inspect raw feedback and follow-up opportunities</small></span></a>
+        <a href="brand-cx-survey-edit.html"><i class="fa-solid fa-wand-magic-sparkles"></i><span><strong>Builder</strong><small>Create, duplicate and refine survey flows</small></span></a>
+      </div>
+    </section>
 
-    <!-- Per-survey dashboard -->
-    <div class="cx-pickbar">
+    <section class="cx-story-grid">
+      <div class="card cx-story-card">
+        <div class="cx-story-head"><div><div class="cx-overline">Current focus</div><h3>What changed recently</h3></div><span class="cx-story-badge" id="cx-momentum-badge">Watching trends</span></div>
+        <div class="cx-spark-wrap" id="cx-spark-wrap" style="display:none">
+          <div class="cx-spark-head"><h3>Responses over time</h3><span id="cx-spark-range"></span></div>
+          <svg class="cx-spark" id="cx-spark" viewBox="0 0 600 60" preserveAspectRatio="none"></svg>
+        </div>
+        <div class="cx-insight-list" id="cx-insight-list">
+          <div class="cx-insight-item"><strong>Loading dashboard insight…</strong><span>We are pulling your latest survey activity.</span></div>
+        </div>
+      </div>
+      <div class="card cx-story-card">
+        <div class="cx-story-head"><div><div class="cx-overline">Operational view</div><h3>Survey selection</h3></div><span class="cx-story-badge">Per-survey deep dive</span></div>
+        <div class="cx-pickbar">
       <label for="cx-survey-pick">Survey</label>
       <select id="cx-survey-pick"><option value="">Loading…</option></select>
       <div class="cx-range" role="tablist" aria-label="Time range">
@@ -113,10 +178,6 @@
       <span id="cx-dash-meta" style="margin-left:auto;font-size:12px;color:var(--text-muted);font-weight:600"></span>
     </div>
 
-    <div class="cx-spark-wrap" id="cx-spark-wrap" style="display:none">
-      <div class="cx-spark-head"><h3>Responses over time</h3><span id="cx-spark-range"></span></div>
-      <svg class="cx-spark" id="cx-spark" viewBox="0 0 600 60" preserveAspectRatio="none"></svg>
-    </div>
 
     <div class="cx-dash-grid" id="cx-dash"></div>
     <div id="cx-dash-empty" class="cx-tile-empty" style="display:none;text-align:center;padding:var(--space-6) 0">No questions on this survey yet.</div>
@@ -132,9 +193,90 @@
   </main>
 </div>
 
-<script src="data/helpers.js"></script>
-<script src="components.js"></script>
-<script src="api.js?v=20260422b"></script>
+<script src="data/helpers.js">
+function updateNpsMeter(nps) {
+  var fill = document.getElementById('cx-nps-meter-fill');
+  if (!fill) return;
+  var safe = Math.max(-100, Math.min(100, Number(nps || 0)));
+  fill.style.width = ((safe + 100) / 2) + '%';
+}
+
+function updateStoryInsights(d) {
+  var list = document.getElementById('cx-insight-list');
+  var badge = document.getElementById('cx-momentum-badge');
+  if (!list) return;
+  var surveys = Number((d && (d.survey_count || d.total_surveys)) || 0);
+  var responses = Number((d && (d.response_count || d.total_responses)) || 0);
+  var active = Number((d && (d.active_surveys || d.live_surveys)) || 0);
+  var draft = Number((d && (d.draft_surveys)) || 0);
+  var insights = [
+    {title:'Response coverage', body: responses ? responses + ' total responses captured across your CX programme.' : 'No responses yet — the fastest win is launching one live survey with a visible channel.'},
+    {title:'Survey inventory', body: surveys ? surveys + ' surveys in the library, with ' + active + ' active and ' + draft + ' in draft.' : 'No surveys created yet — build one high-signal template first.'},
+    {title:'Actionability', body: active ? 'Live surveys are feeding this dashboard now, so this page should prioritise trend visibility and response quality.' : 'No active surveys detected, so the dashboard is currently more setup-oriented than insight-led.'}
+  ];
+  list.innerHTML = insights.map(function(item){
+    return '<div class="cx-insight-item"><div><strong>' + esc(item.title) + '</strong><span>' + esc(item.body) + '</span></div><i class="fa-solid fa-arrow-trend-up"></i></div>';
+  }).join('');
+  if (badge) badge.textContent = responses > 25 ? 'Active feedback flow' : 'Building momentum';
+}
+
+</script>
+<script src="components.js">
+function updateNpsMeter(nps) {
+  var fill = document.getElementById('cx-nps-meter-fill');
+  if (!fill) return;
+  var safe = Math.max(-100, Math.min(100, Number(nps || 0)));
+  fill.style.width = ((safe + 100) / 2) + '%';
+}
+
+function updateStoryInsights(d) {
+  var list = document.getElementById('cx-insight-list');
+  var badge = document.getElementById('cx-momentum-badge');
+  if (!list) return;
+  var surveys = Number((d && (d.survey_count || d.total_surveys)) || 0);
+  var responses = Number((d && (d.response_count || d.total_responses)) || 0);
+  var active = Number((d && (d.active_surveys || d.live_surveys)) || 0);
+  var draft = Number((d && (d.draft_surveys)) || 0);
+  var insights = [
+    {title:'Response coverage', body: responses ? responses + ' total responses captured across your CX programme.' : 'No responses yet — the fastest win is launching one live survey with a visible channel.'},
+    {title:'Survey inventory', body: surveys ? surveys + ' surveys in the library, with ' + active + ' active and ' + draft + ' in draft.' : 'No surveys created yet — build one high-signal template first.'},
+    {title:'Actionability', body: active ? 'Live surveys are feeding this dashboard now, so this page should prioritise trend visibility and response quality.' : 'No active surveys detected, so the dashboard is currently more setup-oriented than insight-led.'}
+  ];
+  list.innerHTML = insights.map(function(item){
+    return '<div class="cx-insight-item"><div><strong>' + esc(item.title) + '</strong><span>' + esc(item.body) + '</span></div><i class="fa-solid fa-arrow-trend-up"></i></div>';
+  }).join('');
+  if (badge) badge.textContent = responses > 25 ? 'Active feedback flow' : 'Building momentum';
+}
+
+</script>
+<script src="api.js?v=20260422b">
+function updateNpsMeter(nps) {
+  var fill = document.getElementById('cx-nps-meter-fill');
+  if (!fill) return;
+  var safe = Math.max(-100, Math.min(100, Number(nps || 0)));
+  fill.style.width = ((safe + 100) / 2) + '%';
+}
+
+function updateStoryInsights(d) {
+  var list = document.getElementById('cx-insight-list');
+  var badge = document.getElementById('cx-momentum-badge');
+  if (!list) return;
+  var surveys = Number((d && (d.survey_count || d.total_surveys)) || 0);
+  var responses = Number((d && (d.response_count || d.total_responses)) || 0);
+  var active = Number((d && (d.active_surveys || d.live_surveys)) || 0);
+  var draft = Number((d && (d.draft_surveys)) || 0);
+  var insights = [
+    {title:'Response coverage', body: responses ? responses + ' total responses captured across your CX programme.' : 'No responses yet — the fastest win is launching one live survey with a visible channel.'},
+    {title:'Survey inventory', body: surveys ? surveys + ' surveys in the library, with ' + active + ' active and ' + draft + ' in draft.' : 'No surveys created yet — build one high-signal template first.'},
+    {title:'Actionability', body: active ? 'Live surveys are feeding this dashboard now, so this page should prioritise trend visibility and response quality.' : 'No active surveys detected, so the dashboard is currently more setup-oriented than insight-led.'}
+  ];
+  list.innerHTML = insights.map(function(item){
+    return '<div class="cx-insight-item"><div><strong>' + esc(item.title) + '</strong><span>' + esc(item.body) + '</span></div><i class="fa-solid fa-arrow-trend-up"></i></div>';
+  }).join('');
+  if (badge) badge.textContent = responses > 25 ? 'Active feedback flow' : 'Building momentum';
+}
+
+</script>
 <script>
 Components.initTheme();
 document.getElementById('sidebar-container').innerHTML = Components.renderBrandSidebar('cx');
@@ -397,6 +539,33 @@ function renderText(a) {
   if (!samples.length) return '<div class="cx-tile-empty">No written answers yet.</div>';
   return '<div class="cx-text-list">' + samples.map(function(s){ return '<p>' + esc(s.t) + '</p>'; }).join('') + '</div>';
 }
+
+function updateNpsMeter(nps) {
+  var fill = document.getElementById('cx-nps-meter-fill');
+  if (!fill) return;
+  var safe = Math.max(-100, Math.min(100, Number(nps || 0)));
+  fill.style.width = ((safe + 100) / 2) + '%';
+}
+
+function updateStoryInsights(d) {
+  var list = document.getElementById('cx-insight-list');
+  var badge = document.getElementById('cx-momentum-badge');
+  if (!list) return;
+  var surveys = Number((d && (d.survey_count || d.total_surveys)) || 0);
+  var responses = Number((d && (d.response_count || d.total_responses)) || 0);
+  var active = Number((d && (d.active_surveys || d.live_surveys)) || 0);
+  var draft = Number((d && (d.draft_surveys)) || 0);
+  var insights = [
+    {title:'Response coverage', body: responses ? responses + ' total responses captured across your CX programme.' : 'No responses yet — the fastest win is launching one live survey with a visible channel.'},
+    {title:'Survey inventory', body: surveys ? surveys + ' surveys in the library, with ' + active + ' active and ' + draft + ' in draft.' : 'No surveys created yet — build one high-signal template first.'},
+    {title:'Actionability', body: active ? 'Live surveys are feeding this dashboard now, so this page should prioritise trend visibility and response quality.' : 'No active surveys detected, so the dashboard is currently more setup-oriented than insight-led.'}
+  ];
+  list.innerHTML = insights.map(function(item){
+    return '<div class="cx-insight-item"><div><strong>' + esc(item.title) + '</strong><span>' + esc(item.body) + '</span></div><i class="fa-solid fa-arrow-trend-up"></i></div>';
+  }).join('');
+  if (badge) badge.textContent = responses > 25 ? 'Active feedback flow' : 'Building momentum';
+}
+
 </script>
 </body>
 </html>
