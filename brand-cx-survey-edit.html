@@ -309,6 +309,18 @@
 .se-inline-note{font-size:11px;color:var(--text-muted);line-height:1.45;margin-top:6px}
 @media(max-width:1000px){.se-logic-row{grid-template-columns:1fr}}
 
+
+.se-tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;border:1px solid var(--border-primary);background:var(--surface-2);color:var(--text-muted);font-size:11px;font-weight:800;cursor:help;vertical-align:middle;margin-left:6px}
+.se-tip:hover,.se-tip:focus-visible{color:var(--green);border-color:rgba(17,165,81,.28);background:rgba(17,165,81,.06)}
+.se-tip:hover::after,.se-tip:focus-visible::after{content:attr(data-tip);position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);width:min(260px,80vw);padding:10px 12px;border-radius:12px;background:#111827;color:#fff;font-size:12px;line-height:1.45;font-weight:500;box-shadow:0 10px 24px rgba(0,0,0,.18);z-index:30;text-align:left}
+.se-tip:hover::before,.se-tip:focus-visible::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-bottom-color:#111827;z-index:31}
+.se-onboard{margin:0 0 var(--space-4);padding:14px 16px;border:1px solid rgba(17,165,81,.2);background:rgba(17,165,81,.06);border-radius:16px}
+.se-onboard h3{margin:0 0 6px;font-size:14px;color:var(--text-primary)}
+.se-onboard p{margin:0;font-size:12px;color:var(--text-secondary);line-height:1.5;max-width:none}
+.se-onboard-steps{display:grid;gap:8px;margin-top:10px}
+.se-onboard-step{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--text-secondary)}
+.se-onboard-step b{color:var(--text-primary)}
+
 </style>
 </head>
 <body>
@@ -330,7 +342,7 @@
     <div class="se-grid">
       <div class="se-rail" id="rail">
         <div class="se-template-card">
-          <div class="se-rail-title" style="margin-bottom:8px">Survey template</div>
+          <div class="se-rail-title" style="margin-bottom:8px">Survey template <span class="se-tip" tabindex="0" data-tip="Templates give you a working starting point. You can still edit every question after applying one.">?</span></div>
           <label class="se-label" for="s-template-key">Template selection</label>
           <select class="se-select" id="s-template-key">
             <option value="">None</option>
@@ -754,10 +766,11 @@ function renderQuestionPanel() {
   ensureQuestionTabMeta();
 
   var html = '';
+  html += '<div class="se-onboard"><h3>How this builder works</h3><p>New users can start in three moves: choose a template, add question blocks, then refine flow and routing.</p><div class="se-onboard-steps"><div class="se-onboard-step"><span>1.</span><span><b>Template:</b> Pick a ready-made survey if you want a faster start.</span></div><div class="se-onboard-step"><span>2.</span><span><b>Blocks:</b> Click or drag question types into the middle flow.</span></div><div class="se-onboard-step"><span>3.</span><span><b>Polish:</b> Edit the card, add logic, and preview the respondent journey on the right.</span></div></div></div>';
   html += '<div class="se-question-shell">';
 
   html += '<section class="se-question-column">';
-  html += '<h3>Question blocks</h3><p>Drag or click a block to add it to the survey flow.</p>';
+  html += '<h3>Question blocks <span class="se-tip" tabindex="0" data-tip="These are the building blocks of your survey. Click to add one instantly, or drag it into the flow.">?</span></h3><p>Drag or click a block to add it to the survey flow.</p>';
   html += '<div class="se-builder-blocks">';
   html += QTYPES.map(function(t){
     return '<div class="se-builder-block" draggable="true" data-add-qtype="'+t.v+'">' +
@@ -769,7 +782,7 @@ function renderQuestionPanel() {
   html += '</section>';
 
   html += '<section class="se-question-column">';
-  html += '<h3>Survey flow</h3><p>Build the flow in the middle and edit each question inside the card.</p>';
+  html += '<h3>Survey flow <span class="se-tip" tabindex="0" data-tip="This middle column controls the respondent journey. Reorder questions, edit cards, and add branching logic here.">?</span></h3><p>Build the flow in the middle and edit each question inside the card.</p>';
   html += '<div class="se-flow-drop" id="se-flow-drop"><i class="fa-solid fa-arrow-down"></i> Drop a question block here to add it to the survey flow</div>';
   html += '<div class="se-flow-cards">';
 
@@ -805,7 +818,7 @@ function renderQuestionPanel() {
             '<div><label class="se-label">Help text</label><textarea class="se-textarea" data-field="help_text" data-idx="'+i+'" placeholder="Optional guidance">'+esc(q.help_text || '')+'</textarea></div>' +
             '<div class="se-flow-row"><div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div><div>'+(isTextLike?'<label class="se-label">Placeholder</label><input class="se-input" data-field="placeholder" data-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">':'')+'</div></div>' +
             choiceHtml +
-            '<div class="se-logic-box"><div class="se-logic-head"><label class="se-label" style="margin:0">Branching and routing</label><button type="button" class="se-flow-btn" data-logic-add="'+i+'"><i class="fa-solid fa-plus"></i> Add rule</button></div><div class="se-inline-note">Add routing rules for any question type. You can jump to another question or end the survey.</div><div class="se-logic-list">'+((q.logic&&q.logic.length)?q.logic.map(function(rule,ridx){ return buildLogicRowHTML(q,i,rule,ridx); }).join(''):'<div class="se-inline-note">No rules yet for this question.</div>')+'</div></div>' +
+            '<div class="se-logic-box"><div class="se-logic-head"><label class="se-label" style="margin:0">Branching and routing <span class="se-tip" tabindex="0" data-tip="Branching lets you send people to a different next question based on their answer, or end the survey early.">?</span></label><button type="button" class="se-flow-btn" data-logic-add="'+i+'"><i class="fa-solid fa-plus"></i> Add rule</button></div><div class="se-inline-note">Add routing rules for any question type. You can jump to another question or end the survey.</div><div class="se-logic-list">'+((q.logic&&q.logic.length)?q.logic.map(function(rule,ridx){ return buildLogicRowHTML(q,i,rule,ridx); }).join(''):'<div class="se-inline-note">No rules yet for this question.</div>')+'</div></div>' +
           '</div>' +
         '</div>' +
       '</article>';
@@ -816,13 +829,13 @@ function renderQuestionPanel() {
   html += '</section>';
 
   html += '<aside class="se-question-column">';
-  html += '<h3>Launch languages</h3><p>Start strong in South Africa with multilingual survey launch support.</p>';
+  html += '<h3>Launch languages <span class="se-tip" tabindex="0" data-tip="These languages define which respondent language options are available when the survey goes live.">?</span></h3><p>Start strong in South Africa with multilingual survey launch support.</p>';
   html += '<div class="se-language-list">' + SA_LANGUAGES.map(function(lang){
     var state = (_survey.languages || []).find(function(l){ return l.code === lang.code; }) || { enabled:false };
     return '<label class="se-language-item"><span><strong>'+esc(lang.name)+'</strong><span>'+esc(lang.native)+' · '+esc(lang.code)+'</span></span><input type="checkbox" data-lang-toggle="'+lang.code+'" '+(state.enabled?'checked':'')+' /></label>';
   }).join('') + '</div>';
   html += '<div style="height:16px"></div>';
-  html += '<h3>Live preview</h3><p>The preview stays visible while you shape the survey flow.</p>';
+  html += '<h3>Live preview <span class="se-tip" tabindex="0" data-tip="Use this to sense-check the flow. It shows how the current survey would feel to a respondent.">?</span></h3><p>The preview stays visible while you shape the survey flow.</p>';
   html += questionPreviewHTML();
   html += '</aside>';
 
