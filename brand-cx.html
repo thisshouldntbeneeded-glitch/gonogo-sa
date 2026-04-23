@@ -70,13 +70,13 @@
 .cx-spark-head h3{font-size:14px;font-weight:700;margin:0}
 .cx-spark-head span{font-size:11px;color:var(--text-muted);font-weight:600}
 
-.cx-hero{padding:var(--space-5);margin-bottom:var(--space-5);background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary)}
+.cx-hero{padding:var(--space-4);margin-bottom:var(--space-4);background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--border-primary)}
 .cx-overline{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px}
-.cx-hero-main{display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--space-5)}
-.cx-hero-title{font-size:30px;line-height:1.05;letter-spacing:-.03em;margin:0 0 10px;color:var(--text-primary);max-width:14ch}
+.cx-hero-main{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--space-3)}
+.cx-hero-title{font-size:24px;line-height:1.08;letter-spacing:-.02em;margin:0 0 8px;color:var(--text-primary);max-width:16ch}
 .cx-hero-copy{margin:0;color:var(--text-muted);font-size:14px;max-width:68ch}
 .cx-hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-.cx-hero-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--space-4);align-items:stretch}
+.cx-hero-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:var(--space-3);align-items:stretch}
 @media(max-width:1080px){.cx-hero-grid{grid-template-columns:1fr}}
 .cx-hero-panel{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-4)}
 .cx-hero-panel-accent{background:linear-gradient(180deg,rgba(17,165,81,.08),var(--surface-1))}
@@ -85,9 +85,9 @@
 .cx-panel-head strong{font-size:12px;color:var(--text-muted)}
 .cx-nps-meter{height:12px;border-radius:999px;background:var(--surface-3);overflow:hidden;border:1px solid var(--border-primary);margin-top:var(--space-4)}
 .cx-nps-meter-fill{height:100%;width:0%;background:linear-gradient(90deg,#ef4444 0%,#eab308 50%,#22c55e 100%);transition:width .3s ease}
-.cx-story-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-4);margin-bottom:var(--space-5)}
+.cx-story-grid{display:grid;grid-template-columns:1fr;gap:var(--space-3);margin-bottom:var(--space-4)}
 @media(max-width:1080px){.cx-story-grid{grid-template-columns:1fr}}
-.cx-story-card{padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-4)}
+.cx-story-card{padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)}
 .cx-story-head{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start;flex-wrap:wrap}
 .cx-story-head h3{margin:4px 0 0;font-size:18px}
 .cx-story-badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(17,165,81,.1);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--green)}
@@ -97,6 +97,11 @@
 .cx-insight-item span{display:block;font-size:12px;color:var(--text-muted);max-width:48ch}
 .cx-insight-item i{color:var(--green);margin-top:2px}
 .cx-dash-grid{margin-top:0}
+
+
+#cx-dash-grid{align-items:start}
+#cx-dash-grid .cx-tile{min-height:0}
+@media(min-width:1100px){.cx-hero{padding:18px 20px}.cx-hero-copy{max-width:56ch}.cx-quick{margin-top:var(--space-3)}}
 
 </style>
 </head>
@@ -118,8 +123,8 @@
       <div class="cx-hero-main">
         <div>
           <div class="cx-overline">Customer experience intelligence</div>
-          <h2 class="cx-hero-title">A clearer story for your private feedback data</h2>
-          <p class="cx-hero-copy">This dashboard should help you spot momentum, risk, and operational priorities at a glance rather than forcing you to read through tables.</p>
+          <h2 class="cx-hero-title">Private feedback, clearer and faster to act on</h2>
+          <p class="cx-hero-copy">A faster top-level read, with more room left for the survey detail that actually drives action.</p>
         </div>
         <div class="cx-hero-actions">
           <a href="brand-cx-surveys.html" class="btn btn-sm" style="background:var(--surface-3)"><i class="fa-solid fa-folder-tree"></i> Manage surveys</a>
