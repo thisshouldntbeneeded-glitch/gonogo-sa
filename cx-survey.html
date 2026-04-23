@@ -187,6 +187,30 @@
 
   @media (max-width:640px){.s-swipe-card{padding:22px 18px 16px}.s-party-prompt{font-size:24px}.s-party-choices{grid-template-columns:1fr}.s-party-stage{min-height:390px}}
 
+
+  .s-shell{max-width:720px}
+  .s-party-wrap{display:grid;gap:18px}
+  .s-party-stage{position:relative;min-height:auto;perspective:1200px}
+  .s-swipe-card{position:relative;overflow:hidden;border-radius:30px;padding:30px 28px 24px;background:linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(0,0,0,.28)}
+  .s-swipe-deck{position:relative;min-height:auto}
+  .s-swipe-inner{position:relative;z-index:2;touch-action:none;user-select:none;transition:transform .18s ease, opacity .18s ease;cursor:grab;padding:0;display:grid;gap:18px}
+  .s-party-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:0;align-content:start}
+  .s-party-prompt{font-size:clamp(1.8rem,1.4rem + 1.1vw,2.45rem);line-height:1.08;font-weight:850;letter-spacing:-.03em;color:#fff;margin:0;max-width:none;text-wrap:balance}
+  .s-party-prompt.is-long{font-size:clamp(1.35rem,1.15rem + .75vw,1.85rem);line-height:1.2;max-width:none}
+  .s-party-help{font-size:15px;line-height:1.55;color:rgba(255,255,255,.82);margin:0;max-width:none}
+  .s-party-answer-wrap{display:grid;gap:12px;margin-top:0}
+  .s-swipe-hint{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:4px;color:rgba(255,255,255,.62);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+  .s-swipe-pill{display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+  .s-party-grid-compact.cols-11{grid-template-columns:repeat(11,minmax(0,1fr))}
+  .s-party-mascot{position:fixed;left:50%;bottom:72px;transform:translateX(-50%) translateY(32px) scale(.82);width:min(420px,92vw);padding:18px 20px;border-radius:26px;background:linear-gradient(180deg, rgba(18,24,38,.96), rgba(18,24,38,.9));border:1px solid rgba(255,255,255,.14);box-shadow:0 34px 72px rgba(0,0,0,.4);display:flex;align-items:center;gap:16px;z-index:60;opacity:0;pointer-events:none}
+  .s-party-mascot.show{animation:s-mascot-pop 2.7s ease forwards}
+  .s-party-mascot-blob{width:92px;height:92px;border-radius:28px;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%, #93c5fd, #22c55e 55%, #0f172a 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 16px 34px rgba(0,0,0,.24)}
+  .s-party-mascot-blob span{font-size:48px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.22))}
+  .s-party-mascot-copy strong{display:block;color:#fff;font-size:20px;line-height:1.12}
+  .s-party-mascot-copy p{margin:6px 0 0;color:rgba(255,255,255,.8);font-size:14px;line-height:1.45}
+  @keyframes s-mascot-pop{0%{opacity:0;transform:translateX(-50%) translateY(34px) scale(.8)}10%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.04)}20%{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1)}78%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-22px) scale(.96)}}
+  @media (max-width:640px){.s-shell{max-width:100%}.s-swipe-card{padding:24px 18px 18px}.s-swipe-inner{gap:16px}.s-swipe-hint{grid-template-columns:repeat(2,minmax(0,1fr));font-size:10px}.s-party-grid-compact.cols-11{grid-template-columns:repeat(4,minmax(0,1fr))}.s-party-mascot{bottom:64px;padding:16px;width:min(360px,92vw)}.s-party-mascot-blob{width:76px;height:76px}.s-party-mascot-blob span{font-size:40px}.s-party-mascot-copy strong{font-size:18px}}
+
   *:focus-visible { outline: 2px solid var(--s-primary); outline-offset: 2px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -205,6 +229,7 @@ var state = {
   mode: 'classic',
   currentIdx: -1, // -1 = intro screen
   streak: 0,
+  partyMascotShown: false,
   started: false
 };
 
@@ -235,7 +260,7 @@ function showPartyMascot(){
   void node.offsetWidth;
   node.classList.add('show');
   haptic(26);
-  setTimeout(function(){ node.classList.remove('show'); }, 1900);
+  setTimeout(function(){ node.classList.remove('show'); }, 2700);
 }
 function canUsePartyMode(){
   return state.questions.every(function(q){ return isPartyQuickQuestion(q); });
@@ -356,14 +381,15 @@ function renderPartyQuestion() {
   html += '<div class="s-party-meta"><div class="s-kicker">'+partyIconForQuestion(q)+' Quick swipe question</div><div class="s-stats"><span class="s-stat-pill">Question '+(state.currentIdx + 1)+' / '+total+'</span>' + (state.streak ? '<span class="s-stat-pill">🔥 Streak '+state.streak+'</span>' : '<span class="s-stat-pill">🎮 Keep the streak going</span>') + '</div></div>';
   html += '<div class="s-party-copy"><small>Party energy</small><small>'+partyEnergy(total)+'%</small></div><div class="s-party-energy"><span style="width:'+partyEnergy(total)+'%"></span></div>';
   html += '<div class="s-party-stage"><div class="s-swipe-card"><div class="s-swipe-deck"><div class="s-swipe-inner" id="party-swipe-card">';
-  html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt">'+esc(q.prompt)+'</h2>' + (q.help_text ? '<p class="s-party-help">'+esc(q.help_text)+'</p>' : '<p class="s-party-help">Go with your instinct. Quick answers keep the vibe alive.</p>') + '</div>';
+  var _partyLong = (q.prompt || '').length > 95;
+  html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt'+(_partyLong?' is-long':'')+'">'+esc(q.prompt)+'</h2>' + (q.help_text ? '<p class="s-party-help">'+esc(q.help_text)+'</p>' : '<p class="s-party-help">Go with your instinct. Quick answers keep the vibe alive.</p>') + '</div>';
   html += '<div id="q-answer">'+renderPartyInput(q, state.currentIdx)+'</div>';
-  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">⬅️ Quick no / lower</span><span class="s-swipe-pill">➡️ Quick yes / higher</span></div>';
+  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">⬅️ Lower</span><span class="s-swipe-pill">➡️ Higher</span><span class="s-swipe-pill">⬆️ Next</span><span class="s-swipe-pill">⬇️ Back</span></div>';
   html += '</div></div></div>';
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
   html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Streak creature unlocked</strong><p>You are flying. Keep the party going.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>';
+  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>';
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
@@ -400,9 +426,29 @@ function renderPartyInput(q, idx){
 }
 function wirePartyQuestion(q, idx){
   var card = document.getElementById('party-swipe-card');
-  var startX = 0, currentX = 0, dragging = false;
-  function setTransform(x){ if(card){ card.style.transform = 'translateX('+x+'px) rotate('+(x/18)+'deg)'; card.style.opacity = String(Math.max(.72, 1 - Math.abs(x)/260)); } }
-  function handleQuick(direction){
+  var startX = 0, startY = 0, currentX = 0, currentY = 0, dragging = false;
+  function setTransform(x, y){
+    if(card){
+      card.style.transform = 'translate('+x+'px,'+y+'px) rotate('+(x/20)+'deg)';
+      card.style.opacity = String(Math.max(.72, 1 - (Math.max(Math.abs(x), Math.abs(y))/320)));
+    }
+  }
+  function advance(){ if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }
+  function retreat(){ if (state.currentIdx > 0) { state.currentIdx--; render(); } }
+  function commitQuick(value, positive){
+    if (value == null) return;
+    if (typeof value === 'number') state.values[q.id] = { value_number:value }; else state.values[q.id] = { value_text:value };
+    haptic(positive ? 22 : 14);
+    celebrateStep(!!positive);
+    if (card) {
+      card.style.transition = 'transform .18s ease, opacity .18s ease';
+      setTransform(positive ? 220 : -220, 0);
+      setTimeout(advance, 170);
+    } else advance();
+  }
+  function handleDirectionalSwipe(direction){
+    if (direction === 'up') { haptic(12); return advance(); }
+    if (direction === 'down') { haptic(10); return retreat(); }
     var value = null;
     if (q.qtype === 'yes_no') value = direction === 'right' ? 'Yes' : 'No';
     else if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') value = direction === 'right' ? 5 : 2;
@@ -411,31 +457,28 @@ function wirePartyQuestion(q, idx){
       var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
       value = direction === 'right' ? opts[Math.min(1, opts.length-1)] : opts[0];
     }
-    if (value == null) return;
-    if (typeof value === 'number') state.values[q.id] = { value_number:value }; else state.values[q.id] = { value_text:value };
-    haptic(direction === 'right' ? 22 : 14);
-    celebrateStep(direction === 'right');
-    if (card) {
+    commitQuick(value, direction === 'right');
+  }
+  if (card) {
+    card.addEventListener('pointerdown', function(e){ dragging = true; startX = e.clientX; startY = e.clientY; currentX = 0; currentY = 0; card.classList.add('dragging'); });
+    window.addEventListener('pointermove', function(e){ if(!dragging) return; currentX = e.clientX - startX; currentY = e.clientY - startY; setTransform(currentX, currentY); });
+    window.addEventListener('pointerup', function(){
+      if(!dragging) return;
+      dragging = false;
+      card.classList.remove('dragging');
+      var absX = Math.abs(currentX), absY = Math.abs(currentY);
+      if (absY > absX && currentY < -90) return handleDirectionalSwipe('up');
+      if (absY > absX && currentY > 90) return handleDirectionalSwipe('down');
+      if (currentX > 90) return handleDirectionalSwipe('right');
+      if (currentX < -90) return handleDirectionalSwipe('left');
       card.style.transition = 'transform .18s ease, opacity .18s ease';
-      setTransform(direction === 'right' ? 220 : -220);
-      setTimeout(function(){ if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }, 170);
-    }
+      setTransform(0,0);
+      setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } }, 180);
+    });
   }
-  if (card && (q.qtype === 'yes_no' || q.qtype === 'single_select' || q.qtype === 'consent' || q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley' || q.qtype === 'nps_0_10')) {
-    card.addEventListener('pointerdown', function(e){ dragging = true; startX = e.clientX; currentX = 0; card.classList.add('dragging'); });
-    window.addEventListener('pointermove', function(e){ if(!dragging) return; currentX = e.clientX - startX; setTransform(currentX); });
-    window.addEventListener('pointerup', function(){ if(!dragging) return; dragging = false; card.classList.remove('dragging'); if (currentX > 90) return handleQuick('right'); if (currentX < -90) return handleQuick('left'); card.style.transition = 'transform .18s ease, opacity .18s ease'; setTransform(0); setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } }, 180); });
-  }
-  document.querySelectorAll('[data-party-val]').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-party-val'); var n = parseInt(raw,10); if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(18); celebrateStep(true); if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }); });
-  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-val'); if (q.qtype === 'multi_select') { var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : []; var i = curr.indexOf(raw); if (i === -1) curr.push(raw); else curr.splice(i, 1); state.values[q.id] = curr; haptic(10); rerenderPartyAnswer(q, idx); } else { var n = parseInt(raw,10); if (!isNaN(n) && String(n)===raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(16); celebrateStep(true); if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } } }); });
+  document.querySelectorAll('[data-party-val]').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-party-val'); var n = parseInt(raw,10); if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(18); celebrateStep(true); advance(); }); });
+  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-val'); if (q.qtype === 'multi_select') { var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : []; var i = curr.indexOf(raw); if (i === -1) curr.push(raw); else curr.splice(i, 1); state.values[q.id] = curr; haptic(10); rerenderPartyAnswer(q, idx); } else { var n = parseInt(raw,10); if (!isNaN(n) && String(n)===raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(16); celebrateStep(true); advance(); } }); });
 }
-function rerenderPartyAnswer(q, idx){
-  var wrap = document.getElementById('q-answer');
-  if (!wrap) return;
-  wrap.innerHTML = renderPartyInput(q, idx);
-  wirePartyQuestion(q, idx);
-}
-
 function bindModeToggle() {
   document.querySelectorAll('[data-mode]').forEach(function(btn){
     btn.addEventListener('click', function(){
