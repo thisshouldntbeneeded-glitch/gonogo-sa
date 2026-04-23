@@ -194,10 +194,29 @@
     <div class="se-grid">
       <!-- Left rail: question list -->
       <div class="se-rail" id="rail">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:var(--space-2)">Questions</div>
+        <div class="se-template-card" style="margin-bottom:var(--space-4)">
+          <div class="se-rail-title" style="margin-bottom:8px">Survey template</div>
+          <label class="se-label" for="s-template-key">Template selection</label>
+          <select class="se-select" id="s-template-key">
+            <option value="">None</option>
+            <option value="nps_short">Short NPS</option>
+            <option value="csat_quick">Quick CSAT</option>
+            <option value="post_visit">Post-visit feedback</option>
+            <option value="post_purchase">Post-purchase</option>
+            <option value="support_followup">Support follow-up</option>
+          </select>
+          <div class="se-template-actions">
+            <button class="se-btn-primary" id="btn-apply-template" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply template</button>
+            <button class="se-btn-secondary" id="btn-clear-template" type="button"><i class="fa-solid fa-eraser"></i> Clear template</button>
+          </div>
+          <div class="se-template-chip"><i class="fa-solid fa-layer-group"></i> Templates update the question list instantly</div>
+          <div class="se-template-note">Choose a template, apply it, then fine-tune the questions below.</div>
+        </div>
+
+        <div class="se-rail-title">Questions</div>
         <div id="q-list"></div>
         <div class="se-add-bar">
-          <button class="btn btn-sm se-add-btn" id="btn-add-q"><i class="fa-solid fa-plus"></i> Add question</button>
+          <button class="se-btn-primary se-add-btn" id="btn-add-q"><i class="fa-solid fa-plus"></i> Add question</button>
         </div>
       </div>
 
@@ -206,10 +225,12 @@
         <div class="se-tabs" id="pane-tabs">
           <button class="se-tab active" data-tab="question">Question</button>
           <button class="se-tab" data-tab="settings">Survey settings</button>
+          <button class="se-tab" data-tab="preview">Preview</button>
           <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Share links</button>
         </div>
         <div id="panel-question"></div>
         <div id="panel-settings" style="display:none"></div>
+        <div id="panel-preview" style="display:none"></div>
         <div id="panel-links" style="display:none"></div>
       </div>
     </div>
