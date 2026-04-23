@@ -951,7 +951,19 @@ function qtypePickerHTML(titleHtml) {
   var html = '<div class="se-empty"><div class="se-empty-icon"><i class="fa-solid fa-clipboard-list"></i></div>';
   html += (titleHtml || '<h3>Choose a question type</h3><p>Pick the format that best fits what you want to learn.</p>');
   html += '<div class="se-qtype-grid">';
-  QTYPES.forEach(function(t){
+  var types = Array.isArray(QTYPES) && QTYPES.length ? QTYPES : [
+    {v:'short_text', l:'Short text', icon:'fa-font'},
+    {v:'long_text', l:'Long text', icon:'fa-align-left'},
+    {v:'single_select', l:'Single select', icon:'fa-circle-dot'},
+    {v:'multi_select', l:'Multi select', icon:'fa-square-check'},
+    {v:'rating_1_5', l:'Rating 1–5', icon:'fa-star'},
+    {v:'csat_smiley', l:'CSAT smiley', icon:'fa-face-smile'},
+    {v:'nps_0_10', l:'NPS 0–10', icon:'fa-gauge-high'},
+    {v:'yes_no', l:'Yes / No', icon:'fa-toggle-on'},
+    {v:'dropdown', l:'Dropdown', icon:'fa-caret-down'},
+    {v:'consent', l:'Consent checkbox', icon:'fa-check-double'}
+  ];
+  types.forEach(function(t){
     html += '<div class="se-qtype-card" data-qtype="' + t.v + '"><i class="fa-solid ' + t.icon + '"></i><span class="se-qtype-card-title">' + esc(t.l) + '</span></div>';
   });
   html += '</div></div>';
