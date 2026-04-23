@@ -742,8 +742,7 @@ function renderQuestionPanel() {
               '<div><label class="se-label">Help text</label><textarea class="se-textarea" data-field="help_text" data-flow-idx="'+i+'" placeholder="Optional guidance for the respondent">'+esc(q.help_text || '')+'</textarea></div>' +
               '<div class="se-row"><div><label class="se-label">Required</label><label style="display:flex;align-items:center;gap:8px;padding-top:10px"><input type="checkbox" data-field="required" data-flow-idx="'+i+'" '+(q.required?'checked':'')+'> <span class="text-sm text-secondary">Require an answer</span></label></div>' +
               '<div>' + ((q.qtype==='short_text'||q.qtype==='long_text'||q.qtype==='email'||q.qtype==='phone'||q.qtype==='name'||q.qtype==='number'||q.qtype==='date') ? '<label class="se-label">Placeholder text</label><input class="se-input" data-field="placeholder" data-flow-idx="'+i+'" value="'+esc((q.options&&q.options[0]) || '')+'" placeholder="Optional placeholder">' : '') + '</div></div>' +
-              + ((q.qtype==='single_select'||q.qtype==='multi_select'||q.qtype==='dropdown') ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-flow-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('
-'))+'</textarea></div>' : '') +
+              ((q.qtype==='single_select'||q.qtype==='multi_select'||q.qtype==='dropdown') ? '<div><label class="se-label">Options</label><textarea class="se-textarea" data-field="options_text" data-flow-idx="'+i+'" placeholder="One option per line">'+esc((q.options||[]).join('\n'))+'</textarea></div>' : '') +
             '</div>' +
           '</div>' +
         '</div>';
