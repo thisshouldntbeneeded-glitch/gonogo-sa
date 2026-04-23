@@ -98,6 +98,25 @@
 .se-link-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:999px}
 .se-link-active{background:rgba(34,197,94,.18);color:#4ade80}
 .se-link-revoked{background:rgba(100,116,139,.18);color:#94a3b8}
+.se-dist-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--space-4);align-items:start}
+@media(max-width:1100px){.se-dist-grid{grid-template-columns:1fr}}
+.se-dist-stack{display:grid;gap:var(--space-4)}
+.se-dist-card{background:var(--surface-1);border:1px solid var(--border-primary);border-radius:16px;padding:var(--space-4)}
+.se-dist-card h3{margin:0 0 6px;font-size:16px;color:var(--text-primary)}
+.se-dist-card p{margin:0 0 var(--space-3);font-size:13px;color:var(--text-muted);line-height:1.5}
+.se-dist-icon{width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:rgba(17,165,81,.1);color:var(--green);margin-bottom:10px;font-size:14px}
+.se-dist-list{display:grid;gap:10px;margin-top:var(--space-3)}
+.se-dist-item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-dist-item strong{display:block;font-size:13px;color:var(--text-primary);margin-bottom:2px}
+.se-dist-item span{display:block;font-size:12px;color:var(--text-muted);line-height:1.45}
+.se-dist-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:var(--space-3)}
+.se-dist-note{padding:12px 14px;border-radius:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.16);font-size:12px;color:var(--text-primary);line-height:1.5;margin-top:var(--space-3)}
+.se-mini-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:var(--space-3)}
+@media(max-width:720px){.se-mini-kpi{grid-template-columns:1fr}}
+.se-mini-kpi .k{padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border-primary)}
+.se-mini-kpi .k b{display:block;font-size:18px;color:var(--text-primary);margin-bottom:4px}
+.se-mini-kpi .k span{font-size:12px;color:var(--text-muted)}
+.se-channel-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(17,165,81,.1);color:var(--green);font-size:11px;font-weight:700;margin-left:auto;white-space:nowrap}
 
 /* ── Toast ── */
 .se-toast{position:fixed;bottom:var(--space-5);right:var(--space-5);padding:var(--space-3) var(--space-5);border-radius:var(--radius-md);font-size:13px;font-weight:600;z-index:200;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none}
@@ -145,7 +164,7 @@
         <div class="se-tabs" id="pane-tabs">
           <button class="se-tab active" data-tab="question">Question</button>
           <button class="se-tab" data-tab="settings">Survey settings</button>
-          <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Share links</button>
+          <button class="se-tab" data-tab="links" id="tab-links" style="display:none">Distribution</button>
         </div>
         <div id="panel-question"></div>
         <div id="panel-settings" style="display:none"></div>
@@ -830,8 +849,11 @@ async function setStatus(status) {
 function renderLinks() {
   var panel = document.getElementById('panel-links');
   var base = window.location.origin + '/cx-survey?t=';
-  var html = '<p class="text-xs text-muted" style="margin-bottom:var(--space-3)">Share links let customers respond without logging in. Revoke any time.</p>';
-
+  var html = '<div class="se-panel-intro"><div><h2>Distribution</h2><p>Manage direct links, QR code use, WhatsApp outreach, and web intercept collection from one place.</p></div></div>';
+  html += '<div class="se-dist-grid">';
+  html += '<div class="se-dist-stack">';
+  html += '<div class="se-dist-card">';
+  html += '<div class="se-dist-icon"><i class="fa-solid fa-link"></i></div><h3>Links & QR codes</h3><p>Generate public survey links for channels, branches, campaigns, and printable QR use cases.</p>';
   if (_links.length) {
     _links.forEach(function(l){
       var statusCls = l.revoked ? 'se-link-revoked' : 'se-link-active';
@@ -846,15 +868,47 @@ function renderLinks() {
         '</div>';
     });
   } else {
-    html += '<p class="text-sm text-muted" style="margin-bottom:var(--space-3)">No share links yet.</p>';
+    html += '<p class="text-sm text-muted" style="margin-bottom:var(--space-3)">No public links yet.</p>';
   }
-
   html += '<div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">';
   html += '<input class="se-input" id="f-link-label" placeholder="Link label (e.g. In-store QR)" style="flex:1">';
   html += '<button class="btn btn-sm" id="btn-new-link" style="background:var(--green);color:#fff;border:none"><i class="fa-solid fa-link"></i> Generate new link</button></div>';
-
+  html += '<div class="se-dist-note"><strong>Best practice:</strong> create separate links for web, QR, WhatsApp, stores, or branches so response source reporting stays clean.</div>';
+  html += '</div>';
+  html += '<div class="se-dist-card">';
+  html += '<div class="se-dist-icon"><i class="fa-brands fa-whatsapp"></i></div><h3>WhatsApp</h3><p>Use a short, branded follow-up message that opens the hosted survey link on mobile.</p>';
+  html += '<div class="se-dist-list">';
+  html += '<div class="se-dist-item"><div><strong>Recommended use</strong><span>Post-purchase, post-service, post-support, or branch follow-up.</span></div><span class="se-channel-pill"><i class="fa-solid fa-mobile-screen"></i> High response</span></div>';
+  html += '<div class="se-dist-item"><div><strong>Suggested message</strong><span>Hi {{first_name}}, thanks for your recent experience with {{brand_name}}. We would value your feedback: {{survey_link}}</span></div></div>';
+  html += '</div>';
+  html += '<div class="se-dist-actions"><button class="se-btn-primary" type="button" id="btn-wa-copy"><i class="fa-brands fa-whatsapp"></i> Copy WhatsApp message</button><button class="se-btn-secondary" type="button" id="btn-wa-link"><i class="fa-solid fa-link"></i> Copy latest link</button></div>';
+  html += '<div class="se-dist-note">This is the first UI step. The next build should add contact source, template approval, reminders, consent status, and send tracking.</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '<div class="se-dist-stack">';
+  html += '<div class="se-dist-card">';
+  html += '<div class="se-dist-icon"><i class="fa-solid fa-globe"></i></div><h3>Web Intercept</h3><p>Collect feedback directly on the website through a modal, slide-in, or sticky tab.</p>';
+  html += '<div class="se-dist-list">';
+  html += '<div class="se-dist-item"><div><strong>Popup / modal</strong><span>Best for high-visibility journeys like checkout exit, pricing, or thank-you pages.</span></div></div>';
+  html += '<div class="se-dist-item"><div><strong>Slide-in panel</strong><span>Best for lower-friction invites after time on page or scroll depth.</span></div></div>';
+  html += '<div class="se-dist-item"><div><strong>Sticky feedback tab</strong><span>Best for always-available passive website feedback collection.</span></div></div>';
+  html += '</div>';
+  html += '<div class="se-mini-kpi"><div class="k"><b>10–30s</b><span>Time trigger</span></div><div class="k"><b>50–75%</b><span>Scroll trigger</span></div><div class="k"><b>Exit</b><span>Abandonment trigger</span></div></div>';
+  html += '<div class="se-dist-actions"><button class="se-btn-primary" type="button" id="btn-web-copy"><i class="fa-solid fa-code"></i> Copy install snippet</button><button class="se-btn-secondary" type="button" id="btn-web-preview"><i class="fa-solid fa-eye"></i> Preview idea</button></div>';
+  html += '<div class="se-dist-note">This adds the distribution UI now. The next build should turn Web Intercept into a full setup flow with trigger rules, targeting, frequency caps, and preview testing.</div>';
+  html += '</div>';
+  html += '<div class="se-dist-card">';
+  html += '<div class="se-dist-icon"><i class="fa-solid fa-layer-group"></i></div><h3>Channel guide</h3><p>Use the right method depending on where the customer is.</p>';
+  html += '<div class="se-dist-list">';
+  html += '<div class="se-dist-item"><div><strong>Links</strong><span>Email, SMS, CRM notes, support follow-up, or buttons.</span></div></div>';
+  html += '<div class="se-dist-item"><div><strong>QR codes</strong><span>In-store posters, counters, table talkers, packaging, receipts.</span></div></div>';
+  html += '<div class="se-dist-item"><div><strong>WhatsApp</strong><span>Direct mobile follow-up after a known customer interaction.</span></div></div>';
+  html += '<div class="se-dist-item"><div><strong>Web Intercept</strong><span>On-site behavioural targeting during a live website session.</span></div></div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
   panel.innerHTML = html;
-
   panel.querySelectorAll('[data-copy]').forEach(function(b){
     b.addEventListener('click', function(){
       navigator.clipboard.writeText(b.dataset.copy);
@@ -879,6 +933,34 @@ function renderLinks() {
   });
   var newLinkBtn = document.getElementById('btn-new-link');
   if (newLinkBtn) newLinkBtn.addEventListener('click', createLink);
+  var latestActive = (_links || []).find(function(l){ return !l.revoked; });
+  var latestUrl = latestActive ? (base + latestActive.token) : '';
+  var waCopyBtn = document.getElementById('btn-wa-copy');
+  if (waCopyBtn) waCopyBtn.addEventListener('click', function(){
+    if (!latestUrl) { toast('Create a public link first', 'error'); return; }
+    var brandName = (_survey && (_survey.brand_name || _survey.brand || _survey.survey_name)) || 'our team';
+    var msg = 'Hi, thanks for your recent experience with ' + brandName + '. We would value your feedback: ' + latestUrl;
+    navigator.clipboard.writeText(msg);
+    toast('WhatsApp message copied', 'success');
+  });
+  var waLinkBtn = document.getElementById('btn-wa-link');
+  if (waLinkBtn) waLinkBtn.addEventListener('click', function(){
+    if (!latestUrl) { toast('Create a public link first', 'error'); return; }
+    navigator.clipboard.writeText(latestUrl);
+    toast('Link copied', 'success');
+  });
+  var webCopyBtn = document.getElementById('btn-web-copy');
+  if (webCopyBtn) webCopyBtn.addEventListener('click', function(){
+    if (!latestUrl) { toast('Create a public link first', 'error'); return; }
+    var snippet = '<script>window.GoNoGoIntercept={surveyUrl:"' + latestUrl + '",trigger:"time",delaySeconds:15,mode:"slidein"};<\/script>
+<script src="https://www.gonogo.co.za/cx-intercept.js" defer><\/script>';
+    navigator.clipboard.writeText(snippet);
+    toast('Install snippet copied', 'success');
+  });
+  var webPreviewBtn = document.getElementById('btn-web-preview');
+  if (webPreviewBtn) webPreviewBtn.addEventListener('click', function(){
+    toast('Web Intercept builder should be the next upgrade for this tab', 'success');
+  });
 }
 
 function showQrModal(url, label) {
