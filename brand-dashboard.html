@@ -1523,7 +1523,7 @@
       var slug = window.brandSlug || '';
       var siteUrl = window.siteUrl || LIVE_PUBLIC_BASE_URL;
       var verdictColor = verdict === 'TOP PERFORMER' ? '#d4a017' : verdict === 'GO' ? '#11a551' : verdict === 'NOGO' ? '#e74c3c' : '#11a551';
-      var brandUrl = siteUrl + '/brand.html?id=' + encodeURIComponent(slug);
+      var brandUrl = siteUrl + '/brand/' + encodeURIComponent(slug);
 
       var badgeHtml = '';
       var embedCode = '';
@@ -1567,7 +1567,7 @@
     }
 
     function setupReviewQr(brandSlug) {
-      var reviewUrl = LIVE_PUBLIC_BASE_URL + '/brand.html?id=' + encodeURIComponent(brandSlug) + '#leave-review';
+      var reviewUrl = LIVE_PUBLIC_BASE_URL + '/brand/' + encodeURIComponent(brandSlug) + '#leave-review';
       window.reviewPageUrl = reviewUrl;
 
       var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(reviewUrl);
