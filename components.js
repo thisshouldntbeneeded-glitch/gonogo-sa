@@ -1,6 +1,34 @@
 // GoNoGo SA — Shared Components
 // Reusable rendering functions for public and admin pages
 
+// --- Security: inject Content-Security-Policy as early as possible ---
+// Scoped pragmatically: the app relies on inline scripts/styles throughout, so
+// 'unsafe-inline' remains on script-src/style-src. The big wins here are
+// connect-src (stops injected code from POSTing stolen data to attacker hosts),
+// frame-ancestors (clickjacking), base-uri, form-action, and object-src.
+(function(){
+  try {
+    if (document.querySelector('meta[http-equiv="Content-Security-Policy"]')) return;
+    var csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
+      "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+      "img-src 'self' data: blob: https:",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.qrserver.com",
+      "frame-src 'self'",
+      "frame-ancestors 'self'",
+      "form-action 'self'",
+      "base-uri 'self'",
+      "object-src 'none'"
+    ].join('; ');
+    var m = document.createElement('meta');
+    m.setAttribute('http-equiv', 'Content-Security-Policy');
+    m.setAttribute('content', csp);
+    (document.head || document.documentElement).insertBefore(m, (document.head || document.documentElement).firstChild);
+  } catch(e) { /* CSP setup failure should never block the app */ }
+})();
+
 const LOGO_URL = 'logos/gonogo-square.jpg';
 const HERO_LOGO_DARK = 'logos/gonogo-hero-dark.jpg';
 const HERO_LOGO_LIGHT = 'logos/gonogo-hero-light.jpg';
@@ -1579,6 +1607,15 @@ const Components = {
     const isAdmin = user && user.role === 'admin';
     const isFullAccess = userTier === 'full' || isAdmin;
     const isCxOnly = userTier === 'cx_only' && !isAdmin;
+
+    // cx_only gate: if a cx_only user lands on a non-CX page, bounce them to CX Overview
+    if (isCxOnly) {
+      const cxAllowedPages = ['cx','cx-surveys','cx-responses'];
+      if (cxAllowedPages.indexOf(activePage) === -1) {
+        try { window.location.replace('brand-cx.html'); } catch(e) {}
+        return '';
+      }
+    }
     const allLinks = [
       { href: 'brand-dashboard.html', label: 'Dashboard', icon: 'fa-gauge', id: 'dashboard', fullOnly: true },
       { href: 'brand-reviews.html', label: 'Reviews', icon: 'fa-comments', id: 'reviews', fullOnly: false },
