@@ -56,15 +56,45 @@
 .cx-toolbar-search i{color:var(--text-muted)}
 .cx-toolbar-search input{width:100%;background:transparent;border:none;outline:none;color:var(--text-primary);font:inherit}
 .cx-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
-.cx-table .cx-actions-cell{width:1%;white-space:nowrap;text-align:right}
-.cx-row-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.cx-row-actions .btn{display:inline-flex;align-items:center;gap:6px}
+.cx-table .cx-actions-cell{
+  width:240px;
+  min-width:240px;
+  text-align:right;
+  vertical-align:middle;
+}
+.cx-row-actions{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:8px;
+  justify-content:end;
+}
+.cx-row-actions .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  width:100%;
+}
+.cx-row-actions .btn-danger{
+  background:rgba(220,38,38,.12);
+  color:#f87171;
+  border:1px solid rgba(220,38,38,.22);
+}
+.cx-row-actions .btn-danger:hover{
+  background:rgba(220,38,38,.18);
+}
 .cx-soft-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(15,23,42,.06);font-size:11px;font-weight:700;color:var(--text-secondary)}
 .cx-empty-state{display:grid;place-items:center;text-align:center;padding:var(--space-8)}
 .cx-empty-state i{font-size:34px;color:var(--text-muted);margin-bottom:var(--space-3)}
 .cx-empty-state h3{margin:0 0 6px;font-size:18px}
 .cx-empty-state p{margin:0;color:var(--text-muted);max-width:48ch}
 
+@media(max-width:900px){
+  .cx-table .cx-actions-cell{
+    width:200px;
+    min-width:200px;
+  }
+}
 </style>
 </head>
 <body>
@@ -284,6 +314,7 @@ function renderList() {
         '<a href="brand-cx-survey-edit.html?id=' + encodeURIComponent(r.id) + '" class="btn btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</a>' +
         '<button class="btn btn-sm" data-duplicate="' + r.id + '"><i class="fa-solid fa-copy"></i> Duplicate</button>' +
         '<button class="btn btn-sm" data-archive="' + r.id + '"><i class="fa-solid fa-box-archive"></i> ' + (String(r.status) === 'archived' ? 'Restore' : 'Archive') + '</button>' +
+        '<button class="btn btn-sm btn-danger" data-delete="' + r.id + '"><i class="fa-solid fa-trash"></i> Delete</button>' +
       '</div></td>' +
     '</tr>';
   });
@@ -295,8 +326,10 @@ function renderList() {
   container.querySelectorAll('[data-archive]').forEach(function(btn){
     btn.addEventListener('click', function(){ toggleArchive(btn.dataset.archive); });
   });
+  container.querySelectorAll('[data-delete]').forEach(function(btn){
+    btn.addEventListener('click', function(){ deleteSurvey(btn.dataset.delete); });
+  });
 }
-
 
 async function duplicateSurvey(id) {
   try {
@@ -354,6 +387,19 @@ async function toggleArchive(id) {
     await loadList();
   } catch (e) {
     alert('Could not update survey status: ' + (e.message || 'error'));
+  }
+}
+
+async function deleteSurvey(id) {
+  var row = (_allRows || []).find(function(r){ return String(r.id) === String(id); });
+  var name = row && row.name ? row.name : 'this survey';
+  if (!confirm('Delete "' + name + '" permanently? This cannot be undone.')) return;
+
+  try {
+    await GoNoGoAPI.cx.deleteSurvey(id);
+    await loadList();
+  } catch (e) {
+    alert('Could not delete survey: ' + (e.message || 'error'));
   }
 }
 
@@ -471,7 +517,6 @@ async function save() {
     };
     if (!payload.name) throw new Error('Name is required');
     var id = await GoNoGoAPI.cx.upsertSurvey(payload);
-    // If brand-new survey, reload it so link tab can work
     if (!_editing) {
       var data = await GoNoGoAPI.cx.getSurvey(id);
       _editing = data.survey; _links = data.links || [];
