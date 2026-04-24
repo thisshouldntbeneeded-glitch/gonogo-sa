@@ -833,17 +833,6 @@ function wireQtypePicker(root) {
   });
 }
 
-function renderEmptyState(mode) {
-  var panel = document.getElementById('panel-question');
-  if (!panel) return;
-  panel.innerHTML = qtypePickerHTML(
-    mode === 'add'
-      ? '<h3>Add your first question</h3><p>Pick a question type to start building this survey.</p>'
-      : '<h3>No questions yet</h3><p>Choose a question type to begin.</p>'
-  );
-  wireQtypePicker(panel);
-}
-
 function addQuestion(qtype) {
   _questions.push(questionDefaults(qtype));
   _selectedIdx = _questions.length - 1;
@@ -1652,7 +1641,7 @@ async function save() {
     } catch (err) {
       var msg = (err && err.message) || '';
       // Retry once with a unique slug suffix if we hit the unique constraint
-      if (/duplicate key|already exists|23505|409|conflict|unique/i.test(msg)) {
+      if (/duplicate key|already exists|23505/i.test(msg)) {
         var suffix = '-' + Math.random().toString(36).slice(2, 6);
         payload.slug = ((payload.slug || payload.name || 'survey').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) + suffix;
         resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
