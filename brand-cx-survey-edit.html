@@ -1517,7 +1517,29 @@ function renderSurveyPreview() {
   panel.innerHTML = html;
 }
 
+function syncQuestionsFromDOM() {
+  // Safety net: pull latest values directly from the live DOM for each question card
+  // so that typed-but-unblurred text is captured at save time.
+  var panel = document.getElementById('panel-question');
+  if (!panel) return;
+  panel.querySelectorAll('.se-flow-card[data-idx]').forEach(function(card){
+    var idx = Number(card.dataset.idx);
+    var q = _questions[idx];
+    if (!q) return;
+    var promptEl = card.querySelector('textarea[data-field="prompt"]');
+    var helpEl = card.querySelector('textarea[data-field="help_text"]');
+    var reqEl = card.querySelector('input[data-field="required"]');
+    var phEl = card.querySelector('input[data-field="placeholder"]');
+    if (promptEl) q.prompt = promptEl.value;
+    if (helpEl) q.help_text = helpEl.value;
+    if (reqEl) q.required = !!reqEl.checked;
+    if (phEl) q.options = [phEl.value || ''];
+  });
+}
+
 async function save() {
+  syncQuestionsFromDOM();
+
   var name = document.getElementById('s-name').value.trim();
   if (!name) {
     toast('Survey name is required', 'error');
