@@ -1641,7 +1641,7 @@ async function save() {
     } catch (err) {
       var msg = (err && err.message) || '';
       // Retry once with a unique slug suffix if we hit the unique constraint
-      if (/duplicate key|already exists|23505/i.test(msg) && !_survey) {
+      if (/duplicate key|already exists|23505/i.test(msg)) {
         var suffix = '-' + Math.random().toString(36).slice(2, 6);
         payload.slug = ((payload.slug || payload.name || 'survey').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) + suffix;
         resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
