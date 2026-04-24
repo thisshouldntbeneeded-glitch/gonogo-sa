@@ -4,10 +4,21 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/brand.html", "has": [{ "type": "query", "key": "id", "value": "(?<slug>.*)" }], "destination": "/brand/:slug", "statusCode": 301 },
+    { "source": "/category.html", "has": [{ "type": "query", "key": "cat", "value": "(?<slug>.*)" }], "destination": "/category/:slug", "statusCode": 301 },
+    { "source": "/category.html", "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.*)" }], "destination": "/category/:slug", "statusCode": 301 },
+    { "source": "/blog-post.html", "has": [{ "type": "query", "key": "slug", "value": "(?<slug>.*)" }], "destination": "/blog/:slug", "statusCode": 301 }
+  ],
   "rewrites": [
+    { "source": "/brand/:slug", "destination": "/brand.html?id=:slug" },
+    { "source": "/category/:slug", "destination": "/category.html?cat=:slug" },
+    { "source": "/blog/:slug", "destination": "/blog-post.html?slug=:slug" },
     { "source": "/category", "destination": "/category.html" },
     { "source": "/branch", "destination": "/branch.html" },
     { "source": "/brand", "destination": "/brand.html" },
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/blog-post", "destination": "/blog-post.html" },
     { "source": "/compare", "destination": "/compare.html" },
     { "source": "/about", "destination": "/about.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
