@@ -497,6 +497,12 @@ function questionPreviewHTML(){
 
 
 function ensureLogicArray(q){ if(!Array.isArray(q.logic)) q.logic = []; }
+function ensureRichTextFields(q){
+  if(!q.formatting || typeof q.formatting !== 'object') q.formatting = {};
+  if(typeof q.formatting.prompt_html !== 'string') q.formatting.prompt_html = q.prompt || '';
+  if(typeof q.formatting.help_html !== 'string') q.formatting.help_html = q.help_text || '';
+}
+function wireDragSort(){ /* rail drag sort wired separately via wireRailDragDrop */ }
 function buildLogicRowHTML(q, idx, rule, ridx){
   ensureLogicArray(q);
   var targetOptions = '<option value="end"'+((rule.action_target||'')==='end'?' selected':'')+'>End survey</option>' + _questions.map(function(item, qIdx){ return '<option value="'+qIdx+'"'+(String(rule.action_target)===String(qIdx)?' selected':'')+'>Go to question '+(qIdx+1)+'</option>'; }).join('');
@@ -1629,7 +1635,20 @@ async function save() {
       })
     };
 
-    var resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
+    var resultId;
+    try {
+      resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
+    } catch (err) {
+      var msg = (err && err.message) || '';
+      // Retry once with a unique slug suffix if we hit the unique constraint
+      if (/duplicate key|already exists|23505/i.test(msg) && !_survey) {
+        var suffix = '-' + Math.random().toString(36).slice(2, 6);
+        payload.slug = ((payload.slug || payload.name || 'survey').toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) + suffix;
+        resultId = await GoNoGoAPI.cx.upsertSurvey(payload);
+      } else {
+        throw err;
+      }
+    }
 
     var id = _survey ? _survey.id : resultId;
     if (id) {
