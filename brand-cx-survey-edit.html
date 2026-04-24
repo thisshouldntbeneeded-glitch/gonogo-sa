@@ -497,6 +497,7 @@ function questionPreviewHTML(){
 
 
 function ensureLogicArray(q){ if(!Array.isArray(q.logic)) q.logic = []; }
+function renderEmptyState(){ /* no-op: legacy hook kept for compatibility */ }
 function ensureRichTextFields(q){
   if(!q.formatting || typeof q.formatting !== 'object') q.formatting = {};
   if(typeof q.formatting.prompt_html !== 'string') q.formatting.prompt_html = q.prompt || '';
