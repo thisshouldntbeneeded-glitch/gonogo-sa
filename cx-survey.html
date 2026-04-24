@@ -318,6 +318,7 @@ function renderIntro() {
   if (s.intro_text) html += '<p class="s-intro-text">' + esc(s.intro_text) + '</p>';
   if (!s.intro_title && !s.intro_text) html += '<h1 class="s-intro-title">Share your feedback</h1><p class="s-intro-text">A few quick questions — your answers go straight to the brand.</p>';
   if (state.mode === 'party') html += '<div class="s-kicker">🎉 Swipe-first party mode</div><p class="s-intro-text">Fast taps, swipe cards, streaks, haptics, and a more playful experience.</p>';
+  if (s.privacy_notice_text) html += '<div class="s-privacy" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0;line-height:1.5">' + esc(s.privacy_notice_text) + '</div>';
   html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">' + (state.mode === 'party' ? 'Let\'s go' : 'Start') + '</button>'; 
   html += '</div>';
   html += '<div class="s-foot">Powered by GoNoGo</div>';
