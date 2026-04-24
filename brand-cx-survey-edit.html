@@ -501,6 +501,14 @@ function questionPreviewHTML(){
 
 function ensureLogicArray(q){ if(!Array.isArray(q.logic)) q.logic = []; }
 function renderEmptyState(){ /* no-op: legacy hook kept for compatibility */ }
+function renderPreview(q){
+  // Minimal single-question preview used by the Preview tab.
+  if(!q) return '';
+  var label = (typeof qtypeLabel === 'function') ? qtypeLabel(q.qtype) : (q.qtype || '');
+  var prompt = esc(q.prompt || label || 'Question');
+  var help = q.help_text ? '<div style="font-size:12px;color:#6b7280;margin-top:4px">'+esc(q.help_text)+'</div>' : '';
+  return '<div class="se-preview-step"><div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">Step 1</div><div style="font-size:14px;font-weight:700">'+prompt+'</div>'+help+'</div>';
+}
 function ensureRichTextFields(q){
   if(!q.formatting || typeof q.formatting !== 'object') q.formatting = {};
   if(typeof q.formatting.prompt_html !== 'string') q.formatting.prompt_html = q.prompt || '';
