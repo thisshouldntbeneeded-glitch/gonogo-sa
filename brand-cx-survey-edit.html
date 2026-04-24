@@ -1662,26 +1662,38 @@ async function save() {
       }
     }
 
-    var id = _survey ? _survey.id : resultId;
+    var id = (_survey && _survey.id) || resultId;
+    // Establish _survey/_surveyId immediately so the rest of the UI knows we have a saved record,
+    // even if the follow-up getSurvey call fails (network/auth blip won't hide the fact that save succeeded).
     if (id) {
-      var data = await GoNoGoAPI.cx.getSurvey(id);
-      _survey = data.survey;
-      _surveyId = _survey.id;
-      _questions = (data.questions || []).map(function(q){
-        return {
-          qtype: q.qtype,
-          prompt: q.prompt || '',
-          help_text: q.help_text || q.helptext || '',
-          required: !!q.required,
-          options: q.options || [],
-          logic: q.logic || []
-        };
-      });
-      _links = data.links || [];
+      _survey = _survey || {};
+      _survey.id = id;
+      _surveyId = id;
+      try {
+        var data = await GoNoGoAPI.cx.getSurvey(id);
+        if (data && data.survey) {
+          _survey = data.survey;
+          _surveyId = _survey.id;
+          _questions = (data.questions || []).map(function(q){
+            return {
+              qtype: q.qtype,
+              prompt: q.prompt || '',
+              help_text: q.help_text || q.helptext || '',
+              required: !!q.required,
+              options: q.options || [],
+              logic: q.logic || []
+            };
+          });
+          _links = data.links || [];
+        }
+      } catch(reloadErr) {
+        // Don't fail save just because reload failed; _survey.id is already set.
+        console.warn('Survey saved but reload failed:', reloadErr);
+      }
     }
 
-    if (!window.location.search.includes('id=')) {
-      history.replaceState(null, '', 'brand-cx-survey-edit.html?id=' + _survey.id);
+    if (id && !window.location.search.includes('id=')) {
+      history.replaceState(null, '', 'brand-cx-survey-edit.html?id=' + id);
     }
 
     document.getElementById('title-text').textContent = 'Edit: ' + (_survey.name || 'Survey');
