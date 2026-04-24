@@ -432,7 +432,7 @@ var _dirty = false;
 var _saving = false;
 var esc = Components.escapeHTML.bind(Components);
 
-if (Components.checkBrandAuth()) init();
+// init() must run AFTER all var/function declarations below so SA_LANGUAGES etc. are defined
 
 var QTYPES = [
   {v:'short_text',   l:'Short text',       icon:'fa-font'},
@@ -460,6 +460,9 @@ var SA_LANGUAGES = [
   { code:'zu-ZA', name:'Zulu', native:'isiZulu' },
   { code:'xh-ZA', name:'Xhosa', native:'isiXhosa' }
 ];
+
+// Kick off init once all top-level declarations are in place
+if (Components.checkBrandAuth()) init();
 
 function ensureQuestionTabMeta(){
   if(!_survey) _survey = {};
