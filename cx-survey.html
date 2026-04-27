@@ -337,8 +337,6 @@ textarea.s-text-input{
   color:var(--s-ink-soft);
   margin:0
 }
-
-/* party mode overrides, unchanged */
 body.party-mode{
   background:linear-gradient(180deg,#0b1020 0,#111827 100%);
 }
@@ -451,6 +449,7 @@ body.party-mode .s-btn-next{
     </main>
   </div>
 </div>
+
 <script src="api.js"></script>
 <script>
 var token=null;
@@ -570,7 +569,6 @@ function render(){
   var idx=state.currentIdx;
   var q=qsList[idx];
   var total=qsList.length;
-  var answeredCount=Object.keys(state.values).length;
   var progress=Math.max(0,Math.min(100,Math.round(((idx)/total)*100)));
   qs('progressBar').style.width=progress+'%';
   setText('progressText','Question '+(idx+1)+' of '+total);
@@ -791,18 +789,13 @@ function handleNext(q,isLast){
   }
 }
 function submitSurvey(){
-  var s=state.survey||{};
-  var payload={
-    token:token,
-    survey_id:s.id,
-    answers:state.values
-  };
   var btn=qs('btnNext');
   if(btn){
     btn.disabled=true;
     btn.textContent='Submitting...';
   }
-  GoNoGoAPI.cxSubmitSurvey(payload).then(function(ok){
+
+  GoNoGoAPI.cx.publicSubmit(token,state.values,{},{}).then(function(ok){
     if(!ok)throw new Error('Submit failed');
     renderThankYou();
     showAffirm('');
