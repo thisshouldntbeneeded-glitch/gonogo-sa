@@ -9,11 +9,11 @@
 <style>
   :root {
     --s-primary: #11a551;
-    --s-accent: #f8fafc;
+    --s-accent: #dff3e6;
     --s-ink: #0f172a;
     --s-ink-soft: #475569;
     --s-muted: #64748b;
-    --s-bg: var(--s-accent);
+    --s-bg: #dff3e6;
     --s-card: #ffffff;
     --s-border: #e2e8f0;
     --s-border-strong: #cbd5e1;
@@ -89,7 +89,7 @@
   .s-affirm { color: var(--s-primary); font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
 
   .s-foot { text-align: center; font-size: 11px; color: var(--s-muted); margin-top: 20px; letter-spacing: .04em; }
-  .s-foot a { color: var(--s-primary); text-decoration: none; }
+  .s-foot a { color: var(--s-primary); text-decoration: none; font-weight: 600; }
 
   .s-thank { text-align: center; padding: 48px 24px; }
   .s-thank h2 { color: var(--s-primary); font-size: 26px; margin: 0 0 8px; }
@@ -294,7 +294,7 @@ function applyBrandTheme() {
   var s = state && state.survey ? state.survey : null;
   if (!root) return;
   var fallbackPrimary = '#11a551';
-  var fallbackSecondary = '#f8fafc';
+  var fallbackSecondary = '#dff3e6';
   var primary = normalizeHexColor(s && (s.brandprimarycolor || s.primary_colour || s.primarycolor || s.primaryColor)) || fallbackPrimary;
   var accent = normalizeHexColor(s && (s.brandaccentcolor || s.accent_colour || s.accentcolor || s.accentColor)) || fallbackSecondary;
   root.style.setProperty('--s-primary', primary);
@@ -307,25 +307,32 @@ function applyBrandTheme() {
     document.head.appendChild(style);
   }
   style.textContent = [
-    '.s-wrap{background:transparent}',
     'html,body{background:var(--s-bg)}',
-    '.s-btn-next,.s-progress > span,.s-choice.active,.s-thank h2{background:var(--s-primary);border-color:var(--s-primary);color:#fff}',
-    '.s-choice:hover{border-color:var(--s-primary);background:color-mix(in srgb, var(--s-primary) 4%, var(--s-card))}',
-    '.s-text-input:focus{border-color:var(--s-primary);box-shadow:0 0 0 3px color-mix(in srgb, var(--s-primary) 18%, transparent)}',
-    '.s-mode-btn.active{background:var(--s-primary);color:#fff}',
-    '.s-mode-btn:not(.active){color:var(--s-primary)}',
-    '.s-foot a{background:none;color:var(--s-primary);font-weight:600}',
-    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-primary) 20%, white)}',
-    'body.party-mode{background:linear-gradient(180deg, color-mix(in srgb, var(--s-accent) 72%, #0f172a), color-mix(in srgb, var(--s-accent) 50%, #111827) 100%)}',
-    'body.party-mode .s-wrap{background:radial-gradient(circle at top left, color-mix(in srgb, var(--s-primary) 18%, transparent), transparent 28%), radial-gradient(circle at top right, color-mix(in srgb, var(--s-accent) 24%, transparent), transparent 32%);min-height:100vh}',
-    'body.party-mode .s-progress > span{background:var(--s-primary)}',
-    'body.party-mode .s-btn-next{background:var(--s-primary)}',
-    'body.party-mode .s-choice.active{background:color-mix(in srgb, var(--s-primary) 28%, transparent);border-color:color-mix(in srgb, var(--s-primary) 60%, transparent);color:#fff}',
-    'body.party-mode .s-party-choice.active{background:color-mix(in srgb, var(--s-primary) 22%, transparent);border-color:color-mix(in srgb, var(--s-primary) 42%, transparent)}',
-    'body.party-mode .s-party-energy span{background:var(--s-primary)}',
-    'body.party-mode .s-kicker{background:color-mix(in srgb, var(--s-primary) 10%, transparent);color:var(--s-primary)}',
-    'body.party-mode .s-swipe-card::before{background:radial-gradient(circle at top left, color-mix(in srgb, var(--s-primary) 18%, transparent), transparent 34%), radial-gradient(circle at top right, color-mix(in srgb, var(--s-accent) 20%, transparent), transparent 30%), radial-gradient(circle at bottom, color-mix(in srgb, var(--s-primary) 10%, transparent), transparent 30%)}',
-    'body.party-mode .s-party-mascot-blob{background:radial-gradient(circle at 30% 30%, color-mix(in srgb, white 35%, var(--s-accent)), var(--s-primary) 55%, #0f172a 100%)}'
+    '.s-wrap{background:transparent}',
+    '.s-btn-next,.s-progress span,.s-choice.active,.s-thank h2{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
+    '.s-choice:hover{border-color:var(--s-primary)!important;background:color-mix(in srgb, var(--s-primary) 4%, var(--s-card))!important}',
+    '.s-text-input:focus{border-color:var(--s-primary)!important;box-shadow:0 0 0 3px color-mix(in srgb, var(--s-primary) 18%, transparent)!important}',
+    '.s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
+    '.s-mode-btn:not(.active){color:var(--s-primary)!important}',
+    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-primary) 22%, white)!important}',
+    '.s-foot a{background:none!important;color:var(--s-primary)!important;font-weight:600;text-decoration:none}',
+    'body.party-mode{background:linear-gradient(180deg,#ffffff 0%,#ffffff 15%,color-mix(in srgb, var(--s-accent) 50%, #ffffff) 26%,color-mix(in srgb, var(--s-accent) 58%, #8b5cf6) 58%,color-mix(in srgb, var(--s-primary) 52%, #ec4899) 100%)!important}',
+    'body.party-mode .s-wrap{background:linear-gradient(180deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.96) 12%,rgba(255,255,255,.2) 24%,transparent 40%),radial-gradient(circle at 18% 28%,color-mix(in srgb, var(--s-primary) 22%, transparent),transparent 28%),radial-gradient(circle at 82% 32%,color-mix(in srgb, var(--s-accent) 30%, transparent),transparent 34%),radial-gradient(circle at 50% 88%,rgba(236,72,153,.24),transparent 32%)!important;min-height:100vh}',
+    'body.party-mode .s-brand-name{color:#0f172a!important}',
+    'body.party-mode .s-mode-toggle{background:rgba(255,255,255,.86)!important;border-color:color-mix(in srgb, var(--s-primary) 18%, white)!important;backdrop-filter:blur(10px)}',
+    'body.party-mode .s-mode-btn{color:rgba(15,23,42,.66)!important}',
+    'body.party-mode .s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
+    'body.party-mode .s-progress{background:rgba(255,255,255,.28)!important}',
+    'body.party-mode .s-progress span{background:var(--s-primary)!important}',
+    'body.party-mode .s-progress-text{color:rgba(255,255,255,.9)!important}',
+    'body.party-mode .s-btn-next{background:var(--s-primary)!important}',
+    'body.party-mode .s-card{background:rgba(255,255,255,.18)!important;border-color:rgba(255,255,255,.24)!important;backdrop-filter:blur(16px);box-shadow:0 24px 80px rgba(15,23,42,.22)!important}',
+    'body.party-mode .s-choice.active{background:color-mix(in srgb, var(--s-primary) 24%, rgba(255,255,255,.08))!important;border-color:color-mix(in srgb, var(--s-primary) 56%, transparent)!important;color:#fff!important}',
+    'body.party-mode .s-party-choice.active{background:color-mix(in srgb, var(--s-primary) 20%, rgba(255,255,255,.08))!important;border-color:color-mix(in srgb, var(--s-primary) 44%, transparent)!important}',
+    'body.party-mode .s-party-energy span{background:linear-gradient(90deg,var(--s-primary),color-mix(in srgb, var(--s-accent) 60%, #8b5cf6),#ec4899)!important}',
+    'body.party-mode .s-kicker{background:color-mix(in srgb, var(--s-primary) 12%, rgba(255,255,255,.3))!important;color:var(--s-primary)!important}',
+    'body.party-mode .s-swipe-card::before{background:radial-gradient(circle at top left,color-mix(in srgb, var(--s-primary) 18%, transparent),transparent 34%),radial-gradient(circle at top right,color-mix(in srgb, var(--s-accent) 26%, transparent),transparent 30%),radial-gradient(circle at bottom,rgba(236,72,153,.14),transparent 30%)!important}',
+    'body.party-mode .s-party-mascot-blob{background:radial-gradient(circle at 30% 30%,#ffffff,color-mix(in srgb, var(--s-accent) 70%, #8b5cf6) 35%,var(--s-primary) 65%,#0f172a 100%)!important}'
   ].join('');
 }
 
@@ -369,7 +376,7 @@ function renderIntro() {
   html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">' + (state.mode === 'party' ? 'Let\'s go' : 'Start') + '</button>';
   if (s.privacy_notice_text) html += '<div class="s-privacy" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0 0;line-height:1.5">' + esc(s.privacy_notice_text) + '</div>'; 
   html += '</div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   document.getElementById('start-btn').onclick = function(){ state.currentIdx = 0; state.started = true; render(); };
@@ -400,7 +407,7 @@ function renderQuestion() {
   html += '<button type="button" class="s-btn s-btn-prev" id="btn-prev"' + (state.currentIdx === 0 ? ' disabled' : '') + '>Back</button>';
   html += '<button type="button" class="s-btn s-btn-next" id="btn-next">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
   html += '</div></div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
 
@@ -438,7 +445,7 @@ function renderPartyQuestion() {
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
   html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>';
+  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div></div>';
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
@@ -767,7 +774,7 @@ function renderThankYou() {
   html += '<h2>' + esc(s.thank_you_title || 'Thank you.') + '</h2>';
   html += '<p>' + esc(s.thank_you_text || 'Your feedback has been shared with the brand.') + '</p>';
   html += '</div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   if (state.mode === 'party' && window.confetti) {
