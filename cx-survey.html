@@ -9,11 +9,11 @@
 <style>
   :root {
     --s-primary: #11a551;
-    --s-accent: #0ea5e9;
+    --s-accent: #dff3e6;
     --s-ink: #0f172a;
     --s-ink-soft: #475569;
     --s-muted: #64748b;
-    --s-bg: #f8fafc;
+    --s-bg: #dff3e6;
     --s-card: #ffffff;
     --s-border: #e2e8f0;
     --s-border-strong: #cbd5e1;
@@ -36,7 +36,7 @@
   .s-brand-name { font-weight: 700; font-size: 15px; color: var(--s-ink); }
   .s-mode-toggle { display: inline-flex; gap: 4px; background: var(--s-card); border: 1px solid var(--s-border); padding: 4px; border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .s-mode-btn { appearance: none; border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--s-ink-soft); cursor: pointer; }
-  .s-mode-btn.active { background: var(--s-accent); color: #fff; }
+  .s-mode-btn.active { background: var(--s-primary); color: #fff; }
 
   /* Progress */
   .s-progress { height: 6px; background: var(--s-border); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
@@ -89,7 +89,7 @@
   .s-affirm { color: var(--s-primary); font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
 
   .s-foot { text-align: center; font-size: 11px; color: var(--s-muted); margin-top: 20px; letter-spacing: .04em; }
-  .s-foot a { color: var(--s-accent); text-decoration: none; }
+  .s-foot a { color: var(--s-primary); text-decoration: none; font-weight: 600; }
 
   .s-thank { text-align: center; padding: 48px 24px; }
   .s-thank h2 { color: var(--s-primary); font-size: 26px; margin: 0 0 8px; }
@@ -274,17 +274,7 @@ async function load() {
     state.survey = res.survey;
     state.questions = res.questions || [];
     applyBrandTheme();
-    var savedTheme = String((res.survey && (res.survey.themevariant || res.survey.theme_variant || res.survey.themeVariant || res.survey.theme)) || '').trim().toLowerCase();
-    var canParty = canUsePartyMode();
-    if (savedTheme === 'party' && canParty) {
-      state.mode = 'party';
-    } else if (savedTheme === 'classic') {
-      state.mode = 'classic';
-    } else if (res.survey && (res.survey.party_mode_default || res.survey.partymodedefault) && canParty) {
-      state.mode = 'party';
-    } else {
-      state.mode = 'classic';
-    }
+    state.mode = (res.survey && res.survey.party_mode_default && canUsePartyMode()) ? 'party' : 'classic';
     applyModeClass();
     render();
   } catch(e) {
@@ -302,11 +292,14 @@ function normalizeHexColor(v) {
 function applyBrandTheme() {
   var root = document.documentElement;
   var s = state && state.survey ? state.survey : null;
-  if (!root || !s) return;
-  var primary = normalizeHexColor(s.brandprimarycolor || s.primary_colour || s.primarycolor || s.primaryColor);
-  var accent = normalizeHexColor(s.brandaccentcolor || s.accent_colour || s.accentcolor || s.accentColor);
-  if (primary) root.style.setProperty('--s-primary', primary);
-  if (accent) root.style.setProperty('--s-accent', accent);
+  if (!root) return;
+  var fallbackPrimary = '#11a551';
+  var fallbackSecondary = '#dff3e6';
+  var primary = normalizeHexColor(s && (s.brandprimarycolor || s.primary_colour || s.primarycolor || s.primaryColor)) || fallbackPrimary;
+  var accent = normalizeHexColor(s && (s.brandaccentcolor || s.accent_colour || s.accentcolor || s.accentColor)) || fallbackSecondary;
+  root.style.setProperty('--s-primary', primary);
+  root.style.setProperty('--s-accent', accent);
+  root.style.setProperty('--s-bg', accent);
   var style = document.getElementById('dynamic-brand-theme');
   if (!style) {
     style = document.createElement('style');
@@ -314,15 +307,36 @@ function applyBrandTheme() {
     document.head.appendChild(style);
   }
   style.textContent = [
-    '.s-wrap{background:transparent}',
     'html,body{background:var(--s-bg)}',
-    '.s-btn-next,.s-progress > span,.s-choice.active,.s-thank h2{background:var(--s-primary);border-color:var(--s-primary);color:#fff}',
-    '.s-choice:hover{border-color:var(--s-primary)}',
-    '.s-text-input:focus{border-color:var(--s-primary);box-shadow:0 0 0 3px color-mix(in srgb, var(--s-primary) 18%, transparent)}',
-    '.s-mode-btn.active{background:var(--s-accent);color:#fff}',
-    '.s-mode-btn:not(.active){color:var(--s-accent)}',
-    '.s-foot a{background:none;color:var(--s-accent);font-weight:600}',
-    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-accent) 28%, white)}'
+    '.s-wrap{background:transparent}',
+    '.s-btn-next{background:var(--s-primary)!important;background-image:none!important;border:0!important;box-shadow:none!important;opacity:1!important;filter:none!important}',
+    '.s-btn-next:hover,.s-btn-next:focus,.s-btn-next:active{background:var(--s-primary)!important;background-image:none!important;filter:none!important;opacity:1!important}',
+    '.s-progress span,.s-choice.active,.s-thank h2{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
+    '.s-choice:hover{border-color:var(--s-primary)!important;background:var(--s-card)!important}',
+    '.s-text-input:focus{border-color:var(--s-primary)!important;box-shadow:0 0 0 3px rgba(17,165,81,.15)!important}',
+    '.s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
+    '.s-mode-btn:not(.active){color:var(--s-primary)!important}',
+    '.s-mode-toggle{border-color:var(--s-primary)!important}',
+    '.s-foot a{background:none!important;color:var(--s-primary)!important;font-weight:600;text-decoration:none}',
+    'body.party-mode{background:#050505!important}',
+    'body.party-mode::before{content:"";position:fixed;left:0;right:0;top:0;height:124px;background:#fff;z-index:0;pointer-events:none}',
+    'body.party-mode::after{content:"";position:fixed;inset:0;background:radial-gradient(circle at 18% 24%, rgba(255,255,255,.22) 0 1px, transparent 2px),radial-gradient(circle at 72% 18%, rgba(255,255,255,.14) 0 1.5px, transparent 2.5px),radial-gradient(circle at 34% 62%, rgba(255,255,255,.16) 0 1px, transparent 2px),radial-gradient(circle at 82% 54%, rgba(255,255,255,.12) 0 1px, transparent 2px),radial-gradient(circle at 56% 78%, rgba(255,255,255,.18) 0 1px, transparent 2px),radial-gradient(circle at 50% 26%, rgba(255,255,255,.10) 0 220px, transparent 320px);background-size:180px 180px,220px 220px,200px 200px,240px 240px,260px 260px,100% 100%;mix-blend-mode:screen;opacity:.95;pointer-events:none;z-index:0}',
+    'body.party-mode .s-wrap{position:relative;z-index:1;background:linear-gradient(180deg,rgba(255,255,255,.98) 0,rgba(255,255,255,.98) 104px,transparent 160px)!important;min-height:100vh}',
+    'body.party-mode .s-brand-name{color:#0f172a!important}',
+    'body.party-mode .s-mode-toggle{background:rgba(255,255,255,.95)!important;border-color:var(--s-primary)!important;backdrop-filter:none!important}',
+    'body.party-mode .s-mode-btn{color:rgba(15,23,42,.72)!important}',
+    'body.party-mode .s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
+    'body.party-mode .s-progress{background:rgba(255,255,255,.18)!important}',
+    'body.party-mode .s-progress span{background:var(--s-primary)!important;background-image:none!important}',
+    'body.party-mode .s-progress-text{color:rgba(255,255,255,.88)!important}',
+    'body.party-mode .s-btn-next{background:var(--s-primary)!important;background-image:none!important;filter:none!important;opacity:1!important}',
+    'body.party-mode .s-card{background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.18)!important;backdrop-filter:blur(14px);box-shadow:0 24px 80px rgba(0,0,0,.35)!important}',
+    'body.party-mode .s-choice.active{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
+    'body.party-mode .s-party-choice.active{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
+    'body.party-mode .s-party-energy span{background:linear-gradient(90deg,#ffffff 0%, var(--s-primary) 35%, #d4af37 100%)!important}',
+    'body.party-mode .s-kicker{background:rgba(255,255,255,.12)!important;color:var(--s-primary)!important}',
+    'body.party-mode .s-swipe-card::before{background:radial-gradient(circle at 20% 18%, rgba(255,255,255,.12), transparent 22%),radial-gradient(circle at 80% 24%, rgba(212,175,55,.16), transparent 24%),radial-gradient(circle at 50% 100%, rgba(255,255,255,.06), transparent 26%)!important}',
+    'body.party-mode .s-party-mascot-blob{background:radial-gradient(circle at 30% 30%, #ffffff, #d4af37 38%, var(--s-primary) 68%, #050505 100%)!important}'
   ].join('');
 }
 
@@ -366,7 +380,7 @@ function renderIntro() {
   html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">' + (state.mode === 'party' ? 'Let\'s go' : 'Start') + '</button>';
   if (s.privacy_notice_text) html += '<div class="s-privacy" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0 0;line-height:1.5">' + esc(s.privacy_notice_text) + '</div>'; 
   html += '</div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   document.getElementById('start-btn').onclick = function(){ state.currentIdx = 0; state.started = true; render(); };
@@ -397,7 +411,7 @@ function renderQuestion() {
   html += '<button type="button" class="s-btn s-btn-prev" id="btn-prev"' + (state.currentIdx === 0 ? ' disabled' : '') + '>Back</button>';
   html += '<button type="button" class="s-btn s-btn-next" id="btn-next">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
   html += '</div></div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
 
@@ -435,7 +449,7 @@ function renderPartyQuestion() {
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
   html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>';
+  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div></div>';
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
@@ -764,7 +778,7 @@ function renderThankYou() {
   html += '<h2>' + esc(s.thank_you_title || 'Thank you.') + '</h2>';
   html += '<p>' + esc(s.thank_you_text || 'Your feedback has been shared with the brand.') + '</p>';
   html += '</div>';
-  html += '<div class="s-foot">Powered by GoNoGo</div>';
+  html += '<div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   if (state.mode === 'party' && window.confetti) {
