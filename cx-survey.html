@@ -32,11 +32,11 @@
   /* Header with brand logo + mode toggle */
   .s-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; min-height: 40px; }
   .s-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .s-brand img { max-height: 72px; max-width: 260px; object-fit: contain; }
+  .s-brand img { max-height: 40px; max-width: 160px; object-fit: contain; }
   .s-brand-name { font-weight: 700; font-size: 15px; color: var(--s-ink); }
   .s-mode-toggle { display: inline-flex; gap: 4px; background: var(--s-card); border: 1px solid var(--s-border); padding: 4px; border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .s-mode-btn { appearance: none; border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--s-ink-soft); cursor: pointer; }
-  .s-mode-btn.active { background: var(--s-ink); color: #fff; }
+  .s-mode-btn.active { background: var(--s-accent); color: #fff; }
 
   /* Progress */
   .s-progress { height: 6px; background: var(--s-border); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
@@ -89,7 +89,7 @@
   .s-affirm { color: var(--s-primary); font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 600; }
 
   .s-foot { text-align: center; font-size: 11px; color: var(--s-muted); margin-top: 20px; letter-spacing: .04em; }
-  .s-foot a { color: var(--s-muted); text-decoration: none; }
+  .s-foot a { color: var(--s-accent); text-decoration: none; }
 
   .s-thank { text-align: center; padding: 48px 24px; }
   .s-thank h2 { color: var(--s-primary); font-size: 26px; margin: 0 0 8px; }
@@ -126,7 +126,7 @@
   body.party-mode .s-foot { color: rgba(255,255,255,.6); }
 
 
-  .s-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(17,165,81,.08);color:var(--s-primary);font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;margin-bottom:14px}
+  .s-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:color-mix(in srgb, var(--s-accent) 12%, white);color:var(--s-accent);font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;margin-bottom:14px}
   .s-party-wrap{display:grid;gap:16px}
   .s-party-hero{display:grid;gap:14px}
   .s-party-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -273,12 +273,31 @@ async function load() {
     if (!res || !res.ok) { showError((res && res.error) || 'Survey not available.'); return; }
     state.survey = res.survey;
     state.questions = res.questions || [];
+    applyBrandTheme();
     state.mode = (res.survey && res.survey.party_mode_default && canUsePartyMode()) ? 'party' : 'classic';
     applyModeClass();
     render();
   } catch(e) {
     showError(e.message || 'Failed to load survey.');
   }
+}
+
+
+function normalizeHexColor(v){
+  var s = String(v || '').trim();
+  if (!s) return '';
+  if (s.charAt(0) !== '#') s = '#' + s;
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s)) return s;
+  return '';
+}
+function applyBrandTheme(){
+  var root = document.documentElement;
+  var s = state && state.survey ? state.survey : null;
+  if (!root || !s) return;
+  var primary = normalizeHexColor(s.brandprimarycolor || s.primary_colour || s.primarycolor || s.primaryColor);
+  var accent = normalizeHexColor(s.brandaccentcolor || s.accent_colour || s.accentcolor || s.accentColor);
+  if (primary) root.style.setProperty('--s-primary', primary);
+  if (accent) root.style.setProperty('--s-accent', accent);
 }
 
 function applyModeClass() {
@@ -321,7 +340,7 @@ function renderIntro() {
   html += '<button type="button" class="s-btn s-btn-next" id="start-btn" style="width:100%">' + (state.mode === 'party' ? 'Let\'s go' : 'Start') + '</button>';
   if (s.privacy_notice_text) html += '<div class="s-privacy" style="font-size:12px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0 0;line-height:1.5">' + esc(s.privacy_notice_text) + '</div>'; 
   html += '</div>';
-  html += '<div class="s-foot"><a href="https://www.gonogo.co.za/business" target="_blank" rel="noopener noreferrer">Powered by GoNoGo</a></div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   document.getElementById('start-btn').onclick = function(){ state.currentIdx = 0; state.started = true; render(); };
@@ -352,7 +371,7 @@ function renderQuestion() {
   html += '<button type="button" class="s-btn s-btn-prev" id="btn-prev"' + (state.currentIdx === 0 ? ' disabled' : '') + '>Back</button>';
   html += '<button type="button" class="s-btn s-btn-next" id="btn-next">' + (state.currentIdx === total - 1 ? 'Submit' : 'Next') + '</button>';
   html += '</div></div>';
-  html += '<div class="s-foot"><a href="https://www.gonogo.co.za/business" target="_blank" rel="noopener noreferrer">Powered by GoNoGo</a></div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
 
@@ -390,7 +409,7 @@ function renderPartyQuestion() {
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
   html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot"><a href="https://www.gonogo.co.za/business" target="_blank" rel="noopener noreferrer">Powered by GoNoGo</a></div></div>';
+  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by GoNoGo</div></div>';
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
@@ -719,7 +738,7 @@ function renderThankYou() {
   html += '<h2>' + esc(s.thank_you_title || 'Thank you.') + '</h2>';
   html += '<p>' + esc(s.thank_you_text || 'Your feedback has been shared with the brand.') + '</p>';
   html += '</div>';
-  html += '<div class="s-foot"><a href="https://www.gonogo.co.za/business" target="_blank" rel="noopener noreferrer">Powered by GoNoGo</a></div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div>';
   html += '</div>';
   document.getElementById('root').innerHTML = html;
   if (state.mode === 'party' && window.confetti) {
