@@ -820,7 +820,7 @@ function init(){
     showError('Missing survey token.');
     return;
   }
-  GoNoGoAPI.cxGetPublicSurvey(token).then(function(res){
+  GoNoGoAPI.cx.publicGetSurvey(token).then(function(res){
     if(!res||!res.survey){
       showError('Survey not available.');
       return;
