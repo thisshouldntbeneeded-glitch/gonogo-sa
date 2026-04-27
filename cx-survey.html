@@ -9,7 +9,7 @@
 <style>
   :root {
     --s-primary: #11a551;
-    --s-accent: #0ea5e9;
+    --s-accent: #11a551;
     --s-ink: #0f172a;
     --s-ink-soft: #475569;
     --s-muted: #64748b;
@@ -36,7 +36,7 @@
   .s-brand-name { font-weight: 700; font-size: 15px; color: var(--s-ink); }
   .s-mode-toggle { display: inline-flex; gap: 4px; background: var(--s-card); border: 1px solid var(--s-border); padding: 4px; border-radius: 999px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .s-mode-btn { appearance: none; border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; color: var(--s-ink-soft); cursor: pointer; }
-  .s-mode-btn.active { background: var(--s-accent); color: #fff; }
+  .s-mode-btn.active { background: var(--s-primary); color: #fff; }
 
   /* Progress */
   .s-progress { height: 6px; background: var(--s-border); border-radius: 999px; overflow: hidden; margin-bottom: 18px; }
@@ -309,10 +309,10 @@ function applyBrandTheme() {
     '.s-btn-next,.s-progress > span,.s-choice.active,.s-thank h2{background:var(--s-primary);border-color:var(--s-primary);color:#fff}',
     '.s-choice:hover{border-color:var(--s-primary)}',
     '.s-text-input:focus{border-color:var(--s-primary);box-shadow:0 0 0 3px color-mix(in srgb, var(--s-primary) 18%, transparent)}',
-    '.s-mode-btn.active{background:var(--s-accent);color:#fff}',
-    '.s-mode-btn:not(.active){color:var(--s-accent)}',
-    '.s-foot a{background:none;color:var(--s-accent);font-weight:600}',
-    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-accent) 28%, white)}'
+    '.s-mode-btn.active{background:var(--s-primary);color:#fff}',
+    '.s-mode-btn:not(.active){color:var(--s-primary)}',
+    '.s-foot a{background:none;color:var(--s-primary);font-weight:600}',
+    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-primary) 28%, white)}'
   ].join('');
 }
 
