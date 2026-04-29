@@ -11,11 +11,11 @@
     if (document.querySelector('meta[http-equiv="Content-Security-Policy"]')) return;
     var csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.qrserver.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.qrserver.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://va.vercel-scripts.com",
       "frame-src 'self'",
       "form-action 'self'",
       "base-uri 'self'",
@@ -2284,3 +2284,15 @@ const Components = {
     return maxW > 0 ? Math.round(total / maxW * 100) : 0;
   }
 };
+
+// ============================================================
+// VERCEL WEB ANALYTICS
+// ============================================================
+// Initialize Vercel Web Analytics
+// The analytics script is automatically injected by Vercel when deployed
+// This initializes the tracking queue for page views and events
+(function() {
+  window.va = window.va || function () { 
+    (window.vaq = window.vaq || []).push(arguments); 
+  };
+})();
