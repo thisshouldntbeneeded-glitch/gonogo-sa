@@ -1827,7 +1827,7 @@ const Components = {
     setTimeout(function() {
       if (Components._currentUser) return;
       Components._showWelcomeModal();
-    }, 2000);
+    }, 120000);
   },
 
   _triggerWelcomeAfterConsent() {
