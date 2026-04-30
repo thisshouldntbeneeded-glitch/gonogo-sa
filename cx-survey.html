@@ -159,8 +159,8 @@
   .s-party-live{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid var(--s-border)}
   .s-party-live strong{font-size:12px;color:var(--s-muted);text-transform:uppercase;letter-spacing:.04em}
   .s-party-live span{font-size:14px;font-weight:800;color:var(--s-ink)}
-  .s-swipe-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;color:var(--s-muted);font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
-  .s-swipe-pill{display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;padding:9px 10px;border-radius:999px;background:#fff;border:1px solid var(--s-border)}
+  .s-swipe-hint{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px;color:var(--s-muted);font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+  .s-swipe-pill{display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;padding:9px 10px;border-radius:999px;background:#fff;border:1px solid var(--s-border);color:var(--s-ink);box-shadow:0 4px 12px rgba(15,23,42,.04)}
   .s-party-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
   .s-party-choice{appearance:none;border:1px solid var(--s-border-strong);background:#fff;color:var(--s-ink);padding:13px 12px;border-radius:16px;font-size:14px;font-weight:800;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(15,23,42,.04)}
   .s-party-choice.is-pos{border-color:rgba(17,165,81,.22)}
@@ -597,7 +597,7 @@ function renderPartyQuestion() {
     html += '<div class="s-party-live"><strong>Current swipe</strong><span id="party-live-selection">'+esc(partyLiveSelectionLabel(q))+'</span></div>';
   }
   html += '<div id="q-answer">'+renderPartyInput(q, state.currentIdx)+'</div>';
-  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">Swipe to choose</span><span class="s-swipe-pill">Tap for exact answer</span></div>';
+  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">Left = detractor / Down = passive / Right = promoter</span><span class="s-swipe-pill">Drag the card until a direction lights up, then release</span><span class="s-swipe-pill">Or tap a button below for an exact answer</span></div>';
   html += '</div></div></div>';
   html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Fast, clear and mobile-first.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
@@ -645,56 +645,61 @@ function wirePartyQuestion(q, idx){
     card.style.transform = 'translate('+x+'px,'+y+'px) rotate('+(x/22)+'deg)';
     card.style.opacity = String(Math.max(.82, 1 - Math.max(Math.abs(x), Math.abs(y))/340));
     var direction = '';
-    if (Math.abs(y) > Math.abs(x) && y > 40) direction = 'down';
-    else if (x > 40) direction = 'right';
-    else if (x < -40) direction = 'left';
+    if (Math.abs(y) > Math.abs(x) && y > 36) direction = 'down';
+    else if (x > 36) direction = 'right';
+    else if (x < -36) direction = 'left';
     setPartySwipePreview(direction);
   }
-  function advance(){
-    if (state.currentIdx === state.questions.length - 1) submit();
-    else { state.currentIdx++; render(); }
+  async function advance(){
+    if (state.currentIdx === state.questions.length - 1) { await submit(); return; }
+    state.currentIdx++;
+    render();
   }
-  function commitQuick(value, positive){
+  async function commitQuick(value, positive, direction){
     if (value == null) return;
     if (typeof value === 'number') state.values[q.id] = { valuenumber: Number(value) };
     else state.values[q.id] = { valuetext: String(value) };
+    setPartySwipePreview(direction || '');
     haptic(positive ? 22 : 14);
     celebrateStep(!!positive);
     if (card) {
       card.style.transition = 'transform .18s ease, opacity .18s ease';
-      setTimeout(advance, 170);
-    } else advance();
+      var tx = direction === 'right' ? 150 : direction === 'left' ? -150 : 0;
+      var ty = direction === 'down' ? 140 : 0;
+      setTransform(tx, ty);
+      setTimeout(function(){ advance(); }, 180);
+    } else {
+      await advance();
+    }
   }
-  function handleDirectionalSwipe(direction){
+  async function handleDirectionalSwipe(direction){
     var value = resolvePartySwipeValue(q, direction);
-    if (value == null) {
-      if (direction === 'down' && state.currentIdx > 0) { haptic(10); state.currentIdx--; return render(); }
-      return;
-    }
-    if (card) {
-      var x = direction === 'right' ? 180 : direction === 'left' ? -180 : 0;
-      var y = direction === 'down' ? 180 : 0;
-      card.style.transition = 'transform .18s ease, opacity .18s ease';
-      setTransform(x, y);
-    }
-    commitQuick(value, direction === 'right');
+    if (value == null) return;
+    await commitQuick(value, direction === 'right', direction);
   }
   if (card) {
     card.addEventListener('pointerdown', function(e){
-      dragging = true; startX = e.clientX; startY = e.clientY; currentX = 0; currentY = 0; card.classList.add('dragging');
+      dragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      currentX = 0;
+      currentY = 0;
+      card.classList.add('dragging');
     });
     window.addEventListener('pointermove', function(e){
       if (!dragging) return;
-      currentX = e.clientX - startX; currentY = e.clientY - startY;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
       setTransform(currentX, currentY);
     });
     window.addEventListener('pointerup', function(){
       if (!dragging) return;
-      dragging = false; card.classList.remove('dragging');
+      dragging = false;
+      card.classList.remove('dragging');
       var absX = Math.abs(currentX), absY = Math.abs(currentY);
-      if (absY > absX && currentY > 88) return handleDirectionalSwipe('down');
-      if (currentX > 88) return handleDirectionalSwipe('right');
-      if (currentX < -88) return handleDirectionalSwipe('left');
+      if (absY > absX && currentY > 72) return handleDirectionalSwipe('down');
+      if (currentX > 72) return handleDirectionalSwipe('right');
+      if (currentX < -72) return handleDirectionalSwipe('left');
       card.style.transition = 'transform .18s ease, opacity .18s ease';
       setTransform(0,0);
       setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } setPartySwipePreview(''); }, 180);
@@ -704,11 +709,12 @@ function wirePartyQuestion(q, idx){
     btn.addEventListener('click', function(){
       var raw = btn.getAttribute('data-party-val');
       var n = parseInt(raw, 10);
-      if (!isNaN(n) && String(n) === raw) state.values[q.id] = { valuenumber: n };
-      else state.values[q.id] = { valuetext: raw };
-      haptic(16);
-      celebrateStep(true);
-      advance();
+      var direction = '';
+      if (q.qtype === 'nps010') direction = n >= 9 ? 'right' : (n >= 7 ? 'down' : 'left');
+      else if (q.qtype === 'yesno') direction = raw === 'Yes' ? 'right' : 'left';
+      else if (q.qtype === 'rating15' || q.qtype === 'starrating' || q.qtype === 'csatsmiley') direction = n >= 4 ? 'right' : (n === 3 ? 'down' : 'left');
+      if (!isNaN(n) && String(n) === raw) commitQuick(n, direction === 'right', direction);
+      else commitQuick(raw, direction === 'right', direction);
     });
   });
   document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){
