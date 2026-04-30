@@ -137,6 +137,7 @@
   .s-party-energy > span{display:block;height:100%;background:var(--s-primary);border-radius:999px;transition:width .28s ease}
   .s-party-stage{position:relative;min-height:auto}
   .s-swipe-card{position:relative;overflow:hidden;border-radius:24px;padding:20px 18px 18px;background:#ffffff;border:1px solid var(--s-border);box-shadow:0 16px 36px rgba(15,23,42,.08)}
+  .s-swipe-card::before{content:none !important}
   .s-swipe-shadow{display:none}
   .s-swipe-inner{position:relative;z-index:2;touch-action:pan-y;user-select:none;transition:transform .18s ease, opacity .18s ease;cursor:grab;padding:0;display:grid;gap:14px}
   .s-swipe-inner.dragging{transition:none;cursor:grabbing}
@@ -401,7 +402,11 @@ function applyBrandTheme() {
     '.s-foot a{background:none!important;color:var(--s-primary)!important;font-weight:600;text-decoration:none}',
     'body.party-mode{background:#f8fafc!important}',
     'body.party-mode .s-wrap{background:#f8fafc!important;position:relative;z-index:1;min-height:100vh}',
-    'body.party-mode .s-card,body.party-mode .s-swipe-card{background:#ffffff!important;border-color:var(--s-border)!important;backdrop-filter:none!important;box-shadow:0 16px 36px rgba(15,23,42,.08)!important}',
+    'body.party-mode .s-card,body.party-mode .s-swipe-card{background:#ffffff!important;border-color:var(--s-border)!important;backdrop-filter:none!important;box-shadow:0 16px 36px rgba(15,23,42,.08)!important;color:var(--s-ink)!important}
+    body.party-mode .s-swipe-card::before{content:none!important;background:none!important}
+    body.party-mode .s-party-prompt,body.party-mode .s-party-help,body.party-mode .s-party-live span,body.party-mode .s-party-live strong,body.party-mode .s-party-tipline{color:var(--s-ink)!important}
+    body.party-mode .s-party-copy small,body.party-mode .s-swipe-zone b,body.party-mode .s-swipe-zone em{color:var(--s-muted)!important}
+    body.party-mode .s-swipe-zone span{color:var(--s-ink)!important}',
     'body.party-mode .s-progress{background:#e2e8f0!important}',
     'body.party-mode .s-progress span,body.party-mode .s-choice.active,body.party-mode .s-party-choice.active{background:var(--s-primary)!important;background-image:none!important;border-color:var(--s-primary)!important;color:#fff!important}',
     'body.party-mode .s-kicker{background:color-mix(in srgb, var(--s-primary) 10%, white)!important;color:var(--s-primary)!important}',
@@ -506,9 +511,9 @@ function getPartySwipeModel(q){
   if (q.qtype === 'nps010') {
     return {
       intro: 'Swipe by sentiment group. Tap a score only if you want to be more exact.',
-      left: { key:'left', title:'Detractor', hint:'0 to 6', value: 3 },
-      down: { key:'down', title:'Passive', hint:'7 or 8', value: 7 },
-      right:{ key:'right', title:'Promoter', hint:'9 or 10', value: 10 }
+      left: { key:'left', title:'Detractor', hint:'records 3', value: 3 },
+      down: { key:'down', title:'Passive', hint:'records 7', value: 7 },
+      right:{ key:'right', title:'Promoter', hint:'records 9', value: 9 }
     };
   }
   if (q.qtype === 'yesno') {
@@ -627,7 +632,7 @@ function renderPartyInput(q, idx){
     return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe low, middle or high, or tap an exact rating below.</div><div class="s-party-grid-compact cols-5">' + faces.map(function(label, i){ var n = i + 1; return '<button type="button" class="s-party-choice big '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div></div>';
   }
   if (q.qtype === 'nps010') {
-    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe left for detractor, down for passive, right for promoter, or tap an exact score.</div><div class="s-party-grid-compact cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-party-choice score" data-party-val="'+i+'">'+i+'</button>'; }).join('') + '</div></div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe left for detractor = 3, down for passive = 7, right for promoter = 9, or tap an exact score.</div><div class="s-party-grid-compact cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-party-choice score" data-party-val="'+i+'">'+i+'</button>'; }).join('') + '</div></div>';
   }
   return '<div class="s-party-answer-wrap">'+renderInput(q, idx)+'</div>';
 }
@@ -651,8 +656,8 @@ function wirePartyQuestion(q, idx){
   }
   function commitQuick(value, positive){
     if (value == null) return;
-    if (typeof value === 'number') state.values[q.id] = { value_number: Number(value) };
-    else state.values[q.id] = { value_text: String(value) };
+    if (typeof value === 'number') state.values[q.id] = { valuenumber: Number(value) };
+    else state.values[q.id] = { valuetext: String(value) };
     haptic(positive ? 22 : 14);
     celebrateStep(!!positive);
     if (card) {
@@ -699,8 +704,8 @@ function wirePartyQuestion(q, idx){
     btn.addEventListener('click', function(){
       var raw = btn.getAttribute('data-party-val');
       var n = parseInt(raw, 10);
-      if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number: n };
-      else state.values[q.id] = { value_text: raw };
+      if (!isNaN(n) && String(n) === raw) state.values[q.id] = { valuenumber: n };
+      else state.values[q.id] = { valuetext: raw };
       haptic(16);
       celebrateStep(true);
       advance();
@@ -835,7 +840,7 @@ function wireQuestion(q, idx) {
       } else if (q.qtype === 'rating_1_5' || q.qtype === 'nps_0_10' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
         state.values[q.id] = { value_number: numVal };
       } else {
-        state.values[q.id] = { value_text: raw };
+        state.values[q.id] = { valuetext: raw };
       }
       rerenderAnswer(q, idx);
     };
@@ -864,7 +869,7 @@ function syncTextInput(q, idx) {
   if (!v) { delete state.values[q.id]; return; }
   if (q.qtype === 'number') {
     var n = parseFloat(v);
-    if (!isNaN(n)) state.values[q.id] = { value_number: n }; else delete state.values[q.id];
+    if (!isNaN(n)) state.values[q.id] = { valuenumber: n }; else delete state.values[q.id];
   } else {
     state.values[q.id] = { value_text: v };
   }
