@@ -768,8 +768,9 @@ var GoNoGoAPI = (function () {
     // BRAND-SCOPED DATA
     // ==========================================
     getBrandData: function (slug) {
+      // Portal pages: allow inactive brands so their owners can still sign in and manage.
       return Promise.all([
-        supabaseRequest('brands?region=eq.' + SITE_REGION + LIVE_FILTER + '&slug=eq.' + encodeURIComponent(slug) + '&select=*&limit=1'),
+        supabaseRequest('brands?region=eq.' + SITE_REGION + '&slug=eq.' + encodeURIComponent(slug) + '&select=*&limit=1'),
         loadCategoryCache()
       ]).then(function (results) {
         var rows = results[0] || [];
