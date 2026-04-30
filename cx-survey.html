@@ -19,14 +19,14 @@
     --s-border-strong: #cbd5e1;
     --s-danger: #dc2626;
   }
-  html, body { margin: 0; padding: 0; background: #ffffff; color: var(--s-ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  html, body { margin: 0; padding: 0; background: var(--s-bg); color: var(--s-ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
 
   /* Confetti must never block clicks */
   canvas { pointer-events: none !important; }
 
   /* ── Shared shell ── */
-  .s-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px; background: #ffffff; }
+  .s-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 48px; }
   .s-shell { width: 100%; max-width: 640px; }
 
   /* Header with brand logo + mode toggle */
@@ -95,37 +95,118 @@
   .s-thank h2 { color: var(--s-primary); font-size: 26px; margin: 0 0 8px; }
   .s-thank p { color: var(--s-ink-soft); margin: 0; }
 
-  /* ── Party mode overrides (dark gradient) ── */
-  body.party-mode { background: linear-gradient(180deg, #0b1020 0%, #111827 100%); }
-  body.party-mode .s-wrap { background: radial-gradient(circle at top left, rgba(17,165,81,.18), transparent 28%), radial-gradient(circle at top right, rgba(168,85,247,.18), transparent 30%); min-height: 100vh; }
-  body.party-mode .s-brand-name { color: #fff; }
-  body.party-mode .s-mode-toggle { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
-  body.party-mode .s-mode-btn { color: rgba(255,255,255,.78); }
-  body.party-mode .s-mode-btn.active { background: #fff; color: #111; }
-  body.party-mode .s-progress { background: rgba(255,255,255,.15); }
-  body.party-mode .s-progress > span { background: linear-gradient(90deg,#22c55e,#a855f7,#f59e0b); }
-  body.party-mode .s-progress-text { color: rgba(255,255,255,.78); }
-  body.party-mode .s-card { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); backdrop-filter: blur(16px); box-shadow: 0 24px 80px rgba(0,0,0,.35); border-radius: 28px; }
-  body.party-mode .s-prompt, body.party-mode .s-intro-title { color: #fff; font-size: 24px; }
-  body.party-mode .s-prompt.s-prompt-long { font-size: 19px; }
-  body.party-mode .s-help, body.party-mode .s-intro-text { color: rgba(255,255,255,.82); }
-  body.party-mode .s-choice { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #fff; }
-  body.party-mode .s-choice:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
-  body.party-mode .s-choice.active { background: rgba(34,197,94,.28); border-color: rgba(34,197,94,.6); color: #fff; }
-  body.party-mode .s-choice.star.active { background: rgba(245,158,11,.28); border-color: rgba(245,158,11,.6); color: #ffd54f; }
-  body.party-mode .s-choice.nps-red.active { background: rgba(239,68,68,.3); border-color: rgba(239,68,68,.6); }
-  body.party-mode .s-choice.nps-amber.active { background: rgba(217,119,6,.3); border-color: rgba(217,119,6,.6); }
-  body.party-mode .s-text-input { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); color: #fff; }
-  body.party-mode .s-text-input::placeholder { color: rgba(255,255,255,.5); }
-  body.party-mode .s-btn-prev { background: rgba(255,255,255,.1); color: #fff; }
-  body.party-mode .s-btn-prev:hover { background: rgba(255,255,255,.18); }
-  body.party-mode .s-btn-next { background: linear-gradient(135deg,#22c55e,#16a34a); }
-  body.party-mode .s-nps-labels { color: rgba(255,255,255,.7); }
-  body.party-mode .s-streak { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.12); font-size: 12px; font-weight: 700; color: #fff; }
-  body.party-mode .s-affirm { color: #a7f3d0; }
-  body.party-mode .s-foot { color: rgba(255,255,255,.6); }
+  /* ── Party mode overrides (clean mobile-first) ── */
+  body.party-mode { background: #f8fafc; }
+  body.party-mode .s-wrap { background: #f8fafc; min-height: 100vh; }
+  body.party-mode .s-shell { max-width: 520px; }
+  body.party-mode .s-top { margin-bottom: 14px; min-height: 72px; align-items: center; }
+  body.party-mode .s-brand img { max-height: 76px; max-width: 220px; }
+  body.party-mode .s-brand-name { color: var(--s-ink); }
+  body.party-mode .s-mode-toggle { background: #fff; border-color: var(--s-border); box-shadow: 0 4px 14px rgba(15,23,42,.06); }
+  body.party-mode .s-mode-btn { color: var(--s-ink-soft); }
+  body.party-mode .s-mode-btn.active { background: var(--s-primary); color: #fff; }
+  body.party-mode .s-progress { background: #e2e8f0; margin-bottom: 10px; }
+  body.party-mode .s-progress > span { background: var(--s-primary); }
+  body.party-mode .s-progress-text { color: var(--s-muted); margin-bottom: 10px; }
+  body.party-mode .s-card { background: #fff; border: 1px solid var(--s-border); box-shadow: 0 12px 32px rgba(15,23,42,.08); border-radius: 24px; }
+  body.party-mode .s-prompt, body.party-mode .s-intro-title { color: var(--s-ink); font-size: 21px; line-height: 1.25; }
+  body.party-mode .s-prompt.s-prompt-long { font-size: 18px; line-height: 1.35; }
+  body.party-mode .s-help, body.party-mode .s-intro-text { color: var(--s-ink-soft); }
+  body.party-mode .s-choice { background: #fff; border-color: var(--s-border-strong); color: var(--s-ink); }
+  body.party-mode .s-choice:hover { background: #f8fafc; border-color: var(--s-primary); }
+  body.party-mode .s-choice.active { background: var(--s-primary); border-color: var(--s-primary); color: #fff; }
+  body.party-mode .s-text-input { background: #fff; border-color: var(--s-border-strong); color: var(--s-ink); }
+  body.party-mode .s-text-input::placeholder { color: var(--s-muted); }
+  body.party-mode .s-btn-prev { background: #e2e8f0; color: var(--s-ink-soft); }
+  body.party-mode .s-btn-prev:hover { background: #cbd5e1; }
+  body.party-mode .s-btn-next { background: var(--s-primary); }
+  body.party-mode .s-nps-labels { color: var(--s-muted); }
+  body.party-mode .s-streak { padding: 6px 10px; border-radius: 999px; background: rgba(17,165,81,.08); font-size: 11px; font-weight: 800; color: var(--s-primary); }
+  body.party-mode .s-affirm { color: var(--s-primary); }
+  body.party-mode .s-foot { color: var(--s-muted); }
 
-
+  .s-kicker{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(17,165,81,.08);color:var(--s-primary);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+  .s-party-wrap{display:grid;gap:14px}
+  .s-party-meta{display:grid;gap:10px}
+  .s-party-topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .s-stats{display:flex;gap:8px;flex-wrap:wrap}
+  .s-stat-pill{padding:7px 10px;border-radius:999px;background:#fff;color:var(--s-ink);font-size:11px;font-weight:700;border:1px solid var(--s-border);box-shadow:0 4px 12px rgba(15,23,42,.04)}
+  .s-party-copy{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px}
+  .s-party-copy small{color:var(--s-muted);font-size:11px;font-weight:700}
+  .s-party-energy{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+  .s-party-energy > span{display:block;height:100%;background:var(--s-primary);border-radius:999px;transition:width .28s ease}
+  .s-party-stage{position:relative;min-height:auto}
+  .s-swipe-card{position:relative;overflow:hidden;border-radius:24px;padding:20px 18px 18px;background:#ffffff;border:1px solid var(--s-border);box-shadow:0 16px 36px rgba(15,23,42,.08)}
+  .s-swipe-shadow{display:none}
+  .s-swipe-inner{position:relative;z-index:2;touch-action:pan-y;user-select:none;transition:transform .18s ease, opacity .18s ease;cursor:grab;padding:0;display:grid;gap:14px}
+  .s-swipe-inner.dragging{transition:none;cursor:grabbing}
+  .s-party-hero{display:grid;gap:10px}
+  .s-party-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(17,165,81,.08);color:var(--s-primary);font-size:20px;border:1px solid rgba(17,165,81,.16)}
+  .s-party-prompt{font-size:clamp(1.35rem,1.12rem + .6vw,1.75rem);line-height:1.18;font-weight:800;letter-spacing:-.02em;color:var(--s-ink);margin:0;max-width:none;text-wrap:balance}
+  .s-party-prompt.is-long{font-size:clamp(1.2rem,1.05rem + .45vw,1.45rem);line-height:1.28}
+  .s-party-help{font-size:14px;line-height:1.45;color:var(--s-ink-soft);margin:0;max-width:none}
+  .s-party-answer-wrap{display:grid;gap:12px;margin-top:2px}
+  .s-party-swipe-map{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .s-swipe-zone{display:grid;gap:4px;padding:10px 10px;border-radius:16px;background:#f8fafc;border:1px solid var(--s-border);text-align:center;min-height:68px;align-content:center;transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease}
+  .s-swipe-zone b{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--s-muted)}
+  .s-swipe-zone span{font-size:13px;font-weight:800;color:var(--s-ink);line-height:1.2}
+  .s-swipe-zone em{font-style:normal;font-size:11px;color:var(--s-muted)}
+  .s-swipe-zone.active{border-color:var(--s-primary);background:rgba(17,165,81,.08);box-shadow:0 10px 20px rgba(17,165,81,.10);transform:translateY(-1px)}
+  .s-swipe-zone.left.active{border-color:#dc2626;background:rgba(220,38,38,.08);box-shadow:0 10px 20px rgba(220,38,38,.10)}
+  .s-swipe-zone.down.active{border-color:#d97706;background:rgba(217,119,6,.08);box-shadow:0 10px 20px rgba(217,119,6,.10)}
+  .s-swipe-zone.right.active{border-color:var(--s-primary);background:rgba(17,165,81,.08)}
+  .s-party-live{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid var(--s-border)}
+  .s-party-live strong{font-size:12px;color:var(--s-muted);text-transform:uppercase;letter-spacing:.04em}
+  .s-party-live span{font-size:14px;font-weight:800;color:var(--s-ink)}
+  .s-swipe-hint{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;color:var(--s-muted);font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+  .s-swipe-pill{display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;padding:9px 10px;border-radius:999px;background:#fff;border:1px solid var(--s-border)}
+  .s-party-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+  .s-party-choice{appearance:none;border:1px solid var(--s-border-strong);background:#fff;color:var(--s-ink);padding:13px 12px;border-radius:16px;font-size:14px;font-weight:800;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 12px rgba(15,23,42,.04)}
+  .s-party-choice.is-pos{border-color:rgba(17,165,81,.22)}
+  .s-party-choice.is-neg{border-color:rgba(220,38,38,.18)}
+  .s-party-choice.active,.s-party-choice:active{transform:scale(.98)}
+  .s-cheer{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid var(--s-border);color:var(--s-ink);font-size:13px;font-weight:700}
+  .s-party-sparkles{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .s-party-sparkles[hidden]{display:none}
+  .s-party-grid-compact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:2px}
+  .s-party-grid-compact.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .s-party-grid-compact.cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .s-party-grid-compact.cols-11{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .s-party-grid-compact .s-party-choice{min-height:52px;padding:12px 10px;font-size:13px}
+  .s-party-grid-compact .s-party-choice.big{min-height:56px;font-size:17px}
+  .s-party-grid-compact .s-party-choice.score{font-variant-numeric:tabular-nums}
+  .s-party-tipline{font-size:12px;color:var(--s-muted);font-weight:700}
+  .s-party-multi-note{font-size:12px;color:var(--s-muted);margin-top:2px}
+  .s-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(17,165,81,.08);border:1px solid rgba(17,165,81,.12);font-size:11px;font-weight:800;color:var(--s-primary);text-transform:uppercase;letter-spacing:.03em}
+  .s-party-final{display:grid;gap:14px;text-align:center}
+  .s-party-final h2{margin:0;color:var(--s-ink);font-size:28px;letter-spacing:-.02em}
+  .s-party-final p{margin:0;color:var(--s-ink-soft);font-size:15px;line-height:1.55}
+  .s-party-mascot{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(24px) scale(.88);width:min(320px,88vw);padding:14px 16px;border-radius:22px;background:#ffffff;border:1px solid var(--s-border);box-shadow:0 18px 40px rgba(15,23,42,.14);display:flex;align-items:center;gap:12px;z-index:60;opacity:0;pointer-events:none}
+  .s-party-mascot.show{animation:s-mascot-pop 2s ease forwards}
+  .s-party-mascot-blob{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:rgba(17,165,81,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+  .s-party-mascot-blob span{font-size:30px;filter:none}
+  .s-party-mascot-copy strong{display:block;color:var(--s-ink);font-size:15px;line-height:1.2}
+  .s-party-mascot-copy p{margin:4px 0 0;color:var(--s-ink-soft);font-size:12px;line-height:1.4}
+  @keyframes s-mascot-pop{0%{opacity:0;transform:translateX(-50%) translateY(28px) scale(.86)}14%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.02)}72%{opacity:1;transform:translateX(-50%) translateY(-2px) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-14px) scale(.96)}}
+  @media (max-width:640px){
+    body.party-mode .s-wrap{padding:16px 12px 32px}
+    body.party-mode .s-top{min-height:58px;margin-bottom:12px}
+    body.party-mode .s-brand img{max-height:54px;max-width:160px}
+    .s-party-prompt{font-size:1.45rem}
+    .s-party-prompt.is-long{font-size:1.2rem}
+    .s-party-help{font-size:13px}
+    .s-swipe-card{padding:18px 14px 16px;border-radius:20px}
+    .s-party-swipe-map{grid-template-columns:1fr;gap:8px}
+    .s-swipe-zone{min-height:58px;padding:9px 10px}
+    .s-swipe-zone b{font-size:10px}
+    .s-swipe-zone span{font-size:13px}
+    .s-party-grid-compact.cols-5{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .s-party-grid-compact.cols-11{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .s-swipe-hint{grid-template-columns:1fr 1fr;font-size:10px}
+    .s-party-mascot{bottom:64px;padding:12px 14px;width:min(300px,90vw)}
+    .s-party-mascot-blob{width:52px;height:52px}
+    .s-party-mascot-blob span{font-size:28px}
+  }
   .s-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(17,165,81,.08);color:var(--s-primary);font-size:12px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;margin-bottom:14px}
   .s-party-wrap{display:grid;gap:16px}
   .s-party-hero{display:grid;gap:14px}
@@ -274,7 +355,7 @@ async function load() {
     state.survey = res.survey;
     state.questions = res.questions || [];
     applyBrandTheme();
-    state.mode = 'classic';
+    state.mode = (res.survey && res.survey.party_mode_default && canUsePartyMode()) ? 'party' : 'classic';
     applyModeClass();
     render();
   } catch(e) {
@@ -299,7 +380,7 @@ function applyBrandTheme() {
   var accent = normalizeHexColor(s && (s.brandaccentcolor || s.accent_colour || s.accentcolor || s.accentColor)) || fallbackSecondary;
   root.style.setProperty('--s-primary', primary);
   root.style.setProperty('--s-accent', accent);
-  root.style.setProperty('--s-bg', '#ffffff');
+  root.style.setProperty('--s-bg', accent);
   var style = document.getElementById('dynamic-brand-theme');
   if (!style) {
     style = document.createElement('style');
@@ -316,27 +397,16 @@ function applyBrandTheme() {
     '.s-text-input:focus{border-color:var(--s-primary)!important;box-shadow:0 0 0 3px rgba(17,165,81,.15)!important}',
     '.s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
     '.s-mode-btn:not(.active){color:var(--s-primary)!important}',
-    '.s-mode-toggle{border-color:var(--s-primary)!important}',
+    '.s-mode-toggle{border-color:color-mix(in srgb, var(--s-primary) 24%, white)!important}',
     '.s-foot a{background:none!important;color:var(--s-primary)!important;font-weight:600;text-decoration:none}',
-    'body.party-mode{background:#050505!important}',
-    'body.party-mode::before{content:"";position:fixed;left:0;right:0;top:0;height:124px;background:#fff;z-index:0;pointer-events:none}',
-    'body.party-mode::after{content:"";position:fixed;inset:0;background:radial-gradient(circle at 18% 24%, rgba(255,255,255,.22) 0 1px, transparent 2px),radial-gradient(circle at 72% 18%, rgba(255,255,255,.14) 0 1.5px, transparent 2.5px),radial-gradient(circle at 34% 62%, rgba(255,255,255,.16) 0 1px, transparent 2px),radial-gradient(circle at 82% 54%, rgba(255,255,255,.12) 0 1px, transparent 2px),radial-gradient(circle at 56% 78%, rgba(255,255,255,.18) 0 1px, transparent 2px),radial-gradient(circle at 50% 26%, rgba(255,255,255,.10) 0 220px, transparent 320px);background-size:180px 180px,220px 220px,200px 200px,240px 240px,260px 260px,100% 100%;mix-blend-mode:screen;opacity:.95;pointer-events:none;z-index:0}',
-    'body.party-mode .s-wrap{position:relative;z-index:1;background:linear-gradient(180deg,rgba(255,255,255,.98) 0,rgba(255,255,255,.98) 104px,transparent 160px)!important;min-height:100vh}',
-    'body.party-mode .s-brand-name{color:#0f172a!important}',
-    'body.party-mode .s-mode-toggle{background:rgba(255,255,255,.95)!important;border-color:var(--s-primary)!important;backdrop-filter:none!important}',
-    'body.party-mode .s-mode-btn{color:rgba(15,23,42,.72)!important}',
-    'body.party-mode .s-mode-btn.active{background:var(--s-primary)!important;color:#fff!important}',
-    'body.party-mode .s-progress{background:rgba(255,255,255,.18)!important}',
-    'body.party-mode .s-progress span{background:var(--s-primary)!important;background-image:none!important}',
-    'body.party-mode .s-progress-text{color:rgba(255,255,255,.88)!important}',
-    'body.party-mode .s-btn-next{background:var(--s-primary)!important;background-image:none!important;filter:none!important;opacity:1!important}',
-    'body.party-mode .s-card{background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.18)!important;backdrop-filter:blur(14px);box-shadow:0 24px 80px rgba(0,0,0,.35)!important}',
-    'body.party-mode .s-choice.active{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
-    'body.party-mode .s-party-choice.active{background:var(--s-primary)!important;border-color:var(--s-primary)!important;color:#fff!important}',
-    'body.party-mode .s-party-energy span{background:linear-gradient(90deg,#ffffff 0%, var(--s-primary) 35%, #d4af37 100%)!important}',
-    'body.party-mode .s-kicker{background:rgba(255,255,255,.12)!important;color:var(--s-primary)!important}',
-    'body.party-mode .s-swipe-card::before{background:radial-gradient(circle at 20% 18%, rgba(255,255,255,.12), transparent 22%),radial-gradient(circle at 80% 24%, rgba(212,175,55,.16), transparent 24%),radial-gradient(circle at 50% 100%, rgba(255,255,255,.06), transparent 26%)!important}',
-    'body.party-mode .s-party-mascot-blob{background:radial-gradient(circle at 30% 30%, #ffffff, #d4af37 38%, var(--s-primary) 68%, #050505 100%)!important}'
+    'body.party-mode{background:#f8fafc!important}',
+    'body.party-mode .s-wrap{background:#f8fafc!important;position:relative;z-index:1;min-height:100vh}',
+    'body.party-mode .s-card,body.party-mode .s-swipe-card{background:#ffffff!important;border-color:var(--s-border)!important;backdrop-filter:none!important;box-shadow:0 16px 36px rgba(15,23,42,.08)!important}',
+    'body.party-mode .s-progress{background:#e2e8f0!important}',
+    'body.party-mode .s-progress span,body.party-mode .s-choice.active,body.party-mode .s-party-choice.active{background:var(--s-primary)!important;background-image:none!important;border-color:var(--s-primary)!important;color:#fff!important}',
+    'body.party-mode .s-kicker{background:color-mix(in srgb, var(--s-primary) 10%, white)!important;color:var(--s-primary)!important}',
+    'body.party-mode .s-party-energy span{background:var(--s-primary)!important}',
+    'body.party-mode .s-party-icon,body.party-mode .s-party-mascot-blob{background:color-mix(in srgb, var(--s-primary) 10%, white)!important;color:var(--s-primary)!important}'
   ].join('');
 }
 
@@ -431,114 +501,226 @@ function renderQuestion() {
 }
 
 
+function getPartySwipeModel(q){
+  if (!q) return null;
+  if (q.qtype === 'nps010') {
+    return {
+      intro: 'Swipe by sentiment group. Tap a score only if you want to be more exact.',
+      left: { key:'left', title:'Detractor', hint:'0 to 6', value: 3 },
+      down: { key:'down', title:'Passive', hint:'7 or 8', value: 7 },
+      right:{ key:'right', title:'Promoter', hint:'9 or 10', value: 10 }
+    };
+  }
+  if (q.qtype === 'yesno') {
+    return {
+      intro: 'Swipe for a quick answer or tap the buttons below.',
+      left: { key:'left', title:'No', hint:'Not this time', value: 'No' },
+      down: null,
+      right:{ key:'right', title:'Yes', hint:'Absolutely', value: 'Yes' }
+    };
+  }
+  if (q.qtype === 'rating15' || q.qtype === 'starrating' || q.qtype === 'csatsmiley') {
+    return {
+      intro: 'Swipe low, middle, or high. Tap below for an exact rating.',
+      left: { key:'left', title:'Low', hint:'1 to 2', value: 1 },
+      down: { key:'down', title:'Middle', hint:'3', value: 3 },
+      right:{ key:'right', title:'High', hint:'4 to 5', value: 5 }
+    };
+  }
+  if (q.qtype === 'singleselect' || q.qtype === 'consent') {
+    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0,3);
+    if (!opts.length) return null;
+    return {
+      intro: 'Swipe toward the answer that fits best, or tap below.',
+      left: opts[0] ? { key:'left', title: String(opts[0]), hint:'Swipe left', value: String(opts[0]) } : null,
+      down: opts[1] ? { key:'down', title: String(opts[1]), hint:'Swipe down', value: String(opts[1]) } : null,
+      right: opts[2] ? { key:'right', title: String(opts[2]), hint:'Swipe right', value: String(opts[2]) } : (opts[1] ? { key:'right', title: String(opts[1]), hint:'Swipe right', value: String(opts[1]) } : null)
+    };
+  }
+  return null;
+}
+function renderPartySwipeMap(q){
+  var model = getPartySwipeModel(q);
+  if (!model) return '';
+  var dirs = [model.left, model.down, model.right].filter(Boolean);
+  return '<div class="s-party-swipe-map">' + dirs.map(function(item){
+    return '<div class="s-swipe-zone ' + item.key + '" data-swipe-zone="' + item.key + '"><b>' + (item.key === 'left' ? 'Swipe left' : item.key === 'down' ? 'Swipe down' : 'Swipe right') + '</b><span>' + esc(item.title) + '</span><em>' + esc(item.hint || '') + '</em></div>';
+  }).join('') + '</div>';
+}
+function partyLiveSelectionLabel(q){
+  var model = getPartySwipeModel(q);
+  if (!model) return 'Swipe or tap to answer';
+  return 'Move the card to preview your answer';
+}
+function setPartySwipePreview(direction){
+  var zones = document.querySelectorAll('[data-swipe-zone]');
+  zones.forEach(function(node){ node.classList.toggle('active', !!direction && node.getAttribute('data-swipe-zone') === direction); });
+  var live = document.getElementById('party-live-selection');
+  var q = state.questions[state.currentIdx];
+  var model = getPartySwipeModel(q);
+  if (!live) return;
+  if (!direction || !model) { live.textContent = partyLiveSelectionLabel(q); return; }
+  var entry = model[direction];
+  live.textContent = entry ? entry.title + (entry.hint ? ' · ' + entry.hint : '') : partyLiveSelectionLabel(q);
+}
+function resolvePartySwipeValue(q, direction){
+  var model = getPartySwipeModel(q);
+  if (!model || !model[direction]) return null;
+  return model[direction].value;
+}
+
 function renderPartyQuestion() {
   var q = state.questions[state.currentIdx];
   var total = state.questions.length;
   var pct = Math.round(((state.currentIdx) / total) * 100);
+  var swipeModel = getPartySwipeModel(q);
   var html = '<div class="s-shell">';
   html += renderBrandHeader();
   html += '<div class="s-party-wrap">';
-  html += '<div class="s-party-meta"><div class="s-kicker">'+partyIconForQuestion(q)+' Quick swipe question</div><div class="s-stats"><span class="s-stat-pill">Question '+(state.currentIdx + 1)+' / '+total+'</span>' + (state.streak ? '<span class="s-stat-pill">🔥 Streak '+state.streak+'</span>' : '<span class="s-stat-pill">🎮 Keep the streak going</span>') + '</div></div>';
-  html += '<div class="s-party-copy"><small>Party energy</small><small>'+partyEnergy(total)+'%</small></div><div class="s-party-energy"><span style="width:'+partyEnergy(total)+'%"></span></div>';
+  html += '<div class="s-party-meta">';
+  html += '<div class="s-party-topline"><div class="s-kicker">'+partyIconForQuestion(q)+' Quick swipe question</div><div class="s-stats"><span class="s-stat-pill">Question '+(state.currentIdx+1)+' / '+total+'</span>'+(state.streak ? '<span class="s-stat-pill">Streak '+state.streak+'</span>' : '<span class="s-stat-pill">Keep the streak going</span>')+'</div></div>';
+  html += '<div class="s-party-copy"><small>Progress</small><small>'+pct+'%</small></div><div class="s-party-energy"><span style="width:'+partyEnergy(total)+'%"></span></div>';
+  html += '</div>';
   html += '<div class="s-party-stage"><div class="s-swipe-card"><div class="s-swipe-deck"><div class="s-swipe-inner" id="party-swipe-card">';
-  var _partyLong = (q.prompt || '').length > 95;
-  html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt'+(_partyLong?' is-long':'')+'">'+esc(q.prompt)+'</h2>' + (q.help_text ? '<p class="s-party-help">'+esc(q.help_text)+'</p>' : '<p class="s-party-help">Go with your instinct. Quick answers keep the vibe alive.</p>') + '</div>';
+  var partyLong = q.prompt.length > 95;
+  html += '<div class="s-party-hero"><div class="s-party-icon">'+partyIconForQuestion(q)+'</div><h2 class="s-party-prompt'+(partyLong ? ' is-long':'')+'">'+esc(q.prompt)+'</h2>';
+  if (q.helptext) html += '<p class="s-party-help">'+esc(q.helptext)+'</p>';
+  if (swipeModel && swipeModel.intro) html += '<p class="s-party-help">'+esc(swipeModel.intro)+'</p>';
+  html += '</div>';
+  if (swipeModel) {
+    html += renderPartySwipeMap(q);
+    html += '<div class="s-party-live"><strong>Current swipe</strong><span id="party-live-selection">'+esc(partyLiveSelectionLabel(q))+'</span></div>';
+  }
   html += '<div id="q-answer">'+renderPartyInput(q, state.currentIdx)+'</div>';
-  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">⬅️ Lower</span><span class="s-swipe-pill">➡️ Higher</span><span class="s-swipe-pill">⬆️ Next</span><span class="s-swipe-pill">⬇️ Back</span></div>';
+  html += '<div class="s-swipe-hint"><span class="s-swipe-pill">Swipe to choose</span><span class="s-swipe-pill">Tap for exact answer</span></div>';
   html += '</div></div></div>';
-  html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Ready? Fast answers make this fun.')+'</div>';
+  html += '<div class="s-cheer" id="q-affirm">'+(state.streak ? partyCheer() : 'Fast, clear and mobile-first.')+'</div>';
   html += '<div class="s-error" id="q-error"></div>';
-  html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev"'+(state.currentIdx === 0 ? ' disabled' : '')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx === total - 1 ? 'Finish the run' : 'Next vibe')+'</button></div>';
-  html += '</div><div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🦝</span></div><div class="s-party-mascot-copy"><strong>Party creature unlocked</strong><p>You are flying. Keep the party going a little longer.</p></div></div><div class="s-foot">Powered by <a href="https://gonogo.co.za/business" target="_blank" rel="noopener noreferrer">GoNoGo</a></div></div>';
+  html += '<div class="s-nav"><button type="button" class="s-btn s-btn-prev" id="btn-prev" '+(state.currentIdx===0?'disabled':'')+'>Back</button><button type="button" class="s-btn s-btn-next" id="btn-next">'+(state.currentIdx===total-1?'Finish':'Next')+'</button></div>';
+  html += '</div>';
+  html += '<div id="party-mascot" class="s-party-mascot" aria-hidden="true"><div class="s-party-mascot-blob"><span>🐾</span></div><div class="s-party-mascot-copy"><strong>You are flying</strong><p>Quick answers, clear signals, better feedback.</p></div></div>';
+  html += '<div class="s-foot">Powered by GoNoGo</div></div>';
   document.getElementById('root').innerHTML = html;
   wirePartyQuestion(q, state.currentIdx);
   bindModeToggle();
+  setPartySwipePreview('');
   if (shouldShowPartyMascot()) setTimeout(showPartyMascot, 180);
   document.getElementById('btn-prev').onclick = function(){ if (state.currentIdx > 0) { state.currentIdx--; render(); } };
-  document.getElementById('btn-next').onclick = async function(){ if (!validateCurrent(q)) return; if (state.currentIdx === total - 1) { await submit(); return; } celebrateStep(); state.currentIdx++; render(); };
+  document.getElementById('btn-next').onclick = async function(){ if (!validateCurrent(q)) return; if (state.currentIdx === total - 1) return await submit(); celebrateStep(); state.currentIdx++; render(); };
 }
+
 function renderPartyInput(q, idx){
   var val = state.values[q.id];
-  if (q.qtype === 'yes_no') {
-    return '<div class="s-party-answer-wrap"><div class="s-party-choices"><button type="button" class="s-party-choice is-neg" data-party-val="No">👎 No</button><button type="button" class="s-party-choice is-pos" data-party-val="Yes">👍 Yes</button></div></div>';
+  if (q.qtype === 'yesno') {
+    return '<div class="s-party-answer-wrap"><div class="s-party-choices"><button type="button" class="s-party-choice is-neg" data-party-val="No">No</button><button type="button" class="s-party-choice is-pos" data-party-val="Yes">Yes</button></div></div>';
   }
-  if (q.qtype === 'single_select' || q.qtype === 'consent') {
-    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0, 4);
-    return '<div class="s-party-answer-wrap">'
-      + '<div class="s-party-grid-compact '+(opts.length >= 3 ? 'cols-3' : '')+'">'
-      + opts.map(function(o, i){ return '<button type="button" class="s-party-choice '+(i === 0 ? 'is-neg' : (i === opts.length - 1 ? 'is-pos' : ''))+'" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('')
-      + '</div>'
-      + ((q.options || []).length > 4 ? '<div class="s-party-sparkles"><span class="s-party-tipline">More options: tap in Classic mode for the full list.</span></div>' : '')
-      + '</div>';
+  if (q.qtype === 'singleselect' || q.qtype === 'consent') {
+    var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []).slice(0, 6);
+    return '<div class="s-party-answer-wrap"><div class="s-party-grid-compact '+(opts.length===3?'cols-3':'')+'">' + opts.map(function(o, i){ return '<button type="button" class="s-party-choice '+(i===0?'is-neg':(i===opts.length-1?'is-pos':''))+'" data-party-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div></div>';
   }
-  if (q.qtype === 'multi_select') {
+  if (q.qtype === 'multiselect') {
     var sel = Array.isArray(val) ? val : [];
-    return '<div class="s-party-answer-wrap"><div class="s-party-multi-note">Tap all that apply, then hit Next vibe.</div><div class="s-choice-grid">' + (q.options || []).map(function(o){ var on = sel.indexOf(o)!==-1; return '<button type="button" class="s-choice left-align'+(on?' active':'')+'" data-val="'+esc(o)+'">'+(on?'✅ ':'⬜ ')+esc(o)+'</button>'; }).join('') + '</div></div>';
+    return '<div class="s-party-answer-wrap"><div class="s-party-multi-note">Tap all that apply, then hit Next.</div><div class="s-choice-grid">' + (q.options || []).map(function(o){ var on = sel.indexOf(o)!==-1; return '<button type="button" class="s-choice left-align'+(on?' active':'')+'" data-val="'+esc(o)+'">'+esc(o)+'</button>'; }).join('') + '</div></div>';
   }
-  if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') {
-    var faces = q.qtype === 'csat_smiley' ? ['😠','😕','😐','🙂','😍'] : ['1','2','3','4','5'];
-    return '<div class="s-party-answer-wrap"><div class="s-party-grid-compact cols-5">' + faces.map(function(label, i){ var n=i+1; return '<button type="button" class="s-party-choice big '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div></div>';
+  if (q.qtype === 'rating15' || q.qtype === 'starrating' || q.qtype === 'csatsmiley') {
+    var faces = q.qtype === 'csatsmiley' ? ['😡','🙁','😐','🙂','🤩'] : [1,2,3,4,5];
+    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe low, middle or high, or tap an exact rating below.</div><div class="s-party-grid-compact cols-5">' + faces.map(function(label, i){ var n = i + 1; return '<button type="button" class="s-party-choice big '+(n>=4?'is-pos':(n<=2?'is-neg':''))+'" data-party-val="'+n+'">'+label+'</button>'; }).join('') + '</div></div>';
   }
-  if (q.qtype === 'nps_0_10') {
-    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe for a fast low/high score, or tap an exact score below.</div><div class="s-party-grid-compact cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-party-choice score'+(((state.values[q.id]&&state.values[q.id].value_number)===i)?' active':'')+'" data-party-val="'+i+'">'+i+'</button>'; }).join('') + '</div></div>';
+  if (q.qtype === 'nps010') {
+    return '<div class="s-party-answer-wrap"><div class="s-party-tipline">Swipe left for detractor, down for passive, right for promoter, or tap an exact score.</div><div class="s-party-grid-compact cols-11">' + Array.from({length:11}, function(_,i){ return '<button type="button" class="s-party-choice score" data-party-val="'+i+'">'+i+'</button>'; }).join('') + '</div></div>';
   }
   return '<div class="s-party-answer-wrap">'+renderInput(q, idx)+'</div>';
 }
+
 function wirePartyQuestion(q, idx){
   var card = document.getElementById('party-swipe-card');
   var startX = 0, startY = 0, currentX = 0, currentY = 0, dragging = false;
   function setTransform(x, y){
-    if(card){
-      card.style.transform = 'translate('+x+'px,'+y+'px) rotate('+(x/20)+'deg)';
-      card.style.opacity = String(Math.max(.72, 1 - (Math.max(Math.abs(x), Math.abs(y))/320)));
-    }
+    if(!card) return;
+    card.style.transform = 'translate('+x+'px,'+y+'px) rotate('+(x/22)+'deg)';
+    card.style.opacity = String(Math.max(.82, 1 - Math.max(Math.abs(x), Math.abs(y))/340));
+    var direction = '';
+    if (Math.abs(y) > Math.abs(x) && y > 40) direction = 'down';
+    else if (x > 40) direction = 'right';
+    else if (x < -40) direction = 'left';
+    setPartySwipePreview(direction);
   }
-  function advance(){ if (state.currentIdx === state.questions.length - 1) submit(); else { state.currentIdx++; render(); } }
-  function retreat(){ if (state.currentIdx > 0) { state.currentIdx--; render(); } }
+  function advance(){
+    if (state.currentIdx === state.questions.length - 1) submit();
+    else { state.currentIdx++; render(); }
+  }
   function commitQuick(value, positive){
     if (value == null) return;
-    if (typeof value === 'number') state.values[q.id] = { value_number:value }; else state.values[q.id] = { value_text:value };
+    if (typeof value === 'number') state.values[q.id] = { value_number: Number(value) };
+    else state.values[q.id] = { value_text: String(value) };
     haptic(positive ? 22 : 14);
     celebrateStep(!!positive);
     if (card) {
       card.style.transition = 'transform .18s ease, opacity .18s ease';
-      setTransform(positive ? 220 : -220, 0);
       setTimeout(advance, 170);
     } else advance();
   }
   function handleDirectionalSwipe(direction){
-    if (direction === 'up') { haptic(12); return advance(); }
-    if (direction === 'down') { haptic(10); return retreat(); }
-    var value = null;
-    if (q.qtype === 'yes_no') value = direction === 'right' ? 'Yes' : 'No';
-    else if (q.qtype === 'rating_1_5' || q.qtype === 'star_rating' || q.qtype === 'csat_smiley') value = direction === 'right' ? 5 : 2;
-    else if (q.qtype === 'nps_0_10') value = direction === 'right' ? 10 : 6;
-    else if (q.qtype === 'single_select' || q.qtype === 'consent') {
-      var opts = q.qtype === 'consent' ? ['I agree'] : (q.options || []);
-      value = direction === 'right' ? opts[Math.min(1, opts.length-1)] : opts[0];
+    var value = resolvePartySwipeValue(q, direction);
+    if (value == null) {
+      if (direction === 'down' && state.currentIdx > 0) { haptic(10); state.currentIdx--; return render(); }
+      return;
+    }
+    if (card) {
+      var x = direction === 'right' ? 180 : direction === 'left' ? -180 : 0;
+      var y = direction === 'down' ? 180 : 0;
+      card.style.transition = 'transform .18s ease, opacity .18s ease';
+      setTransform(x, y);
     }
     commitQuick(value, direction === 'right');
   }
   if (card) {
-    card.addEventListener('pointerdown', function(e){ dragging = true; startX = e.clientX; startY = e.clientY; currentX = 0; currentY = 0; card.classList.add('dragging'); });
-    window.addEventListener('pointermove', function(e){ if(!dragging) return; currentX = e.clientX - startX; currentY = e.clientY - startY; setTransform(currentX, currentY); });
+    card.addEventListener('pointerdown', function(e){
+      dragging = true; startX = e.clientX; startY = e.clientY; currentX = 0; currentY = 0; card.classList.add('dragging');
+    });
+    window.addEventListener('pointermove', function(e){
+      if (!dragging) return;
+      currentX = e.clientX - startX; currentY = e.clientY - startY;
+      setTransform(currentX, currentY);
+    });
     window.addEventListener('pointerup', function(){
-      if(!dragging) return;
-      dragging = false;
-      card.classList.remove('dragging');
+      if (!dragging) return;
+      dragging = false; card.classList.remove('dragging');
       var absX = Math.abs(currentX), absY = Math.abs(currentY);
-      if (absY > absX && currentY < -90) return handleDirectionalSwipe('up');
-      if (absY > absX && currentY > 90) return handleDirectionalSwipe('down');
-      if (currentX > 90) return handleDirectionalSwipe('right');
-      if (currentX < -90) return handleDirectionalSwipe('left');
+      if (absY > absX && currentY > 88) return handleDirectionalSwipe('down');
+      if (currentX > 88) return handleDirectionalSwipe('right');
+      if (currentX < -88) return handleDirectionalSwipe('left');
       card.style.transition = 'transform .18s ease, opacity .18s ease';
       setTransform(0,0);
-      setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } }, 180);
+      setTimeout(function(){ if(card){ card.style.transition=''; card.style.opacity=''; } setPartySwipePreview(''); }, 180);
     });
   }
-  document.querySelectorAll('[data-party-val]').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-party-val'); var n = parseInt(raw,10); if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(18); celebrateStep(true); advance(); }); });
-  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){ btn.addEventListener('click', function(){ var raw = btn.getAttribute('data-val'); if (q.qtype === 'multi_select') { var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : []; var i = curr.indexOf(raw); if (i === -1) curr.push(raw); else curr.splice(i, 1); state.values[q.id] = curr; haptic(10); rerenderPartyAnswer(q, idx); } else { var n = parseInt(raw,10); if (!isNaN(n) && String(n)===raw) state.values[q.id] = { value_number:n }; else state.values[q.id] = { value_text:raw }; haptic(16); celebrateStep(true); advance(); } }); });
+  document.querySelectorAll('[data-party-val]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var raw = btn.getAttribute('data-party-val');
+      var n = parseInt(raw, 10);
+      if (!isNaN(n) && String(n) === raw) state.values[q.id] = { value_number: n };
+      else state.values[q.id] = { value_text: raw };
+      haptic(16);
+      celebrateStep(true);
+      advance();
+    });
+  });
+  document.querySelectorAll('#q-answer .s-choice').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var raw = btn.getAttribute('data-val');
+      if (q.qtype === 'multiselect') {
+        var curr = Array.isArray(state.values[q.id]) ? state.values[q.id].slice() : [];
+        var i = curr.indexOf(raw);
+        if (i === -1) curr.push(raw); else curr.splice(i, 1);
+        state.values[q.id] = curr;
+        haptic(10);
+        rerenderPartyAnswer(q, idx);
+      }
+    });
+  });
 }
+
 function bindModeToggle() {
   document.querySelectorAll('[data-mode]').forEach(function(btn){
     btn.addEventListener('click', function(){
